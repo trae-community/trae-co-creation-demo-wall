@@ -16,47 +16,53 @@
 
 ## 技术栈
 
-- **前端框架**: React + Vite
+- **前端框架**: Next.js + React
 - **样式**: Tailwind CSS
-- **路由**: React Router DOM
+- **数据库**: Supabase (PostgreSQL)
+- **ORM**: Prisma
 - **表单**: React Hook Form + Zod
 - **图标**: Lucide React
 
-## 开发指南
+## 协作开发指南
 
-1. 安装依赖:
-   ```bash
-   npm install
-   ```
+### 1. 环境准备
 
-2. 启动开发服务器:
-   ```bash
-   npm run dev
-   ```
+1.  克隆仓库并安装依赖:
+    ```bash
+    npm install
+    ```
 
-3. 构建生产版本:
-   ```bash
-   npm run build
-   ```
+2.  配置环境变量:
+    *   复制 `.env.example` 文件为 `.env.local`。
+    *   填入您的 Supabase 项目凭证。
+    *   **注意**: `.env.local` 包含敏感信息，请勿提交到代码仓库。
 
-## 数据管理
+### 2. 数据库配置
 
-目前项目数据存储在 `src/data/projects.ts` 中。在实际部署中，可以通过将提交的 JSON 数据合并到此文件中来更新展示内容。
+本项目使用 Prisma 进行数据库管理。
+
+1.  **同步数据库结构**:
+    如果您是第一次拉取代码，或数据库结构有更新，请运行以下命令将 Schema 同步到您的 Supabase 数据库：
+    ```bash
+    npx prisma db push
+    ```
+
+2.  **生成客户端**:
+    每次修改 `prisma/schema.prisma` 后，都需要重新生成客户端代码：
+    ```bash
+    npx prisma generate
+    ```
+
+### 3. 启动开发服务器
+
+```bash
+npm run dev
+```
 
 ## 部署指南
 
 ### Vercel (推荐)
-本项目已预配置 `vercel.json`，可以直接部署：
-1. 安装 Vercel CLI: `npm i -g vercel`
-2. 登录并部署: `vercel`
-3. 生产环境部署: `vercel --prod`
-
-或者直接将代码推送到 GitHub，并在 Vercel 官网导入项目，Vercel 会自动识别 Vite 项目并进行部署。
-
-### Netlify
-本项目已预配置 `public/_redirects` 以支持 SPA 路由：
-1. 直接拖拽 `dist` 文件夹到 Netlify Drop。
-2. 或者连接 GitHub 仓库自动部署，Build command: `npm run build`, Publish directory: `dist`。
-
-### GitHub Pages
-若需部署到 GitHub Pages，请在 `vite.config.ts` 中设置 `base` 为你的仓库名（例如 `base: '/repo-name/'`），然后构建并发布 `dist` 目录。
+本项目已预配置，可以直接部署到 Vercel：
+1.  在 Vercel控制台导入项目。
+2.  在 Settings -> Environment Variables 中配置 `.env.example` 中列出的所有环境变量。
+3.  Vercel 会自动识别 Next.js 项目并进行构建部署。

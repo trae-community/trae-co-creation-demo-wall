@@ -1,0 +1,248 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// 1. 系统字典主表 (sys_dict)
+model SysDict {
+  id          BigInt   @id @default(autoincrement())
+  dictCode    String   @unique @map("dict_code") @db.VarChar(50)
+  dictName    String   @map("dict_name") @db.VarChar(50)
+  description String?  @db.VarChar(255)
+  isSystem    Boolean? @default(false) @map("is_system")
+
+  items SysDictItem[]
+
+  @@map("sys_dict")
+}
+
+// 2. 系统字典项表 (sys_dict_item)
+model SysDictItem {
+  id        BigInt   @id @default(autoincrement())
+  dictCode  String   @map("dict_code") @db.VarChar(50)
+  itemLabel String   @map("item_label") @db.VarChar(100)
+  itemValue String   @map("item_value") @db.VarChar(100)
+  sortOrder Int?     @default(0) @map("sort_order")
+  status    Boolean? @default(true)
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz
+
+  dict SysDict @relation(fields: [dictCode], references: [dictCode], onDelete: Cascade)
+
+  @@map("sys_dict_item")
+}
+
+// 3. 系统用户表 (sys_user)
+model SysUser {
+  id           BigInt   @id @default(autoincrement())
+  username     String   @db.VarChar(255)
+  email        String   @unique @db.VarChar(255)
+  phone        String?  @db.VarChar(50)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  avatarUrl    String?  @map("avatar_url") @db.VarChar(255)
+  bio          String?
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  roles       SysUserRole[]
+  works       WorkBase[]
+  grantedHonors WorkHonor[] @relation("GrantedBy")
+  auditedLogs WorkAuditLog[] @relation("Auditor")
+  likes       WorkLike[]
+
+  @@map("sys_user")
+}
+
+// 4. 系统角色表 (sys_role)
+model SysRole {
+  id          Int      @id @default(autoincrement())
+  roleCode    String   @unique @map("role_code") @db.VarChar(50)
+  roleName    String   @map("role_name") @db.VarChar(50)
+  description String?  @db.VarChar(255)
+
+  users SysUserRole[]
+
+  @@map("sys_role")
+}
+
+// 5. 用户角色关联表 (sys_user_role)
+model SysUserRole {
+  id     BigInt @id @default(autoincrement())
+  userId BigInt @map("user_id")
+  roleId Int    @map("role_id")
+
+  user SysUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role SysRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@map("sys_user_role")
+}
+
+// 6. 作品基础表 (work_base)
+model WorkBase {
+  id            BigInt   @id @default(autoincrement())
+  userId        BigInt   @map("user_id")
+  title         String   @db.VarChar(255)
+  summary       String?  @db.VarChar(255)
+  coverUrl      String?  @map("cover_url") @db.VarChar(255)
+  countryCode   String?  @map("country_code") @db.VarChar(100)
+  cityCode      String?  @map("city_code") @db.VarChar(100)
+  categoryCode  String?  @map("category_code") @db.VarChar(100)
+  devStatusCode String?  @map("dev_status_code") @db.VarChar(100)
+  createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  user      SysUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  detail    WorkDetail?
+  images    WorkImage[]
+  team      WorkTeam?
+  statistic WorkStatistic?
+  honors    WorkHonor[]
+  auditLogs WorkAuditLog[]
+  tags      WorkTagRelation[]
+  likes     WorkLike[]
+
+  @@index([userId])
+  @@index([countryCode])
+  @@index([cityCode])
+  @@index([categoryCode])
+  @@map("work_base")
+}
+
+// 7. 作品详情表 (work_detail)
+model WorkDetail {
+  workId     BigInt @id @map("work_id")
+  story      String?
+  highlights Json?
+  scenarios  Json?
+  demoUrl    String? @map("demo_url") @db.VarChar(255)
+  repoUrl    String? @map("repo_url") @db.VarChar(255)
+
+  work WorkBase @relation(fields: [workId], references: [id], onDelete: Cascade)
+
+  @@map("work_detail")
+}
+
+// 8. 作品图片表 (work_image)
+model WorkImage {
+  id        BigInt   @id @default(autoincrement())
+  workId    BigInt   @map("work_id")
+  imageUrl  String   @map("image_url") @db.VarChar(255)
+  imageType String?  @map("image_type") @db.VarChar(50)
+  sortOrder Int?     @default(0) @map("sort_order")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz
+
+  work WorkBase @relation(fields: [workId], references: [id], onDelete: Cascade)
+
+  @@index([workId])
+  @@map("work_image")
+}
+
+// 9. 团队信息表 (work_team)
+model WorkTeam {
+  id           BigInt  @id @default(autoincrement())
+  workId       BigInt  @unique @map("work_id")
+  teamIntro    String? @map("team_intro")
+  members      String?
+  contactPhone String? @map("contact_phone") @db.VarChar(50)
+  contactEmail String? @map("contact_email") @db.VarChar(255)
+
+  work WorkBase @relation(fields: [workId], references: [id], onDelete: Cascade)
+
+  @@index([workId])
+  @@map("work_team")
+}
+
+// 10. 作品状态与统计表 (work_statistic)
+model WorkStatistic {
+  workId        BigInt    @id @map("work_id")
+  auditStatus   Int?      @default(0) @map("audit_status")
+  displayStatus Int?      @default(0) @map("display_status")
+  viewCount     BigInt?   @default(0) @map("view_count")
+  likeCount     BigInt?   @default(0) @map("like_count")
+  lastAuditAt   DateTime? @map("last_audit_at") @db.Timestamptz
+
+  work WorkBase @relation(fields: [workId], references: [id], onDelete: Cascade)
+
+  @@map("work_statistic")
+}
+
+// 11. 作品荣誉/推荐表 (work_honor)
+model WorkHonor {
+  id        BigInt   @id @default(autoincrement())
+  workId    BigInt   @map("work_id")
+  honorCode String   @map("honor_code") @db.VarChar(50)
+  honorName String?  @map("honor_name") @db.VarChar(100)
+  grantedAt DateTime? @default(now()) @map("granted_at") @db.Timestamptz
+  grantedBy BigInt?  @map("granted_by")
+
+  work    WorkBase @relation(fields: [workId], references: [id], onDelete: Cascade)
+  granter SysUser? @relation("GrantedBy", fields: [grantedBy], references: [id])
+
+  @@index([workId])
+  @@map("work_honor")
+}
+
+// 12. 审核记录表 (work_audit_log)
+model WorkAuditLog {
+  id         BigInt   @id @default(autoincrement())
+  workId     BigInt   @map("work_id")
+  auditorId  BigInt?  @map("auditor_id")
+  prevStatus Int?     @map("prev_status")
+  newStatus  Int?     @map("new_status")
+  reason     String?  @db.VarChar(255)
+  createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz
+
+  work    WorkBase @relation(fields: [workId], references: [id], onDelete: Cascade)
+  auditor SysUser? @relation("Auditor", fields: [auditorId], references: [id])
+
+  @@index([workId])
+  @@map("work_audit_log")
+}
+
+// 13. 作品标签表 (work_tag)
+model WorkTag {
+  id             Int       @id @default(autoincrement())
+  name           String    @unique @db.VarChar(100)
+  isAutoAudit    Boolean?  @default(false) @map("is_auto_audit")
+  auditStartTime DateTime? @map("audit_start_time") @db.Timestamptz
+  auditEndTime   DateTime? @map("audit_end_time") @db.Timestamptz
+
+  works WorkTagRelation[]
+
+  @@map("work_tag")
+}
+
+// 14. 作品-标签关联表 (work_tag_relation)
+model WorkTagRelation {
+  workId BigInt @map("work_id")
+  tagId  Int    @map("tag_id")
+
+  work WorkBase @relation(fields: [workId], references: [id], onDelete: Cascade)
+  tag  WorkTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([workId, tagId])
+  @@map("work_tag_relation")
+}
+
+// 15. 作品点赞记录表 (work_like)
+model WorkLike {
+  id        BigInt   @id @default(autoincrement())
+  userId    BigInt   @map("user_id")
+  workId    BigInt   @map("work_id")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz
+
+  user SysUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  work WorkBase @relation(fields: [workId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workId])
+  @@index([workId])
+  @@index([userId])
+  @@map("work_like")
+}
