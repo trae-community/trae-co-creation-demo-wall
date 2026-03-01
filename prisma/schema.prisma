@@ -39,6 +39,8 @@ model SysDictItem {
   dictCode  String   @map("dict_code") @db.VarChar(50)
   /// 显示标签 (e.g., '中国', '实用工具', '社区推荐')
   itemLabel String   @map("item_label") @db.VarChar(100)
+  /// 语言标识 (e.g., zh-CN, en-US, ja-JP)
+  lang      String   @default("zh-CN") @db.VarChar(20)
   /// 存储值 (e.g., 'CN', 'tool', 'community_pick')
   itemValue String   @map("item_value") @db.VarChar(100)
   /// 排序权重
