@@ -2,11 +2,12 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "../lib/utils";
-import { PlusCircle, Home, LogIn, Languages, Check, Shield } from "lucide-react";
+import { PlusCircle, Home, LogIn, Languages, Check, Shield, LayoutDashboard } from "lucide-react";
 import { ParticlesBackground } from "./ParticlesBackground";
 import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
+import NextLink from 'next/link';
 
 const LOCALE_OPTIONS = [
   { code: 'zh', label: '中文', flag: '🇨🇳' },
@@ -57,7 +58,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans text-foreground relative z-0">
       <ParticlesBackground />
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-background/50 backdrop-blur-xl supports-[backdrop-filter]:bg-background/20">
+      <header className="sticky top-0 z-50 border-b border-white/5 bg-background/50 backdrop-blur-xl supports-[backdrop-filter]:bg-background/20">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 text-lg font-bold text-white tracking-tight group">
             <svg viewBox="0 0 100 70" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-auto shrink-0 shadow-[0_0_15px_rgba(34,197,94,0.5)] group-hover:shadow-[0_0_25px_rgba(34,197,94,0.8)] transition-all duration-300">
@@ -93,6 +94,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <PlusCircle className="w-3.5 h-3.5" />
               {t('submit')}
             </Link>
+
+            <NextLink
+              href="/console"
+              className={cn(
+                "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
+                pathname && pathname.startsWith("/console")
+                  ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
+                  : "text-gray-400 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              {t('console')}
+            </NextLink>
 
             <SignedOut>
               <Link
