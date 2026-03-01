@@ -4,9 +4,10 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "../lib/utils";
-import { PlusCircle, Home, LogIn, UserPlus, Languages } from "lucide-react";
+import { PlusCircle, Home, LogIn, Languages } from "lucide-react";
 import { ParticlesBackground } from "./ParticlesBackground";
 import { useLanguageStore } from "../store/useLanguageStore";
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -51,30 +52,28 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <PlusCircle className="w-3.5 h-3.5" />
               {language === 'zh' ? '提交' : 'Submit'}
             </Link>
-            <Link
-              href="/login"
-              className={cn(
-                "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
-                pathname === "/login"
-                  ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
-              )}
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              {language === 'zh' ? '登录' : 'Login'}
-            </Link>
-            <Link
-              href="/register"
-              className={cn(
-                "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
-                pathname === "/register"
-                  ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
-              )}
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              {language === 'zh' ? '注册' : 'Register'}
-            </Link>
+            
+            <SignedOut>
+              <Link
+                href="/sign-in"
+                className={cn(
+                  "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
+                  pathname === "/sign-in"
+                    ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                {language === 'zh' ? '登录 / 注册' : 'Login / Register'}
+              </Link>
+            </SignedOut>
+
+            <SignedIn>
+              <div className="flex items-center gap-2 px-4 py-1.5">
+                <UserButton />
+              </div>
+            </SignedIn>
+
             <button
               onClick={toggleLanguage}
               className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5"

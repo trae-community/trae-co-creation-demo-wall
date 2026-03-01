@@ -23,7 +23,7 @@ const submissionSchema = z.object({
 
 type SubmissionFormValues = z.infer<typeof submissionSchema>;
 
-export function SubmissionPage() {
+export function SubmissionPage({ user }: { user?: { id: string; email: string | null; username: string; avatarUrl: string | null } }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const {
@@ -38,7 +38,7 @@ export function SubmissionPage() {
       name: "",
       intro: "",
       city: "",
-      team: "",
+      team: user?.username || "",
       coverUrl: "",
       problem: "",
       solution: "",
