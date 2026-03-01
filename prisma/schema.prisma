@@ -120,6 +120,7 @@ model SysUserRole {
   user SysUser @relation(fields: [userId], references: [id], onDelete: Cascade)
   role SysRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, roleId])
   @@map("sys_user_role")
 }
 

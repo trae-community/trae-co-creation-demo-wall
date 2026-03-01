@@ -4,7 +4,8 @@
     "submit": "提交",
     "login": "登录 / 注册",
     "langSwitch": "EN",
-    "langLabel": "切换语言"
+    "langLabel": "切换语言",
+    "admin": "后台管理"
   },
   "Home": {
     "heroTitle": "Ship Faster with",
@@ -105,5 +106,18 @@
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
     "slogan": "展示每一个真实完成的作品"
+  },
+  "Admin": {
+    "title": "后台管理",
+    "subtitle": "管理和监控平台数据",
+    "userManagement": "用户管理",
+    "userManagementDesc": "管理用户账号、角色分配与权限设置",
+    "contentReview": "作品审核",
+    "contentReviewDesc": "审核提交的作品，管理展示内容",
+    "dataStats": "数据统计",
+    "dataStatsDesc": "查看平台访问量、用户活跃度等数据",
+    "systemSettings": "系统设置",
+    "systemSettingsDesc": "配置平台参数、维护系统设置",
+    "comingSoon": "功能开发中..."
   }
 }

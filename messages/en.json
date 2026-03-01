@@ -4,7 +4,8 @@
     "submit": "Submit",
     "login": "Login / Register",
     "langSwitch": "EN",
-    "langLabel": "Switch Language"
+    "langLabel": "Switch Language",
+    "admin": "Admin"
   },
   "Home": {
     "heroTitle": "Ship Faster with",
@@ -105,5 +106,18 @@
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
     "slogan": "Showcasing every real completed work"
+  },
+  "Admin": {
+    "title": "Admin Dashboard",
+    "subtitle": "Manage and monitor platform data",
+    "userManagement": "User Management",
+    "userManagementDesc": "Manage user accounts, role assignments and permissions",
+    "contentReview": "Content Review",
+    "contentReviewDesc": "Review submitted works and manage displayed content",
+    "dataStats": "Data Statistics",
+    "dataStatsDesc": "View platform traffic, user activity and analytics",
+    "systemSettings": "System Settings",
+    "systemSettingsDesc": "Configure platform parameters and system maintenance",
+    "comingSoon": "Coming soon..."
   }
 }

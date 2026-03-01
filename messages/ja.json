@@ -4,7 +4,8 @@
     "submit": "投稿",
     "login": "ログイン / 登録",
     "langSwitch": "EN",
-    "langLabel": "言語切替"
+    "langLabel": "言語切替",
+    "admin": "管理画面"
   },
   "Home": {
     "heroTitle": "Ship Faster with",
@@ -105,5 +106,18 @@
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
     "slogan": "すべてのリアルな完成作品を展示する"
+  },
+  "Admin": {
+    "title": "管理画面",
+    "subtitle": "プラットフォームデータの管理と監視",
+    "userManagement": "ユーザー管理",
+    "userManagementDesc": "ユーザーアカウント、ロール割当、権限の管理",
+    "contentReview": "作品審査",
+    "contentReviewDesc": "投稿された作品の審査と表示コンテンツの管理",
+    "dataStats": "データ統計",
+    "dataStatsDesc": "アクセス数、ユーザー活動などのデータ閲覧",
+    "systemSettings": "システム設定",
+    "systemSettingsDesc": "プラットフォームパラメータの設定とシステムメンテナンス",
+    "comingSoon": "開発中..."
   }
 }
