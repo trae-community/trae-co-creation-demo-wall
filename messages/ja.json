@@ -5,7 +5,8 @@
     "login": "ログイン / 登録",
     "langSwitch": "EN",
     "langLabel": "言語切替",
-    "admin": "管理画面"
+    "admin": "管理画面",
+    "console": "コンソール"
   },
   "Home": {
     "heroTitle": "Ship Faster with",

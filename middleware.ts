@@ -5,12 +5,13 @@ import { routing } from './src/i18n/routing';
 const handleI18nRouting = createMiddleware(routing);
 const isProtectedRoute = createRouteMatcher(['/:locale/submit(.*)', '/:locale/admin(.*)']);
 const isApiRoute = createRouteMatcher(['/api(.*)']);
+const isConsoleRoute = createRouteMatcher(['/console(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) await auth.protect();
 
-  // API 路由不做 i18n 处理，避免被加上 locale 前缀
-  if (isApiRoute(req)) return;
+  // API 路由和控制台路由不做 i18n 处理
+  if (isApiRoute(req) || isConsoleRoute(req)) return;
 
   return handleI18nRouting(req);
 });

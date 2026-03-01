@@ -5,7 +5,8 @@
     "login": "Login / Register",
     "langSwitch": "EN",
     "langLabel": "Switch Language",
-    "admin": "Admin"
+    "admin": "Admin",
+    "console": "Console"
   },
   "Home": {
     "heroTitle": "Ship Faster with",
