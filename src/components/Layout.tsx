@@ -95,7 +95,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               {t('submit')}
             </Link>
 
-            <NextLink
+            <Link
               href="/console"
               className={cn(
                 "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
@@ -106,7 +106,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             >
               <LayoutDashboard className="w-3.5 h-3.5" />
               {t('console')}
-            </NextLink>
+            </Link>
 
             <SignedOut>
               <Link
