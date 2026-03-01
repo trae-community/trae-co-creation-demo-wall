@@ -1,14 +1,17 @@
 'use client'
 
-import Link from "next/link";
 import { Project } from "../types";
 import { MapPin, Users, ArrowRight, TrendingUp, Award, Eye, ThumbsUp, Crown, Star } from "lucide-react";
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 interface ProjectCardProps {
   project: Project;
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
+  const t = useTranslations('Card');
+
   return (
     <Link
       href={`/project/${project.id}`}
@@ -27,25 +30,25 @@ export function ProjectCard({ project }: ProjectCardProps) {
           {project.isFeatured && (
             <div className="bg-gradient-to-r from-yellow-500 to-amber-600 text-white text-xs font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1">
               <Award className="w-3 h-3" />
-              城市精选
+              {t('cityPick')}
             </div>
           )}
           {project.isTrending && (
             <div className="bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1">
               <TrendingUp className="w-3 h-3" />
-              城市人气
+              {t('cityTrending')}
             </div>
           )}
           {project.isCitySelection && (
             <div className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-xs font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1">
               <Crown className="w-3 h-3" />
-              城市人气
+              {t('cityCurated')}
             </div>
           )}
           {project.isCommunityRecommended && (
             <div className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1">
               <Star className="w-3 h-3" />
-              社区推荐
+              {t('communityRecommended')}
             </div>
           )}
         </div>
@@ -70,7 +73,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <div className="flex flex-wrap gap-2 mb-4">
           {project.tags.map((tag) => {
             const isSpecial = ["已上线", "开源", "持续更新"].includes(tag);
-            if (!isSpecial && project.tags.indexOf(tag) > 2) return null; // Limit normal tags
+            if (!isSpecial && project.tags.indexOf(tag) > 2) return null;
 
             return (
               <span
@@ -105,7 +108,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
               {project.likes}
             </div>
             <span className="text-green-500 font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              查看详情 <ArrowRight className="w-3 h-3" />
+              {t('viewDetails')} <ArrowRight className="w-3 h-3" />
             </span>
           </div>
         </div>

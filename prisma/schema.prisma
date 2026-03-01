@@ -64,12 +64,18 @@ model SysUser {
   email        String   @unique @db.VarChar(255)
   /// 手机号 (选填)
   phone        String?  @db.VarChar(50)
-  /// 密码哈希
-  passwordHash String   @map("password_hash") @db.VarChar(255)
+  /// Clerk 用户ID
+  clerkId      String?  @unique @map("clerk_id") @db.VarChar(255)
+  /// 密码哈希 (Clerk 用户为空)
+  passwordHash String?  @map("password_hash") @db.VarChar(255)
   /// 头像链接
   avatarUrl    String?  @map("avatar_url") @db.VarChar(255)
   /// 个人简介
   bio          String?
+  /// 最后登录时间
+  lastSignInAt DateTime? @map("last_sign_in_at") @db.Timestamptz
+  /// 绑定的第三方身份 (JSON数组: [{provider, id, email}])
+  identities   Json?
   /// 创建时间
   createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz
   /// 更新时间
@@ -114,6 +120,7 @@ model SysUserRole {
   user SysUser @relation(fields: [userId], references: [id], onDelete: Cascade)
   role SysRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, roleId])
   @@map("sys_user_role")
 }
 

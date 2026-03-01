@@ -1,13 +1,15 @@
 'use client'
 
 import { useParams } from "next/navigation";
-import Link from "next/link";
 import { PROJECTS } from "../data/projects";
 import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp } from "lucide-react";
 import { Button } from "../components/Button";
 import { useState } from "react";
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 export function ProjectDetailPage() {
+  const t = useTranslations('Project');
   const params = useParams();
   const id = params?.id as string;
   const project = PROJECTS.find((p) => p.id === id);
@@ -26,16 +28,15 @@ export function ProjectDetailPage() {
   if (!project) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-white">项目未找到</h2>
+        <h2 className="text-2xl font-bold text-white">{t('notFound')}</h2>
         <Link href="/" className="text-primary hover:underline mt-4 block">
-          返回首页
+          {t('backHome')}
         </Link>
       </div>
     );
   }
 
   const handleShare = () => {
-    // TODO: Implement share card logic here
     console.log("Share card clicked");
   };
 
@@ -47,7 +48,7 @@ export function ProjectDetailPage() {
         className="inline-flex items-center text-gray-400 hover:text-primary transition-colors mb-4"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        返回列表
+        {t('backList')}
       </Link>
 
       {/* Header Section */}
@@ -66,7 +67,7 @@ export function ProjectDetailPage() {
                 </span>
                 {project.isFeatured && (
                   <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded">
-                    城市优选
+                    {t('cityFeatured')}
                   </span>
                 )}
               </div>
@@ -92,12 +93,12 @@ export function ProjectDetailPage() {
               <div className="flex flex-wrap gap-6 text-sm">
                 <div className="flex items-center gap-2 text-gray-400">
                   <Users className="w-4 h-4 text-gray-500" />
-                  <span className="font-medium">团队成员:</span>
+                  <span className="font-medium">{t('teamMembers')}</span>
                   <span className="text-gray-200">{project.team.join(", ")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-400">
                   <Calendar className="w-4 h-4 text-gray-500" />
-                  <span className="font-medium">提交时间:</span>
+                  <span className="font-medium">{t('submitTime')}</span>
                   <span className="text-gray-200">{new Date(project.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
@@ -113,7 +114,7 @@ export function ProjectDetailPage() {
                 }`}
               >
                 <ThumbsUp className={`w-4 h-4 ${liked ? "fill-current animate-bounce" : "group-hover:scale-110 transition-transform"}`} />
-                {liked ? "已点赞" : "为作品点赞"}
+                {liked ? t('liked') : t('likeProject')}
                 <span className={`ml-1.5 px-2 py-0.5 rounded-full text-xs font-mono ${liked ? "bg-white/20" : "bg-white/5 text-gray-400 group-hover:text-white"}`}>
                   {likesCount}
                 </span>
@@ -128,7 +129,7 @@ export function ProjectDetailPage() {
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary rounded-full"></span>
-              创作故事
+              {t('story')}
             </h2>
             <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed">
               {project.story}
@@ -138,7 +139,7 @@ export function ProjectDetailPage() {
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary/80 rounded-full"></span>
-              功能亮点
+              {t('features')}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {project.features.split('\n').map((feature, index) => (
@@ -155,7 +156,7 @@ export function ProjectDetailPage() {
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary/60 rounded-full"></span>
-              使用场景
+              {t('scenarios')}
             </h2>
             <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed">
               {project.scenarios}
@@ -165,7 +166,7 @@ export function ProjectDetailPage() {
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary/40 rounded-full"></span>
-              界面截图
+              {t('screenshots')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {project.screenshots.map((url, index) => (
@@ -182,7 +183,7 @@ export function ProjectDetailPage() {
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary/20 rounded-full"></span>
-              技术说明
+              {t('techStack')}
             </h2>
             <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed">
               {project.techStack}
@@ -195,7 +196,7 @@ export function ProjectDetailPage() {
             <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
               <Button className="w-full gap-2 font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40">
                 <ExternalLink className="w-4 h-4" />
-                体验 Demo
+                {t('tryDemo')}
               </Button>
             </a>
 
@@ -203,7 +204,7 @@ export function ProjectDetailPage() {
               <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
                 <Button variant="secondary" className="w-full gap-2 bg-white/10 hover:bg-white/20 border-white/5 text-white">
                   <Github className="w-4 h-4" />
-                  代码仓库
+                  {t('codeRepo')}
                 </Button>
               </a>
             )}
@@ -214,19 +215,19 @@ export function ProjectDetailPage() {
               className="w-full gap-2 border-white/10 hover:bg-white/5 hover:text-white hover:border-white/20 text-gray-400"
             >
               <Share2 className="w-4 h-4" />
-              分享卡片
+              {t('shareCard')}
             </Button>
           </div>
 
           <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
-            <h3 className="font-bold text-primary mb-2">关于作品</h3>
-            <p className="text-gray-400 text-sm mb-4">该作品由TRAE Friends@杭州线下活动提交。如果您对该项目感兴趣，可以通过代码仓库或Demo链接进一步了解。</p>
+            <h3 className="font-bold text-primary mb-2">{t('aboutProject')}</h3>
+            <p className="text-gray-400 text-sm mb-4">{t('aboutProjectDesc')}</p>
           </div>
 
           <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
             <h3 className="font-bold text-primary mb-4 flex items-center gap-2">
               <Users className="w-4 h-4" />
-              关于作者
+              {t('aboutAuthor')}
             </h3>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
@@ -237,10 +238,10 @@ export function ProjectDetailPage() {
 
               <div className="pt-4 border-t border-zinc-800">
                 <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                  <span>电话：13800000000</span>
+                  <span>{t('phone')}：13800000000</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-400">
-                  <span>邮箱：demo@example.com</span>
+                  <span>{t('email')}：demo@example.com</span>
                 </div>
               </div>
             </div>
