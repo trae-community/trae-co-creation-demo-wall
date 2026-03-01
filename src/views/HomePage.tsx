@@ -1,13 +1,15 @@
 'use client'
 
 import { useState } from "react";
-import Link from "next/link";
 import { PROJECTS } from "../data/projects";
 import { ProjectCard } from "../components/ProjectCard";
 import { CityFilter, FilterState } from "../components/CityFilter";
 import { Search, Clock, ThumbsUp, Eye } from "lucide-react";
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 export function HomePage() {
+  const t = useTranslations('Home');
   const [filters, setFilters] = useState<FilterState>({
     cities: [],
     categories: [],
@@ -46,12 +48,12 @@ export function HomePage() {
 
         <div className="relative z-10 max-w-3xl">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight leading-tight">
-            Ship Faster with <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#22c55e] to-gray-300">TRAE</span>
+            {t('heroTitle')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#22c55e] to-gray-300">TRAE</span>
           </h1>
 
           <div className="mb-10 max-w-xl">
             <p className="text-xl md:text-2xl font-light text-gray-300">
-              Built with <span className="font-bold text-white">TRAE</span>. Built by <span className="font-bold text-white">Friends</span>.
+              {t('heroSubtitle1')} <span className="font-bold text-white">{t('heroSubtitleTRAE')}</span>. {t('heroSubtitle2')} <span className="font-bold text-white">{t('heroSubtitleFriends')}</span>.
             </p>
           </div>
 
@@ -60,14 +62,14 @@ export function HomePage() {
               href="/submit"
               className="px-8 py-4 rounded-full font-bold bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-black hover:opacity-90 transition-all shadow-[0_0_20px_rgba(34,197,94,0.2)] hover:shadow-[0_0_30px_rgba(34,197,94,0.4)] flex items-center gap-2 group/btn"
             >
-              提交我的作品
+              {t('submitWork')}
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover/btn:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </Link>
             <a
               href="#projects"
               className="px-8 py-4 rounded-full font-bold bg-white/5 text-white border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md"
             >
-              浏览作品
+              {t('browseWork')}
             </a>
           </div>
         </div>
@@ -87,7 +89,7 @@ export function HomePage() {
             </div>
             <input
               type="text"
-              placeholder="搜索项目..."
+              placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="block w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-gray-200 placeholder:text-gray-500 focus:outline-none focus:bg-white/10 focus:ring-2 focus:ring-[#22C55E]/50 focus:border-[#22C55E]/50 text-sm transition-all duration-300 shadow-inner"
@@ -105,7 +107,7 @@ export function HomePage() {
               }`}
             >
               <Clock className="w-4 h-4" />
-              <span>最新</span>
+              <span>{t('sortNewest')}</span>
             </button>
             <button
               onClick={() => setSortBy('likes')}
@@ -116,7 +118,7 @@ export function HomePage() {
               }`}
             >
               <ThumbsUp className="w-4 h-4" />
-              <span>点赞</span>
+              <span>{t('sortLikes')}</span>
             </button>
             <button
               onClick={() => setSortBy('views')}
@@ -127,7 +129,7 @@ export function HomePage() {
               }`}
             >
               <Eye className="w-4 h-4" />
-              <span>热门</span>
+              <span>{t('sortViews')}</span>
             </button>
           </div>
         </div>
@@ -144,7 +146,7 @@ export function HomePage() {
         </div>
       ) : (
         <div className="text-center py-20 bg-white/5 rounded-xl border border-dashed border-white/10 backdrop-blur-sm">
-          <p className="text-gray-400 text-lg">没有找到符合条件的项目</p>
+          <p className="text-gray-400 text-lg">{t('noResults')}</p>
           <button
             onClick={() => {
               setFilters({
@@ -157,7 +159,7 @@ export function HomePage() {
             }}
             className="text-primary font-medium mt-2 hover:underline"
           >
-            清除筛选条件
+            {t('clearFilters')}
           </button>
         </div>
       )}

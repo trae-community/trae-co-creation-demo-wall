@@ -1,17 +1,46 @@
 'use client'
 
-import React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import React, { useState, useRef, useEffect } from "react";
 import { cn } from "../lib/utils";
-import { PlusCircle, Home, LogIn, Languages } from "lucide-react";
+import { PlusCircle, Home, LogIn, Languages, Check } from "lucide-react";
 import { ParticlesBackground } from "./ParticlesBackground";
-import { useLanguageStore } from "../store/useLanguageStore";
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { useTranslations, useLocale } from 'next-intl';
+import { Link, usePathname, useRouter } from '@/i18n/navigation';
+
+const LOCALE_OPTIONS = [
+  { code: 'zh', label: '中文', flag: '🇨🇳' },
+  { code: 'en', label: 'English', flag: '🇺🇸' },
+  { code: 'ja', label: '日本語', flag: '🇯🇵' },
+] as const;
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { language, toggleLanguage } = useLanguageStore();
+  const t = useTranslations('Nav');
+  const tFooter = useTranslations('Footer');
+  const locale = useLocale();
+  const router = useRouter();
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const langMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
+        setLangMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLanguageSwitch = (newLocale: string) => {
+    if (newLocale !== locale) {
+      router.replace(pathname, { locale: newLocale as 'zh' | 'en' | 'ja' });
+    }
+    setLangMenuOpen(false);
+  };
+
+  const currentOption = LOCALE_OPTIONS.find(o => o.code === locale) ?? LOCALE_OPTIONS[0];
 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans text-foreground relative z-0">
@@ -38,7 +67,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               )}
             >
               <Home className="w-3.5 h-3.5" />
-              {language === 'zh' ? '首页' : 'Home'}
+              {t('home')}
             </Link>
             <Link
               href="/submit"
@@ -50,9 +79,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
               )}
             >
               <PlusCircle className="w-3.5 h-3.5" />
-              {language === 'zh' ? '提交' : 'Submit'}
+              {t('submit')}
             </Link>
-            
+
             <SignedOut>
               <Link
                 href="/sign-in"
@@ -64,7 +93,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 )}
               >
                 <LogIn className="w-3.5 h-3.5" />
-                {language === 'zh' ? '登录 / 注册' : 'Login / Register'}
+                {t('login')}
               </Link>
             </SignedOut>
 
@@ -74,13 +103,37 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </div>
             </SignedIn>
 
-            <button
-              onClick={toggleLanguage}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5"
-            >
-              <Languages className="w-3.5 h-3.5" />
-              {language === 'zh' ? 'EN' : '中'}
-            </button>
+            <div className="relative" ref={langMenuRef}>
+              <button
+                onClick={() => setLangMenuOpen(!langMenuOpen)}
+                className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5"
+              >
+                <Languages className="w-3.5 h-3.5" />
+                {currentOption.label}
+              </button>
+              {langMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-40 bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden py-1 z-50">
+                  {LOCALE_OPTIONS.map((option) => (
+                    <button
+                      key={option.code}
+                      onClick={() => handleLanguageSwitch(option.code)}
+                      className={cn(
+                        "flex items-center justify-between w-full px-4 py-2.5 text-sm transition-colors",
+                        option.code === locale
+                          ? "text-green-500 bg-green-500/10"
+                          : "text-gray-300 hover:text-white hover:bg-white/5"
+                      )}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <span className="text-base">{option.flag}</span>
+                        {option.label}
+                      </span>
+                      {option.code === locale && <Check className="w-3.5 h-3.5" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
         </div>
       </header>
@@ -91,8 +144,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       <footer className="bg-card border-t border-border py-8 text-center text-gray-400 text-sm">
         <div className="container mx-auto px-4">
-          <p>© 2026 TRAE DEMO WALL. All rights reserved.</p>
-          <p className="mt-2">{language === 'zh' ? '展示每一个真实完成的作品' : 'Showcasing every real completed work'}</p>
+          <p>{tFooter('rights')}</p>
+          <p className="mt-2">{tFooter('slogan')}</p>
         </div>
       </footer>
     </div>

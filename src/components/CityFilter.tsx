@@ -2,6 +2,7 @@
 
 import { CATEGORIES, COUNTRIES, COUNTRY_CITY_MAP } from "../types";
 import { cn } from "../lib/utils";
+import { useTranslations } from 'next-intl';
 
 export interface FilterState {
   cities: string[];
@@ -16,6 +17,8 @@ interface CityFilterProps {
 }
 
 export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
+  const t = useTranslations('Filter');
+
   const toggleFilter = (type: keyof FilterState, value: string) => {
     const currentValues = filters[type];
     const newValues = currentValues.includes(value)
@@ -65,7 +68,7 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
               : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10 backdrop-blur-sm"
           )}
         >
-          全部
+          {t('all')}
         </button>
         {items.map((item) => (
           <button
@@ -91,9 +94,9 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
 
   return (
     <div className="flex flex-col gap-6 w-full">
-      {renderFilterSection("类型", CATEGORIES, "categories", filters.categories)}
-      {renderFilterSection("国家", COUNTRIES, "countries", filters.countries)}
-      {filters.countries.length > 0 && renderFilterSection("城市", availableCities, "cities", filters.cities)}
+      {renderFilterSection(t('type'), CATEGORIES, "categories", filters.categories)}
+      {renderFilterSection(t('country'), COUNTRIES, "countries", filters.countries)}
+      {filters.countries.length > 0 && renderFilterSection(t('city'), availableCities, "cities", filters.cities)}
     </div>
   );
 }

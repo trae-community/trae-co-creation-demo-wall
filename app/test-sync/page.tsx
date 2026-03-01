@@ -1,8 +1,8 @@
 import { getOrSyncUser } from '@/lib/auth';
 
 export default async function Page() {
-  let user = null;
-  let error = null;
+  let user: Awaited<ReturnType<typeof getOrSyncUser>> | null = null;
+  let error: string | null = null;
 
   try {
     user = await getOrSyncUser();
