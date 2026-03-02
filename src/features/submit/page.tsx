@@ -3,8 +3,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CITIES } from "../types";
-import { Button } from "../components/Button";
+import { CITIES } from "../../types";
+import { Button } from "../../components/Button";
 import { v4 as uuidv4 } from "uuid";
 import { AlertCircle, CheckCircle, UploadCloud, Link as LinkIcon, Users, MapPin, FileText, Image as ImageIcon } from "lucide-react";
 import { useState } from "react";

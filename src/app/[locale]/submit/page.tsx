@@ -1,4 +1,4 @@
-import { SubmissionPage } from '@/views/SubmissionPage'
+import { SubmissionPage } from '@/features/submit/page'
 import { getOrSyncUser } from '@/lib/auth'
 import { redirect } from '@/i18n/navigation'
 

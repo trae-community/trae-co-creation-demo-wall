@@ -1,9 +1,9 @@
 'use client'
 
 import { useParams } from "next/navigation";
-import { PROJECTS } from "../data/projects";
+import { PROJECTS } from "../../data/projects";
 import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp } from "lucide-react";
-import { Button } from "../components/Button";
+import { Button } from "../../components/Button";
 import { useState } from "react";
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
