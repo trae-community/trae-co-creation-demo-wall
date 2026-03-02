@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import { CRUD_QUERY_PARAMS, DICT_FILTERS, normalizeFilter } from '@/lib/crud';
 
 // GET: 获取字典列表（包含字典项）
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const code = searchParams.get('code');
+    const page = Number(searchParams.get(CRUD_QUERY_PARAMS.page) || '1');
+    const pageSize = Number(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10');
+    const query = searchParams.get(CRUD_QUERY_PARAMS.query) || '';
+    const filter = normalizeFilter(searchParams.get(CRUD_QUERY_PARAMS.filter), DICT_FILTERS, 'all');
 
     if (code) {
       const dict = await prisma.sysDict.findUnique({
@@ -19,21 +25,50 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(dict);
     }
 
-    const dicts = await prisma.sysDict.findMany({
-      include: {
-        items: {
-          orderBy: { sortOrder: 'asc' }
-        }
-      },
-      orderBy: { id: 'asc' }
-    });
+    const whereFilters: Prisma.SysDictWhereInput[] = [];
+    if (query.trim()) {
+      whereFilters.push({
+        OR: [
+          { dictName: { contains: query, mode: 'insensitive' } },
+          { dictCode: { contains: query, mode: 'insensitive' } },
+        ],
+      });
+    }
+    if (filter === 'system') {
+      whereFilters.push({ isSystem: true });
+    } else if (filter === 'custom') {
+      whereFilters.push({ isSystem: false });
+    }
 
-    // 转换 BigInt 为 String
+    const whereClause = whereFilters.length ? { AND: whereFilters } : undefined;
+    const skip = (Math.max(page, 1) - 1) * Math.max(pageSize, 1);
+    const take = Math.max(pageSize, 1);
+
+    const [total, dicts] = await Promise.all([
+      prisma.sysDict.count({ where: whereClause }),
+      prisma.sysDict.findMany({
+        where: whereClause,
+        include: {
+          items: {
+            orderBy: { sortOrder: 'asc' }
+          }
+        },
+        orderBy: { id: 'asc' },
+        skip,
+        take
+      })
+    ]);
+
     const serializedDicts = JSON.parse(JSON.stringify(dicts, (key, value) =>
       typeof value === 'bigint' ? value.toString() : value
     ));
 
-    return NextResponse.json(serializedDicts);
+    return NextResponse.json({
+      items: serializedDicts,
+      total,
+      page: Math.max(page, 1),
+      pageSize: Math.max(pageSize, 1)
+    });
   } catch (error) {
     console.error('[API] Failed to fetch dicts:', error);
     return NextResponse.json({ error: 'Failed to fetch dictionaries' }, { status: 500 });

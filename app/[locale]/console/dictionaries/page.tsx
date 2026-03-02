@@ -1,11 +1,16 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { Plus, Edit, Trash2, Search, Globe, ChevronDown, ChevronRight } from 'lucide-react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { Plus, Edit, Trash2, Globe, ChevronDown, ChevronRight } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 
+import { CrudFeedback } from '@/components/CrudFeedback'
+import { CrudFilterBar } from '@/components/CrudFilterBar'
+import { CrudPagination } from '@/components/CrudPagination'
+import { useFeedback } from '@/components/useFeedback'
+import { CRUD_QUERY_PARAMS, type DictFilter } from '@/lib/crud'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -66,10 +71,13 @@ const itemSchema = z.object({
 
 export default function DictionariesPage() {
   const [dicts, setDicts] = useState<Dict[]>([])
+  const [totalItems, setTotalItems] = useState(0)
   const [expandedDicts, setExpandedDicts] = useState<Set<string>>(new Set())
   const [searchTerm, setSearchTerm] = useState('')
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null)
-  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [filterMode, setFilterMode] = useState<DictFilter>('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 6
+  const { feedback, showFeedback } = useFeedback()
   
   // Dialog states
   const [isDictDialogOpen, setIsDictDialogOpen] = useState(false)
@@ -105,18 +113,19 @@ export default function DictionariesPage() {
     }
   })
 
-  const showFeedback = (type: 'success' | 'error' | 'info', message: string) => {
-    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current)
-    setFeedback({ type, message })
-    feedbackTimerRef.current = setTimeout(() => setFeedback(null), 2500)
-  }
-
-  const fetchDicts = async () => {
+  const fetchDicts = useCallback(async () => {
     try {
-      const res = await fetch('/api/dictionaries')
+      const params = new URLSearchParams({
+        [CRUD_QUERY_PARAMS.page]: String(currentPage),
+        [CRUD_QUERY_PARAMS.pageSize]: String(pageSize),
+        [CRUD_QUERY_PARAMS.query]: searchTerm,
+        [CRUD_QUERY_PARAMS.filter]: filterMode
+      })
+      const res = await fetch(`/api/dictionaries?${params.toString()}`)
       if (res.ok) {
         const data = await res.json()
-        setDicts(data)
+        setDicts(data.items || [])
+        setTotalItems(data.total || 0)
       } else {
         showFeedback('error', '字典加载失败')
       }
@@ -124,17 +133,11 @@ export default function DictionariesPage() {
       console.error('Failed to fetch dicts:', error)
       showFeedback('error', '字典加载失败')
     }
-  }
+  }, [currentPage, pageSize, searchTerm, filterMode, showFeedback])
 
   useEffect(() => {
     fetchDicts()
-  }, [])
-
-  useEffect(() => {
-    return () => {
-      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current)
-    }
-  }, [])
+  }, [fetchDicts])
 
   // Toggle dictionary expansion
   const toggleExpand = (dictCode: string) => {
@@ -313,32 +316,22 @@ export default function DictionariesPage() {
     setIsItemDialogOpen(true)
   }
 
-  // Filter dicts
-  const filteredDicts = dicts.filter(dict => 
-    dict.dictName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    dict.dictCode.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredDicts = useMemo(() => dicts, [dicts])
+
+  useEffect(() => {
+    setCurrentPage(1)
+    setExpandedDicts(new Set())
+  }, [searchTerm, filterMode])
+
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
+  const current = Math.min(currentPage, totalPages)
+  const startIndex = (current - 1) * pageSize
+  const endIndex = Math.min(startIndex + pageSize, totalItems)
+  const pagedDicts = filteredDicts
 
   return (
     <div className="space-y-6">
-      {feedback && (
-        <Card className="border-border bg-card/60 px-4 py-3">
-          <div className="flex items-center gap-3">
-            <Badge
-              className={
-                feedback.type === 'success'
-                  ? 'bg-green-500/10 text-green-500 border border-green-500/20'
-                  : feedback.type === 'error'
-                    ? 'bg-red-500/10 text-red-500 border border-red-500/20'
-                    : 'bg-secondary text-secondary-foreground border border-border'
-              }
-            >
-              {feedback.type === 'success' ? '成功' : feedback.type === 'error' ? '失败' : '提示'}
-            </Badge>
-            <span className="text-sm text-muted-foreground">{feedback.message}</span>
-          </div>
-        </Card>
-      )}
+      <CrudFeedback feedback={feedback} />
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">字典管理</h2>
@@ -350,20 +343,23 @@ export default function DictionariesPage() {
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-        <Input 
-          placeholder="搜索字典名称、编码..." 
-          className="pl-10 bg-card border-border"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+      <CrudFilterBar
+        searchPlaceholder="搜索字典名称、编码..."
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        filterValue={filterMode}
+        filterOptions={[
+          { value: 'all', label: '全部字典' },
+          { value: 'system', label: '系统预设' },
+          { value: 'custom', label: '自定义' },
+        ]}
+        onFilterChange={(val) => setFilterMode(val as DictFilter)}
+        filterPlaceholder="筛选字典"
+      />
 
       {/* Dictionary List */}
       <div className="space-y-4">
-        {filteredDicts.map((dict) => (
+        {pagedDicts.map((dict) => (
           <Card key={dict.id} className="overflow-hidden border-border bg-card/50">
             {/* Dict Header */}
             <div 
@@ -455,7 +451,22 @@ export default function DictionariesPage() {
             )}
           </Card>
         ))}
+        {pagedDicts.length === 0 && (
+          <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
+            暂无字典数据
+          </div>
+        )}
       </div>
+
+      <CrudPagination
+        totalItems={totalItems}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        current={current}
+        totalPages={totalPages}
+        onPrev={() => setCurrentPage(current - 1)}
+        onNext={() => setCurrentPage(current + 1)}
+      />
 
       {/* Dict Dialog */}
       <Dialog open={isDictDialogOpen} onOpenChange={setIsDictDialogOpen}>

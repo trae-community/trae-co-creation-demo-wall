@@ -1,12 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+import { CRUD_QUERY_PARAMS, TAG_FILTERS, normalizeFilter } from '@/lib/crud'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const tags = await prisma.workTag.findMany({
-      orderBy: { id: 'asc' }
+    const { searchParams } = new URL(req.url)
+    const page = Number(searchParams.get(CRUD_QUERY_PARAMS.page) || '1')
+    const pageSize = Number(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10')
+    const query = searchParams.get(CRUD_QUERY_PARAMS.query) || ''
+    const filter = normalizeFilter(searchParams.get(CRUD_QUERY_PARAMS.filter), TAG_FILTERS, 'all')
+
+    const whereFilters: Prisma.WorkTagWhereInput[] = []
+    if (query.trim()) {
+      whereFilters.push({ name: { contains: query, mode: 'insensitive' } })
+    }
+    if (filter === 'auto') {
+      whereFilters.push({ isAutoAudit: true })
+    } else if (filter === 'manual') {
+      whereFilters.push({ isAutoAudit: false })
+    }
+
+    const whereClause = whereFilters.length ? { AND: whereFilters } : undefined
+    const skip = (Math.max(page, 1) - 1) * Math.max(pageSize, 1)
+    const take = Math.max(pageSize, 1)
+
+    const [total, items] = await Promise.all([
+      prisma.workTag.count({ where: whereClause }),
+      prisma.workTag.findMany({
+        where: whereClause,
+        orderBy: { id: 'asc' },
+        skip,
+        take
+      })
+    ])
+
+    return NextResponse.json({
+      items,
+      total,
+      page: Math.max(page, 1),
+      pageSize: Math.max(pageSize, 1)
     })
-    return NextResponse.json(tags)
   } catch (error) {
     console.error('[API] Failed to fetch tags:', error)
     return NextResponse.json({ error: 'Failed to fetch tags' }, { status: 500 })

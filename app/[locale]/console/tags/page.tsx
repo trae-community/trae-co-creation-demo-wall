@@ -1,11 +1,16 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Plus, Edit, Trash2, Search, Tag } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Plus, Edit, Trash2, Tag } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 
+import { CrudFeedback } from '@/components/CrudFeedback'
+import { CrudFilterBar } from '@/components/CrudFilterBar'
+import { CrudPagination } from '@/components/CrudPagination'
+import { useFeedback } from '@/components/useFeedback'
+import { CRUD_QUERY_PARAMS, type TagFilter } from '@/lib/crud'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -43,13 +48,16 @@ const tagSchema = z.object({
 
 export default function TagsPage() {
   const [tags, setTags] = useState<WorkTag[]>([])
+  const [totalItems, setTotalItems] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
+  const [filterMode, setFilterMode] = useState<TagFilter>('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 8
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingTag, setEditingTag] = useState<WorkTag | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [deletingTagId, setDeletingTagId] = useState<number | null>(null)
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null)
-  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const { feedback, showFeedback } = useFeedback()
 
   const tagForm = useForm<z.infer<typeof tagSchema>>({
     resolver: zodResolver(tagSchema),
@@ -61,18 +69,19 @@ export default function TagsPage() {
     }
   })
 
-  const showFeedback = useCallback((type: 'success' | 'error' | 'info', message: string) => {
-    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current)
-    setFeedback({ type, message })
-    feedbackTimerRef.current = setTimeout(() => setFeedback(null), 2500)
-  }, [])
-
   const fetchTags = useCallback(async () => {
     try {
-      const res = await fetch('/api/tags')
+      const params = new URLSearchParams({
+        [CRUD_QUERY_PARAMS.page]: String(currentPage),
+        [CRUD_QUERY_PARAMS.pageSize]: String(pageSize),
+        [CRUD_QUERY_PARAMS.query]: searchTerm,
+        [CRUD_QUERY_PARAMS.filter]: filterMode
+      })
+      const res = await fetch(`/api/tags?${params.toString()}`)
       if (res.ok) {
         const data = await res.json()
-        setTags(data)
+        setTags(data.items || [])
+        setTotalItems(data.total || 0)
       } else {
         showFeedback('error', '标签加载失败')
       }
@@ -80,17 +89,11 @@ export default function TagsPage() {
       console.error('Failed to fetch tags:', error)
       showFeedback('error', '标签加载失败')
     }
-  }, [showFeedback])
+  }, [currentPage, pageSize, searchTerm, filterMode, showFeedback])
 
   useEffect(() => {
     fetchTags()
   }, [fetchTags])
-
-  useEffect(() => {
-    return () => {
-      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current)
-    }
-  }, [])
 
   const formatDateValue = (value: string | null) => {
     if (!value) return ''
@@ -104,11 +107,17 @@ export default function TagsPage() {
     return `${yyyy}-${mm}-${dd}T${hh}:${min}`
   }
 
-  const filteredTags = useMemo(() => {
-    const keyword = searchTerm.trim().toLowerCase()
-    if (!keyword) return tags
-    return tags.filter(tag => tag.name.toLowerCase().includes(keyword))
-  }, [tags, searchTerm])
+  const filteredTags = useMemo(() => tags, [tags])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, filterMode])
+
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
+  const current = Math.min(currentPage, totalPages)
+  const startIndex = (current - 1) * pageSize
+  const endIndex = Math.min(startIndex + pageSize, totalItems)
+  const pagedTags = filteredTags
 
   const openCreateDialog = () => {
     setEditingTag(null)
@@ -185,24 +194,7 @@ export default function TagsPage() {
 
   return (
     <div className="space-y-6">
-      {feedback && (
-        <Card className="border-border bg-card/60 px-4 py-3">
-          <div className="flex items-center gap-3">
-            <Badge
-              className={
-                feedback.type === 'success'
-                  ? 'bg-green-500/10 text-green-500 border border-green-500/20'
-                  : feedback.type === 'error'
-                    ? 'bg-red-500/10 text-red-500 border border-red-500/20'
-                    : 'bg-secondary text-secondary-foreground border border-border'
-              }
-            >
-              {feedback.type === 'success' ? '成功' : feedback.type === 'error' ? '失败' : '提示'}
-            </Badge>
-            <span className="text-sm text-muted-foreground">{feedback.message}</span>
-          </div>
-        </Card>
-      )}
+      <CrudFeedback feedback={feedback} />
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">标签管理</h2>
@@ -214,18 +206,22 @@ export default function TagsPage() {
         </Button>
       </div>
 
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-        <Input
-          placeholder="搜索标签名称..."
-          className="pl-10 bg-card border-border"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+      <CrudFilterBar
+        searchPlaceholder="搜索标签名称..."
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        filterValue={filterMode}
+        filterOptions={[
+          { value: 'all', label: '全部标签' },
+          { value: 'auto', label: '自动过审' },
+          { value: 'manual', label: '手动审核' },
+        ]}
+        onFilterChange={(val) => setFilterMode(val as TagFilter)}
+        filterPlaceholder="筛选标签"
+      />
 
       <div className="space-y-4">
-        {filteredTags.map(tag => (
+        {pagedTags.map(tag => (
           <Card key={tag.id} className="overflow-hidden border-border bg-card/50">
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -271,12 +267,22 @@ export default function TagsPage() {
             </div>
           </Card>
         ))}
-        {filteredTags.length === 0 && (
+        {pagedTags.length === 0 && (
           <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
             暂无标签，点击右上角添加
           </div>
         )}
       </div>
+
+      <CrudPagination
+        totalItems={totalItems}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        current={current}
+        totalPages={totalPages}
+        onPrev={() => setCurrentPage(current - 1)}
+        onNext={() => setCurrentPage(current + 1)}
+      />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="bg-card border border-border text-foreground">
