@@ -7,6 +7,7 @@ import {
   FolderKanban, 
   BookOpen, 
   Building2, 
+  Tags,
   Menu, 
   X
 } from 'lucide-react'
@@ -24,6 +25,7 @@ export default function ConsoleLayout({
     { name: '概览', href: '/console', icon: LayoutDashboard },
     { name: '作品管理', href: '/console/projects', icon: FolderKanban },
     { name: '字典管理', href: '/console/dictionaries', icon: BookOpen },
+    { name: '标签管理', href: '/console/tags', icon: Tags },
     { name: '城市管理', href: '/console/cities', icon: Building2 },
   ]
 
