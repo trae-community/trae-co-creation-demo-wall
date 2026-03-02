@@ -77,6 +77,8 @@
     "submitTime": "Submitted:",
     "liked": "Liked",
     "likeProject": "Like this project",
+    "loginToLike": "Please sign in to like",
+    "likeFailed": "Like failed, please try again",
     "story": "Creation Story",
     "features": "Key Features",
     "scenarios": "Use Cases",

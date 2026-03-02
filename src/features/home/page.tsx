@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PROJECTS } from "../../data/projects";
 import { ProjectCard } from "../../components/ProjectCard";
 import { CityFilter, FilterState } from "../../components/CityFilter";
 import { Search, Clock, ThumbsUp, Eye } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import type { Project } from "../../types";
 
 export function HomePage() {
   const t = useTranslations('Home');
@@ -18,8 +19,29 @@ export function HomePage() {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<'time' | 'likes' | 'views'>('time');
+  const [statsMap, setStatsMap] = useState<Record<string, { viewCount: number; likeCount: number }>>({});
 
-  const filteredProjects = PROJECTS.filter((project) => {
+  useEffect(() => {
+    const ids = PROJECTS.map((p) => p.id).join(",");
+    if (!ids) return;
+    const url = typeof window !== "undefined"
+      ? `${window.location.origin}/api/works/stats?ids=${encodeURIComponent(ids)}`
+      : `/api/works/stats?ids=${ids}`;
+    fetch(url)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && typeof data === "object") setStatsMap(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const mergeStats = (p: Project): Project => {
+    const s = statsMap[p.id];
+    if (!s) return p;
+    return { ...p, views: s.viewCount, likes: s.likeCount };
+  };
+
+  const filteredProjects = PROJECTS.map(mergeStats).filter((project) => {
     const matchCity = filters.cities.length === 0 || filters.cities.includes(project.city);
     const matchCategory = filters.categories.length === 0 || filters.categories.includes(project.category);
     const matchCountry = filters.countries.length === 0 || filters.countries.includes(project.country);

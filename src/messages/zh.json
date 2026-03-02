@@ -77,6 +77,8 @@
     "submitTime": "提交时间:",
     "liked": "已点赞",
     "likeProject": "为作品点赞",
+    "loginToLike": "请先登录后再点赞",
+    "likeFailed": "点赞失败，请稍后重试",
     "story": "创作故事",
     "features": "功能亮点",
     "scenarios": "使用场景",

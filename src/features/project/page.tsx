@@ -4,25 +4,84 @@ import { useParams } from "next/navigation";
 import { PROJECTS } from "../../data/projects";
 import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp } from "lucide-react";
 import { Button } from "../../components/Button";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
+
+function getApiBase() {
+  if (typeof window !== "undefined") return window.location.origin;
+  return "";
+}
+
+async function fetchStats(workId: string) {
+  const base = getApiBase();
+  const res = await fetch(`${base}/api/works/${workId}/stats`);
+  if (!res.ok) return null;
+  return res.json() as Promise<{ viewCount: number; likeCount: number; liked: boolean }>;
+}
 
 export function ProjectDetailPage() {
   const t = useTranslations('Project');
   const params = useParams();
   const id = params?.id as string;
   const project = PROJECTS.find((p) => p.id === id);
+  // 仅用接口数据，不用 mock：初始为 0，等 /api/works/[id]/stats 返回后再更新
+  const router = useRouter();
   const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(project?.likes || 0);
+  const [likesCount, setLikesCount] = useState(0);
+  const [likeError, setLikeError] = useState<string | null>(null);
+  const viewRecordedRef = useRef<Set<string>>(new Set());
 
-  const handleLike = () => {
-    if (liked) {
-      setLikesCount(prev => prev - 1);
-    } else {
-      setLikesCount(prev => prev + 1);
+  useEffect(() => {
+    if (!id || !project) return;
+    const workId = id;
+    if (viewRecordedRef.current.has(workId)) {
+      fetchStats(workId).then((stats) => {
+        if (stats) {
+          setLikesCount(stats.likeCount);
+          setLiked(stats.liked);
+        }
+      });
+      return;
     }
-    setLiked(!liked);
+    viewRecordedRef.current.add(workId);
+    (async () => {
+      try {
+        await fetch(`${getApiBase()}/api/works/${workId}/view`, { method: 'POST' });
+      } catch {
+        viewRecordedRef.current.delete(workId);
+      }
+      const stats = await fetchStats(workId);
+      if (stats) {
+        setLikesCount(stats.likeCount);
+        setLiked(stats.liked);
+      }
+    })();
+  }, [id, project]);
+
+  const handleLike = async () => {
+    setLikeError(null);
+    try {
+      const res = await fetch(`${getApiBase()}/api/works/${id}/like`, { method: 'POST' });
+      if (res.status === 401) {
+        setLikeError(t('loginToLike'));
+        router.push('/sign-in');
+        return;
+      }
+      const data = await res.json();
+      if (data.liked !== undefined) {
+        setLiked(data.liked);
+        setLikesCount(prev => (data.liked ? prev + 1 : Math.max(0, prev - 1)));
+      } else {
+        const stats = await fetchStats(id);
+        if (stats) {
+          setLiked(stats.liked);
+          setLikesCount(stats.likeCount);
+        }
+      }
+    } catch {
+      setLikeError(t('likeFailed'));
+    }
   };
 
   if (!project) {
@@ -119,6 +178,9 @@ export function ProjectDetailPage() {
                   {likesCount}
                 </span>
               </Button>
+              {likeError && (
+                <p className="text-sm text-amber-400 mt-2">{likeError}</p>
+              )}
             </div>
           </div>
       </div>

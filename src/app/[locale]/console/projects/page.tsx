@@ -1,6 +1,6 @@
 'use client'
 
-import { Search, Plus, Filter, MoreHorizontal, Edit, Trash, Eye, Calendar, User } from 'lucide-react'
+import { Search, Plus, Filter, Edit, Trash, Eye, Calendar, User } from 'lucide-react'
 
 export default function ProjectsPage() {
   const projects = [

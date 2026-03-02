@@ -90,3 +90,11 @@
 4.  **国际化**：
     *   所有用户可见文本必须使用 `next-intl` 进行国际化处理。
     *   翻译键值对存放在 `src/messages/` 下的 JSON 文件中。
+
+## E2E 测试
+
+项目使用 **Playwright** 进行端到端测试，用例位于 `e2e/` 目录。
+
+*   **运行测试**：`npm run test:e2e`（需先启动开发服务 `npm run dev`，或由 Playwright 复用已有服务）。
+*   **UI 模式**：`npm run test:e2e:ui` 可打开 Playwright 界面调试。
+*   **覆盖范围**：首页展示与导航、作品详情页、浏览量/点赞展示、未登录点赞跳转登录等。

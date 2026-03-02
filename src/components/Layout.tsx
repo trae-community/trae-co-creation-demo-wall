@@ -7,7 +7,6 @@ import { ParticlesBackground } from "./ParticlesBackground";
 import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
-import NextLink from 'next/link';
 
 const LOCALE_OPTIONS = [
   { code: 'zh', label: '中文', flag: '🇨🇳' },

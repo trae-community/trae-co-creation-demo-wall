@@ -77,6 +77,8 @@
     "submitTime": "投稿日:",
     "liked": "いいね済み",
     "likeProject": "いいね",
+    "loginToLike": "いいねするにはログインしてください",
+    "likeFailed": "いいねに失敗しました。しばらくして再試行してください",
     "story": "制作ストーリー",
     "features": "主な機能",
     "scenarios": "使用シーン",
