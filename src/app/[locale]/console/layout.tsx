@@ -9,6 +9,7 @@ import {
   Building2, 
   Tags,
   Users,
+  Shield,
   Menu, 
   X
 } from 'lucide-react'
@@ -25,6 +26,7 @@ export default function ConsoleLayout({
   const navItems = [
     { name: '概览', href: '/console', icon: LayoutDashboard },
     { name: '用户管理', href: '/console/users', icon: Users },
+    { name: '角色管理', href: '/console/roles', icon: Shield },
     { name: '作品管理', href: '/console/projects', icon: FolderKanban },
     { name: '字典管理', href: '/console/dictionaries', icon: BookOpen },
     { name: '标签管理', href: '/console/tags', icon: Tags },

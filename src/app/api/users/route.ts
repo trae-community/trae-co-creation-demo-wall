@@ -55,6 +55,11 @@ export async function GET(req: NextRequest) {
           updatedAt: true,
           clerkId: true,
           // Explicitly excluding passwordHash by not selecting it
+          roles: {
+            include: {
+              role: true
+            }
+          }
         },
         orderBy: { createdAt: 'desc' },
         skip,
@@ -121,11 +126,21 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, username, email, phone, bio, avatarUrl } = body;
+    const { id, username, email, phone, bio, avatarUrl, roleIds } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
+
+    // If roleIds is provided, update roles
+    const roleUpdate = roleIds ? {
+      roles: {
+        deleteMany: {}, // Remove all existing roles
+        create: roleIds.map((roleId: number) => ({
+          role: { connect: { id: roleId } }
+        }))
+      }
+    } : {};
 
     const updatedUser = await prisma.sysUser.update({
       where: { id: BigInt(id) },
@@ -135,6 +150,7 @@ export async function PUT(req: NextRequest) {
         phone,
         bio,
         avatarUrl,
+        ...roleUpdate
       },
       select: {
         id: true,
@@ -146,6 +162,11 @@ export async function PUT(req: NextRequest) {
         createdAt: true,
         updatedAt: true,
         clerkId: true,
+        roles: {
+          include: {
+            role: true
+          }
+        }
       }
     });
 

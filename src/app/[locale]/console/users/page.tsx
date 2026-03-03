@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Plus, User, Mail, Phone, Calendar } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { Plus, User, Mail, Phone, Calendar, Shield } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -23,9 +23,16 @@ import {
 } from '@/components/ui/dialog'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Textarea } from '@/components/ui/textarea' // Assuming Textarea exists or I'll use Input for bio if not
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 
 // Types
+interface Role {
+  id: number
+  roleName: string
+  roleCode: string
+}
+
 interface UserItem {
   id: string
   username: string
@@ -36,6 +43,7 @@ interface UserItem {
   createdAt: string
   updatedAt: string
   clerkId: string | null
+  roles: { role: Role }[]
 }
 
 // Schema
@@ -60,6 +68,13 @@ export default function UsersPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   
+  // Role Dialog states
+  const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<UserItem | null>(null)
+  const [availableRoles, setAvailableRoles] = useState<Role[]>([])
+  const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([])
+  const [isSavingRoles, setIsSavingRoles] = useState(false)
+
   const { feedback, showFeedback } = useFeedback()
 
   // Form
@@ -97,10 +112,24 @@ export default function UsersPage() {
     }
   }, [currentPage, pageSize, searchTerm, showFeedback])
 
+  // Fetch Roles
+  const fetchRoles = useCallback(async () => {
+    try {
+      const res = await fetch('/api/roles?pageSize=100') // Assume < 100 roles
+      if (res.ok) {
+        const data = await res.json()
+        setAvailableRoles(data.items || [])
+      }
+    } catch (error) {
+      console.error('Failed to fetch roles:', error)
+    }
+  }, [])
+
   // Initial fetch
   useEffect(() => {
     fetchUsers()
-  }, [fetchUsers])
+    fetchRoles()
+  }, [fetchUsers, fetchRoles])
 
   // Reset page when search changes
   useEffect(() => {
@@ -151,6 +180,49 @@ export default function UsersPage() {
       showFeedback('error', '保存失败')
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const handleOpenRoleDialog = (user: UserItem) => {
+    setSelectedUser(user)
+    setSelectedRoleIds(user.roles ? user.roles.map(r => r.role.id) : [])
+    setIsRoleDialogOpen(true)
+  }
+
+  const handleRoleToggle = useCallback((roleId: number) => {
+    setSelectedRoleIds(prev => 
+      prev.includes(roleId)
+        ? prev.filter(id => id !== roleId)
+        : [...prev, roleId]
+    )
+  }, [])
+
+  const onSaveRoles = async () => {
+    if (!selectedUser) return
+    try {
+      setIsSavingRoles(true)
+      const res = await fetch('/api/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedUser.id,
+          roleIds: selectedRoleIds
+        })
+      })
+
+      if (res.ok) {
+        setIsRoleDialogOpen(false)
+        fetchUsers()
+        showFeedback('success', '用户角色已更新')
+      } else {
+        const data = await res.json()
+        showFeedback('error', data.error || '更新角色失败')
+      }
+    } catch (error) {
+      console.error('Failed to save roles:', error)
+      showFeedback('error', '更新角色失败')
+    } finally {
+      setIsSavingRoles(false)
     }
   }
 
@@ -205,6 +277,11 @@ export default function UsersPage() {
                     {user.clerkId && (
                       <Badge variant="outline" className="text-xs font-normal">Clerk User</Badge>
                     )}
+                    {user.roles && user.roles.map(r => (
+                      <Badge key={r.role.id} variant="secondary" className="text-xs">
+                        {r.role.roleName}
+                      </Badge>
+                    ))}
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-1 text-sm text-muted-foreground">
@@ -230,6 +307,12 @@ export default function UsersPage() {
                     </p>
                   )}
                 </div>
+              </div>
+
+              <div className="flex items-center gap-2 self-end sm:self-center">
+                <Button variant="ghost" size="sm" onClick={() => handleOpenRoleDialog(user)} title="分配角色">
+                  <Shield size={16} />
+                </Button>
               </div>
             </div>
           </Card>
@@ -300,6 +383,43 @@ export default function UsersPage() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isRoleDialogOpen} onOpenChange={setIsRoleDialogOpen}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>分配角色</DialogTitle>
+            <DialogDescription>
+              为用户 {selectedUser?.username} 分配系统角色
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {availableRoles.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center">暂无可用角色</p>
+            ) : (
+              availableRoles.map(role => (
+                <div key={role.id} className="flex items-center space-x-2">
+                  <Checkbox 
+                    id={`role-${role.id}`} 
+                    checked={selectedRoleIds.includes(role.id)}
+                    onCheckedChange={() => handleRoleToggle(role.id)}
+                  />
+                  <Label htmlFor={`role-${role.id}`} className="flex flex-col">
+                    <span>{role.roleName}</span>
+                    <span className="text-xs text-muted-foreground font-normal">{role.description || role.roleCode}</span>
+                  </Label>
+                </div>
+              ))
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsRoleDialogOpen(false)}>取消</Button>
+            <Button onClick={onSaveRoles} disabled={isSavingRoles}>
+              {isSavingRoles ? '保存中...' : '保存'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
