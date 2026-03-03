@@ -1,112 +1,461 @@
 'use client'
 
-import { Search, Plus, Filter, MoreHorizontal, Edit, Trash, Eye, Calendar, User } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { Plus, Edit, Trash2, Eye, Calendar, User, MapPin, Tag, Code } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+
+import { CrudFeedback } from '@/components/CrudFeedback'
+import { CrudFilterBar } from '@/components/CrudFilterBar'
+import { CrudPagination } from '@/components/CrudPagination'
+import { useFeedback } from '@/components/useFeedback'
+import { CRUD_QUERY_PARAMS } from '@/lib/crud'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+// Types
+interface WorkItem {
+  id: string
+  userId: string
+  title: string
+  summary: string | null
+  coverUrl: string | null
+  countryCode: string | null
+  cityCode: string | null
+  categoryCode: string | null
+  devStatusCode: string | null
+  createdAt: string
+  updatedAt: string
+  user: {
+    username: string
+    email: string
+    avatarUrl: string | null
+  }
+}
+
+interface DictItem {
+  itemLabel: string
+  itemValue: string
+}
+
+// Schema
+const workSchema = z.object({
+  title: z.string().min(1, '请输入作品名称'),
+  summary: z.string().optional().or(z.literal('')),
+  coverUrl: z.string().optional().or(z.literal('')),
+  countryCode: z.string().optional().or(z.literal('')),
+  cityCode: z.string().optional().or(z.literal('')),
+  categoryCode: z.string().optional().or(z.literal('')),
+  devStatusCode: z.string().optional().or(z.literal('')),
+  userId: z.string().min(1, '请选择所属用户'),
+})
+
+type WorkFormValues = z.infer<typeof workSchema>
 
 export default function ProjectsPage() {
-  const projects = [
-    { id: 1, title: 'AI 绘画助手', author: '张三', date: '2024-03-20', status: '已发布' },
-    { id: 2, title: '智能客服系统', author: '李四', date: '2024-03-18', status: '审核中' },
-    { id: 3, title: '数据可视化大屏', author: '王五', date: '2024-03-15', status: '草稿' },
-    { id: 4, title: '企业官网模板', author: '赵六', date: '2024-03-10', status: '已发布' },
-  ]
+  const [works, setWorks] = useState<WorkItem[]>([])
+  const [totalItems, setTotalItems] = useState(0)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
+  
+  // Dictionaries
+  const [countries, setCountries] = useState<DictItem[]>([])
+  const [cities, setCities] = useState<DictItem[]>([])
+  const [categories, setCategories] = useState<DictItem[]>([])
+  const [devStatuses, setDevStatuses] = useState<DictItem[]>([])
+  const [users, setUsers] = useState<{id: string, username: string}[]>([])
+
+  // Dialog states
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [editingWork, setEditingWork] = useState<WorkItem | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const [deletingWorkId, setDeletingWorkId] = useState<string | null>(null)
+  
+  const { feedback, showFeedback } = useFeedback()
+
+  // Form
+  const form = useForm<WorkFormValues>({
+    resolver: zodResolver(workSchema),
+    defaultValues: {
+      title: '',
+      summary: '',
+      coverUrl: '',
+      countryCode: '',
+      cityCode: '',
+      categoryCode: '',
+      devStatusCode: '',
+      userId: '',
+    }
+  })
+
+  // Fetch Dictionaries
+  const fetchDicts = useCallback(async () => {
+    try {
+      const [resCountry, resCity, resCategory, resStatus, resUsers] = await Promise.all([
+        fetch('/api/dictionaries?code=country').then(res => res.ok ? res.json() : null),
+        fetch('/api/dictionaries?code=city').then(res => res.ok ? res.json() : null),
+        fetch('/api/dictionaries?code=category').then(res => res.ok ? res.json() : null),
+        fetch('/api/dictionaries?code=dev_status').then(res => res.ok ? res.json() : null),
+        fetch('/api/users?pageSize=100').then(res => res.ok ? res.json() : null)
+      ])
+
+      if (resCountry?.items) setCountries(resCountry.items)
+      if (resCity?.items) setCities(resCity.items)
+      if (resCategory?.items) setCategories(resCategory.items)
+      if (resStatus?.items) setDevStatuses(resStatus.items)
+      if (resUsers?.items) setUsers(resUsers.items.map((u: any) => ({ id: u.id, username: u.username })))
+    } catch (error) {
+      console.error('Failed to fetch dictionaries:', error)
+    }
+  }, [])
+
+  // Fetch Works
+  const fetchWorks = useCallback(async () => {
+    try {
+      const params = new URLSearchParams({
+        [CRUD_QUERY_PARAMS.page]: String(currentPage),
+        [CRUD_QUERY_PARAMS.pageSize]: String(pageSize),
+        [CRUD_QUERY_PARAMS.query]: searchTerm,
+      })
+      
+      const res = await fetch(`/api/projects?${params.toString()}`)
+      if (res.ok) {
+        const data = await res.json()
+        setWorks(data.items || [])
+        setTotalItems(data.total || 0)
+      } else {
+        showFeedback('error', '作品列表加载失败')
+      }
+    } catch (error) {
+      console.error('Failed to fetch works:', error)
+      showFeedback('error', '作品列表加载失败')
+    }
+  }, [currentPage, pageSize, searchTerm, showFeedback])
+
+  // Initial fetch
+  useEffect(() => {
+    fetchWorks()
+    fetchDicts()
+  }, [fetchWorks, fetchDicts])
+
+  // Reset page when search changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm])
+
+  // Handlers
+  const handleEdit = (work: WorkItem) => {
+    setEditingWork(work)
+    form.reset({
+      title: work.title,
+      summary: work.summary || '',
+      coverUrl: work.coverUrl || '',
+      countryCode: work.countryCode || '',
+      cityCode: work.cityCode || '',
+      categoryCode: work.categoryCode || '',
+      devStatusCode: work.devStatusCode || '',
+      userId: work.userId,
+    })
+    setIsDialogOpen(true)
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('确定要删除该作品吗？此操作不可恢复。')) return
+    
+    try {
+      setDeletingWorkId(id)
+      const res = await fetch(`/api/projects?id=${id}`, { method: 'DELETE' })
+      
+      if (res.ok) {
+        fetchWorks()
+        showFeedback('success', '作品已删除')
+      } else {
+        const data = await res.json()
+        showFeedback('error', data.error || '删除失败')
+      }
+    } catch (error) {
+      console.error('Failed to delete work:', error)
+      showFeedback('error', '删除失败')
+    } finally {
+      setDeletingWorkId(null)
+    }
+  }
+
+  const onSubmit = async (values: WorkFormValues) => {
+    try {
+      setIsSaving(true)
+      const url = '/api/projects'
+      // Only Update allowed
+      const method = 'PUT'
+      const body = { ...values, id: editingWork?.id }
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+
+      if (res.ok) {
+        setIsDialogOpen(false)
+        fetchWorks()
+        showFeedback('success', '作品已更新')
+      } else {
+        const data = await res.json()
+        showFeedback('error', data.error || '保存失败')
+      }
+    } catch (error) {
+      console.error('Failed to save work:', error)
+      showFeedback('error', '保存失败')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  // Helpers to get labels
+  const getLabel = (value: string | null, list: DictItem[]) => {
+    if (!value) return null
+    return list.find(item => item.itemValue === value)?.itemLabel || value
+  }
+
+  // Pagination calculations
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
+  const current = Math.min(currentPage, totalPages)
+  const startIndex = (current - 1) * pageSize
+  const endIndex = Math.min(startIndex + pageSize, totalItems)
 
   return (
     <div className="space-y-6">
+      <CrudFeedback feedback={feedback} />
+      
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
-        <h2 className="text-2xl font-bold tracking-tight">作品管理</h2>
-        <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
-          <Plus size={16} />
-          <span>新建作品</span>
-        </button>
-      </div>
-
-      <div className="p-4 rounded-xl border border-border bg-card flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="relative flex-1 max-w-md w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <input 
-            type="text" 
-            placeholder="搜索作品名称、作者..." 
-            className="w-full pl-10 pr-4 py-2 rounded-lg bg-secondary border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground/50"
-          />
-        </div>
-        <div className="flex gap-2 w-full sm:w-auto">
-          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border bg-card hover:bg-secondary text-foreground transition-colors">
-            <Filter size={16} />
-            <span>筛选</span>
-          </button>
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">作品管理</h2>
+          <p className="text-muted-foreground mt-1">管理作品信息及状态</p>
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs text-muted-foreground uppercase bg-secondary/50 border-b border-border">
-              <tr>
-                <th className="px-6 py-4 font-medium">作品名称</th>
-                <th className="px-6 py-4 font-medium">作者</th>
-                <th className="px-6 py-4 font-medium">状态</th>
-                <th className="px-6 py-4 font-medium">创建时间</th>
-                <th className="px-6 py-4 font-medium text-right">操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              {projects.map((project) => (
-                <tr key={project.id} className="border-b border-border hover:bg-secondary/20 transition-colors group">
-                  <td className="px-6 py-4 font-medium text-foreground">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded bg-secondary flex items-center justify-center text-xs text-muted-foreground">
-                        IMG
-                      </div>
-                      {project.title}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-muted-foreground">
+      <CrudFilterBar
+        searchPlaceholder="搜索作品名称、简介..."
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        filterValue="all"
+        filterOptions={[]} 
+        onFilterChange={() => {}}
+        filterPlaceholder="筛选作品"
+      />
+
+      <div className="space-y-4">
+        {works.map(work => (
+          <Card key={work.id} className="overflow-hidden border-border bg-card/50">
+            <div className="p-4 flex flex-col sm:flex-row items-start gap-4">
+              <div className="h-24 w-24 rounded-lg bg-secondary shrink-0 overflow-hidden">
+                {work.coverUrl ? (
+                  <img src={work.coverUrl} alt={work.title} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center text-muted-foreground">
+                    IMG
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex-1 space-y-2">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-semibold text-lg">{work.title}</h3>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                       <User size={14} />
-                      {project.author}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                      project.status === '已发布' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                      project.status === '审核中' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
-                      'bg-gray-500/10 text-gray-500 border-gray-500/20'
-                    }`}>
-                      {project.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-muted-foreground">
-                    <div className="flex items-center gap-2">
+                      <span>{work.user.username}</span>
+                      <span className="text-border">|</span>
                       <Calendar size={14} />
-                      {project.date}
+                      <span>{new Date(work.createdAt).toLocaleDateString('zh-CN')}</span>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-2 hover:bg-secondary rounded-lg text-muted-foreground hover:text-foreground transition-colors" title="查看">
-                        <Eye size={16} />
-                      </button>
-                      <button className="p-2 hover:bg-secondary rounded-lg text-blue-500 hover:text-blue-400 transition-colors" title="编辑">
-                        <Edit size={16} />
-                      </button>
-                      <button className="p-2 hover:bg-secondary rounded-lg text-red-500 hover:text-red-400 transition-colors" title="删除">
-                        <Trash size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="p-4 border-t border-border flex items-center justify-between text-sm text-muted-foreground">
-          <div>显示 1-4 共 4 条记录</div>
-          <div className="flex gap-2">
-            <button className="px-3 py-1 rounded border border-border hover:bg-secondary disabled:opacity-50" disabled>上一页</button>
-            <button className="px-3 py-1 rounded border border-border hover:bg-secondary">下一页</button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(work)}>
+                      <Edit size={16} />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-red-500 hover:text-red-400"
+                      onClick={() => handleDelete(work.id)}
+                      disabled={deletingWorkId === work.id}
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {work.devStatusCode && (
+                    <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary">
+                      <Code size={12} className="mr-1" />
+                      {getLabel(work.devStatusCode, devStatuses)}
+                    </Badge>
+                  )}
+                  {work.categoryCode && (
+                    <Badge variant="outline">
+                      <Tag size={12} className="mr-1" />
+                      {getLabel(work.categoryCode, categories)}
+                    </Badge>
+                  )}
+                  {(work.countryCode || work.cityCode) && (
+                    <Badge variant="secondary" className="text-muted-foreground">
+                      <MapPin size={12} className="mr-1" />
+                      {[getLabel(work.countryCode, countries), getLabel(work.cityCode, cities)].filter(Boolean).join(' · ')}
+                    </Badge>
+                  )}
+                </div>
+
+                {work.summary && (
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {work.summary}
+                  </p>
+                )}
+              </div>
+            </div>
+          </Card>
+        ))}
+        
+        {works.length === 0 && (
+          <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
+            暂无作品
           </div>
-        </div>
+        )}
       </div>
+
+      <CrudPagination
+        totalItems={totalItems}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        current={current}
+        totalPages={totalPages}
+        onPrev={() => setCurrentPage(current - 1)}
+        onNext={() => setCurrentPage(current + 1)}
+      />
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>{editingWork ? '编辑作品' : '新建作品'}</DialogTitle>
+            <DialogDescription>
+              {editingWork ? '修改作品信息' : '创建新作品'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">作品名称 <span className="text-red-500">*</span></label>
+              <Input {...form.register('title')} placeholder="请输入作品名称" />
+              {form.formState.errors.title && <p className="text-red-500 text-xs">{form.formState.errors.title.message}</p>}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">所属用户</label>
+                <div className="flex h-10 w-full items-center rounded-md border border-input bg-secondary px-3 py-2 text-sm text-muted-foreground">
+                  {users.find(u => u.id === form.getValues('userId'))?.username || '未知用户'}
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">开发状态</label>
+                <Select onValueChange={(val) => form.setValue('devStatusCode', val)} defaultValue={form.getValues('devStatusCode')}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择状态" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {devStatuses.map(item => (
+                      <SelectItem key={item.itemValue} value={item.itemValue}>{item.itemLabel}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">国家</label>
+                <Select onValueChange={(val) => form.setValue('countryCode', val)} defaultValue={form.getValues('countryCode')}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择国家" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map(item => (
+                      <SelectItem key={item.itemValue} value={item.itemValue}>{item.itemLabel}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">城市</label>
+                <Select onValueChange={(val) => form.setValue('cityCode', val)} defaultValue={form.getValues('cityCode')}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择城市" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cities.map(item => (
+                      <SelectItem key={item.itemValue} value={item.itemValue}>{item.itemLabel}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">类别</label>
+                <Select onValueChange={(val) => form.setValue('categoryCode', val)} defaultValue={form.getValues('categoryCode')}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择类别" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(item => (
+                      <SelectItem key={item.itemValue} value={item.itemValue}>{item.itemLabel}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">封面图 URL</label>
+              <Input {...form.register('coverUrl')} placeholder="https://..." />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">简介</label>
+              <Textarea {...form.register('summary')} placeholder="作品一句话简介..." />
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>取消</Button>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? '保存中...' : '保存'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

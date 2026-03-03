@@ -45,20 +45,22 @@ export function CrudFilterBar({
           onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
-      <div className="flex gap-2 w-full sm:w-auto">
-        <Select onValueChange={onFilterChange} defaultValue={filterValue}>
-          <SelectTrigger className="w-full sm:w-40 bg-card border-border">
-            <SelectValue placeholder={filterPlaceholder} />
-          </SelectTrigger>
-          <SelectContent>
-            {filterOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {filterOptions.length > 0 && (
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Select onValueChange={onFilterChange} defaultValue={filterValue}>
+            <SelectTrigger className="w-full sm:w-40 bg-card border-border">
+              <SelectValue placeholder={filterPlaceholder} />
+            </SelectTrigger>
+            <SelectContent>
+              {filterOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
     </div>
   )
 }
