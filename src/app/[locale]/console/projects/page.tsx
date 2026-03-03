@@ -24,6 +24,8 @@ import {
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -33,6 +35,11 @@ import {
 } from "@/components/ui/select"
 
 // Types
+interface TagItem {
+  id: number
+  name: string
+}
+
 interface WorkItem {
   id: string
   userId: string
@@ -50,6 +57,7 @@ interface WorkItem {
     email: string
     avatarUrl: string | null
   }
+  tags: { tag: TagItem }[]
 }
 
 interface DictItem {
@@ -84,6 +92,7 @@ export default function ProjectsPage() {
   const [categories, setCategories] = useState<DictItem[]>([])
   const [devStatuses, setDevStatuses] = useState<DictItem[]>([])
   const [users, setUsers] = useState<{id: string, username: string}[]>([])
+  const [availableTags, setAvailableTags] = useState<TagItem[]>([])
 
   // Dialog states
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -91,6 +100,12 @@ export default function ProjectsPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [deletingWorkId, setDeletingWorkId] = useState<string | null>(null)
   
+  // Tag Dialog states
+  const [isTagDialogOpen, setIsTagDialogOpen] = useState(false)
+  const [selectedWork, setSelectedWork] = useState<WorkItem | null>(null)
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
+  const [isSavingTags, setIsSavingTags] = useState(false)
+
   const { feedback, showFeedback } = useFeedback()
 
   // Form
@@ -108,15 +123,16 @@ export default function ProjectsPage() {
     }
   })
 
-  // Fetch Dictionaries
+  // Fetch Dictionaries & Tags
   const fetchDicts = useCallback(async () => {
     try {
-      const [resCountry, resCity, resCategory, resStatus, resUsers] = await Promise.all([
+      const [resCountry, resCity, resCategory, resStatus, resUsers, resTags] = await Promise.all([
         fetch('/api/dictionaries?code=country').then(res => res.ok ? res.json() : null),
         fetch('/api/dictionaries?code=city').then(res => res.ok ? res.json() : null),
         fetch('/api/dictionaries?code=category').then(res => res.ok ? res.json() : null),
         fetch('/api/dictionaries?code=dev_status').then(res => res.ok ? res.json() : null),
-        fetch('/api/users?pageSize=100').then(res => res.ok ? res.json() : null)
+        fetch('/api/users?pageSize=100').then(res => res.ok ? res.json() : null),
+        fetch('/api/tags?pageSize=100').then(res => res.ok ? res.json() : null)
       ])
 
       if (resCountry?.items) setCountries(resCountry.items)
@@ -124,6 +140,7 @@ export default function ProjectsPage() {
       if (resCategory?.items) setCategories(resCategory.items)
       if (resStatus?.items) setDevStatuses(resStatus.items)
       if (resUsers?.items) setUsers(resUsers.items.map((u: any) => ({ id: u.id, username: u.username })))
+      if (resTags?.items) setAvailableTags(resTags.items)
     } catch (error) {
       console.error('Failed to fetch dictionaries:', error)
     }
@@ -198,6 +215,48 @@ export default function ProjectsPage() {
       showFeedback('error', '删除失败')
     } finally {
       setDeletingWorkId(null)
+    }
+  }
+
+  const handleOpenTagDialog = (work: WorkItem) => {
+    setSelectedWork(work)
+    setSelectedTagIds(work.tags ? work.tags.map(t => t.tag.id) : [])
+    setIsTagDialogOpen(true)
+  }
+
+  const handleTagToggle = (tagId: number) => {
+    setSelectedTagIds(prev => 
+      prev.includes(tagId)
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId]
+    )
+  }
+
+  const onSaveTags = async () => {
+    if (!selectedWork) return
+    try {
+      setIsSavingTags(true)
+      const res = await fetch('/api/projects', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedWork.id,
+          tagIds: selectedTagIds
+        })
+      })
+
+      if (res.ok) {
+        setIsTagDialogOpen(false)
+        fetchWorks()
+        showFeedback('success', '作品标签已更新')
+      } else {
+        showFeedback('error', '更新标签失败')
+      }
+    } catch (error) {
+      console.error('Failed to save tags:', error)
+      showFeedback('error', '更新标签失败')
+    } finally {
+      setIsSavingTags(false)
     }
   }
 
@@ -294,6 +353,9 @@ export default function ProjectsPage() {
                     <Button variant="ghost" size="sm" onClick={() => handleEdit(work)}>
                       <Edit size={16} />
                     </Button>
+                    <Button variant="ghost" size="sm" onClick={() => handleOpenTagDialog(work)} title="关联标签">
+                      <Tag size={16} />
+                    </Button>
                     <Button 
                       variant="ghost" 
                       size="sm" 
@@ -325,6 +387,11 @@ export default function ProjectsPage() {
                       {[getLabel(work.countryCode, countries), getLabel(work.cityCode, cities)].filter(Boolean).join(' · ')}
                     </Badge>
                   )}
+                  {work.tags && work.tags.map(t => (
+                    <Badge key={t.tag.id} variant="secondary" className="text-xs bg-secondary/50">
+                      #{t.tag.name}
+                    </Badge>
+                  ))}
                 </div>
 
                 {work.summary && (
@@ -454,6 +521,45 @@ export default function ProjectsPage() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isTagDialogOpen} onOpenChange={setIsTagDialogOpen}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>关联标签</DialogTitle>
+            <DialogDescription>
+              为作品 "{selectedWork?.title}" 选择关联标签
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {availableTags.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center">暂无可用标签，请先在标签管理中添加</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto">
+                {availableTags.map(tag => (
+                  <div key={tag.id} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`tag-${tag.id}`} 
+                      checked={selectedTagIds.includes(tag.id)}
+                      onCheckedChange={() => handleTagToggle(tag.id)}
+                    />
+                    <Label htmlFor={`tag-${tag.id}`} className="cursor-pointer">
+                      {tag.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsTagDialogOpen(false)}>取消</Button>
+            <Button onClick={onSaveTags} disabled={isSavingTags}>
+              {isSavingTags ? '保存中...' : '保存'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

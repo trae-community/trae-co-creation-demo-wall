@@ -47,6 +47,11 @@ export async function GET(req: NextRequest) {
               email: true,
               avatarUrl: true
             }
+          },
+          tags: {
+            include: {
+              tag: true
+            }
           }
         },
         orderBy: { createdAt: 'desc' },
@@ -127,12 +132,23 @@ export async function PUT(req: NextRequest) {
       countryCode, 
       cityCode, 
       categoryCode, 
-      devStatusCode 
+      devStatusCode,
+      tagIds 
     } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Work ID is required' }, { status: 400 });
     }
+
+    // If tagIds is provided, update tags
+    const tagUpdate = tagIds ? {
+      tags: {
+        deleteMany: {}, // Remove all existing tags
+        create: tagIds.map((tagId: number) => ({
+          tag: { connect: { id: tagId } }
+        }))
+      }
+    } : {};
 
     const updatedWork = await prisma.workBase.update({
       where: { id: BigInt(id) },
@@ -144,6 +160,7 @@ export async function PUT(req: NextRequest) {
         cityCode,
         categoryCode,
         devStatusCode,
+        ...tagUpdate
       },
       include: {
         user: {
@@ -151,6 +168,11 @@ export async function PUT(req: NextRequest) {
             username: true,
             email: true,
             avatarUrl: true
+          }
+        },
+        tags: {
+          include: {
+            tag: true
           }
         }
       }
