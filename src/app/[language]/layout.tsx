@@ -1,8 +1,15 @@
+import '@/assets/globals.css';
+import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ClerkProvider } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
 import { SiteLayout } from '@/components/layout/site-layout';
+
+export const metadata: Metadata = {
+  title: 'TRAE DEMO WALL',
+  description: 'Showcasing every real completed work',
+};
 
 export default async function LocaleLayout({
   children,
