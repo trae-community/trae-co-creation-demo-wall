@@ -20,7 +20,11 @@
     "sortLikes": "いいね",
     "sortViews": "人気",
     "noResults": "条件に一致するプロジェクトが見つかりません",
-    "clearFilters": "フィルターをクリア"
+    "clearFilters": "フィルターをクリア",
+    "paginationInfo": "{total}件中 {start}-{end}件を表示",
+    "prevPage": "前へ",
+    "nextPage": "次へ",
+    "loading": "読み込み中..."
   },
   "Submit": {
     "title": "作品を投稿する",
@@ -87,6 +91,20 @@
     "aboutProject": "作品について",
     "aboutProjectDesc": "この作品はTRAE Friends@杭州オフラインイベントで投稿されました。このプロジェクトに興味がある場合は、コードリポジトリやデモリンクから詳しく確認できます。",
     "aboutAuthor": "著者について",
+    "country": "国",
+    "city": "都市",
+    "category": "タイプ",
+    "honors": "受賞",
+    "tags": "タグ",
+    "teamIntro": "チーム紹介",
+    "shareCardTitle": "シェアカード",
+    "shareCardDesc": "カード画像をプレビューし、画像ダウンロードとリンク共有ができます。",
+    "sharePreviewAlt": "シェアカードプレビュー",
+    "shareGenerating": "シェアカードを生成中...",
+    "downloadImage": "画像をダウンロード",
+    "copyLink": "リンクをコピー",
+    "copied": "コピー完了",
+    "systemShare": "システム共有",
     "phone": "電話",
     "email": "メール"
   },

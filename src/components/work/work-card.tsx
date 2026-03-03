@@ -71,6 +71,15 @@ export function WorkCard({ work }: WorkCardProps) {
           }}
         />
         <div className="absolute top-2 right-2 flex flex-col gap-2 items-end">
+          {(work.honors || []).slice(0, 2).map((honor) => (
+            <div
+              key={honor}
+              className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1"
+            >
+              <Award className="w-3 h-3" />
+              {honor}
+            </div>
+          ))}
           {work.isFeatured && (
             <div className="bg-gradient-to-r from-yellow-500 to-amber-600 text-white text-xs font-bold px-2 py-1 rounded shadow-sm flex items-center gap-1">
               <Award className="w-3 h-3" />

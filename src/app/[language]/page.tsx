@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Work } from "@/lib/types";
 import { WorkCard } from "@/components/work/work-card";
 import { CityFilter, FilterState } from "@/components/work/city-filter";
 import { Search, Clock, ThumbsUp, Eye, Loader2 } from "lucide-react";
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/lib/language/navigation';
 
 export default function Page() {
   const t = useTranslations('Home');
+  const locale = useLocale();
   const [filters, setFilters] = useState<FilterState>({
     cities: [],
     categories: [],
@@ -21,56 +22,51 @@ export default function Page() {
   const [works, setWorks] = useState<Work[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 12;
 
-  const fetchProjects = async (isLoadMore = false) => {
+  const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
-        page: isLoadMore ? (page + 1).toString() : '1',
-        pageSize: '12',
+        page: String(page),
+        pageSize: String(pageSize),
         search: searchQuery,
         sort: sortBy === 'time' ? 'newest' : sortBy,
+        lang: locale,
       });
 
-      if (filters.cities.length > 0) params.append('city', filters.cities.join(',')); // API currently supports single value, need adjustment if multiple
+      if (filters.cities.length > 0) params.append('city', filters.cities.join(','));
       if (filters.countries.length > 0) params.append('country', filters.countries.join(','));
       if (filters.categories.length > 0) params.append('category', filters.categories.join(','));
       if (filters.tags.length > 0) params.append('tags', filters.tags.join(','));
-
-      // For now, let's take the first one if multiple are selected, as API example showed single value support for city/country/category
-      // Or we update API to support 'in' queries. The API created supports single value for city/country/category.
-      // Let's adjust params to match API for now:
-      if (filters.cities.length > 0) params.set('city', filters.cities[0]);
-      if (filters.countries.length > 0) params.set('country', filters.countries[0]);
-      if (filters.categories.length > 0) params.set('category', filters.categories[0]);
       
       const response = await fetch(`/api/works?${params.toString()}`);
       const data = await response.json();
-
-      if (isLoadMore) {
-        setWorks(prev => [...prev, ...data.items]);
-        setPage(prev => prev + 1);
-      } else {
-        setWorks(data.items);
-        setPage(1);
-      }
-      
-      setHasMore(data.page < data.totalPages);
+      setWorks(data.items || []);
+      setTotalItems(data.total || 0);
+      setTotalPages(Math.max(1, data.totalPages || 1));
     } catch (error) {
       console.error("Failed to fetch projects:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, searchQuery, sortBy, locale, page, pageSize]);
 
-  // Debounce search and filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [filters, searchQuery, sortBy, locale]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchProjects();
     }, 300);
     return () => clearTimeout(timer);
-  }, [filters, searchQuery, sortBy]);
+  }, [fetchProjects]);
+
+  const startIndex = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
+  const endIndex = Math.min(page * pageSize, totalItems);
 
   return (
     <div className="space-y-8">
@@ -113,7 +109,7 @@ export default function Page() {
       </section>
 
       {/* Filter & Search */}
-      <div id="projects" className="sticky top-0 z-40 bg-zinc-950/80 backdrop-blur-xl border-b border-white/5 py-6 space-y-6 transition-all duration-300">
+      <div id="projects" className="bg-zinc-950/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 space-y-6 transition-all duration-300">
         <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
           {/* Search Input */}
           <div className="relative w-full md:flex-1 md:max-w-md group">
@@ -201,16 +197,41 @@ export default function Page() {
         </div>
       )}
 
-      {/* Load More */}
-      {hasMore && works.length > 0 && (
-        <div className="flex justify-center pt-8">
+      {works.length > 0 && (
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-8">
+          <div className="text-sm text-gray-400">
+            {t('paginationInfo', { start: startIndex, end: endIndex, total: totalItems })}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              disabled={loading || page <= 1}
+              className="px-4 py-2 rounded-full font-medium bg-white/5 text-white border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md disabled:opacity-50"
+            >
+              {t('prevPage')}
+            </button>
+            <span className="px-3 text-sm text-gray-300">
+              {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+              disabled={loading || page >= totalPages}
+              className="px-4 py-2 rounded-full font-medium bg-white/5 text-white border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md disabled:opacity-50"
+            >
+              {t('nextPage')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {loading && works.length > 0 && (
+        <div className="flex justify-center">
           <button
-            onClick={() => fetchProjects(true)}
-            disabled={loading}
-            className="px-6 py-3 rounded-full font-medium bg-white/5 text-white border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md flex items-center gap-2 disabled:opacity-50"
+            disabled
+            className="px-6 py-3 rounded-full font-medium bg-white/5 text-white border border-white/10 transition-all backdrop-blur-md flex items-center gap-2 opacity-70"
           >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            {loading ? t('loading') : t('loadMore')}
+            <Loader2 className="w-4 h-4 animate-spin" />
+            {t('loading')}
           </button>
         </div>
       )}

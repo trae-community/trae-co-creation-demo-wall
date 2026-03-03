@@ -3,7 +3,15 @@ import { prisma } from '@/lib/prisma'
 
 const toStringArray = (value: unknown): string[] => {
   if (Array.isArray(value)) {
-    return value.map(item => String(item)).filter(Boolean)
+    return value
+      .map(item => {
+        if (typeof item === 'string') return item.trim()
+        if (item && typeof item === 'object' && 'value' in item) {
+          return String((item as { value?: unknown }).value ?? '').trim()
+        }
+        return String(item).trim()
+      })
+      .filter(Boolean)
   }
   if (typeof value === 'string') {
     try {
@@ -19,11 +27,29 @@ const toStringArray = (value: unknown): string[] => {
   return []
 }
 
+const resolveLabelMap = (
+  items: Array<{ itemValue: string; itemLabel: string; labelI18n: unknown }>,
+  lang: string
+) =>
+  items.reduce<Record<string, string>>((acc, item) => {
+    let label = item.itemLabel
+    if (item.labelI18n && typeof item.labelI18n === 'object') {
+      const i18n = item.labelI18n as Record<string, string>
+      if (i18n[lang]) {
+        label = i18n[lang]
+      }
+    }
+    acc[item.itemValue] = label
+    return acc
+  }, {})
+
 export async function GET(
-  _req: Request,
+  req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { searchParams } = new URL(req.url)
+    const lang = searchParams.get('lang') || 'zh-CN'
     const { id } = await context.params
     if (!id) {
       return NextResponse.json({ error: 'Work ID is required' }, { status: 400 })
@@ -35,7 +61,9 @@ export async function GET(
         user: {
           select: {
             username: true,
-            avatarUrl: true
+            avatarUrl: true,
+            email: true,
+            bio: true
           }
         },
         statistic: {
@@ -47,6 +75,11 @@ export async function GET(
         tags: {
           include: {
             tag: true
+          }
+        },
+        honors: {
+          include: {
+            dictItem: true
           }
         },
         detail: true,
@@ -61,16 +94,38 @@ export async function GET(
       return NextResponse.json({ error: 'Work not found' }, { status: 404 })
     }
 
+    const [countryDict, cityDict, categoryDict] = await Promise.all([
+      prisma.sysDict.findUnique({
+        where: { dictCode: 'country' },
+        include: { items: true }
+      }),
+      prisma.sysDict.findUnique({
+        where: { dictCode: 'city' },
+        include: { items: true }
+      }),
+      prisma.sysDict.findUnique({
+        where: { dictCode: 'category_code' },
+        include: { items: true }
+      })
+    ])
+
+    const countryLabelMap = resolveLabelMap(countryDict?.items || [], lang)
+    const cityLabelMap = resolveLabelMap(cityDict?.items || [], lang)
+    const categoryLabelMap = resolveLabelMap(categoryDict?.items || [], lang)
+
     const features = toStringArray(work.detail?.highlights)
     const scenarios = toStringArray(work.detail?.scenarios)
+    const teamMembers = toStringArray(work.team?.members)
 
     const item = {
       id: work.id.toString(),
       name: work.title || '',
       intro: work.summary || '',
-      city: work.cityCode || '',
-      country: work.countryCode || '',
-      team: work.team?.members ?? null,
+      city: cityLabelMap[work.cityCode || ''] || work.cityCode || '',
+      country: countryLabelMap[work.countryCode || ''] || work.countryCode || '',
+      team: teamMembers,
+      teamIntro: work.team?.teamIntro || '',
+      contactEmail: work.team?.contactEmail || '',
       coverUrl: work.coverUrl || '',
       story: work.detail?.story || '',
       features: features.map((line, index) => `${index + 1}. ${line}`).join('\n'),
@@ -86,11 +141,25 @@ export async function GET(
       createdAt: work.createdAt,
       views: Number(work.statistic?.viewCount || 0),
       likes: Number(work.statistic?.likeCount || 0),
-      category: work.categoryCode || '',
+      category: categoryLabelMap[work.categoryCode || ''] || work.categoryCode || '',
       tags: work.tags.map(item => item.tag.name),
+      honors: work.honors
+        .map(honor => {
+          if (honor.dictItem?.itemValue) {
+            if (honor.dictItem.labelI18n && typeof honor.dictItem.labelI18n === 'object') {
+              const i18n = honor.dictItem.labelI18n as Record<string, string>
+              return i18n[lang] || honor.dictItem.itemLabel
+            }
+            return honor.dictItem.itemLabel
+          }
+          return ''
+        })
+        .filter(Boolean),
       author: {
         name: work.user?.username || '',
-        avatar: work.user?.avatarUrl || null
+        avatar: work.user?.avatarUrl || null,
+        email: work.user?.email || null,
+        bio: work.user?.bio || null
       }
     }
 
