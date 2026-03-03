@@ -2,21 +2,22 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "../lib/utils";
-import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard } from "lucide-react";
+import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound } from "lucide-react";
 import { ParticlesBackground } from "./ParticlesBackground";
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 
 const LOCALE_OPTIONS = [
-  { code: 'zh', label: '中文', flag: '🇨🇳' },
-  { code: 'en', label: 'English', flag: '🇺🇸' },
-  { code: 'ja', label: '日本語', flag: '🇯🇵' },
+  { code: 'zh-CN', label: '中文', flag: '🇨🇳' },
+  { code: 'en-US', label: 'English', flag: '🇺🇸' },
+  { code: 'ja-JP', label: '日本語', flag: '🇯🇵' },
 ] as const;
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const t = useTranslations('Nav');
+  const tProfile = useTranslations('Profile');
   const tFooter = useTranslations('Footer');
   const locale = useLocale();
   const router = useRouter();
@@ -35,7 +36,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   const handleLanguageSwitch = (newLocale: string) => {
     if (newLocale !== locale) {
-      router.replace(pathname, { locale: newLocale as 'zh' | 'en' | 'ja' });
+      router.replace(pathname, { locale: newLocale as 'zh-CN' | 'en-US' | 'ja-JP' });
     }
     setLangMenuOpen(false);
   };
@@ -114,7 +115,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             <SignedIn>
               <div className="flex items-center gap-2 px-4 py-1.5">
-                <UserButton />
+                <UserButton>
+                  <UserButton.MenuItems>
+                    <UserButton.Link
+                      href={`/${locale}/profile`}
+                      label={tProfile('menu')}
+                      labelIcon={<UserRound className="w-4 h-4" />}
+                    />
+                  </UserButton.MenuItems>
+                </UserButton>
               </div>
             </SignedIn>
 
@@ -166,3 +175,4 @@ export function Layout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
