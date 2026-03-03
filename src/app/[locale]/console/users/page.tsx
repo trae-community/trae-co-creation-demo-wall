@@ -31,6 +31,7 @@ interface Role {
   id: number
   roleName: string
   roleCode: string
+  description?: string | null
 }
 
 interface UserItem {
