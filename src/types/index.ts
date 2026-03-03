@@ -3,25 +3,29 @@ export interface Project {
   name: string;
   intro: string;
   city: string;
-  team: string[];
+  team?: string | null; // Changed from string[] to string | null (JSON stringified array or plain string)
   coverUrl: string;
-  story: string; // 创作故事
-  features: string; // 功能亮点
-  scenarios: string; // 使用场景
-  screenshots: string[]; // 界面截图
-  techStack: string; // 技术说明
-  demoUrl: string;
+  story?: string;
+  features?: string;
+  scenarios?: string;
+  screenshots?: string[];
+  techStack?: string;
+  demoUrl?: string;
   repoUrl?: string;
-  isFeatured?: boolean; // For "城市精选"
-  isTrending?: boolean; // For "城市人气"
-  isCitySelection?: boolean; // For "社区精选"
-  isCommunityRecommended?: boolean; // For "社区推荐"
-  createdAt: string;
+  isFeatured?: boolean;
+  isTrending?: boolean;
+  isCitySelection?: boolean;
+  isCommunityRecommended?: boolean;
+  createdAt: Date | string; // Updated to accept Date object from Prisma
   views: number;
   likes: number;
   category: string;
   tags: string[];
   country: string;
+  author: {
+    name: string;
+    avatar: string | null;
+  };
 }
 
 export interface SubmissionFormData {
@@ -76,5 +80,19 @@ export const TAGS = [
   "开源",
   "持续更新",
 ];
+
+export interface Tag {
+  id: number;
+  name: string;
+}
+
+export interface DictionaryItem {
+  id: string;
+  dictCode: string;
+  itemLabel: string;
+  itemValue: string;
+  sortOrder: number;
+  lang: string;
+}
 
 export const COUNTRIES = Object.keys(COUNTRY_CITY_MAP);

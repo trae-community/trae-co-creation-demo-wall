@@ -3,16 +3,23 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CITIES, COUNTRIES, COUNTRY_CITY_MAP } from "../../types";
+import { CITIES, COUNTRIES, COUNTRY_CITY_MAP, CATEGORIES, Tag, DictionaryItem } from "../../types";
 import { Button } from "../../components/Button";
+import { Select } from "../../components/Select";
 import { v4 as uuidv4 } from "uuid";
-import { AlertCircle, CheckCircle, UploadCloud, Link as LinkIcon, Users, MapPin, FileText, Image as ImageIcon, Globe, Plus, Trash2 } from "lucide-react";
+import { AlertCircle, CheckCircle, UploadCloud, Link as LinkIcon, Users, MapPin, FileText, Image as ImageIcon, Globe, Plus, Trash2, Tag, LayoutGrid } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslations } from 'next-intl';
 
 export function SubmissionPage({ user }: { user?: { id: string; email: string | null; username: string; avatarUrl: string | null } }) {
   const t = useTranslations('Submit');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [screenshotFiles, setScreenshotFiles] = useState<File[]>([]);
+  const [previewCoverUrl, setPreviewCoverUrl] = useState<string>("");
+  const [previewScreenshots, setPreviewScreenshots] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [availableCategories, setAvailableCategories] = useState<DictionaryItem[]>([]);
 
   const [availableCities, setAvailableCities] = useState<string[]>(CITIES);
 
@@ -21,7 +28,9 @@ export function SubmissionPage({ user }: { user?: { id: string; email: string | 
     intro: z.string().min(10, t('validationIntroMin')).max(100, t('validationIntroMax')),
     country: z.string().min(1, t('validationCountry')),
     city: z.string().min(1, t('validationCity')),
-    team: z.string().min(2, t('validationTeam')),
+    category: z.string().min(1, t('validationCategory')),
+    tags: z.array(z.number()).min(1, t('validationTagsMin')).max(5, t('validationTagsMax')),
+    team: z.array(z.object({ value: z.string().min(1, t('validationTeamMemberRequired')) })).min(1, t('validationTeamMin')),
     teamIntro: z.string().optional(),
     contactPhone: z.string().optional(),
     contactEmail: z.string().email(t('validationEmail')).optional().or(z.literal("")),
@@ -36,6 +45,7 @@ export function SubmissionPage({ user }: { user?: { id: string; email: string | 
     demoUrl: z.string().url(t('validationDemoUrl')),
     repoUrl: z.string().url(t('validationRepoUrl')).optional().or(z.literal("")),
   });
+  
 
   type SubmissionFormValues = z.infer<typeof submissionSchema>;
 
@@ -53,7 +63,9 @@ export function SubmissionPage({ user }: { user?: { id: string; email: string | 
       intro: "",
       country: "",
       city: "",
-      team: user?.username || "",
+      category: "",
+      tags: [],
+      team: [{ value: user?.username || "" }],
       teamIntro: "",
       contactPhone: "",
       contactEmail: "",
@@ -77,9 +89,42 @@ export function SubmissionPage({ user }: { user?: { id: string; email: string | 
     name: "scenarios"
   });
 
+  const { fields: teamFields, append: appendTeam, remove: removeTeam } = useFieldArray({
+    control,
+    name: "team"
+  });
+
   const coverUrl = watch("coverUrl");
   const screenshots = watch("screenshots") || [];
   const selectedCountry = watch("country");
+  const selectedTags = watch("tags") || [];
+
+  const fetchTags = async () => {
+    try {
+      const response = await fetch('/api/tags/all');
+      if (!response.ok) throw new Error(`Failed to fetch tags: ${response.statusText}`);
+      const data = await response.json();
+      setAvailableTags(data);
+    } catch (err) {
+      console.error("Failed to fetch tags:", err);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/dictionaries?code=category');
+      if (!response.ok) throw new Error(`Failed to fetch categories: ${response.statusText}`);
+      const data = await response.json();
+      setAvailableCategories(data.items || []);
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchTags();
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     if (selectedCountry) {
@@ -98,61 +143,101 @@ export function SubmissionPage({ user }: { user?: { id: string; email: string | 
         alert(t('uploadSizeError'));
         return;
       }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setValue("coverUrl", reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setCoverFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewCoverUrl(url);
+      setValue("coverUrl", "pending"); // Set a placeholder value to pass validation
     }
   };
 
   const handleScreenshotUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      if (files.length + screenshots.length > 5) {
+      if (files.length + screenshotFiles.length > 5) {
         alert(t('uploadLimitError'));
         return;
       }
 
-      const newScreenshots: string[] = [];
-      const readers: Promise<void>[] = [];
+      const newFiles: File[] = [];
+      const newPreviews: string[] = [];
 
       Array.from(files).forEach((file) => {
         if (file.size > 5 * 1024 * 1024) {
           alert(t('uploadSizeError'));
           return;
         }
-
-        const reader = new FileReader();
-        const promise = new Promise<void>((resolve) => {
-          reader.onloadend = () => {
-            newScreenshots.push(reader.result as string);
-            resolve();
-          };
-        });
-        reader.readAsDataURL(file);
-        readers.push(promise);
+        newFiles.push(file);
+        newPreviews.push(URL.createObjectURL(file));
       });
-
-      Promise.all(readers).then(() => {
-        setValue("screenshots", [...screenshots, ...newScreenshots]);
-      });
+      
+      const updatedFiles = [...screenshotFiles, ...newFiles];
+      setScreenshotFiles(updatedFiles);
+      setPreviewScreenshots([...previewScreenshots, ...newPreviews]);
+      // Update form value with placeholder array of same length
+      setValue("screenshots", new Array(updatedFiles.length).fill("pending"));
     }
   };
 
   const removeScreenshot = (index: number) => {
-    const newScreenshots = [...screenshots];
-    newScreenshots.splice(index, 1);
-    setValue("screenshots", newScreenshots);
+    const newFiles = [...screenshotFiles];
+    newFiles.splice(index, 1);
+    setScreenshotFiles(newFiles);
+
+    const newPreviews = [...previewScreenshots];
+    URL.revokeObjectURL(newPreviews[index]); // Clean up memory
+    newPreviews.splice(index, 1);
+    setPreviewScreenshots(newPreviews);
+    
+    setValue("screenshots", new Array(newFiles.length).fill("pending"));
+  };
+
+  const uploadFile = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch('/api/file', {
+      method: 'POST',
+      body: formData,
+    });
+    const result = await response.json();
+    if (result.success) {
+      return result.url;
+    }
+    throw new Error(result.error || "Upload failed");
+  };
+
+  const toggleTag = (tagId: number) => {
+    const currentTags = selectedTags as number[];
+    if (currentTags.includes(tagId)) {
+      setValue("tags", currentTags.filter(t => t !== tagId));
+    } else {
+      if (currentTags.length >= 5) {
+        alert(t('tagsLimitError'));
+        return;
+      }
+      setValue("tags", [...currentTags, tagId]);
+    }
   };
 
   const onSubmit = async (data: SubmissionFormValues) => {
     try {
+      // 1. Upload files first
+      let uploadedCoverUrl = "";
+      if (coverFile) {
+        uploadedCoverUrl = await uploadFile(coverFile);
+      }
+
+      const uploadedScreenshotUrls = await Promise.all(
+        screenshotFiles.map(file => uploadFile(file))
+      );
+
+      // 2. Prepare payload with real URLs
       const payload = {
         ...data,
+        coverUrl: uploadedCoverUrl,
+        screenshots: uploadedScreenshotUrls,
         highlights: data.highlights.map(h => h.value),
-        scenarios: data.scenarios.map(s => s.value)
+        scenarios: data.scenarios.map(s => s.value),
+        team: JSON.stringify(data.team.map(t => t.value)), // Stringify team array for backend
       };
 
       const response = await fetch('/api/submit', {
@@ -227,36 +312,28 @@ export function SubmissionPage({ user }: { user?: { id: string; email: string | 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">{t('country')} <span className="text-red-500">*</span></label>
-              <div className="relative">
-                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4" />
-                <select
-                  {...register("country")}
-                  className="w-full pl-10 pr-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors"
-                >
-                  <option value="">{t('countryPlaceholder')}</option>
-                  {COUNTRIES.map((country) => (
-                    <option key={country} value={country}>{country}</option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                options={COUNTRIES.map(country => ({ label: country, value: country }))}
+                value={selectedCountry}
+                onChange={(value) => setValue("country", value)}
+                placeholder={t('countryPlaceholder')}
+                icon={<Globe className="w-4 h-4" />}
+              />
+              <input type="hidden" {...register("country")} />
               {errors.country && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.country.message}</p>}
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">{t('city')} <span className="text-red-500">*</span></label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4" />
-                <select
-                  {...register("city")}
-                  className="w-full pl-10 pr-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors"
-                  disabled={!selectedCountry}
-                >
-                  <option value="">{t('cityPlaceholder')}</option>
-                  {availableCities.map((city) => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                options={availableCities.map(city => ({ label: city, value: city }))}
+                value={watch("city")}
+                onChange={(value) => setValue("city", value)}
+                placeholder={t('cityPlaceholder')}
+                disabled={!selectedCountry}
+                icon={<MapPin className="w-4 h-4" />}
+              />
+              <input type="hidden" {...register("city")} />
               {errors.city && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.city.message}</p>}
             </div>
           </div>
@@ -270,13 +347,57 @@ export function SubmissionPage({ user }: { user?: { id: string; email: string | 
               />
             {errors.intro && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.intro.message}</p>}
           </div>
+
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">{t('category')} <span className="text-red-500">*</span></label>
+              <Select
+                options={availableCategories.length > 0 
+                  ? availableCategories.map(category => ({ label: category.itemLabel, value: category.itemValue }))
+                  : CATEGORIES.map(category => ({ label: category, value: category }))
+                }
+                value={watch("category")}
+                onChange={(value) => setValue("category", value)}
+                placeholder={t('categoryPlaceholder')}
+                icon={<LayoutGrid className="w-4 h-4" />}
+              />
+              <input type="hidden" {...register("category")} />
+              {errors.category && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.category.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">{t('tags')} <span className="text-red-500">*</span></label>
+              <div className="flex flex-wrap gap-2">
+                {availableTags.map((tag) => {
+                  const isSelected = (selectedTags as number[]).includes(tag.id);
+                  return (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      onClick={() => toggleTag(tag.id)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
+                        isSelected 
+                          ? "bg-primary text-black border-primary" 
+                          : "bg-zinc-900/50 text-zinc-400 border-zinc-700 hover:border-zinc-500"
+                      }`}
+                    >
+                      {tag.name}
+                    </button>
+                  );
+                })}
+              </div>
+              <input type="hidden" {...register("tags")} />
+              {errors.tags && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.tags.message}</p>}
+              <p className="text-xs text-zinc-500 mt-1">{t('tagsDesc')}</p>
+            </div>
+          </div>
         </section>
 
         {/* Cover Image */}
         <section className="space-y-6">
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-300">{t('coverImageLabel')} <span className="text-red-500">*</span></label>
-            {!coverUrl ? (
+            {!previewCoverUrl ? (
               <div className="flex gap-4 items-start">
                 <div className="flex-1">
                   <div className="flex items-center justify-center w-full">
@@ -302,13 +423,18 @@ export function SubmissionPage({ user }: { user?: { id: string; email: string | 
               /* Preview */
               <div className="mt-4 w-full aspect-video bg-zinc-900 rounded-lg overflow-hidden border border-border flex items-center justify-center relative group">
                 <img
-                  src={coverUrl}
+                  src={previewCoverUrl}
                   alt={t('coverPreviewAlt')}
                   className="w-full h-full object-cover"
                 />
                 <button
                   type="button"
-                  onClick={() => setValue("coverUrl", "")}
+                  onClick={() => {
+                    setCoverFile(null);
+                    URL.revokeObjectURL(previewCoverUrl);
+                    setPreviewCoverUrl("");
+                    setValue("coverUrl", "");
+                  }}
                   className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                   title={t('deleteImage')}
                 >
@@ -408,7 +534,7 @@ export function SubmissionPage({ user }: { user?: { id: string; email: string | 
             <label className="text-sm font-medium text-gray-300">{t('screenshotsLabel')} <span className="text-red-500">*</span></label>
             <p className="text-xs text-zinc-500 mb-2">{t('screenshotsDesc')}</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {screenshots.map((url, index) => (
+              {previewScreenshots.map((url, index) => (
                 <div key={index} className="relative group aspect-video bg-zinc-900 rounded-lg overflow-hidden border border-border">
                   <img src={url} alt={`Screenshot ${index + 1}`} className="w-full h-full object-cover" />
                   <button
@@ -420,7 +546,7 @@ export function SubmissionPage({ user }: { user?: { id: string; email: string | 
                   </button>
                 </div>
               ))}
-              {screenshots.length < 5 && (
+              {previewScreenshots.length < 5 && (
                 <label className="flex flex-col items-center justify-center aspect-video border-2 border-zinc-700 border-dashed rounded-lg cursor-pointer bg-zinc-900/50 hover:bg-zinc-800 transition-colors">
                   <Plus className="w-8 h-8 mb-2 text-zinc-500" />
                   <span className="text-xs text-zinc-500">{t('addScreenshot')}</span>
@@ -475,16 +601,30 @@ export function SubmissionPage({ user }: { user?: { id: string; email: string | 
             {t('teamInfo')}
           </h2>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">{t('team')} <span className="text-red-500">*</span></label>
-            <div className="relative">
-              <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4" />
-              <input
-                {...register("team")}
-                className="w-full pl-10 pr-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
-                placeholder={t('teamPlaceholder')}
-              />
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-gray-300">{t('team')} <span className="text-red-500">*</span></label>
             </div>
+            {teamFields.map((field, index) => (
+              <div key={field.id} className="flex gap-2 items-start">
+                <div className="flex-1 space-y-1">
+                  <input
+                    {...register(`team.${index}.value` as const)}
+                    className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
+                    placeholder={t('teamPlaceholder')}
+                  />
+                  {errors.team?.[index]?.value && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.team[index]?.value?.message}</p>}
+                </div>
+                {teamFields.length > 1 && (
+                  <button type="button" onClick={() => removeTeam(index)} className="p-3 text-zinc-500 hover:text-red-500 transition-colors">
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+            ))}
+            <Button type="button" variant="outline" size="sm" onClick={() => appendTeam({ value: "" })} className="w-full border-dashed border-zinc-700 hover:border-primary hover:text-primary">
+              <Plus className="w-4 h-4 mr-2" /> {t('addTeamMember')}
+            </Button>
             {errors.team && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.team.message}</p>}
           </div>
 
@@ -492,7 +632,7 @@ export function SubmissionPage({ user }: { user?: { id: string; email: string | 
             <label className="text-sm font-medium text-gray-300">{t('teamIntro')}</label>
             <textarea
               {...register("teamIntro")}
-              rows={3}
+              rows={4}
               className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
               placeholder={t('teamIntroPlaceholder')}
             />

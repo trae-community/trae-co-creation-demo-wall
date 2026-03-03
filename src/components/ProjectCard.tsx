@@ -92,10 +92,16 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <div className="flex items-center gap-3 text-gray-500 text-xs">
-            <div className="flex items-center gap-1" title={project.team.join(", ")}>
-              <Users className="w-3.5 h-3.5" />
-              <span className="truncate max-w-[80px]">{project.team.join(", ")}</span>
-            </div>
+            {project.team && (
+              <div className="flex items-center gap-1" title={String(project.team)}>
+                <Users className="w-3.5 h-3.5" />
+                <span className="truncate max-w-[80px]">
+                  {(() => {
+                      return JSON.parse(project.team).join(", ");
+                  })() }
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-3 text-gray-500 text-xs">

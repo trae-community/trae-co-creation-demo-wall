@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from "react";
-import { PROJECTS } from "../../data/projects";
+import { useState, useEffect } from "react";
+import { Project } from "../../types";
 import { ProjectCard } from "../../components/ProjectCard";
 import { CityFilter, FilterState } from "../../components/CityFilter";
-import { Search, Clock, ThumbsUp, Eye } from "lucide-react";
+import { Search, Clock, ThumbsUp, Eye, Loader2 } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 
@@ -18,26 +18,59 @@ export function HomePage() {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<'time' | 'likes' | 'views'>('time');
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
-  const filteredProjects = PROJECTS.filter((project) => {
-    const matchCity = filters.cities.length === 0 || filters.cities.includes(project.city);
-    const matchCategory = filters.categories.length === 0 || filters.categories.includes(project.category);
-    const matchCountry = filters.countries.length === 0 || filters.countries.includes(project.country);
-    const matchTags = filters.tags.length === 0 || project.tags.some(tag => filters.tags.includes(tag));
+  const fetchProjects = async (isLoadMore = false) => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page: isLoadMore ? (page + 1).toString() : '1',
+        pageSize: '12',
+        search: searchQuery,
+        sort: sortBy === 'time' ? 'newest' : sortBy,
+      });
 
-    const matchSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        project.intro.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchCity && matchCategory && matchCountry && matchTags && matchSearch;
-  }).sort((a, b) => {
-    if (sortBy === 'time') {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    } else if (sortBy === 'likes') {
-      return (b.likes || 0) - (a.likes || 0);
-    } else if (sortBy === 'views') {
-      return (b.views || 0) - (a.views || 0);
+      if (filters.cities.length > 0) params.append('city', filters.cities.join(',')); // API currently supports single value, need adjustment if multiple
+      if (filters.countries.length > 0) params.append('country', filters.countries.join(','));
+      if (filters.categories.length > 0) params.append('category', filters.categories.join(','));
+      if (filters.tags.length > 0) params.append('tags', filters.tags.join(','));
+
+      // For now, let's take the first one if multiple are selected, as API example showed single value support for city/country/category
+      // Or we update API to support 'in' queries. The API created supports single value for city/country/category.
+      // Let's adjust params to match API for now:
+      if (filters.cities.length > 0) params.set('city', filters.cities[0]);
+      if (filters.countries.length > 0) params.set('country', filters.countries[0]);
+      if (filters.categories.length > 0) params.set('category', filters.categories[0]);
+      
+      const response = await fetch(`/api/works?${params.toString()}`);
+      const data = await response.json();
+
+      if (isLoadMore) {
+        setProjects(prev => [...prev, ...data.items]);
+        setPage(prev => prev + 1);
+      } else {
+        setProjects(data.items);
+        setPage(1);
+      }
+      
+      setHasMore(data.page < data.totalPages);
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+    } finally {
+      setLoading(false);
     }
-    return 0;
-  });
+  };
+
+  // Debounce search and filter changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchProjects();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [filters, searchQuery, sortBy]);
 
   return (
     <div className="space-y-8">
@@ -138,9 +171,13 @@ export function HomePage() {
       </div>
 
       {/* Project Grid */}
-      {filteredProjects.length > 0 ? (
+      {loading && projects.length === 0 ? (
+        <div className="flex justify-center py-20">
+          <Loader2 className="w-10 h-10 text-[#22C55E] animate-spin" />
+        </div>
+      ) : projects.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects.map((project) => (
+          {projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
         </div>
@@ -160,6 +197,20 @@ export function HomePage() {
             className="text-primary font-medium mt-2 hover:underline"
           >
             {t('clearFilters')}
+          </button>
+        </div>
+      )}
+
+      {/* Load More */}
+      {hasMore && projects.length > 0 && (
+        <div className="flex justify-center pt-8">
+          <button
+            onClick={() => fetchProjects(true)}
+            disabled={loading}
+            className="px-6 py-3 rounded-full font-medium bg-white/5 text-white border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md flex items-center gap-2 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+            {loading ? t('loading') : t('loadMore')}
           </button>
         </div>
       )}
