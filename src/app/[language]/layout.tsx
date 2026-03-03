@@ -13,9 +13,12 @@ export const metadata: Metadata = {
 
 export default async function LocaleLayout({
   children,
+  params,
 }: {
   children: React.ReactNode
+  params: Promise<{ language: string }>
 }) {
+  const { language } = await params;
   const messages = await getMessages();
 
   return (
@@ -31,9 +34,13 @@ export default async function LocaleLayout({
         },
       }}
     >
-      <NextIntlClientProvider messages={messages}>
-        <SiteLayout>{children}</SiteLayout>
-      </NextIntlClientProvider>
+      <html lang={language}>
+        <body>
+          <NextIntlClientProvider messages={messages}>
+            <SiteLayout>{children}</SiteLayout>
+          </NextIntlClientProvider>
+        </body>
+      </html>
     </ClerkProvider>
   )
 }

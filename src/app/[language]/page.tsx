@@ -77,7 +77,7 @@ export default function Page() {
       {/* Banner */}
       <section className="relative rounded-3xl p-8 md:p-16 text-white overflow-hidden border border-white/20 shadow-2xl group">
         <div className="absolute inset-0 bg-gradient-to-br from-zinc-900/50 via-background to-background z-0"></div>
-        <div className="absolute inset-0 bg-[url('https://www.trae.ai/images/hero-bg.png')] bg-cover bg-center opacity-30 mix-blend-overlay z-0"></div>
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center opacity-30 z-0"></div>
 
         <div className="relative z-10 max-w-3xl">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight leading-tight">
