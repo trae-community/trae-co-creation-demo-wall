@@ -9,8 +9,52 @@ interface ProjectCardProps {
   project: Project;
 }
 
+type TeamValue = { value?: unknown; members?: unknown };
+
+const normalizeTeamMembers = (team: unknown): string[] => {
+  if (!team) return [];
+
+  if (Array.isArray(team)) {
+    return team
+      .map((member) => {
+        if (typeof member === "string") return member.trim();
+        if (member && typeof member === "object" && "value" in member) {
+          return String((member as TeamValue).value ?? "").trim();
+        }
+        return "";
+      })
+      .filter(Boolean);
+  }
+
+  if (typeof team === "string") {
+    const trimmed = team.trim();
+    if (!trimmed) return [];
+
+    try {
+      const parsed = JSON.parse(trimmed);
+      const parsedMembers = normalizeTeamMembers(parsed);
+      if (parsedMembers.length > 0) return parsedMembers;
+    } catch {
+      // Legacy rows may store plain comma-separated names instead of JSON.
+    }
+
+    return trimmed
+      .split(/[\uFF0C,]/)
+      .map((name) => name.trim())
+      .filter(Boolean);
+  }
+
+  if (typeof team === "object" && "members" in team) {
+    return normalizeTeamMembers((team as TeamValue).members);
+  }
+
+  return [];
+};
+
 export function ProjectCard({ project }: ProjectCardProps) {
   const t = useTranslations('Card');
+  const teamMembers = normalizeTeamMembers(project.team);
+  const teamLabel = teamMembers.join(", ");
 
   return (
     <Link
@@ -92,13 +136,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <div className="flex items-center gap-3 text-gray-500 text-xs">
-            {project.team && (
-              <div className="flex items-center gap-1" title={String(project.team)}>
+            {teamMembers.length > 0 && (
+              <div className="flex items-center gap-1" title={teamLabel}>
                 <Users className="w-3.5 h-3.5" />
                 <span className="truncate max-w-[80px]">
-                  {(() => {
-                      return JSON.parse(project.team).join(", ");
-                  })() }
+                  {teamLabel}
                 </span>
               </div>
             )}
@@ -122,3 +164,4 @@ export function ProjectCard({ project }: ProjectCardProps) {
     </Link>
   );
 }
+
