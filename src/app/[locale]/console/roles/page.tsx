@@ -22,6 +22,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Card } from '@/components/ui/card'
+import { LoadingOverlay } from '@/components/LoadingOverlay'
 
 // Types
 interface RoleItem {
@@ -41,6 +42,7 @@ const roleSchema = z.object({
 type RoleFormValues = z.infer<typeof roleSchema>
 
 export default function RolesPage() {
+  const [isLoading, setIsLoading] = useState(false)
   const [roles, setRoles] = useState<RoleItem[]>([])
   const [totalItems, setTotalItems] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
@@ -68,6 +70,7 @@ export default function RolesPage() {
   // Fetch Roles
   const fetchRoles = useCallback(async () => {
     try {
+      setIsLoading(true)
       const params = new URLSearchParams({
         [CRUD_QUERY_PARAMS.page]: String(currentPage),
         [CRUD_QUERY_PARAMS.pageSize]: String(pageSize),
@@ -85,6 +88,8 @@ export default function RolesPage() {
     } catch (error) {
       console.error('Failed to fetch roles:', error)
       showFeedback('error', '角色列表加载失败')
+    } finally {
+      setIsLoading(false)
     }
   }, [currentPage, pageSize, searchTerm, showFeedback])
 
@@ -181,7 +186,8 @@ export default function RolesPage() {
   const endIndex = Math.min(startIndex + pageSize, totalItems)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative min-h-[500px]">
+      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
       
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">

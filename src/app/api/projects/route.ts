@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
+import { getOrSyncUser } from '@/lib/auth';
 
 // Helper to sanitize object
 const sanitize = (data: any) => {
@@ -164,9 +165,19 @@ export async function PUT(req: NextRequest) {
     // If auditStatus is provided, update statistic and create log
     if (auditStatus !== undefined) {
       console.log('Updating audit status for work:', id, 'to:', auditStatus)
+      const currentUser = await getOrSyncUser()
+      const bodyAuditorId = body.auditorId ? BigInt(body.auditorId) : undefined
+      const auditorId = currentUser?.id ?? bodyAuditorId
+      if (!auditorId) {
+        return NextResponse.json({ error: 'Auditor ID is required for audit action' }, { status: 401 })
+      }
       const currentStat = await prisma.workStatistic.findUnique({
         where: { workId: BigInt(id) }
       });
+      
+      const newStatus = Number(auditStatus)
+      // Extract audit reason from body or use default
+      const auditReason = body.auditReason || 'Manual update via console'
 
       if (!currentStat) {
         // If no statistic record exists, create one (safety fallback)
@@ -174,38 +185,38 @@ export async function PUT(req: NextRequest) {
         await prisma.workStatistic.create({
           data: {
             workId: BigInt(id),
-            auditStatus: Number(auditStatus),
-            displayStatus: Number(auditStatus) === 1 ? 1 : 0,
+            auditStatus: newStatus,
+            displayStatus: newStatus === 1 ? 1 : 0,
             lastAuditAt: new Date()
           }
         })
-      } else if (currentStat.auditStatus !== Number(auditStatus)) {
-        // Update statistic
+        
+        await prisma.$executeRaw`
+          INSERT INTO "work_audit_log"
+          ("work_id", "auditor_id", "prev_status", "new_status", "reason", "created_at")
+          VALUES (${BigInt(id)}, ${auditorId ?? null}, ${null}, ${newStatus}, ${body.auditReason || 'Initial status creation via console'}, ${new Date()})
+        `
+
+      } else {
+        // Even if status is the same, we log it if reason is provided or force it
+        // This helps in debugging and also allows "re-confirming" a status with a new note
+        console.log(`Audit status update request for work ${id} (Current: ${currentStat.auditStatus}, New: ${newStatus})`);
+        
+        // Update statistic (update timestamp anyway)
         await prisma.workStatistic.update({
           where: { workId: BigInt(id) },
           data: {
-            auditStatus: Number(auditStatus),
+            auditStatus: newStatus,
             lastAuditAt: new Date(),
-            displayStatus: Number(auditStatus) === 1 ? 1 : 0 // Auto display if approved
+            displayStatus: newStatus === 1 ? 1 : 0 
           }
         });
 
-        // Create audit log
-        try {
-          await prisma.workAuditLog.create({
-            data: {
-              workId: BigInt(id),
-              // auditorId: userId ? BigInt(userId) : undefined, // Assuming current user is auditor
-              prevStatus: currentStat.auditStatus,
-              newStatus: Number(auditStatus),
-              reason: 'Manual update via console', 
-              createdAt: new Date()
-            }
-          });
-        } catch (logError) {
-          console.error('Failed to create audit log:', logError)
-          // Don't block the main update
-        }
+        await prisma.$executeRaw`
+          INSERT INTO "work_audit_log"
+          ("work_id", "auditor_id", "prev_status", "new_status", "reason", "created_at")
+          VALUES (${BigInt(id)}, ${auditorId ?? null}, ${currentStat.auditStatus ?? null}, ${newStatus}, ${auditReason}, ${new Date()})
+        `
       }
     }
 

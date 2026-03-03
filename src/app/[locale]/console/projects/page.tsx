@@ -93,11 +93,13 @@ const workSchema = z.object({
 type WorkFormValues = z.infer<typeof workSchema>
 
 import { useParams } from 'next/navigation'
+import { LoadingOverlay } from '@/components/LoadingOverlay'
 
 export default function ProjectsPage() {
   const params = useParams()
   const locale = (params?.locale as string) || 'zh-CN' // Get locale from URL params
   
+  const [isLoading, setIsLoading] = useState(false)
   const [works, setWorks] = useState<WorkItem[]>([])
   const [totalItems, setTotalItems] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
@@ -134,6 +136,7 @@ export default function ProjectsPage() {
   // Audit Dialog states
   const [isAuditDialogOpen, setIsAuditDialogOpen] = useState(false)
   const [selectedAuditStatus, setSelectedAuditStatus] = useState<string>('0')
+  const [auditReason, setAuditReason] = useState('')
   const [isSavingAudit, setIsSavingAudit] = useState(false)
 
   const { feedback, showFeedback } = useFeedback()
@@ -188,6 +191,7 @@ export default function ProjectsPage() {
   // Fetch Works
   const fetchWorks = useCallback(async () => {
     try {
+      setIsLoading(true)
       const params = new URLSearchParams({
         [CRUD_QUERY_PARAMS.page]: String(currentPage),
         [CRUD_QUERY_PARAMS.pageSize]: String(pageSize),
@@ -205,6 +209,8 @@ export default function ProjectsPage() {
     } catch (error) {
       console.error('Failed to fetch works:', error)
       showFeedback('error', '作品列表加载失败')
+    } finally {
+      setIsLoading(false)
     }
   }, [currentPage, pageSize, searchTerm, showFeedback])
 
@@ -354,6 +360,7 @@ export default function ProjectsPage() {
       ? String(work.statistic.auditStatus) 
       : '0'
     setSelectedAuditStatus(status)
+    setAuditReason('') // Reset reason
     setIsAuditDialogOpen(true)
   }
 
@@ -361,14 +368,15 @@ export default function ProjectsPage() {
     if (!selectedWork) return
     try {
       setIsSavingAudit(true)
-      console.log('Saving audit status:', selectedAuditStatus, 'for work:', selectedWork.id)
+      console.log('Saving audit status:', selectedAuditStatus, 'reason:', auditReason, 'for work:', selectedWork.id)
       
       const res = await fetch('/api/projects', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: selectedWork.id,
-          auditStatus: Number(selectedAuditStatus) // Ensure it's a number
+          auditStatus: Number(selectedAuditStatus), // Ensure it's a number
+          auditReason: auditReason // Send reason
         })
       })
 
@@ -432,7 +440,8 @@ export default function ProjectsPage() {
   const endIndex = Math.min(startIndex + pageSize, totalItems)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative min-h-[500px]">
+      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
       
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
@@ -809,6 +818,15 @@ export default function ProjectsPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>审核意见 (可选)</Label>
+              <Input 
+                value={auditReason} 
+                onChange={(e) => setAuditReason(e.target.value)} 
+                placeholder="请输入审核通过或拒绝的理由..." 
+              />
             </div>
           </div>
 

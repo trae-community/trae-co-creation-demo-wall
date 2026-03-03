@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/select"
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import { LoadingOverlay } from '@/components/LoadingOverlay'
 
 // Types
 interface DictItem {
@@ -72,6 +73,7 @@ const itemSchema = z.object({
 })
 
 export default function DictionariesPage() {
+  const [isLoading, setIsLoading] = useState(false)
   const [dicts, setDicts] = useState<Dict[]>([])
   const [totalItems, setTotalItems] = useState(0)
   const [expandedDicts, setExpandedDicts] = useState<Set<string>>(new Set())
@@ -119,6 +121,7 @@ export default function DictionariesPage() {
 
   const fetchDicts = useCallback(async () => {
     try {
+      setIsLoading(true)
       const params = new URLSearchParams({
         [CRUD_QUERY_PARAMS.page]: String(currentPage),
         [CRUD_QUERY_PARAMS.pageSize]: String(pageSize),
@@ -136,6 +139,8 @@ export default function DictionariesPage() {
     } catch (error) {
       console.error('Failed to fetch dicts:', error)
       showFeedback('error', '字典加载失败')
+    } finally {
+      setIsLoading(false)
     }
   }, [currentPage, pageSize, searchTerm, filterMode, showFeedback])
 
@@ -347,7 +352,8 @@ export default function DictionariesPage() {
   const pagedDicts = filteredDicts
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative min-h-[500px]">
+      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
         <div>
