@@ -20,7 +20,11 @@
     "sortLikes": "いいね",
     "sortViews": "人気",
     "noResults": "条件に一致するプロジェクトが見つかりません",
-    "clearFilters": "フィルターをクリア"
+    "clearFilters": "フィルターをクリア",
+    "paginationInfo": "{total}件中 {start}-{end}件を表示",
+    "prevPage": "前へ",
+    "nextPage": "次へ",
+    "loading": "読み込み中..."
   },
   "Submit": {
     "title": "作品を投稿する",

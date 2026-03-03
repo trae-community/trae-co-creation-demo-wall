@@ -3,6 +3,8 @@ export interface Work {
   name: string;
   intro: string;
   city: string;
+  country: string;
+  category: string;
   team?: string[] | string | null;
   coverUrl: string;
   story?: string;
@@ -19,9 +21,8 @@ export interface Work {
   createdAt: Date | string; // Updated to accept Date object from Prisma
   views: number;
   likes: number;
-  category: string;
   tags: string[];
-  country: string;
+  honors?: string[];
   author: {
     name: string;
     avatar: string | null;

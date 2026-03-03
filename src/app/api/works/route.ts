@@ -5,14 +5,19 @@ import { Prisma } from '@prisma/client';
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const page = Number(searchParams.get('page') || '1');
-    const pageSize = Number(searchParams.get('pageSize') || '12');
+    const page = Math.max(1, Number(searchParams.get('page') || '1'));
+    const pageSize = Math.max(1, Number(searchParams.get('pageSize') || '12'));
     const search = searchParams.get('search') || '';
     const city = searchParams.get('city');
     const country = searchParams.get('country');
     const category = searchParams.get('category');
     const tags = searchParams.get('tags')?.split(',').filter(Boolean);
+    const lang = searchParams.get('lang') || 'zh-CN';
     const sort = searchParams.get('sort') || 'newest'; // newest, likes, views
+
+    const cityCodes = city?.split(',').filter(Boolean) || [];
+    const countryCodes = country?.split(',').filter(Boolean) || [];
+    const categoryCodes = category?.split(',').filter(Boolean) || [];
 
     const where: Prisma.WorkBaseWhereInput = {
       // Basic filtering
@@ -22,9 +27,9 @@ export async function GET(req: Request) {
           { summary: { contains: search, mode: 'insensitive' } },
         ],
       }),
-      ...(city && { cityCode: city }),
-      ...(country && { countryCode: country }),
-      ...(category && { categoryCode: category }),
+      ...(cityCodes.length > 0 && { cityCode: { in: cityCodes } }),
+      ...(countryCodes.length > 0 && { countryCode: { in: countryCodes } }),
+      ...(categoryCodes.length > 0 && { categoryCode: { in: categoryCodes } }),
       
       // Tag filtering
       ...(tags && tags.length > 0 && {
@@ -52,6 +57,44 @@ export async function GET(req: Request) {
       orderBy = { statistic: { viewCount: 'desc' } };
     }
 
+    const [countryDict, cityDict, categoryDict, honorDict] = await Promise.all([
+      prisma.sysDict.findUnique({
+        where: { dictCode: 'country' },
+        include: { items: true }
+      }),
+      prisma.sysDict.findUnique({
+        where: { dictCode: 'city' },
+        include: { items: true }
+      }),
+      prisma.sysDict.findUnique({
+        where: { dictCode: 'category_code' },
+        include: { items: true }
+      }),
+      prisma.sysDict.findUnique({
+        where: { dictCode: 'honor_type' },
+        include: { items: true }
+      })
+    ]);
+
+    const resolveLabelMap = (items: Array<{ itemValue: string; itemLabel: string; labelI18n: Prisma.JsonValue | null }>) => {
+      return items.reduce<Record<string, string>>((acc, item) => {
+        let label = item.itemLabel;
+        if (item.labelI18n && typeof item.labelI18n === 'object') {
+          const i18n = item.labelI18n as Record<string, string>;
+          if (i18n[lang]) {
+            label = i18n[lang];
+          }
+        }
+        acc[item.itemValue] = label;
+        return acc;
+      }, {});
+    };
+
+    const countryLabelMap = resolveLabelMap(countryDict?.items || []);
+    const cityLabelMap = resolveLabelMap(cityDict?.items || []);
+    const categoryLabelMap = resolveLabelMap(categoryDict?.items || []);
+    const honorLabelMap = resolveLabelMap(honorDict?.items || []);
+
     const [total, works] = await Promise.all([
       prisma.workBase.count({ where }),
       prisma.workBase.findMany({
@@ -77,6 +120,11 @@ export async function GET(req: Request) {
               tag: true
             }
           },
+          honors: {
+            include: {
+              dictItem: true
+            }
+          },
           team: {
             select: {
               members: true
@@ -85,17 +133,15 @@ export async function GET(req: Request) {
         }
       })
     ]);
-    console.log(works);
-    
 
     // Transform data to match frontend expectations
     const items = works.map(work => ({
       id: work.id.toString(),
       name: work.title,
       intro: work.summary,
-      city: work.cityCode,
-      country: work.countryCode,
-      category: work.categoryCode,
+      city: cityLabelMap[work.cityCode || ''] || work.cityCode || '',
+      country: countryLabelMap[work.countryCode || ''] || work.countryCode || '',
+      category: categoryLabelMap[work.categoryCode || ''] || work.categoryCode || '',
       coverUrl: work.coverUrl,
       author: {
         name: work.user.username,
@@ -105,6 +151,14 @@ export async function GET(req: Request) {
       views: Number(work.statistic?.viewCount || 0),
       likes: Number(work.statistic?.likeCount || 0),
       tags: work.tags.map(r => r.tag.name),
+      honors: work.honors
+        .map((honor) => {
+          if (honor.dictItem?.itemValue) {
+            return honorLabelMap[honor.dictItem.itemValue] || honor.dictItem.itemLabel || '';
+          }
+          return '';
+        })
+        .filter(Boolean),
       createdAt: work.createdAt
     }));
 

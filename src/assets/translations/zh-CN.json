@@ -21,6 +21,9 @@
     "sortViews": "热门",
     "noResults": "没有找到符合条件的项目",
     "clearFilters": "清除筛选条件",
+    "paginationInfo": "显示 {start}-{end}，共 {total} 个作品",
+    "prevPage": "上一页",
+    "nextPage": "下一页",
     "loadMore": "加载更多",
     "loading": "加载中..."
   },

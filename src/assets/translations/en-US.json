@@ -21,6 +21,9 @@
     "sortViews": "Views",
     "noResults": "No projects found matching your criteria",
     "clearFilters": "Clear all filters",
+    "paginationInfo": "Showing {start}-{end} of {total} works",
+    "prevPage": "Previous",
+    "nextPage": "Next",
     "loadMore": "Load More",
     "loading": "Loading..."
   },
