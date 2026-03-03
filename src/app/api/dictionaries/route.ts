@@ -39,7 +39,6 @@ export async function GET(req: NextRequest) {
       const processedItems = dict.items.map(item => {
         let label = item.itemLabel;
         if (lang && item.labelI18n && typeof item.labelI18n === 'object') {
-          // @ts-ignore: JSON types in Prisma can be complex, assuming object
           const i18n = item.labelI18n as Record<string, string>;
           if (i18n[lang]) {
             label = i18n[lang];
