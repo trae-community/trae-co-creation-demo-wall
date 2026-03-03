@@ -27,13 +27,9 @@ export default async function LocaleLayout({
         },
       }}
     >
-      <html lang={locale} suppressHydrationWarning>
-        <body suppressHydrationWarning>
-          <NextIntlClientProvider messages={messages}>
-            <Layout>{children}</Layout>
-          </NextIntlClientProvider>
-        </body>
-      </html>
+      <NextIntlClientProvider messages={messages}>
+        <Layout>{children}</Layout>
+      </NextIntlClientProvider>
     </ClerkProvider>
   )
 }

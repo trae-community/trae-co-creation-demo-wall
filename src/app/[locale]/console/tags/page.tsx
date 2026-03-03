@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import { LoadingOverlay } from '@/components/LoadingOverlay'
 
 interface WorkTag {
   id: number
@@ -47,6 +48,7 @@ const tagSchema = z.object({
 })
 
 export default function TagsPage() {
+  const [isLoading, setIsLoading] = useState(false)
   const [tags, setTags] = useState<WorkTag[]>([])
   const [totalItems, setTotalItems] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
@@ -71,6 +73,7 @@ export default function TagsPage() {
 
   const fetchTags = useCallback(async () => {
     try {
+      setIsLoading(true)
       const params = new URLSearchParams({
         [CRUD_QUERY_PARAMS.page]: String(currentPage),
         [CRUD_QUERY_PARAMS.pageSize]: String(pageSize),
@@ -88,6 +91,8 @@ export default function TagsPage() {
     } catch (error) {
       console.error('Failed to fetch tags:', error)
       showFeedback('error', '标签加载失败')
+    } finally {
+      setIsLoading(false)
     }
   }, [currentPage, pageSize, searchTerm, filterMode, showFeedback])
 
@@ -193,7 +198,8 @@ export default function TagsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative min-h-[500px]">
+      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
         <div>

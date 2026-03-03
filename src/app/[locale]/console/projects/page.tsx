@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Plus, Edit, Trash2, Eye, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck } from 'lucide-react'
+import { Edit, Trash2, Eye, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -69,12 +69,32 @@ interface WorkItem {
     viewCount: string
     likeCount: string
   }
+  detail?: {
+    story: string | null
+    highlights: unknown
+    scenarios: unknown
+    demoUrl: string | null
+    repoUrl: string | null
+  } | null
+  images?: {
+    id: string
+    imageUrl: string
+    imageType: string | null
+    sortOrder: number | null
+  }[]
+  team?: {
+    members: unknown
+    teamIntro: string | null
+    contactPhone: string | null
+    contactEmail: string | null
+  } | null
 }
 
 interface DictItem {
   id: string
   itemLabel: string
   itemValue: string
+  lang?: string
   labelI18n?: Record<string, string> | null
 }
 
@@ -88,16 +108,22 @@ const workSchema = z.object({
   categoryCode: z.string().optional().or(z.literal('')),
   devStatusCode: z.string().optional().or(z.literal('')),
   userId: z.string().min(1, '请选择所属用户'),
+  teamMembers: z.string().optional().or(z.literal('')),
+  teamIntro: z.string().optional().or(z.literal('')),
+  contactPhone: z.string().optional().or(z.literal('')),
+  contactEmail: z.string().email('请输入有效邮箱地址').optional().or(z.literal('')),
 })
 
 type WorkFormValues = z.infer<typeof workSchema>
 
 import { useParams } from 'next/navigation'
+import { LoadingOverlay } from '@/components/LoadingOverlay'
 
 export default function ProjectsPage() {
   const params = useParams()
   const locale = (params?.locale as string) || 'zh-CN' // Get locale from URL params
   
+  const [isLoading, setIsLoading] = useState(false)
   const [works, setWorks] = useState<WorkItem[]>([])
   const [totalItems, setTotalItems] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
@@ -134,7 +160,11 @@ export default function ProjectsPage() {
   // Audit Dialog states
   const [isAuditDialogOpen, setIsAuditDialogOpen] = useState(false)
   const [selectedAuditStatus, setSelectedAuditStatus] = useState<string>('0')
+  const [auditReason, setAuditReason] = useState('')
   const [isSavingAudit, setIsSavingAudit] = useState(false)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
+  const [viewingWork, setViewingWork] = useState<WorkItem | null>(null)
+  const [viewImageIndex, setViewImageIndex] = useState(0)
 
   const { feedback, showFeedback } = useFeedback()
 
@@ -150,8 +180,23 @@ export default function ProjectsPage() {
       categoryCode: '',
       devStatusCode: '',
       userId: '',
+      teamMembers: '',
+      teamIntro: '',
+      contactPhone: '',
+      contactEmail: '',
     }
   })
+
+  const normalizeStringList = (input: unknown): string[] => {
+    if (!Array.isArray(input)) return []
+    return input
+      .map(item => {
+        if (typeof item === 'string') return item.trim()
+        if (item && typeof item === 'object' && 'value' in item) return String((item as { value?: unknown }).value ?? '').trim()
+        return ''
+      })
+      .filter(Boolean)
+  }
 
   // Fetch Dictionaries & Tags
   const fetchDicts = useCallback(async () => {
@@ -188,6 +233,7 @@ export default function ProjectsPage() {
   // Fetch Works
   const fetchWorks = useCallback(async () => {
     try {
+      setIsLoading(true)
       const params = new URLSearchParams({
         [CRUD_QUERY_PARAMS.page]: String(currentPage),
         [CRUD_QUERY_PARAMS.pageSize]: String(pageSize),
@@ -205,6 +251,8 @@ export default function ProjectsPage() {
     } catch (error) {
       console.error('Failed to fetch works:', error)
       showFeedback('error', '作品列表加载失败')
+    } finally {
+      setIsLoading(false)
     }
   }, [currentPage, pageSize, searchTerm, showFeedback])
 
@@ -222,6 +270,7 @@ export default function ProjectsPage() {
   // Handlers
   const handleEdit = (work: WorkItem) => {
     setEditingWork(work)
+    const teamMembers = normalizeStringList(work.team?.members).join('\n')
     form.reset({
       title: work.title,
       summary: work.summary || '',
@@ -231,8 +280,18 @@ export default function ProjectsPage() {
       categoryCode: work.categoryCode || '',
       devStatusCode: work.devStatusCode || '',
       userId: work.userId,
+      teamMembers,
+      teamIntro: work.team?.teamIntro || '',
+      contactPhone: work.team?.contactPhone || '',
+      contactEmail: work.team?.contactEmail || '',
     })
     setIsDialogOpen(true)
+  }
+
+  const handleView = (work: WorkItem) => {
+    setViewingWork(work)
+    setViewImageIndex(0)
+    setIsViewDialogOpen(true)
   }
 
   const handleDelete = async (id: string) => {
@@ -354,6 +413,7 @@ export default function ProjectsPage() {
       ? String(work.statistic.auditStatus) 
       : '0'
     setSelectedAuditStatus(status)
+    setAuditReason('') // Reset reason
     setIsAuditDialogOpen(true)
   }
 
@@ -361,14 +421,15 @@ export default function ProjectsPage() {
     if (!selectedWork) return
     try {
       setIsSavingAudit(true)
-      console.log('Saving audit status:', selectedAuditStatus, 'for work:', selectedWork.id)
+      console.log('Saving audit status:', selectedAuditStatus, 'reason:', auditReason, 'for work:', selectedWork.id)
       
       const res = await fetch('/api/projects', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: selectedWork.id,
-          auditStatus: Number(selectedAuditStatus) // Ensure it's a number
+          auditStatus: Number(selectedAuditStatus), // Ensure it's a number
+          auditReason: auditReason // Send reason
         })
       })
 
@@ -393,9 +454,29 @@ export default function ProjectsPage() {
     try {
       setIsSaving(true)
       const url = '/api/projects'
-      // Only Update allowed
       const method = 'PUT'
-      const body = { ...values, id: editingWork?.id }
+      const teamMembers = values.teamMembers
+        ? values.teamMembers
+            .split(/[\n,，]/)
+            .map(member => member.trim())
+            .filter(Boolean)
+        : []
+
+      const body = {
+        id: editingWork?.id,
+        userId: values.userId,
+        title: values.title,
+        summary: values.summary,
+        coverUrl: values.coverUrl,
+        countryCode: values.countryCode,
+        cityCode: values.cityCode,
+        categoryCode: values.categoryCode,
+        devStatusCode: values.devStatusCode,
+        teamMembers,
+        teamIntro: values.teamIntro,
+        contactPhone: values.contactPhone,
+        contactEmail: values.contactEmail,
+      }
 
       const res = await fetch(url, {
         method,
@@ -430,9 +511,15 @@ export default function ProjectsPage() {
   const current = Math.min(currentPage, totalPages)
   const startIndex = (current - 1) * pageSize
   const endIndex = Math.min(startIndex + pageSize, totalItems)
+  const viewingTeamMembers = normalizeStringList(viewingWork?.team?.members)
+  const viewingHighlights = normalizeStringList(viewingWork?.detail?.highlights)
+  const viewingScenarios = normalizeStringList(viewingWork?.detail?.scenarios)
+  const viewingImages = (viewingWork?.images || []).filter(image => Boolean(image.imageUrl))
+  const currentViewImageIndex = viewingImages.length > 0 ? Math.min(viewImageIndex, viewingImages.length - 1) : 0
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative min-h-[500px]">
+      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
       
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
@@ -490,7 +577,7 @@ export default function ProjectsPage() {
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h3 className="font-semibold text-lg line-clamp-1 hover:text-primary cursor-pointer transition-colors" title={work.title} onClick={() => handleEdit(work)}>
+                      <h3 className="font-semibold text-lg line-clamp-1 hover:text-primary cursor-pointer transition-colors" title={work.title} onClick={() => handleView(work)}>
                         {work.title}
                       </h3>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
@@ -508,6 +595,9 @@ export default function ProjectsPage() {
                     
                     {/* Action Buttons */}
                     <div className="flex items-center gap-1 shrink-0">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-indigo-500 hover:bg-indigo-500/10" onClick={() => handleView(work)} title="查看作品">
+                        <Eye size={16} />
+                      </Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-blue-500 hover:bg-blue-500/10" onClick={() => handleOpenAuditDialog(work)} title="审核作品">
                         <ShieldCheck size={16} />
                       </Button>
@@ -606,7 +696,7 @@ export default function ProjectsPage() {
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[600px]">
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingWork ? '编辑作品' : '新建作品'}</DialogTitle>
             <DialogDescription>
@@ -698,6 +788,28 @@ export default function ProjectsPage() {
               <Textarea {...form.register('summary')} placeholder="作品一句话简介..." />
             </div>
 
+            <div className="space-y-2">
+              <label className="text-sm font-medium">团队成员</label>
+              <Textarea {...form.register('teamMembers')} placeholder="每行一个成员姓名，或使用逗号分隔" rows={4} />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">团队介绍</label>
+              <Textarea {...form.register('teamIntro')} placeholder="介绍团队背景与分工..." rows={3} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">联系电话</label>
+                <Input {...form.register('contactPhone')} placeholder="选填" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">联系邮箱</label>
+                <Input {...form.register('contactEmail')} placeholder="选填" />
+                {form.formState.errors.contactEmail && <p className="text-red-500 text-xs">{form.formState.errors.contactEmail.message}</p>}
+              </div>
+            </div>
+
             <DialogFooter className="gap-2 sm:gap-0">
               <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>取消</Button>
               <Button type="submit" disabled={isSaving}>
@@ -705,6 +817,204 @@ export default function ProjectsPage() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[900px] max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{viewingWork?.title || '查看作品'}</DialogTitle>
+            <DialogDescription>
+              参考提交作品信息展示，包含详情与团队信息
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-1 rounded-md overflow-hidden border border-border bg-secondary/20">
+                {viewingWork?.coverUrl ? (
+                  <img src={viewingWork.coverUrl} alt={viewingWork.title} className="w-full h-48 object-cover" />
+                ) : (
+                  <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">无封面图</div>
+                )}
+              </div>
+              <div className="md:col-span-2 space-y-3">
+                <div>
+                  <div className="text-xs text-muted-foreground">一句话简介</div>
+                  <div className="text-sm">{viewingWork?.summary || '暂无'}</div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <div className="text-xs text-muted-foreground">分类</div>
+                    <div>{getLabel(viewingWork?.categoryCode || null, categories) || '暂无'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">开发状态</div>
+                    <div>{getLabel(viewingWork?.devStatusCode || null, devStatuses) || '暂无'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">国家/城市</div>
+                    <div>
+                      {viewingWork?.countryCode ? getLabel(viewingWork.countryCode, countries) : ''}
+                      {viewingWork?.countryCode && viewingWork?.cityCode ? ' · ' : ''}
+                      {viewingWork?.cityCode ? getLabel(viewingWork.cityCode, cities) : ''}
+                      {!viewingWork?.countryCode && !viewingWork?.cityCode ? '暂无' : ''}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">作者</div>
+                    <div>{viewingWork?.user?.username || '暂无'}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="font-medium">轮播图片</div>
+              <div className="rounded-md border border-border p-3 bg-secondary/20">
+                {viewingImages.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="relative overflow-hidden rounded-md bg-black/20">
+                      <img
+                        src={viewingImages[currentViewImageIndex].imageUrl}
+                        alt={`${viewingWork?.title || '作品'}-轮播图-${currentViewImageIndex + 1}`}
+                        className="w-full h-56 sm:h-72 object-cover"
+                      />
+                      {viewingImages.length > 1 && (
+                        <>
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="icon"
+                            className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                            onClick={() => setViewImageIndex(prev => (prev - 1 + viewingImages.length) % viewingImages.length)}
+                          >
+                            <ChevronLeft size={16} />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="icon"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                            onClick={() => setViewImageIndex(prev => (prev + 1) % viewingImages.length)}
+                          >
+                            <ChevronRight size={16} />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                    {viewingImages.length > 1 && (
+                      <div className="flex items-center justify-center gap-2">
+                        {viewingImages.map((_, index) => (
+                          <button
+                            key={`view-image-dot-${index}`}
+                            type="button"
+                            className={`h-2.5 w-2.5 rounded-full transition-colors ${index === currentViewImageIndex ? 'bg-primary' : 'bg-muted-foreground/40 hover:bg-muted-foreground/60'}`}
+                            onClick={() => setViewImageIndex(index)}
+                            aria-label={`切换到第 ${index + 1} 张图片`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground">暂无关联轮播图片</div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="font-medium">详细内容</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="rounded-md border border-border p-3">
+                  <div className="text-xs text-muted-foreground mb-2">创作故事</div>
+                  <div className="text-sm whitespace-pre-wrap">{viewingWork?.detail?.story || '暂无'}</div>
+                </div>
+                <div className="rounded-md border border-border p-3 space-y-2">
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">核心亮点</div>
+                    {viewingHighlights.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {viewingHighlights.map((item, idx) => (
+                          <Badge key={`${item}-${idx}`} variant="secondary">{item}</Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-sm">暂无</div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">使用场景</div>
+                    {viewingScenarios.length > 0 ? (
+                      <div className="space-y-1">
+                        {viewingScenarios.map((item, idx) => (
+                          <div key={`${item}-${idx}`} className="text-sm">• {item}</div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-sm">暂无</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="rounded-md border border-border p-3">
+                  <div className="text-xs text-muted-foreground mb-1">演示链接</div>
+                  {viewingWork?.detail?.demoUrl ? (
+                    <a href={viewingWork.detail.demoUrl} target="_blank" rel="noreferrer" className="text-sm text-primary inline-flex items-center gap-1">
+                      <ExternalLink size={14} />
+                      {viewingWork.detail.demoUrl}
+                    </a>
+                  ) : <div className="text-sm">暂无</div>}
+                </div>
+                <div className="rounded-md border border-border p-3">
+                  <div className="text-xs text-muted-foreground mb-1">代码仓库</div>
+                  {viewingWork?.detail?.repoUrl ? (
+                    <a href={viewingWork.detail.repoUrl} target="_blank" rel="noreferrer" className="text-sm text-primary inline-flex items-center gap-1">
+                      <ExternalLink size={14} />
+                      {viewingWork.detail.repoUrl}
+                    </a>
+                  ) : <div className="text-sm">暂无</div>}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="font-medium">团队信息</div>
+              <div className="rounded-md border border-border p-3 space-y-3">
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1 inline-flex items-center gap-1"><Users size={13} />团队成员</div>
+                  {viewingTeamMembers.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {viewingTeamMembers.map((member, idx) => (
+                        <Badge key={`${member}-${idx}`} variant="outline">{member}</Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm">暂无</div>
+                  )}
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">团队介绍</div>
+                  <div className="text-sm whitespace-pre-wrap">{viewingWork?.team?.teamIntro || '暂无'}</div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <div className="inline-flex items-center gap-2">
+                    <Phone size={14} />
+                    <span>{viewingWork?.team?.contactPhone || '暂无'}</span>
+                  </div>
+                  <div className="inline-flex items-center gap-2">
+                    <Mail size={14} />
+                    <span>{viewingWork?.team?.contactEmail || '暂无'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>关闭</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -809,6 +1119,15 @@ export default function ProjectsPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>审核意见 (可选)</Label>
+              <Input 
+                value={auditReason} 
+                onChange={(e) => setAuditReason(e.target.value)} 
+                placeholder="请输入审核通过或拒绝的理由..." 
+              />
             </div>
           </div>
 

@@ -25,6 +25,7 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import { LoadingOverlay } from '@/components/LoadingOverlay'
 
 // Types
 interface Role {
@@ -59,6 +60,7 @@ const userSchema = z.object({
 type UserFormValues = z.infer<typeof userSchema>
 
 export default function UsersPage() {
+  const [isLoading, setIsLoading] = useState(false)
   const [users, setUsers] = useState<UserItem[]>([])
   const [totalItems, setTotalItems] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
@@ -93,12 +95,13 @@ export default function UsersPage() {
   // Fetch Users
   const fetchUsers = useCallback(async () => {
     try {
+      setIsLoading(true)
       const params = new URLSearchParams({
         [CRUD_QUERY_PARAMS.page]: String(currentPage),
         [CRUD_QUERY_PARAMS.pageSize]: String(pageSize),
         [CRUD_QUERY_PARAMS.query]: searchTerm,
       })
-      
+
       const res = await fetch(`/api/users?${params.toString()}`)
       if (res.ok) {
         const data = await res.json()
@@ -110,13 +113,15 @@ export default function UsersPage() {
     } catch (error) {
       console.error('Failed to fetch users:', error)
       showFeedback('error', '用户列表加载失败')
+    } finally {
+      setIsLoading(false)
     }
   }, [currentPage, pageSize, searchTerm, showFeedback])
 
   // Fetch Roles
   const fetchRoles = useCallback(async () => {
     try {
-      const res = await fetch('/api/roles?pageSize=100') // Assume < 100 roles
+      const res = await fetch('/api/roles')
       if (res.ok) {
         const data = await res.json()
         setAvailableRoles(data.items || [])
