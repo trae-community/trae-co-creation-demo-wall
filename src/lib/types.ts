@@ -5,7 +5,9 @@ export interface Work {
   city: string;
   country: string;
   category: string;
-  team?: string[] | string | null;
+  team?: unknown;
+  teamIntro?: string;
+  contactEmail?: string;
   coverUrl: string;
   story?: string;
   features?: string;
@@ -26,6 +28,8 @@ export interface Work {
   author: {
     name: string;
     avatar: string | null;
+    email?: string | null;
+    bio?: string | null;
   };
 }
 
