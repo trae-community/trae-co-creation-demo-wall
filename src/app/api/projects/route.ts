@@ -52,6 +52,11 @@ export async function GET(req: NextRequest) {
             include: {
               tag: true
             }
+          },
+          honors: {
+            include: {
+              dictItem: true
+            }
           }
         },
         orderBy: { createdAt: 'desc' },
@@ -126,6 +131,7 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const { 
       id, 
+      userId,
       title, 
       summary, 
       coverUrl, 
@@ -133,7 +139,8 @@ export async function PUT(req: NextRequest) {
       cityCode, 
       categoryCode, 
       devStatusCode,
-      tagIds 
+      tagIds,
+      honorIds
     } = body;
 
     if (!id) {
@@ -141,18 +148,36 @@ export async function PUT(req: NextRequest) {
     }
 
     // If tagIds is provided, update tags
-    const tagUpdate = tagIds ? {
-      tags: {
-        deleteMany: {}, // Remove all existing tags
-        create: tagIds.map((tagId: number) => ({
-          tag: { connect: { id: tagId } }
-        }))
-      }
-    } : {};
+    let tagUpdate = {};
+    if (tagIds) {
+      tagUpdate = {
+        tags: {
+          deleteMany: {}, // Remove all existing tags
+          create: tagIds.map((tagId: number) => ({
+            tag: { connect: { id: tagId } }
+          }))
+        }
+      };
+    }
+
+    // If honorIds is provided, update honors
+    let honorUpdate = {};
+    if (honorIds && Array.isArray(honorIds)) {
+      honorUpdate = {
+        honors: {
+          deleteMany: {}, // Remove all existing honors
+          create: honorIds.map((id: string | number) => ({
+            honorItemId: BigInt(id),
+            grantedAt: new Date(),
+          }))
+        }
+      };
+    }
 
     const updatedWork = await prisma.workBase.update({
       where: { id: BigInt(id) },
       data: {
+        userId: userId ? BigInt(userId) : undefined,
         title,
         summary,
         coverUrl,
@@ -160,7 +185,8 @@ export async function PUT(req: NextRequest) {
         cityCode,
         categoryCode,
         devStatusCode,
-        ...tagUpdate
+        ...tagUpdate,
+        ...honorUpdate
       },
       include: {
         user: {
@@ -173,6 +199,11 @@ export async function PUT(req: NextRequest) {
         tags: {
           include: {
             tag: true
+          }
+        },
+        honors: {
+          include: {
+            dictItem: true
           }
         }
       }

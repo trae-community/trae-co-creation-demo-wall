@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Plus, Edit, Trash2, Eye, Calendar, User, MapPin, Tag, Code } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, Calendar, User, MapPin, Tag, Code, Award } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -58,11 +58,18 @@ interface WorkItem {
     avatarUrl: string | null
   }
   tags: { tag: TagItem }[]
+  honors: { 
+    id: string
+    honorItemId: string
+    dictItem: DictItem 
+  }[]
 }
 
 interface DictItem {
+  id: string
   itemLabel: string
   itemValue: string
+  lang?: string
 }
 
 // Schema
@@ -93,6 +100,7 @@ export default function ProjectsPage() {
   const [devStatuses, setDevStatuses] = useState<DictItem[]>([])
   const [users, setUsers] = useState<{id: string, username: string}[]>([])
   const [availableTags, setAvailableTags] = useState<TagItem[]>([])
+  const [availableHonors, setAvailableHonors] = useState<DictItem[]>([])
 
   // Dialog states
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -105,6 +113,11 @@ export default function ProjectsPage() {
   const [selectedWork, setSelectedWork] = useState<WorkItem | null>(null)
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
   const [isSavingTags, setIsSavingTags] = useState(false)
+
+  // Honor Dialog states
+  const [isHonorDialogOpen, setIsHonorDialogOpen] = useState(false)
+  const [selectedHonorIds, setSelectedHonorIds] = useState<string[]>([])
+  const [isSavingHonors, setIsSavingHonors] = useState(false)
 
   const { feedback, showFeedback } = useFeedback()
 
@@ -126,13 +139,14 @@ export default function ProjectsPage() {
   // Fetch Dictionaries & Tags
   const fetchDicts = useCallback(async () => {
     try {
-      const [resCountry, resCity, resCategory, resStatus, resUsers, resTags] = await Promise.all([
+      const [resCountry, resCity, resCategory, resStatus, resUsers, resTags, resHonors] = await Promise.all([
         fetch('/api/dictionaries?code=country').then(res => res.ok ? res.json() : null),
         fetch('/api/dictionaries?code=city').then(res => res.ok ? res.json() : null),
         fetch('/api/dictionaries?code=category').then(res => res.ok ? res.json() : null),
         fetch('/api/dictionaries?code=dev_status').then(res => res.ok ? res.json() : null),
         fetch('/api/users?pageSize=100').then(res => res.ok ? res.json() : null),
-        fetch('/api/tags?pageSize=100').then(res => res.ok ? res.json() : null)
+        fetch('/api/tags?pageSize=100').then(res => res.ok ? res.json() : null),
+        fetch('/api/dictionaries?code=honor_type').then(res => res.ok ? res.json() : null)
       ])
 
       if (resCountry?.items) setCountries(resCountry.items)
@@ -141,6 +155,9 @@ export default function ProjectsPage() {
       if (resStatus?.items) setDevStatuses(resStatus.items)
       if (resUsers?.items) setUsers(resUsers.items.map((u: any) => ({ id: u.id, username: u.username })))
       if (resTags?.items) setAvailableTags(resTags.items)
+      if (resHonors?.items) {
+        setAvailableHonors(resHonors.items as DictItem[])
+      }
     } catch (error) {
       console.error('Failed to fetch dictionaries:', error)
     }
@@ -260,6 +277,53 @@ export default function ProjectsPage() {
     }
   }
 
+  const handleOpenHonorDialog = (work: WorkItem) => {
+    setSelectedWork(work)
+    // Find matching honor IDs from availableHonors
+    // Now we can directly use the stored honorItemId
+    const currentHonorIds = work.honors.map(h => h.honorItemId)
+    
+    // Remove duplicates
+    setSelectedHonorIds([...new Set(currentHonorIds)])
+    setIsHonorDialogOpen(true)
+  }
+
+  const handleHonorToggle = (honorId: string) => {
+    setSelectedHonorIds(prev => 
+      prev.includes(honorId)
+        ? prev.filter(id => id !== honorId)
+        : [...prev, honorId]
+    )
+  }
+
+  const onSaveHonors = async () => {
+    if (!selectedWork) return
+    try {
+      setIsSavingHonors(true)
+      const res = await fetch('/api/projects', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedWork.id,
+          honorIds: selectedHonorIds
+        })
+      })
+
+      if (res.ok) {
+        setIsHonorDialogOpen(false)
+        fetchWorks()
+        showFeedback('success', '作品荣誉已更新')
+      } else {
+        showFeedback('error', '更新荣誉失败')
+      }
+    } catch (error) {
+      console.error('Failed to save honors:', error)
+      showFeedback('error', '更新荣誉失败')
+    } finally {
+      setIsSavingHonors(false)
+    }
+  }
+
   const onSubmit = async (values: WorkFormValues) => {
     try {
       setIsSaving(true)
@@ -356,6 +420,9 @@ export default function ProjectsPage() {
                     <Button variant="ghost" size="sm" onClick={() => handleOpenTagDialog(work)} title="关联标签">
                       <Tag size={16} />
                     </Button>
+                    <Button variant="ghost" size="sm" onClick={() => handleOpenHonorDialog(work)} title="授予荣誉">
+                      <Award size={16} />
+                    </Button>
                     <Button 
                       variant="ghost" 
                       size="sm" 
@@ -390,6 +457,12 @@ export default function ProjectsPage() {
                   {work.tags && work.tags.map(t => (
                     <Badge key={t.tag.id} variant="secondary" className="text-xs bg-secondary/50">
                       #{t.tag.name}
+                    </Badge>
+                  ))}
+                  {work.honors && work.honors.map(h => (
+                    <Badge key={h.id} variant="outline" className="text-xs border-yellow-500 text-yellow-500 bg-yellow-500/10">
+                      <Award size={10} className="mr-1" />
+                      {h.dictItem?.itemLabel || '未知荣誉'}
                     </Badge>
                   ))}
                 </div>
@@ -558,6 +631,46 @@ export default function ProjectsPage() {
             <Button variant="outline" onClick={() => setIsTagDialogOpen(false)}>取消</Button>
             <Button onClick={onSaveTags} disabled={isSavingTags}>
               {isSavingTags ? '保存中...' : '保存'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isHonorDialogOpen} onOpenChange={setIsHonorDialogOpen}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>授予荣誉</DialogTitle>
+            <DialogDescription>
+              为作品 "{selectedWork?.title}" 授予官方荣誉
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {availableHonors.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center">暂无可用荣誉类型</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {availableHonors.map(honor => (
+                  <div key={honor.id} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`honor-${honor.id}`} 
+                      checked={selectedHonorIds.includes(honor.id)}
+                      onCheckedChange={() => handleHonorToggle(honor.id)}
+                    />
+                    <Label htmlFor={`honor-${honor.id}`} className="cursor-pointer">
+                      {honor.itemLabel}
+                      {honor.lang && <span className="text-xs text-muted-foreground ml-1">({honor.lang})</span>}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsHonorDialogOpen(false)}>取消</Button>
+            <Button onClick={onSaveHonors} disabled={isSavingHonors}>
+              {isSavingHonors ? '保存中...' : '保存'}
             </Button>
           </DialogFooter>
         </DialogContent>
