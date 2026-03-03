@@ -2,12 +2,11 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "../lib/utils";
-import { PlusCircle, Home, LogIn, Languages, Check, Shield, LayoutDashboard } from "lucide-react";
+import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard } from "lucide-react";
 import { ParticlesBackground } from "./ParticlesBackground";
-import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
-import NextLink from 'next/link';
 
 const LOCALE_OPTIONS = [
   { code: 'zh', label: '中文', flag: '🇨🇳' },
@@ -21,20 +20,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const tFooter = useTranslations('Footer');
   const locale = useLocale();
   const router = useRouter();
-  const { user } = useUser();
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
-
-  const userRoles = (user?.publicMetadata?.roles as string[] | undefined) ?? [];
-  const isAdmin = userRoles.includes('admin') || userRoles.includes('root');
-
-  useEffect(() => {
-    if (user) {
-      console.log('[Layout] user.publicMetadata:', user.publicMetadata);
-      console.log('[Layout] roles:', user.publicMetadata?.roles, '| isAdmin:', isAdmin);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.publicMetadata, isAdmin]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -84,6 +71,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </Link>
             <Link
               href="/submit"
+              prefetch={false}
               className={cn(
                 "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                 pathname === "/submit"
@@ -97,6 +85,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             <Link
               href="/console"
+              prefetch={false}
               className={cn(
                 "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                 pathname && pathname.startsWith("/console")
@@ -124,20 +113,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </SignedOut>
 
             <SignedIn>
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
-                    pathname === "/admin"
-                      ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
-                  )}
-                >
-                  <Shield className="w-3.5 h-3.5" />
-                  {t('admin')}
-                </Link>
-              )}
               <div className="flex items-center gap-2 px-4 py-1.5">
                 <UserButton />
               </div>

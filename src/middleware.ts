@@ -1,16 +1,23 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 
 const handleI18nRouting = createMiddleware(routing);
-const isProtectedRoute = createRouteMatcher(['/:locale/submit(.*)', '/:locale/admin(.*)', '/:locale/console(.*)']);
+const isProtectedRoute = createRouteMatcher(['/:locale/submit(.*)', '/:locale/console(.*)']);
 const isApiRoute = createRouteMatcher(['/api(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) await auth.protect();
+  const isPrefetchRequest =
+    req.headers.get('purpose') === 'prefetch' ||
+    req.headers.has('next-router-prefetch');
 
-  // API 路由和控制台路由不做 i18n 处理
-  if (isApiRoute(req)) return;
+  if (isProtectedRoute(req) && !isPrefetchRequest) {
+    await auth.protect();
+  }
+
+  // API routes skip i18n middleware.
+  if (isApiRoute(req)) return NextResponse.next();
 
   return handleI18nRouting(req);
 });
