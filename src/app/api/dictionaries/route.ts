@@ -22,7 +22,9 @@ export async function GET(req: NextRequest) {
           }
         }
       });
-      return NextResponse.json(dict);
+      return NextResponse.json(JSON.parse(JSON.stringify(dict, (key, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      )));
     }
 
     const whereFilters: Prisma.SysDictWhereInput[] = [];
