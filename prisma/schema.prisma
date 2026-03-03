@@ -220,8 +220,8 @@ model WorkTeam {
   workId       BigInt  @unique @map("work_id")
   /// 团队介绍 (文本)
   teamIntro    String? @map("team_intro")
-  /// 成员名单 (文本，顿号分隔)
-  members      String?
+  /// 成员名单 (JSONB, 存储字符串数组)
+  members      Json?
   /// 联系电话 (可选)
   contactPhone String? @map("contact_phone") @db.VarChar(50)
   /// 联系邮箱 (可选)

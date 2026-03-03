@@ -17,8 +17,10 @@ const submissionSchema = z.object({
   teamIntro: z.string().optional(),
   contactPhone: z.string().optional(),
   contactEmail: z.string().email().optional().or(z.literal("")),
-  coverUrl: z.string().min(1), // Base64 string expected
+  coverUrl: z.string().min(1), // URL string expected
   story: z.string().min(20),
+  category: z.string().min(1),
+  tags: z.array(z.number()).min(1).max(5),
   highlights: z.array(z.string().max(10)).min(3).max(5),
   scenarios: z.array(z.string()).min(1),
   screenshots: z.array(z.string()).min(1).max(5),
@@ -50,33 +52,7 @@ export async function POST(request: Request) {
 
     const data = validationResult.data;
 
-    // 3. Handle image upload (Base64 -> File)
-    const processImage = async (dataUrl: string) => {
-      if (dataUrl.startsWith("data:image")) {
-        try {
-          const matches = dataUrl.match(/^data:image\/([a-zA-Z+]+);base64,(.+)$/);
-          if (matches && matches.length === 3) {
-            const ext = matches[1];
-            const buffer = Buffer.from(matches[2], "base64");
-            const fileName = `${uuidv4()}.${ext}`;
-            const uploadDir = path.join(process.cwd(), "public", "uploads");
-            await fs.mkdir(uploadDir, { recursive: true });
-            const filePath = path.join(uploadDir, fileName);
-            await fs.writeFile(filePath, buffer);
-            return `/uploads/${fileName}`;
-          }
-        } catch (error) {
-          console.error("Image processing error:", error);
-          throw new Error("Failed to process image");
-        }
-      }
-      return dataUrl;
-    };
-
-    let coverUrl = await processImage(data.coverUrl);
-    const screenshots = await Promise.all(data.screenshots.map(processImage));
-
-    // 4. Save to database using transaction
+    // 3. Save to database using transaction
     const result = await prisma.$transaction(async (tx) => {
       // Create WorkBase
       const work = await tx.workBase.create({
@@ -86,10 +62,21 @@ export async function POST(request: Request) {
           summary: data.intro,
           cityCode: data.city,
           countryCode: data.country,
-          coverUrl: coverUrl,
+          coverUrl: data.coverUrl,
+          categoryCode: data.category,
           // Optional fields left as null/default
         },
       });
+
+      // Create WorkTagRelation
+      if (data.tags.length > 0) {
+        await tx.workTagRelation.createMany({
+          data: data.tags.map(tagId => ({
+            workId: work.id,
+            tagId: tagId
+          }))
+        });
+      }
 
       // Create WorkDetail
       await tx.workDetail.create({
@@ -104,9 +91,9 @@ export async function POST(request: Request) {
       });
 
       // Create WorkImage
-      if (screenshots.length > 0) {
+      if (data.screenshots.length > 0) {
         await tx.workImage.createMany({
-          data: screenshots.map((url, index) => ({
+          data: data.screenshots.map((url, index) => ({
             workId: work.id,
             imageUrl: url,
             imageType: "screenshot",
@@ -130,13 +117,12 @@ export async function POST(request: Request) {
       await tx.workStatistic.create({
         data: {
           workId: work.id,
-          auditStatus: 0, // Pending
-          displayStatus: 0, // Hidden
+          auditStatus: 0,
+          displayStatus: 0, 
           viewCount: 0,
-          likeCount: 0,
+          likeCount: 0
         },
       });
-
       return work;
     });
 
@@ -149,7 +135,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Submission error:", error);
     return NextResponse.json(
-      { success: false, error: "Internal server error" },
+      { success: false, error: error },
       { status: 500 }
     );
   }
