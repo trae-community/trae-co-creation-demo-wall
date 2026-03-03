@@ -8,6 +8,14 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const code = searchParams.get('code');
+    const rawLang = searchParams.get('lang'); // Get language parameter
+    
+    // Map URL locale to DB locale
+    // Now URL locale matches DB locale (zh-CN, en-US), but keeping fallback for safety
+    let lang = rawLang;
+    if (rawLang === 'zh') lang = 'zh-CN';
+    if (rawLang === 'en') lang = 'en-US';
+
     const page = Number(searchParams.get(CRUD_QUERY_PARAMS.page) || '1');
     const pageSize = Number(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10');
     const query = searchParams.get(CRUD_QUERY_PARAMS.query) || '';
@@ -22,7 +30,33 @@ export async function GET(req: NextRequest) {
           }
         }
       });
-      return NextResponse.json(JSON.parse(JSON.stringify(dict, (key, value) =>
+
+      if (!dict) {
+        return NextResponse.json({ error: 'Dictionary not found' }, { status: 404 });
+      }
+
+      // Process items to return correct label based on lang
+      const processedItems = dict.items.map(item => {
+        let label = item.itemLabel;
+        if (lang && item.labelI18n && typeof item.labelI18n === 'object') {
+          // @ts-ignore: JSON types in Prisma can be complex, assuming object
+          const i18n = item.labelI18n as Record<string, string>;
+          if (i18n[lang]) {
+            label = i18n[lang];
+          }
+        }
+        return {
+          ...item,
+          itemLabel: label
+        };
+      });
+
+      const response = {
+        ...dict,
+        items: processedItems
+      };
+
+      return NextResponse.json(JSON.parse(JSON.stringify(response, (key, value) =>
         typeof value === 'bigint' ? value.toString() : value
       )));
     }
@@ -102,7 +136,7 @@ export async function POST(req: NextRequest) {
         dictCode: data.dictCode,
         itemLabel: data.itemLabel,
         itemValue: data.itemValue,
-        ...(data.lang !== undefined ? { lang: data.lang } : {}),
+        labelI18n: data.labelI18n, // Support v0.3 JSONB
         sortOrder: data.sortOrder ?? 0,
         status: data.status ?? true
       }
@@ -145,7 +179,7 @@ export async function PUT(req: NextRequest) {
       const itemData = {
         itemLabel: data.itemLabel,
         itemValue: data.itemValue,
-        ...(data.lang !== undefined ? { lang: data.lang } : {}),
+        labelI18n: data.labelI18n, // Support v0.3 JSONB
         sortOrder: data.sortOrder,
         status: data.status
       }

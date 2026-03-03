@@ -75,7 +75,7 @@ interface DictItem {
   id: string
   itemLabel: string
   itemValue: string
-  lang?: string
+  labelI18n?: Record<string, string> | null
 }
 
 // Schema
@@ -92,7 +92,12 @@ const workSchema = z.object({
 
 type WorkFormValues = z.infer<typeof workSchema>
 
+import { useParams } from 'next/navigation'
+
 export default function ProjectsPage() {
+  const params = useParams()
+  const locale = (params?.locale as string) || 'zh-CN' // Get locale from URL params
+  
   const [works, setWorks] = useState<WorkItem[]>([])
   const [totalItems, setTotalItems] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
@@ -151,17 +156,22 @@ export default function ProjectsPage() {
   // Fetch Dictionaries & Tags
   const fetchDicts = useCallback(async () => {
     try {
-      const [resCountry, resCity, resCategory, resStatus, resUsers, resTags, resHonors] = await Promise.all([
-        fetch('/api/dictionaries?code=country').then(res => res.ok ? res.json() : null),
-        fetch('/api/dictionaries?code=city').then(res => res.ok ? res.json() : null),
-        fetch('/api/dictionaries?code=category').then(res => res.ok ? res.json() : null),
-        fetch('/api/dictionaries?code=dev_status').then(res => res.ok ? res.json() : null),
+      // Locale is now directly matched (zh-CN, en-US)
+      const apiLang = locale
+
+      const [resCountry, resCity, resCategory, resStatus, resUsers, resTags, resHonors, resAudit] = await Promise.all([
+        fetch(`/api/dictionaries?code=country&lang=${apiLang}`).then(res => res.ok ? res.json() : null),
+        fetch(`/api/dictionaries?code=city&lang=${apiLang}`).then(res => res.ok ? res.json() : null),
+        fetch(`/api/dictionaries?code=category_code&lang=${apiLang}`).then(res => res.ok ? res.json() : null),
+        fetch(`/api/dictionaries?code=dev_status&lang=${apiLang}`).then(res => res.ok ? res.json() : null),
         fetch('/api/users?pageSize=100').then(res => res.ok ? res.json() : null),
         fetch('/api/tags?pageSize=100').then(res => res.ok ? res.json() : null),
-        fetch('/api/dictionaries?code=honor_type').then(res => res.ok ? res.json() : null)
+        fetch(`/api/dictionaries?code=honor_type&lang=${apiLang}`).then(res => res.ok ? res.json() : null),
+        fetch(`/api/dictionaries?code=audit_status&lang=${apiLang}`).then(res => res.ok ? res.json() : null)
       ])
 
       if (resCountry?.items) setCountries(resCountry.items)
+      if (resAudit?.items) setAuditStatuses(resAudit.items)
       if (resCity?.items) setCities(resCity.items)
       if (resCategory?.items) setCategories(resCategory.items)
       if (resStatus?.items) setDevStatuses(resStatus.items)
@@ -338,7 +348,12 @@ export default function ProjectsPage() {
 
   const handleOpenAuditDialog = (work: WorkItem) => {
     setSelectedWork(work)
-    setSelectedAuditStatus(work.statistic?.auditStatus?.toString() || '0')
+    // Ensure we are getting the correct initial value from work statistic
+    // work.auditStatus might be directly on work object or inside statistic
+    const status = work.statistic?.auditStatus !== undefined 
+      ? String(work.statistic.auditStatus) 
+      : '0'
+    setSelectedAuditStatus(status)
     setIsAuditDialogOpen(true)
   }
 
@@ -346,21 +361,25 @@ export default function ProjectsPage() {
     if (!selectedWork) return
     try {
       setIsSavingAudit(true)
+      console.log('Saving audit status:', selectedAuditStatus, 'for work:', selectedWork.id)
+      
       const res = await fetch('/api/projects', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: selectedWork.id,
-          auditStatus: selectedAuditStatus
+          auditStatus: Number(selectedAuditStatus) // Ensure it's a number
         })
       })
 
       if (res.ok) {
         setIsAuditDialogOpen(false)
-        fetchWorks()
+        await fetchWorks() // Wait for refresh
         showFeedback('success', '作品审核状态已更新')
       } else {
-        showFeedback('error', '更新审核状态失败')
+        const errorData = await res.json().catch(() => ({}))
+        console.error('Audit update failed:', errorData)
+        showFeedback('error', errorData.error || '更新审核状态失败')
       }
     } catch (error) {
       console.error('Failed to save audit status:', error)
