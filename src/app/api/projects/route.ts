@@ -57,7 +57,8 @@ export async function GET(req: NextRequest) {
             include: {
               dictItem: true
             }
-          }
+          },
+          statistic: true
         },
         orderBy: { createdAt: 'desc' },
         skip,
@@ -114,7 +115,19 @@ export async function POST(req: NextRequest) {
             email: true,
             avatarUrl: true
           }
-        }
+        },
+        statistic: true
+      }
+    });
+
+    // Create initial statistic record
+    await prisma.workStatistic.create({
+      data: {
+        workId: newWork.id,
+        auditStatus: 0, // Pending
+        displayStatus: 0, // Hidden
+        viewCount: 0,
+        likeCount: 0
       }
     });
 
@@ -140,11 +153,43 @@ export async function PUT(req: NextRequest) {
       categoryCode, 
       devStatusCode,
       tagIds,
-      honorIds
+      honorIds,
+      auditStatus // Optional audit status update
     } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Work ID is required' }, { status: 400 });
+    }
+
+    // If auditStatus is provided, update statistic and create log
+    if (auditStatus !== undefined) {
+      const currentStat = await prisma.workStatistic.findUnique({
+        where: { workId: BigInt(id) }
+      });
+
+      if (currentStat && currentStat.auditStatus !== Number(auditStatus)) {
+        // Update statistic
+        await prisma.workStatistic.update({
+          where: { workId: BigInt(id) },
+          data: {
+            auditStatus: Number(auditStatus),
+            lastAuditAt: new Date(),
+            displayStatus: Number(auditStatus) === 1 ? 1 : 0 // Auto display if approved
+          }
+        });
+
+        // Create audit log
+        await prisma.workAuditLog.create({
+          data: {
+            workId: BigInt(id),
+            // auditorId: userId ? BigInt(userId) : undefined, // Assuming current user is auditor
+            prevStatus: currentStat.auditStatus,
+            newStatus: Number(auditStatus),
+            reason: 'Manual update via console',
+            createdAt: new Date()
+          }
+        });
+      }
     }
 
     // If tagIds is provided, update tags
@@ -205,7 +250,8 @@ export async function PUT(req: NextRequest) {
           include: {
             dictItem: true
           }
-        }
+        },
+        statistic: true
       }
     });
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Plus, Edit, Trash2, Eye, Calendar, User, MapPin, Tag, Code, Award } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -63,6 +63,12 @@ interface WorkItem {
     honorItemId: string
     dictItem: DictItem 
   }[]
+  statistic?: {
+    auditStatus: number
+    displayStatus: number
+    viewCount: string
+    likeCount: string
+  }
 }
 
 interface DictItem {
@@ -98,7 +104,8 @@ export default function ProjectsPage() {
   const [cities, setCities] = useState<DictItem[]>([])
   const [categories, setCategories] = useState<DictItem[]>([])
   const [devStatuses, setDevStatuses] = useState<DictItem[]>([])
-  const [users, setUsers] = useState<{id: string, username: string}[]>([])
+  const [auditStatuses, setAuditStatuses] = useState<DictItem[]>([])
+  const [users, setUsers] = useState<{ id: string; username: string }[]>([])
   const [availableTags, setAvailableTags] = useState<TagItem[]>([])
   const [availableHonors, setAvailableHonors] = useState<DictItem[]>([])
 
@@ -118,6 +125,11 @@ export default function ProjectsPage() {
   const [isHonorDialogOpen, setIsHonorDialogOpen] = useState(false)
   const [selectedHonorIds, setSelectedHonorIds] = useState<string[]>([])
   const [isSavingHonors, setIsSavingHonors] = useState(false)
+
+  // Audit Dialog states
+  const [isAuditDialogOpen, setIsAuditDialogOpen] = useState(false)
+  const [selectedAuditStatus, setSelectedAuditStatus] = useState<string>('0')
+  const [isSavingAudit, setIsSavingAudit] = useState(false)
 
   const { feedback, showFeedback } = useFeedback()
 
@@ -324,6 +336,40 @@ export default function ProjectsPage() {
     }
   }
 
+  const handleOpenAuditDialog = (work: WorkItem) => {
+    setSelectedWork(work)
+    setSelectedAuditStatus(work.statistic?.auditStatus?.toString() || '0')
+    setIsAuditDialogOpen(true)
+  }
+
+  const onSaveAudit = async () => {
+    if (!selectedWork) return
+    try {
+      setIsSavingAudit(true)
+      const res = await fetch('/api/projects', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedWork.id,
+          auditStatus: selectedAuditStatus
+        })
+      })
+
+      if (res.ok) {
+        setIsAuditDialogOpen(false)
+        fetchWorks()
+        showFeedback('success', '作品审核状态已更新')
+      } else {
+        showFeedback('error', '更新审核状态失败')
+      }
+    } catch (error) {
+      console.error('Failed to save audit status:', error)
+      showFeedback('error', '更新审核状态失败')
+    } finally {
+      setIsSavingAudit(false)
+    }
+  }
+
   const onSubmit = async (values: WorkFormValues) => {
     try {
       setIsSaving(true)
@@ -389,76 +435,128 @@ export default function ProjectsPage() {
 
       <div className="space-y-4">
         {works.map(work => (
-          <Card key={work.id} className="overflow-hidden border-border bg-card/50">
-            <div className="p-4 flex flex-col sm:flex-row items-start gap-4">
-              <div className="h-24 w-24 rounded-lg bg-secondary shrink-0 overflow-hidden">
+          <Card key={work.id} className="overflow-hidden border border-border bg-card hover:bg-card/80 transition-colors">
+            <div className="flex flex-col sm:flex-row">
+              {/* Cover Image */}
+              <div className="w-full sm:w-48 h-32 sm:h-auto bg-muted shrink-0 relative group">
                 {work.coverUrl ? (
-                  <img src={work.coverUrl} alt={work.title} className="h-full w-full object-cover" />
+                  <img 
+                    src={work.coverUrl} 
+                    alt={work.title} 
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center text-muted-foreground">
-                    IMG
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex-1 space-y-2">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold text-lg">{work.title}</h3>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                      <User size={14} />
-                      <span>{work.user.username}</span>
-                      <span className="text-border">|</span>
-                      <Calendar size={14} />
-                      <span>{new Date(work.createdAt).toLocaleDateString('zh-CN')}</span>
+                  <div className="absolute inset-0 flex items-center justify-center text-muted-foreground bg-secondary/20">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold opacity-20">NO</div>
+                      <div className="text-sm opacity-40">IMAGE</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(work)}>
-                      <Edit size={16} />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleOpenTagDialog(work)} title="关联标签">
-                      <Tag size={16} />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleOpenHonorDialog(work)} title="授予荣誉">
-                      <Award size={16} />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-red-500 hover:text-red-400"
-                      onClick={() => handleDelete(work.id)}
-                      disabled={deletingWorkId === work.id}
+                )}
+                {/* Status Badge Overlay */}
+                <div className="absolute top-2 left-2 z-10">
+                   {work.statistic && (
+                     <Badge 
+                      variant={work.statistic.auditStatus === 1 ? 'default' : work.statistic.auditStatus === 2 ? 'destructive' : 'secondary'} 
+                      className="shadow-sm"
                     >
-                      <Trash2 size={16} />
-                    </Button>
+                       {auditStatuses.find(s => s.itemValue === work.statistic?.auditStatus?.toString())?.itemLabel || '待审核'}
+                     </Badge>
+                   )}
+                </div>
+              </div>
+              
+              {/* Content */}
+              <div className="flex-1 p-4 flex flex-col justify-between gap-4">
+                <div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="font-semibold text-lg line-clamp-1 hover:text-primary cursor-pointer transition-colors" title={work.title} onClick={() => handleEdit(work)}>
+                        {work.title}
+                      </h3>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                        <div className="flex items-center gap-1" title="作者">
+                          <User size={14} />
+                          <span>{work.user.username}</span>
+                        </div>
+                        <span className="text-border">|</span>
+                        <div className="flex items-center gap-1" title="创建时间">
+                          <Calendar size={14} />
+                          <span>{new Date(work.createdAt).toLocaleDateString('zh-CN')}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-blue-500 hover:bg-blue-500/10" onClick={() => handleOpenAuditDialog(work)} title="审核作品">
+                        <ShieldCheck size={16} />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(work)} title="编辑作品">
+                        <Edit size={16} />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenTagDialog(work)} title="关联标签">
+                        <Tag size={16} />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenHonorDialog(work)} title="授予荣誉">
+                        <Award size={16} />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => handleDelete(work.id)}
+                        disabled={deletingWorkId === work.id}
+                        title="删除作品"
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
                   </div>
+
+                  {work.summary && (
+                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2" title={work.summary}>
+                      {work.summary}
+                    </p>
+                  )}
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                {/* Metadata Tags */}
+                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border/50">
+                  {/* Development Status */}
                   {work.devStatusCode && (
                     <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary">
                       <Code size={12} className="mr-1" />
                       {getLabel(work.devStatusCode, devStatuses)}
                     </Badge>
                   )}
+                  
+                  {/* Category */}
                   {work.categoryCode && (
                     <Badge variant="outline">
                       <Tag size={12} className="mr-1" />
                       {getLabel(work.categoryCode, categories)}
                     </Badge>
                   )}
+
+                  {/* Location */}
                   {(work.countryCode || work.cityCode) && (
                     <Badge variant="secondary" className="text-muted-foreground">
                       <MapPin size={12} className="mr-1" />
-                      {[getLabel(work.countryCode, countries), getLabel(work.cityCode, cities)].filter(Boolean).join(' · ')}
+                      {work.countryCode ? getLabel(work.countryCode, countries) : ''}
+                      {work.countryCode && work.cityCode ? ' · ' : ''}
+                      {work.cityCode ? getLabel(work.cityCode, cities) : ''}
                     </Badge>
                   )}
+
+                  {/* Tags */}
                   {work.tags && work.tags.map(t => (
                     <Badge key={t.tag.id} variant="secondary" className="text-xs bg-secondary/50">
                       #{t.tag.name}
                     </Badge>
                   ))}
+
+                  {/* Honors */}
                   {work.honors && work.honors.map(h => (
                     <Badge key={h.id} variant="outline" className="text-xs border-yellow-500 text-yellow-500 bg-yellow-500/10">
                       <Award size={10} className="mr-1" />
@@ -466,19 +564,13 @@ export default function ProjectsPage() {
                     </Badge>
                   ))}
                 </div>
-
-                {work.summary && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {work.summary}
-                  </p>
-                )}
               </div>
             </div>
           </Card>
         ))}
         
         {works.length === 0 && (
-          <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
+          <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg bg-card/30">
             暂无作品
           </div>
         )}
@@ -671,6 +763,40 @@ export default function ProjectsPage() {
             <Button variant="outline" onClick={() => setIsHonorDialogOpen(false)}>取消</Button>
             <Button onClick={onSaveHonors} disabled={isSavingHonors}>
               {isSavingHonors ? '保存中...' : '保存'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isAuditDialogOpen} onOpenChange={setIsAuditDialogOpen}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>审核作品</DialogTitle>
+            <DialogDescription>
+              更改作品的审核状态。审核通过后作品将自动上架。
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>审核状态</Label>
+              <Select value={selectedAuditStatus} onValueChange={setSelectedAuditStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder="选择审核状态" />
+                </SelectTrigger>
+                <SelectContent>
+                  {auditStatuses.map(status => (
+                    <SelectItem key={status.id} value={status.itemValue}>{status.itemLabel}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAuditDialogOpen(false)}>取消</Button>
+            <Button onClick={onSaveAudit} disabled={isSavingAudit}>
+              {isSavingAudit ? '保存中...' : '保存'}
             </Button>
           </DialogFooter>
         </DialogContent>
