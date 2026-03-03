@@ -1,92 +1,101 @@
 # 开发规范文档
 
-## 目录结构
+## 当前规范结论
 
-本项目采用 Next.js App Router 架构，并遵循 `src` 目录规范。核心代码位于 `src` 目录下，`app` 目录仅作为路由定义层。
+当前命名规范遵循以下组合标准，属于工程上常见且可维护的方案：
 
-### 根目录结构
+- Next.js App Router 约定式路由标准（`page.tsx`、`layout.tsx`、`route.ts`、`[segment]`）。
+- React/TypeScript 社区惯例（Hook 以 `use-` 开头，组件导出用 PascalCase）。
+- 文件系统可读性规范（文件名使用 kebab-case，目录按领域分组）。
 
+## 当前目录结构
+
+核心代码位于 `src`，结构如下：
+
+```text
+src/
+├── app/
+│   ├── [language]/                 # 国际化路由段（Next.js 动态段）
+│   │   ├── page.tsx
+│   │   ├── layout.tsx
+│   │   ├── console/
+│   │   ├── sign-in/
+│   │   ├── sign-up/
+│   │   ├── submit/
+│   │   │   ├── page.tsx
+│   │   │   └── submission-form.tsx
+│   │   └── works/[id]/
+│   │       ├── page.tsx
+│   │       └── work-detail-view.tsx
+│   ├── api/
+│   ├── test/
+│   └── layout.tsx
+├── assets/
+│   ├── globals.css
+│   └── translations/
+├── components/
+│   ├── ui/                         # shadcn 基础组件
+│   ├── common/                     # 通用业务组件
+│   ├── layout/                     # 布局组件
+│   ├── work/                       # 作品域组件
+│   └── crud/                       # CRUD 相关组件
+├── hooks/
+│   └── use-feedback.ts
+├── lib/
+│   ├── language/                   # i18n 路由与请求配置
+│   ├── crud.ts
+│   ├── types.ts
+│   ├── utils.ts
+│   ├── auth.ts
+│   ├── prisma.ts
+│   └── supabase.ts
+└── middleware.ts
 ```
-/
-├── docs/                   # 项目开发文档
-├── prisma/                 # 数据库模型与迁移脚本
-│   ├── schema.prisma       # Prisma 数据模型定义
-│   └── schema.sql          # 数据库初始化 SQL
-├── public/                 # 静态资源 (favicon, robots.txt 等)
-├── src/                    # 核心源码
-│   ├── app/                # 路由定义层 (Next.js App Router)
-│   ├── assets/             # 静态资源 (css, images 等)
-│   ├── components/         # 通用组件
-│   ├── data/               # 静态数据/Mock数据
-│   ├── hooks/              # 自定义 Hooks
-│   ├── i18n/               # 国际化配置
-│   ├── lib/                # 工具函数与库封装
-│   ├── messages/           # 国际化语言包 (json)
-│   ├── features/              # 页面业务逻辑实现 (View Layer)
-│   ├── services/           # 后端业务逻辑实现 (Service Layer)
-│   ├── types/              # TypeScript 类型定义
-│   └── middleware.ts       # 中间件
-├── .env.example            # 环境变量示例
-├── .gitignore              # Git 忽略配置
-├── components.json         # shadcn/ui 配置文件
-├── eslint.config.js        # ESLint 配置文件
-├── next.config.ts          # Next.js 配置文件
-├── package.json            # 项目依赖配置
-├── postcss.config.js       # PostCSS 配置文件
-├── tailwind.config.js      # Tailwind CSS 配置文件
-├── tsconfig.json           # TypeScript 配置文件
-└── vercel.json             # Vercel 部署配置
-```
 
-### 详细说明
+## 命名规则
 
-#### 1. `src/app/` (Route Layer)
-*   **职责**：仅负责定义 URL 路由结构、Layout 布局嵌套、Loading/Error 状态处理以及 Metadata 配置。
-*   **规范**：`page.tsx` 文件中应尽量减少业务逻辑，主要负责引入并渲染 `src/features/` 下对应的页面组件。
+### 1) 路由与文件名
 
-#### 2. `src/features/` (View Layer)
-*   **职责**：包含具体的页面业务逻辑、状态管理和视图渲染。
-*   **规范**：与 `src/app` 目录下的路由结构尽量保持映射关系，方便查找。
-    *   例如：`src/app/[locale]/home/page.tsx` -> `src/features/home/page.tsx`
+- 路由保留 Next.js 约定文件名：`page.tsx`、`layout.tsx`、`route.ts`。
+- 动态路由必须使用方括号：如 `[language]`、`[id]`。
+- 非约定页面文件使用语义化 kebab-case：如 `submission-form.tsx`、`work-detail-view.tsx`。
 
-#### 3. `src/components/`
-*   **职责**：存放可复用的 UI 组件。
-*   **规范**：
-    *   `ui/`：存放基础 UI 组件（如 Button, Input 等）。
-    *   其他：存放业务相关的复用组件。
+### 2) 组件命名
 
-#### 4. `src/i18n/` & `src/messages/`
-*   **职责**：国际化相关配置。
-*   **规范**：
-    *   `messages/*.json`：存放各语言的翻译文本。
-    *   `i18n/request.ts`：Next-intl 的请求配置。
+- 组件文件名统一 kebab-case：`site-layout.tsx`、`work-card.tsx`。
+- 组件导出名统一 PascalCase：`SiteLayout`、`WorkCard`。
+- 按业务域分目录：`layout/`、`work/`、`crud/`、`common/`、`ui/`。
 
-#### 5. `src/lib/` & `src/hooks/`
-*   **职责**：
-    *   `lib/`：存放工具函数、API 客户端封装、数据库连接等。
-    *   `hooks/`：存放 React Custom Hooks。
+### 3) Hook 命名
 
-#### 6. `src/services/` (Service Layer)
-*   **职责**：存放后端业务逻辑，被 `src/app/api/` 下的路由处理函数调用。
-*   **规范**：
-    *   处理数据库操作、第三方 API 调用等核心业务逻辑。
-    *   保持 `src/app/api/` 层轻量，仅负责请求参数解析和响应格式化。
+- Hook 文件统一 `use-*.ts`：如 `use-feedback.ts`。
+- Hook 放 `src/hooks/`，避免与 UI 组件混放，职责更清晰。
+
+### 4) 国际化命名
+
+- 路由段使用 `[language]`，表示 URL 语言参数。
+- i18n 配置统一放 `src/lib/language/`。
+- 翻译资源统一放 `src/assets/translations/`。
 
 ## 开发流程规范
 
-1.  **新建页面**：
-    *   在 `src/app/[locale]/` 下创建路由文件夹和 `page.tsx`。
-    *   在 `src/features/` 下创建对应的页面组件文件。
-    *   在 `src/app/**/page.tsx` 中引入并使用 `src/features/**` 组件。
+1. 新建页面  
+   - 在 `src/app/[language]/...` 新建路由目录及 `page.tsx`。  
+   - 页面复杂逻辑可以拆到同级语义文件（如 `xxx-view.tsx`、`xxx-form.tsx`）。
 
-2.  **样式管理**：
-    *   全局样式：`src/assets/globals.css`。
-    *   组件样式：推荐使用 Tailwind CSS。
+2. 新建组件  
+   - 根据用途放入 `components/common|layout|work|crud|ui`。  
+   - 文件名使用 kebab-case，导出名使用 PascalCase。
 
-3.  **类型定义**：
-    *   通用类型定义在 `src/types/index.ts`。
-    *   组件特定类型可定义在组件文件内或同级目录。
+3. 新建 Hook  
+   - 放在 `src/hooks/`，命名 `use-*.ts`。  
+   - 避免把 hook 放在 `components/` 内，除非该 hook 仅服务某个组件且不复用。
 
-4.  **国际化**：
-    *   所有用户可见文本必须使用 `next-intl` 进行国际化处理。
-    *   翻译键值对存放在 `src/messages/` 下的 JSON 文件中。
+4. 类型与工具  
+   - 通用类型放 `src/lib/types.ts`。  
+   - 公共常量与过滤参数放 `src/lib/crud.ts`。  
+   - 公共函数放 `src/lib/utils.ts`。
+
+5. 国际化  
+   - 所有用户可见文案走 `next-intl`。  
+   - 文案文件放在 `src/assets/translations/*.json`。
