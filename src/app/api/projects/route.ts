@@ -60,6 +60,12 @@ export async function GET(req: NextRequest) {
             }
           },
           statistic: true
+          ,
+          detail: true,
+          images: {
+            orderBy: { sortOrder: 'asc' }
+          },
+          team: true
         },
         orderBy: { createdAt: 'desc' },
         skip,
@@ -117,7 +123,8 @@ export async function POST(req: NextRequest) {
             avatarUrl: true
           }
         },
-        statistic: true
+        statistic: true,
+        team: true
       }
     });
 
@@ -155,7 +162,11 @@ export async function PUT(req: NextRequest) {
       devStatusCode,
       tagIds,
       honorIds,
-      auditStatus // Optional audit status update
+      auditStatus,
+      teamMembers,
+      teamIntro,
+      contactPhone,
+      contactEmail
     } = body;
 
     if (!id) {
@@ -252,6 +263,44 @@ export async function PUT(req: NextRequest) {
       };
     }
 
+    let teamUpdate = {};
+    if (
+      teamMembers !== undefined ||
+      teamIntro !== undefined ||
+      contactPhone !== undefined ||
+      contactEmail !== undefined
+    ) {
+      const normalizedMembers = Array.isArray(teamMembers)
+        ? teamMembers
+            .map((member: any) => String(member).trim())
+            .filter(Boolean)
+            .map((value: string) => ({ value }))
+        : [];
+
+      const normalizedTeamIntro = typeof teamIntro === 'string' ? teamIntro.trim() : '';
+      const normalizedContactPhone = typeof contactPhone === 'string' ? contactPhone.trim() : '';
+      const normalizedContactEmail = typeof contactEmail === 'string' ? contactEmail.trim() : '';
+
+      teamUpdate = {
+        team: {
+          upsert: {
+            create: {
+              members: normalizedMembers,
+              teamIntro: normalizedTeamIntro || null,
+              contactPhone: normalizedContactPhone || null,
+              contactEmail: normalizedContactEmail || null
+            },
+            update: {
+              members: normalizedMembers,
+              teamIntro: normalizedTeamIntro || null,
+              contactPhone: normalizedContactPhone || null,
+              contactEmail: normalizedContactEmail || null
+            }
+          }
+        }
+      };
+    }
+
     const updatedWork = await prisma.workBase.update({
       where: { id: BigInt(id) },
       data: {
@@ -264,7 +313,8 @@ export async function PUT(req: NextRequest) {
         categoryCode,
         devStatusCode,
         ...tagUpdate,
-        ...honorUpdate
+        ...honorUpdate,
+        ...teamUpdate
       },
       include: {
         user: {
@@ -284,7 +334,12 @@ export async function PUT(req: NextRequest) {
             dictItem: true
           }
         },
-        statistic: true
+        statistic: true,
+        detail: true,
+        images: {
+          orderBy: { sortOrder: 'asc' }
+        },
+        team: true
       }
     });
 
