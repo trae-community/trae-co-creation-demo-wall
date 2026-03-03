@@ -37,7 +37,7 @@ interface DictItem {
   dictCode: string
   itemLabel: string
   itemValue: string
-  lang?: string | null
+  labelI18n?: Record<string, string> | null
   sortOrder: number
   status: boolean
 }
@@ -59,9 +59,11 @@ const dictSchema = z.object({
 })
 
 const itemSchema = z.object({
-  itemLabel: z.string().min(1, '请输入显示标签'),
+  itemLabel: z.string().min(1, '请输入默认显示标签'),
   itemValue: z.string().min(1, '请输入存储值'),
-  lang: z.string().optional(),
+  labelZh: z.string().optional(),
+  labelEn: z.string().optional(),
+  labelJa: z.string().optional(),
   sortOrder: z.preprocess((value) => {
     if (value === '' || value === null || value === undefined) return 0
     const num = Number(value)
@@ -108,7 +110,9 @@ export default function DictionariesPage() {
     defaultValues: {
       itemLabel: '',
       itemValue: '',
-      lang: 'zh-CN',
+      labelZh: '',
+      labelEn: '',
+      labelJa: '',
       sortOrder: 0,
     }
   })
@@ -211,7 +215,13 @@ export default function DictionariesPage() {
   const onItemSubmit = async (values: ItemFormOutput) => {
     try {
       setIsSavingItem(true)
-      const langValue = values.lang === '__empty__' ? '' : values.lang
+      
+      // Construct labelI18n object
+      const labelI18n: Record<string, string> = {}
+      if (values.labelZh) labelI18n['zh-CN'] = values.labelZh
+      if (values.labelEn) labelI18n['en-US'] = values.labelEn
+      if (values.labelJa) labelI18n['ja-JP'] = values.labelJa
+
       const url = '/api/dictionaries'
       const method = editingItem ? 'PUT' : 'POST'
       const body = {
@@ -220,7 +230,7 @@ export default function DictionariesPage() {
         data: {
           itemLabel: values.itemLabel,
           itemValue: values.itemValue,
-          ...(langValue !== undefined ? { lang: langValue } : {}),
+          labelI18n: Object.keys(labelI18n).length > 0 ? labelI18n : undefined,
           sortOrder: values.sortOrder,
           dictCode: currentDictCode,
           status: true
@@ -298,7 +308,9 @@ export default function DictionariesPage() {
     itemForm.reset({
       itemLabel: '',
       itemValue: '',
-      lang: 'zh-CN',
+      labelZh: '',
+      labelEn: '',
+      labelJa: '',
       sortOrder: 0
     })
     setIsItemDialogOpen(true)
@@ -307,10 +319,15 @@ export default function DictionariesPage() {
   const openEditItemDialog = (item: DictItem, dictCode: string) => {
     setEditingItem(item)
     setCurrentDictCode(dictCode)
+    
+    const i18n = item.labelI18n || {}
+    
     itemForm.reset({
       itemLabel: item.itemLabel,
       itemValue: item.itemValue,
-      lang: item.lang ?? 'zh-CN',
+      labelZh: i18n['zh-CN'] || '',
+      labelEn: i18n['en-US'] || '',
+      labelJa: i18n['ja-JP'] || '',
       sortOrder: item.sortOrder
     })
     setIsItemDialogOpen(true)
@@ -416,10 +433,15 @@ export default function DictionariesPage() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{item.itemLabel}</span>
-                          <Badge variant="secondary" className="text-[10px] h-5 px-1.5 flex gap-1 items-center">
-                            <Globe size={10} />
-                            {item.lang}
-                          </Badge>
+                          {item.labelI18n && (
+                            <div className="flex gap-1">
+                              {Object.keys(item.labelI18n).map(lang => (
+                                <Badge key={lang} variant="secondary" className="text-[10px] h-4 px-1">
+                                  {lang}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
                         </div>
                         <div className="text-xs text-muted-foreground font-mono bg-white/5 px-1.5 py-0.5 rounded w-fit">
                           {item.itemValue}
@@ -510,37 +532,42 @@ export default function DictionariesPage() {
           <form onSubmit={itemForm.handleSubmit(onItemSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">存储值 (Value)</label>
+                <label className="text-sm font-medium">存储值 (Value) <span className="text-red-500">*</span></label>
                 <Input {...itemForm.register('itemValue')} placeholder="例如: 1, CN" className="bg-background border-border" />
                 {itemForm.formState.errors.itemValue && <p className="text-red-500 text-xs">{itemForm.formState.errors.itemValue.message}</p>}
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">语言 (Lang)</label>
-                <Select 
-                  onValueChange={(val) => itemForm.setValue('lang', val)} 
-                  defaultValue={itemForm.getValues('lang')}
-                >
-                  <SelectTrigger className="bg-background border-border">
-                    <SelectValue placeholder="选择语言" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="zh-CN">中文 (zh-CN)</SelectItem>
-                    <SelectItem value="en-US">English (en-US)</SelectItem>
-                    <SelectItem value="ja-JP">日本語 (ja-JP)</SelectItem>
-                    <SelectItem value="__empty__">留空</SelectItem>
-                  </SelectContent>
-                </Select>
+                <label className="text-sm font-medium">排序权重</label>
+                <Input type="number" {...itemForm.register('sortOrder')} className="bg-background border-border" />
               </div>
             </div>
+
             <div className="space-y-2">
-              <label className="text-sm font-medium">显示标签 (Label)</label>
+              <label className="text-sm font-medium">默认显示标签 (Fallback) <span className="text-red-500">*</span></label>
               <Input {...itemForm.register('itemLabel')} placeholder="例如: 男, Male" className="bg-background border-border" />
               {itemForm.formState.errors.itemLabel && <p className="text-red-500 text-xs">{itemForm.formState.errors.itemLabel.message}</p>}
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">排序权重</label>
-              <Input type="number" {...itemForm.register('sortOrder')} className="bg-background border-border" />
+
+            <div className="space-y-2 pt-2 border-t border-border">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Globe size={14} /> 多语言配置 (可选)
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">中文 (zh-CN)</label>
+                  <Input {...itemForm.register('labelZh')} placeholder="中文标签" className="bg-background border-border text-sm" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">English (en-US)</label>
+                  <Input {...itemForm.register('labelEn')} placeholder="English Label" className="bg-background border-border text-sm" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">日本語 (ja-JP)</label>
+                  <Input {...itemForm.register('labelJa')} placeholder="日本語ラベル" className="bg-background border-border text-sm" />
+                </div>
+              </div>
             </div>
+
             <DialogFooter>
               <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={isSavingItem}>
                 {isSavingItem ? '处理中...' : editingItem ? '保存修改' : '立即添加'}

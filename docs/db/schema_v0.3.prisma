@@ -47,6 +47,8 @@ model SysDictItem {
   sortOrder Int?     @default(0) @map("sort_order")
   /// 启用状态 (1=启用, 0=禁用)
   status    Boolean? @default(true)
+  /// 创建时间
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz
 
   dict SysDict @relation(fields: [dictCode], references: [dictCode], onDelete: Cascade)
   workHonors WorkHonor[]
@@ -220,8 +222,8 @@ model WorkTeam {
   workId       BigInt  @unique @map("work_id")
   /// 团队介绍 (文本)
   teamIntro    String? @map("team_intro")
-  /// 成员名单 (JSONB, 存储字符串数组)
-  members      Json?
+  /// 成员名单 (文本，顿号分隔)
+  members      String?
   /// 联系电话 (可选)
   contactPhone String? @map("contact_phone") @db.VarChar(50)
   /// 联系邮箱 (可选)

@@ -47,7 +47,18 @@ export async function GET(req: NextRequest) {
               email: true,
               avatarUrl: true
             }
-          }
+          },
+          tags: {
+            include: {
+              tag: true
+            }
+          },
+          honors: {
+            include: {
+              dictItem: true
+            }
+          },
+          statistic: true
         },
         orderBy: { createdAt: 'desc' },
         skip,
@@ -104,7 +115,19 @@ export async function POST(req: NextRequest) {
             email: true,
             avatarUrl: true
           }
-        }
+        },
+        statistic: true
+      }
+    });
+
+    // Create initial statistic record
+    await prisma.workStatistic.create({
+      data: {
+        workId: newWork.id,
+        auditStatus: 0, // Pending
+        displayStatus: 0, // Hidden
+        viewCount: 0,
+        likeCount: 0
       }
     });
 
@@ -121,22 +144,107 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const { 
       id, 
+      userId,
       title, 
       summary, 
       coverUrl, 
       countryCode, 
       cityCode, 
       categoryCode, 
-      devStatusCode 
+      devStatusCode,
+      tagIds,
+      honorIds,
+      auditStatus // Optional audit status update
     } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Work ID is required' }, { status: 400 });
     }
 
+    // If auditStatus is provided, update statistic and create log
+    if (auditStatus !== undefined) {
+      console.log('Updating audit status for work:', id, 'to:', auditStatus)
+      const currentStat = await prisma.workStatistic.findUnique({
+        where: { workId: BigInt(id) }
+      });
+
+      if (!currentStat) {
+        // If no statistic record exists, create one (safety fallback)
+        console.warn('No statistic record found for work:', id, 'creating one')
+        await prisma.workStatistic.create({
+          data: {
+            workId: BigInt(id),
+            auditStatus: Number(auditStatus),
+            displayStatus: Number(auditStatus) === 1 ? 1 : 0,
+            lastAuditAt: new Date()
+          }
+        })
+      } else if (currentStat.auditStatus !== Number(auditStatus)) {
+        // Update statistic
+        await prisma.workStatistic.update({
+          where: { workId: BigInt(id) },
+          data: {
+            auditStatus: Number(auditStatus),
+            lastAuditAt: new Date(),
+            displayStatus: Number(auditStatus) === 1 ? 1 : 0 // Auto display if approved
+          }
+        });
+
+        // Create audit log
+        try {
+          await prisma.workAuditLog.create({
+            data: {
+              workId: BigInt(id),
+              // auditorId: userId ? BigInt(userId) : undefined, // Assuming current user is auditor
+              prevStatus: currentStat.auditStatus,
+              newStatus: Number(auditStatus),
+              reason: 'Manual update via console', 
+              createdAt: new Date()
+            }
+          });
+        } catch (logError) {
+          console.error('Failed to create audit log:', logError)
+          // Don't block the main update
+        }
+      }
+    }
+
+    // If tagIds is provided, update tags
+    let tagUpdate = {};
+    if (tagIds) {
+      tagUpdate = {
+        tags: {
+          deleteMany: {}, // Remove all existing tags
+          create: tagIds.map((tagId: number) => ({
+            tag: { connect: { id: tagId } }
+          }))
+        }
+      };
+    }
+
+    // If honorIds is provided, update honors
+    let honorUpdate = {};
+    if (honorIds && Array.isArray(honorIds)) {
+      // Filter out invalid IDs and ensure they are BigInt
+      const validHonorIds = honorIds
+        .filter(id => id !== null && id !== undefined && id !== '')
+        .map(id => BigInt(id));
+
+      honorUpdate = {
+        honors: {
+          deleteMany: {}, // Remove all existing honors
+          create: validHonorIds.map((honorItemId: bigint) => ({
+            honorItemId,
+            grantedAt: new Date(),
+          }))
+        }
+      };
+    }
+
     const updatedWork = await prisma.workBase.update({
       where: { id: BigInt(id) },
       data: {
+        userId: userId ? BigInt(userId) : undefined,
         title,
         summary,
         coverUrl,
@@ -144,6 +252,8 @@ export async function PUT(req: NextRequest) {
         cityCode,
         categoryCode,
         devStatusCode,
+        ...tagUpdate,
+        ...honorUpdate
       },
       include: {
         user: {
@@ -152,7 +262,18 @@ export async function PUT(req: NextRequest) {
             email: true,
             avatarUrl: true
           }
-        }
+        },
+        tags: {
+          include: {
+            tag: true
+          }
+        },
+        honors: {
+          include: {
+            dictItem: true
+          }
+        },
+        statistic: true
       }
     });
 
