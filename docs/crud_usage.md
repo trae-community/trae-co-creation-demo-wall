@@ -1,14 +1,21 @@
 # CRUD 组件与分页接口使用说明
 
-## 1. 组件说明
+## 1. 组件与 Hook 位置
+
+当前目录已按领域拆分，CRUD 相关能力统一位于：
+
+- `src/components/crud/crud-feedback.tsx`
+- `src/components/crud/crud-filter-bar.tsx`
+- `src/components/crud/crud-pagination.tsx`
+- `src/hooks/use-feedback.ts`
 
 ### 1.1 CrudFeedback
 用于展示统一的成功/失败/提示反馈。
 
 **使用方式**
 ```tsx
-import { CrudFeedback } from '@/components/CrudFeedback'
-import { useFeedback } from '@/components/useFeedback'
+import { CrudFeedback } from '@/components/crud/crud-feedback'
+import { useFeedback } from '@/hooks/use-feedback'
 
 const { feedback, showFeedback } = useFeedback()
 
@@ -20,7 +27,7 @@ const { feedback, showFeedback } = useFeedback()
 
 **使用方式**
 ```tsx
-import { CrudFilterBar } from '@/components/CrudFilterBar'
+import { CrudFilterBar } from '@/components/crud/crud-filter-bar'
 
 <CrudFilterBar
   searchPlaceholder="搜索标签名称..."
@@ -42,7 +49,7 @@ import { CrudFilterBar } from '@/components/CrudFilterBar'
 
 **使用方式**
 ```tsx
-import { CrudPagination } from '@/components/CrudPagination'
+import { CrudPagination } from '@/components/crud/crud-pagination'
 
 <CrudPagination
   totalItems={totalItems}
@@ -56,11 +63,11 @@ import { CrudPagination } from '@/components/CrudPagination'
 ```
 
 ### 1.4 useFeedback
-用于统一反馈状态管理。
+用于统一反馈状态管理（显示与自动消失）。
 
 **使用方式**
 ```tsx
-import { useFeedback } from '@/components/useFeedback'
+import { useFeedback } from '@/hooks/use-feedback'
 
 const { feedback, showFeedback } = useFeedback()
 showFeedback('success', '保存成功')

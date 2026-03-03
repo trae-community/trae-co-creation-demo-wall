@@ -1,9 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import createMiddleware from 'next-intl/middleware';
-import { routing } from './i18n/routing';
+import { routing } from './lib/language/routing';
 
 const handleI18nRouting = createMiddleware(routing);
-const isProtectedRoute = createRouteMatcher(['/:locale/submit(.*)', '/:locale/admin(.*)', '/:locale/console(.*)']);
+const isProtectedRoute = createRouteMatcher(['/:language/submit(.*)', '/:language/console(.*)']);
 const isApiRoute = createRouteMatcher(['/api(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
