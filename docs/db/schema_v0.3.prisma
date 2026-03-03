@@ -47,6 +47,8 @@ model SysDictItem {
   sortOrder Int?     @default(0) @map("sort_order")
   /// 启用状态 (1=启用, 0=禁用)
   status    Boolean? @default(true)
+  /// 创建时间
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz
 
   dict SysDict @relation(fields: [dictCode], references: [dictCode], onDelete: Cascade)
   workHonors WorkHonor[]

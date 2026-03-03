@@ -37,16 +37,18 @@ model SysDictItem {
   id        BigInt   @id @default(autoincrement())
   /// 关联字典编码
   dictCode  String   @map("dict_code") @db.VarChar(50)
-  /// 显示标签 (Fallback)
+  /// 显示标签 (e.g., '中国', '实用工具', '社区推荐')
   itemLabel String   @map("item_label") @db.VarChar(100)
-  /// 多语言标签 (e.g., {"zh-CN": "中国", "en-US": "China"})
-  labelI18n Json?    @map("label_i18n")
+  /// 语言标识 (e.g., zh-CN, en-US, ja-JP)
+  lang      String   @default("zh-CN") @db.VarChar(20)
   /// 存储值 (e.g., 'CN', 'tool', 'community_pick')
   itemValue String   @map("item_value") @db.VarChar(100)
   /// 排序权重
   sortOrder Int?     @default(0) @map("sort_order")
   /// 启用状态 (1=启用, 0=禁用)
   status    Boolean? @default(true)
+  /// 创建时间
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz
 
   dict SysDict @relation(fields: [dictCode], references: [dictCode], onDelete: Cascade)
   workHonors WorkHonor[]
