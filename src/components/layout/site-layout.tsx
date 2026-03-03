@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard } from "lucide-react";
+import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound } from "lucide-react";
 import { ParticlesBackground } from "./particles-background";
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { useTranslations, useLocale } from 'next-intl';
@@ -18,6 +18,7 @@ const LOCALE_OPTIONS = [
 export function SiteLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const t = useTranslations('Nav');
+  const tProfile = useTranslations('Profile');
   const tFooter = useTranslations('Footer');
   const locale = useLocale();
   const router = useRouter();
@@ -72,6 +73,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             </Link>
             <Link
               href="/submit"
+              prefetch={false}
               className={cn(
                 "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                 pathname === "/submit"
@@ -85,6 +87,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
             <Link
               href="/console"
+              prefetch={false}
               className={cn(
                 "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                 pathname && pathname.startsWith("/console")
@@ -113,7 +116,15 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
             <SignedIn>
               <div className="flex items-center gap-2 px-4 py-1.5">
-                <UserButton />
+                <UserButton>
+                  <UserButton.MenuItems>
+                    <UserButton.Link
+                      href={`/${locale}/profile`}
+                      label={tProfile('menu')}
+                      labelIcon={<UserRound className="w-4 h-4" />}
+                    />
+                  </UserButton.MenuItems>
+                </UserButton>
               </div>
             </SignedIn>
 
