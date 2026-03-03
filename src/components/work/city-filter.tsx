@@ -17,12 +17,17 @@ interface CityFilterProps {
   onFilterChange: (filters: FilterState) => void;
 }
 
+type FilterOption = {
+  label: string;
+  value: string;
+};
+
 export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
   const t = useTranslations('Filter');
   const locale = useLocale();
-  const [categories, setCategories] = useState<string[]>([]);
-  const [countries, setCountries] = useState<string[]>([]);
-  const [cities, setCities] = useState<string[]>([]);
+  const [categories, setCategories] = useState<FilterOption[]>([]);
+  const [countries, setCountries] = useState<FilterOption[]>([]);
+  const [cities, setCities] = useState<FilterOption[]>([]);
 
   useEffect(() => {
     const loadFilterOptions = async () => {
@@ -40,9 +45,9 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
           cityRes.ok ? cityRes.json() : null
         ]);
 
-        setCategories(((categoryData?.items as DictionaryItem[] | undefined) || []).map(item => item.itemLabel));
-        setCountries(((countryData?.items as DictionaryItem[] | undefined) || []).map(item => item.itemLabel));
-        setCities(((cityData?.items as DictionaryItem[] | undefined) || []).map(item => item.itemLabel));
+        setCategories(((categoryData?.items as DictionaryItem[] | undefined) || []).map(item => ({ label: item.itemLabel, value: item.itemValue })));
+        setCountries(((countryData?.items as DictionaryItem[] | undefined) || []).map(item => ({ label: item.itemLabel, value: item.itemValue })));
+        setCities(((cityData?.items as DictionaryItem[] | undefined) || []).map(item => ({ label: item.itemLabel, value: item.itemValue })));
       } catch (error) {
         console.error('Failed to load filter options:', error);
       }
@@ -66,7 +71,8 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
       if (newValues.length === 0) {
         newFilters.cities = [];
       } else {
-        newFilters.cities = filters.cities.filter((city) => cities.includes(city));
+        const validCityValues = cities.map((city) => city.value);
+        newFilters.cities = filters.cities.filter((city) => validCityValues.includes(city));
       }
     }
 
@@ -83,7 +89,7 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
 
   const renderFilterSection = (
     title: string,
-    items: string[],
+    items: FilterOption[],
     type: keyof FilterState,
     selectedItems: string[]
   ) => (
@@ -103,16 +109,16 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
         </button>
         {items.map((item) => (
           <button
-            key={item}
-            onClick={() => toggleFilter(type, item)}
+            key={item.value}
+            onClick={() => toggleFilter(type, item.value)}
             className={cn(
               "px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
-              selectedItems.includes(item)
+              selectedItems.includes(item.value)
                 ? "bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-black shadow-[0_0_15px_rgba(34,197,94,0.3)] border border-transparent font-bold"
                 : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10 backdrop-blur-sm"
             )}
           >
-            {item}
+            {item.label}
           </button>
         ))}
       </div>
