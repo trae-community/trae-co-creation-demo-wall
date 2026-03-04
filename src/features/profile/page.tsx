@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "@/i18n/navigation";
+import { Link } from "@/lib/language/navigation";
 import { SignOutButton, UserProfile } from "@clerk/nextjs";
 import { useLocale, useTranslations } from "next-intl";
 import { Loader2, MapPin, Save, ShieldCheck, Sparkles, User, LogOut } from "lucide-react";
