@@ -10,6 +10,8 @@ import {
   Tags,
   Users,
   Shield,
+  Logs,
+  ShieldCheck,
   Menu, 
   X
 } from 'lucide-react'
@@ -31,6 +33,8 @@ export default function ConsoleLayout({
     { name: '字典管理', href: '/console/dictionaries', icon: BookOpen },
     { name: '标签管理', href: '/console/tags', icon: Tags },
     { name: '城市管理', href: '/console/cities', icon: Building2 },
+    { name: '登录注册日志', href: '/console/auth-logs', icon: ShieldCheck },
+    { name: '操作日志', href: '/console/operation-logs', icon: Logs },
   ]
 
   return (

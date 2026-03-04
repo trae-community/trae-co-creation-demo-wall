@@ -2,10 +2,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getOrSyncUser } from "@/lib/auth";
+import { writeOperationLog } from "@/lib/audit-log";
 import { z } from "zod";
-import fs from "node:fs/promises";
-import path from "node:path";
-import { v4 as uuidv4 } from "uuid";
 
 // Schema matching the frontend form
 const submissionSchema = z.object({
@@ -126,6 +124,19 @@ export async function POST(request: Request) {
       return work;
     });
 
+    await writeOperationLog({
+      operatorId: user.id,
+      module: "submit",
+      action: "create_work",
+      targetType: "work_base",
+      targetId: result.id,
+      payload: {
+        title: data.name,
+        category: data.category
+      },
+      request
+    });
+
     // Return success with ID (serialized to string for BigInt safety)
     return NextResponse.json({ 
       success: true, 
@@ -134,6 +145,14 @@ export async function POST(request: Request) {
 
   } catch (error) {
     console.error("Submission error:", error);
+    await writeOperationLog({
+      module: "submit",
+      action: "create_work",
+      targetType: "work_base",
+      success: false,
+      errorMessage: error instanceof Error ? error.message : "unknown error",
+      request
+    });
     return NextResponse.json(
       { success: false, error: error },
       { status: 500 }

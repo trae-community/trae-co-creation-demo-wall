@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
+import { getOrSyncUser } from '@/lib/auth';
+import { writeOperationLog } from '@/lib/audit-log';
 
 // Helper to sanitize user object (remove sensitive data)
 const sanitizeUser = (user: any) => {
@@ -82,6 +84,7 @@ export async function GET(req: NextRequest) {
 // POST: 创建用户
 export async function POST(req: NextRequest) {
   try {
+    const operator = await getOrSyncUser();
     const body = await req.json();
     const { username, email, phone, bio, avatarUrl } = body;
 
@@ -111,9 +114,27 @@ export async function POST(req: NextRequest) {
       }
     });
 
+    await writeOperationLog({
+      operatorId: operator?.id,
+      module: 'users',
+      action: 'create',
+      targetType: 'sys_user',
+      targetId: newUser.id,
+      payload: { email, username },
+      request: req
+    });
+
     return NextResponse.json(sanitizeUser(newUser));
   } catch (error) {
     console.error('[API] Failed to create user:', error);
+    await writeOperationLog({
+      module: 'users',
+      action: 'create',
+      targetType: 'sys_user',
+      success: false,
+      errorMessage: error instanceof Error ? error.message : 'unknown error',
+      request: req
+    });
     // Handle unique constraint violations
     if ((error as any).code === 'P2002') {
       return NextResponse.json({ error: 'Email or Username already exists' }, { status: 409 });
@@ -125,6 +146,7 @@ export async function POST(req: NextRequest) {
 // PUT: 更新用户
 export async function PUT(req: NextRequest) {
   try {
+    const operator = await getOrSyncUser();
     const body = await req.json();
     const { id, username, email, phone, bio, avatarUrl, roleIds } = body;
 
@@ -170,9 +192,27 @@ export async function PUT(req: NextRequest) {
       }
     });
 
+    await writeOperationLog({
+      operatorId: operator?.id,
+      module: 'users',
+      action: 'update',
+      targetType: 'sys_user',
+      targetId: updatedUser.id,
+      payload: { id, email, username, hasRoleUpdate: Boolean(roleIds) },
+      request: req
+    });
+
     return NextResponse.json(sanitizeUser(updatedUser));
   } catch (error) {
     console.error('[API] Failed to update user:', error);
+    await writeOperationLog({
+      module: 'users',
+      action: 'update',
+      targetType: 'sys_user',
+      success: false,
+      errorMessage: error instanceof Error ? error.message : 'unknown error',
+      request: req
+    });
     if ((error as any).code === 'P2002') {
       return NextResponse.json({ error: 'Email or Username already exists' }, { status: 409 });
     }
@@ -183,6 +223,7 @@ export async function PUT(req: NextRequest) {
 // DELETE: 删除用户
 export async function DELETE(req: NextRequest) {
   try {
+    const operator = await getOrSyncUser();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
@@ -194,9 +235,26 @@ export async function DELETE(req: NextRequest) {
       where: { id: BigInt(id) },
     });
 
+    await writeOperationLog({
+      operatorId: operator?.id,
+      module: 'users',
+      action: 'delete',
+      targetType: 'sys_user',
+      targetId: id,
+      request: req
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[API] Failed to delete user:', error);
+    await writeOperationLog({
+      module: 'users',
+      action: 'delete',
+      targetType: 'sys_user',
+      success: false,
+      errorMessage: error instanceof Error ? error.message : 'unknown error',
+      request: req
+    });
     return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
   }
 }

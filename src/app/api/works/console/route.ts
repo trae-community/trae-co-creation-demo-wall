@@ -3,6 +3,7 @@ import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
 import { getOrSyncUser } from '@/lib/auth';
+import { writeOperationLog } from '@/lib/audit-log';
 
 // Helper to sanitize object
 const sanitize = (data: any) => {
@@ -88,6 +89,7 @@ export async function GET(req: NextRequest) {
 // POST: 创建作品
 export async function POST(req: NextRequest) {
   try {
+    const operator = await getOrSyncUser();
     const body = await req.json();
     const { 
       userId, 
@@ -139,9 +141,27 @@ export async function POST(req: NextRequest) {
       }
     });
 
+    await writeOperationLog({
+      operatorId: operator?.id,
+      module: 'works',
+      action: 'create',
+      targetType: 'work_base',
+      targetId: newWork.id,
+      payload: { title, userId, auditStatus: 0 },
+      request: req
+    });
+
     return NextResponse.json(sanitize(newWork));
   } catch (error) {
     console.error('[API] Failed to create work:', error);
+    await writeOperationLog({
+      module: 'works',
+      action: 'create',
+      targetType: 'work_base',
+      success: false,
+      errorMessage: error instanceof Error ? error.message : 'unknown error',
+      request: req
+    });
     return NextResponse.json({ error: 'Failed to create work' }, { status: 500 });
   }
 }
@@ -149,6 +169,7 @@ export async function POST(req: NextRequest) {
 // PUT: 更新作品
 export async function PUT(req: NextRequest) {
   try {
+    const operator = await getOrSyncUser();
     const body = await req.json();
     const { 
       id, 
@@ -176,9 +197,8 @@ export async function PUT(req: NextRequest) {
     // If auditStatus is provided, update statistic and create log
     if (auditStatus !== undefined) {
       console.log('Updating audit status for work:', id, 'to:', auditStatus)
-      const currentUser = await getOrSyncUser()
       const bodyAuditorId = body.auditorId ? BigInt(body.auditorId) : undefined
-      const auditorId = currentUser?.id ?? bodyAuditorId
+      const auditorId = operator?.id ?? bodyAuditorId
       if (!auditorId) {
         return NextResponse.json({ error: 'Auditor ID is required for audit action' }, { status: 401 })
       }
@@ -229,6 +249,19 @@ export async function PUT(req: NextRequest) {
           VALUES (${BigInt(id)}, ${auditorId ?? null}, ${currentStat.auditStatus ?? null}, ${newStatus}, ${auditReason}, ${new Date()})
         `
       }
+
+      await writeOperationLog({
+        operatorId: auditorId,
+        module: 'works',
+        action: 'audit',
+        targetType: 'work_base',
+        targetId: id,
+        payload: {
+          auditStatus: newStatus,
+          auditReason
+        },
+        request: req
+      });
     }
 
     // If tagIds is provided, update tags
@@ -343,9 +376,37 @@ export async function PUT(req: NextRequest) {
       }
     });
 
+    await writeOperationLog({
+      operatorId: operator?.id,
+      module: 'works',
+      action: 'update',
+      targetType: 'work_base',
+      targetId: updatedWork.id,
+      payload: {
+        id,
+        title,
+        hasTagUpdate: Boolean(tagIds),
+        hasHonorUpdate: Boolean(honorIds),
+        hasTeamUpdate:
+          teamMembers !== undefined ||
+          teamIntro !== undefined ||
+          contactPhone !== undefined ||
+          contactEmail !== undefined
+      },
+      request: req
+    });
+
     return NextResponse.json(sanitize(updatedWork));
   } catch (error) {
     console.error('[API] Failed to update work:', error);
+    await writeOperationLog({
+      module: 'works',
+      action: 'update',
+      targetType: 'work_base',
+      success: false,
+      errorMessage: error instanceof Error ? error.message : 'unknown error',
+      request: req
+    });
     return NextResponse.json({ error: 'Failed to update work' }, { status: 500 });
   }
 }
@@ -353,6 +414,7 @@ export async function PUT(req: NextRequest) {
 // DELETE: 删除作品
 export async function DELETE(req: NextRequest) {
   try {
+    const operator = await getOrSyncUser();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
@@ -364,9 +426,26 @@ export async function DELETE(req: NextRequest) {
       where: { id: BigInt(id) },
     });
 
+    await writeOperationLog({
+      operatorId: operator?.id,
+      module: 'works',
+      action: 'delete',
+      targetType: 'work_base',
+      targetId: id,
+      request: req
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[API] Failed to delete work:', error);
+    await writeOperationLog({
+      module: 'works',
+      action: 'delete',
+      targetType: 'work_base',
+      success: false,
+      errorMessage: error instanceof Error ? error.message : 'unknown error',
+      request: req
+    });
     return NextResponse.json({ error: 'Failed to delete work' }, { status: 500 });
   }
 }
