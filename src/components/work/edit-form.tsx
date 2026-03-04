@@ -265,12 +265,12 @@ export function EditForm({ initialData }: { initialData: InitialData }) {
         team: JSON.stringify(data.team.map(t => t.value)), // Stringify team array for backend
       };
 
-      const response = await fetch(`/api/works/edit/${initialData.id}`, {
+      const response = await fetch('/api/works', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, id: initialData.id }),
       });
 
       const result = await response.json();
