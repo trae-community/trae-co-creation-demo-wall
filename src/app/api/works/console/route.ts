@@ -19,9 +19,13 @@ export async function GET(req: NextRequest) {
     const page = Number(searchParams.get(CRUD_QUERY_PARAMS.page) || '1');
     const pageSize = Number(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10');
     const query = searchParams.get(CRUD_QUERY_PARAMS.query) || '';
+    const userId = searchParams.get('userId');
     
     // 构建过滤条件
     const whereFilters: Prisma.WorkBaseWhereInput[] = [];
+    if (userId) {
+      whereFilters.push({ userId: BigInt(userId) });
+    }
     if (query.trim()) {
       whereFilters.push({
         OR: [
