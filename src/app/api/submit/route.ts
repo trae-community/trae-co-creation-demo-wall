@@ -28,7 +28,6 @@ const submissionSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    // 1. Authenticate user
     const user = await getOrSyncUser();
     if (!user) {
       return NextResponse.json(
@@ -37,7 +36,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Parse and validate body
     const body = await request.json();
     const validationResult = submissionSchema.safeParse(body);
 
@@ -49,10 +47,9 @@ export async function POST(request: Request) {
     }
 
     const data = validationResult.data;
+    const now = new Date();
 
-    // 3. Save to database using transaction
     const result = await prisma.$transaction(async (tx) => {
-      // Create WorkBase
       const work = await tx.workBase.create({
         data: {
           userId: user.id,
@@ -66,7 +63,21 @@ export async function POST(request: Request) {
         },
       });
 
-      // Create WorkTagRelation
+      const autoAuditTags = await tx.workTag.findMany({
+        where: {
+          id: { in: data.tags },
+          isAutoAudit: true,
+          OR: [{ auditStartTime: null }, { auditStartTime: { lte: now } }],
+          AND: [{ OR: [{ auditEndTime: null }, { auditEndTime: { gte: now } }] }]
+        },
+        select: {
+          id: true,
+          name: true
+        }
+      });
+
+      const isAutoApproved = autoAuditTags.length > 0;
+
       if (data.tags.length > 0) {
         await tx.workTagRelation.createMany({
           data: data.tags.map(tagId => ({
@@ -76,7 +87,6 @@ export async function POST(request: Request) {
         });
       }
 
-      // Create WorkDetail
       await tx.workDetail.create({
         data: {
           workId: work.id,
@@ -88,7 +98,6 @@ export async function POST(request: Request) {
         },
       });
 
-      // Create WorkImage
       if (data.screenshots.length > 0) {
         await tx.workImage.createMany({
           data: data.screenshots.map((url, index) => ({
@@ -100,7 +109,6 @@ export async function POST(request: Request) {
         });
       }
 
-      // Create WorkTeam
       await tx.workTeam.create({
         data: {
           workId: work.id,
@@ -111,17 +119,33 @@ export async function POST(request: Request) {
         },
       });
 
-      // Initialize WorkStatistic
       await tx.workStatistic.create({
         data: {
           workId: work.id,
-          auditStatus: 0,
-          displayStatus: 0, 
+          auditStatus: isAutoApproved ? 1 : 0,
+          displayStatus: isAutoApproved ? 1 : 0,
+          lastAuditAt: isAutoApproved ? now : null,
           viewCount: 0,
           likeCount: 0
         },
       });
-      return work;
+
+      if (isAutoApproved) {
+        await tx.workAuditLog.create({
+          data: {
+            workId: work.id,
+            auditorId: null,
+            prevStatus: 0,
+            newStatus: 1,
+            reason: `Auto approved by system via tags: ${autoAuditTags.map(tag => tag.name).join(", ")}`
+          }
+        });
+      }
+      return {
+        work,
+        isAutoApproved,
+        autoAuditTags
+      };
     });
 
     await writeOperationLog({
@@ -129,18 +153,38 @@ export async function POST(request: Request) {
       module: "submit",
       action: "create_work",
       targetType: "work_base",
-      targetId: result.id,
+      targetId: result.work.id,
       payload: {
         title: data.name,
-        category: data.category
+        category: data.category,
+        autoApproved: result.isAutoApproved,
+        autoAuditTags: result.autoAuditTags.map(tag => tag.name)
       },
       request
     });
 
-    // Return success with ID (serialized to string for BigInt safety)
+    if (result.isAutoApproved) {
+      await writeOperationLog({
+        module: "submit",
+        action: "auto_audit",
+        targetType: "work_base",
+        targetId: result.work.id,
+        payload: {
+          auditStatus: 1,
+          displayStatus: 1,
+          auditor: "system",
+          tags: result.autoAuditTags.map(tag => tag.name)
+        },
+        request
+      });
+    }
+
     return NextResponse.json({ 
       success: true, 
-      id: result.id.toString() 
+      id: result.work.id.toString(),
+      auditStatus: result.isAutoApproved ? 1 : 0,
+      displayStatus: result.isAutoApproved ? 1 : 0,
+      autoApproved: result.isAutoApproved
     });
 
   } catch (error) {
