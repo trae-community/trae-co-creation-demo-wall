@@ -23,6 +23,7 @@ export function SubmissionForm({ user }: { user?: { id: string; email: string | 
   const [availableCategories, setAvailableCategories] = useState<DictionaryItem[]>([]);
   const [availableCountries, setAvailableCountries] = useState<DictionaryItem[]>([]);
   const [availableCities, setAvailableCities] = useState<DictionaryItem[]>([]);
+  const [availableDevStatuses, setAvailableDevStatuses] = useState<DictionaryItem[]>([]);
 
   const submissionSchema = z.object({
     name: z.string().min(2, t('validationNameMin')).max(50, t('validationNameMax')),
@@ -30,6 +31,7 @@ export function SubmissionForm({ user }: { user?: { id: string; email: string | 
     country: z.string().min(1, t('validationCountry')),
     city: z.string().min(1, t('validationCity')),
     category: z.string().min(1, t('validationCategory')),
+    devStatus: z.string().min(1, t('validationDevStatus')),
     tags: z.array(z.number()).min(1, t('validationTagsMin')).max(5, t('validationTagsMax')),
     team: z.array(z.object({ value: z.string().min(1, t('validationTeamMemberRequired')) })).min(1, t('validationTeamMin')),
     teamIntro: z.string().optional(),
@@ -65,8 +67,9 @@ export function SubmissionForm({ user }: { user?: { id: string; email: string | 
       country: "",
       city: "",
       category: "",
+      devStatus: "",
       tags: [],
-      team: [{ value: user?.username || "" }],
+      team: [{ value: "" }],
       teamIntro: "",
       contactPhone: "",
       contactEmail: "",
@@ -114,12 +117,16 @@ export function SubmissionForm({ user }: { user?: { id: string; email: string | 
   const fetchCategories = async () => {
     try {
       const apiLang = locale === 'zh' ? 'zh-CN' : locale === 'en' ? 'en-US' : locale === 'ja' ? 'ja-JP' : locale;
-      const response = await fetch(`/api/dictionaries?code=category_code&lang=${apiLang}`);
-      if (!response.ok) throw new Error(`Failed to fetch categories: ${response.statusText}`);
-      const data = await response.json();
-      setAvailableCategories(data.items || []);
+      const [categoryRes, devStatusRes] = await Promise.all([
+        fetch(`/api/dictionaries?code=category_code&lang=${apiLang}`),
+        fetch(`/api/dictionaries?code=dev_status&lang=${apiLang}`)
+      ]);
+      const categoryData = categoryRes.ok ? await categoryRes.json() : { items: [] };
+      const devStatusData = devStatusRes.ok ? await devStatusRes.json() : { items: [] };
+      setAvailableCategories(categoryData.items || []);
+      setAvailableDevStatuses(devStatusData.items || []);
     } catch (err) {
-      console.error("Failed to fetch categories:", err);
+      console.error("Failed to fetch dictionaries:", err);
     }
   };
 
@@ -375,6 +382,19 @@ export function SubmissionForm({ user }: { user?: { id: string; email: string | 
               />
               <input type="hidden" {...register("category")} />
               {errors.category && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.category.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">{t('devStatus')} <span className="text-red-500">*</span></label>
+              <Select
+                options={availableDevStatuses.map(status => ({ label: status.itemLabel, value: status.itemValue }))}
+                value={watch("devStatus")}
+                onChange={(value) => setValue("devStatus", value)}
+                placeholder={t('devStatusPlaceholder')}
+                icon={<CheckCircle className="w-4 h-4" />}
+              />
+              <input type="hidden" {...register("devStatus")} />
+              {errors.devStatus && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.devStatus.message}</p>}
             </div>
 
             <div className="space-y-2">
