@@ -59,6 +59,7 @@ export async function POST(request: Request) {
           countryCode: data.country,
           coverUrl: data.coverUrl,
           categoryCode: data.category,
+          devStatusCode: data.devStatus,
           // Optional fields left as null/default
         },
       });
