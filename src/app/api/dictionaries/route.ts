@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS, DICT_FILTERS, normalizeFilter } from '@/lib/crud';
-import { getOrSyncUser } from '@/lib/auth';
-import { writeOperationLog } from '@/lib/audit-log';
 
 // GET: 获取字典列表（包含字典项）
 export async function GET(req: NextRequest) {
@@ -115,7 +113,6 @@ export async function GET(req: NextRequest) {
 // POST: 创建字典或字典项
 export async function POST(req: NextRequest) {
   try {
-    const operator = await getOrSyncUser();
     const body = await req.json();
     const { type, data } = body; // type: 'dict' | 'item'
 
@@ -127,15 +124,6 @@ export async function POST(req: NextRequest) {
           description: data.description,
           isSystem: data.isSystem || false
         }
-      });
-      await writeOperationLog({
-        operatorId: operator?.id,
-        module: 'dictionaries',
-        action: 'create_dict',
-        targetType: 'sys_dict',
-        targetId: newDict.id,
-        payload: { dictCode: data.dictCode, dictName: data.dictName },
-        request: req
       });
       return NextResponse.json(JSON.parse(JSON.stringify(newDict, (key, value) =>
         typeof value === 'bigint' ? value.toString() : value
@@ -155,15 +143,6 @@ export async function POST(req: NextRequest) {
       const newItem = await prisma.sysDictItem.create({
         data: itemData
       })
-      await writeOperationLog({
-        operatorId: operator?.id,
-        module: 'dictionaries',
-        action: 'create_item',
-        targetType: 'sys_dict_item',
-        targetId: newItem.id,
-        payload: { dictCode: data.dictCode, itemValue: data.itemValue },
-        request: req
-      });
       return NextResponse.json(JSON.parse(JSON.stringify(newItem, (key, value) =>
         typeof value === 'bigint' ? value.toString() : value
       )));
@@ -172,13 +151,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
   } catch (error) {
     console.error('[API] Failed to create:', error);
-    await writeOperationLog({
-      module: 'dictionaries',
-      action: 'create',
-      success: false,
-      errorMessage: error instanceof Error ? error.message : 'unknown error',
-      request: req
-    });
     return NextResponse.json({ error: 'Failed to create' }, { status: 500 });
   }
 }
@@ -186,7 +158,6 @@ export async function POST(req: NextRequest) {
 // PUT: 更新字典或字典项
 export async function PUT(req: NextRequest) {
   try {
-    const operator = await getOrSyncUser();
     const body = await req.json();
     const { type, id, data } = body;
 
@@ -197,15 +168,6 @@ export async function PUT(req: NextRequest) {
           dictName: data.dictName,
           description: data.description
         }
-      });
-      await writeOperationLog({
-        operatorId: operator?.id,
-        module: 'dictionaries',
-        action: 'update_dict',
-        targetType: 'sys_dict',
-        targetId: updatedDict.id,
-        payload: { id, dictName: data.dictName },
-        request: req
       });
       return NextResponse.json(JSON.parse(JSON.stringify(updatedDict, (key, value) =>
         typeof value === 'bigint' ? value.toString() : value
@@ -225,15 +187,6 @@ export async function PUT(req: NextRequest) {
         where: { id: BigInt(id) },
         data: itemData
       })
-      await writeOperationLog({
-        operatorId: operator?.id,
-        module: 'dictionaries',
-        action: 'update_item',
-        targetType: 'sys_dict_item',
-        targetId: updatedItem.id,
-        payload: { id, itemValue: data.itemValue },
-        request: req
-      });
       return NextResponse.json(JSON.parse(JSON.stringify(updatedItem, (key, value) =>
         typeof value === 'bigint' ? value.toString() : value
       )));
@@ -242,13 +195,6 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
   } catch (error) {
     console.error('[API] Failed to update:', error);
-    await writeOperationLog({
-      module: 'dictionaries',
-      action: 'update',
-      success: false,
-      errorMessage: error instanceof Error ? error.message : 'unknown error',
-      request: req
-    });
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
   }
 }
@@ -256,7 +202,6 @@ export async function PUT(req: NextRequest) {
 // DELETE: 删除字典或字典项
 export async function DELETE(req: NextRequest) {
   try {
-    const operator = await getOrSyncUser();
     const { searchParams } = new URL(req.url);
     const type = searchParams.get('type');
     const id = searchParams.get('id');
@@ -267,25 +212,9 @@ export async function DELETE(req: NextRequest) {
       await prisma.sysDict.delete({
         where: { id: BigInt(id) }
       });
-      await writeOperationLog({
-        operatorId: operator?.id,
-        module: 'dictionaries',
-        action: 'delete_dict',
-        targetType: 'sys_dict',
-        targetId: id,
-        request: req
-      });
     } else if (type === 'item') {
       await prisma.sysDictItem.delete({
         where: { id: BigInt(id) }
-      });
-      await writeOperationLog({
-        operatorId: operator?.id,
-        module: 'dictionaries',
-        action: 'delete_item',
-        targetType: 'sys_dict_item',
-        targetId: id,
-        request: req
       });
     } else {
       return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
@@ -294,13 +223,6 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[API] Failed to delete:', error);
-    await writeOperationLog({
-      module: 'dictionaries',
-      action: 'delete',
-      success: false,
-      errorMessage: error instanceof Error ? error.message : 'unknown error',
-      request: req
-    });
     return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
   }
 }

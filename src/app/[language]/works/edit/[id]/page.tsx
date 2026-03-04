@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getOrSyncUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { EditForm, InitialData } from "./edit-form";
+import { EditForm, InitialData } from "../../../../../components/work/edit-form";
 
 // Define the type for InitialData to match SubmissionForm's expectations
 // This duplicates the type from SubmissionForm but ensures type safety here

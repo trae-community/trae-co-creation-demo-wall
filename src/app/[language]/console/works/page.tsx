@@ -11,6 +11,7 @@ import { CrudFilterBar } from '@/components/crud/crud-filter-bar'
 import { CrudPagination } from '@/components/crud/crud-pagination'
 import { useFeedback } from '@/hooks/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
+import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -116,7 +117,7 @@ const workSchema = z.object({
 
 type WorkFormValues = z.infer<typeof workSchema>
 
-import { useParams } from 'next/navigation'
+import { EditForm, InitialData } from '@/components/work/edit-form'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
 
 export default function WorksPage() {
@@ -143,7 +144,6 @@ export default function WorksPage() {
   // Dialog states
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingWork, setEditingWork] = useState<WorkItem | null>(null)
-  const [isSaving, setIsSaving] = useState(false)
   const [deletingWorkId, setDeletingWorkId] = useState<string | null>(null)
   
   // Tag Dialog states
@@ -270,22 +270,13 @@ export default function WorksPage() {
   // Handlers
   const handleEdit = (work: WorkItem) => {
     setEditingWork(work)
-    const teamMembers = normalizeStringList(work.team?.members).join('\n')
-    form.reset({
-      title: work.title,
-      summary: work.summary || '',
-      coverUrl: work.coverUrl || '',
-      countryCode: work.countryCode || '',
-      cityCode: work.cityCode || '',
-      categoryCode: work.categoryCode || '',
-      devStatusCode: work.devStatusCode || '',
-      userId: work.userId,
-      teamMembers,
-      teamIntro: work.team?.teamIntro || '',
-      contactPhone: work.team?.contactPhone || '',
-      contactEmail: work.team?.contactEmail || '',
-    })
     setIsDialogOpen(true)
+  }
+
+  const handleEditSuccess = () => {
+    setIsDialogOpen(false)
+    fetchWorks()
+    showFeedback('success', '作品已更新')
   }
 
   const handleView = (work: WorkItem) => {
@@ -696,127 +687,14 @@ export default function WorksPage() {
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingWork ? '编辑作品' : '新建作品'}</DialogTitle>
-            <DialogDescription>
-              {editingWork ? '修改作品信息' : '创建新作品'}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">作品名称 <span className="text-red-500">*</span></label>
-              <Input {...form.register('title')} placeholder="请输入作品名称" />
-              {form.formState.errors.title && <p className="text-red-500 text-xs">{form.formState.errors.title.message}</p>}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">所属用户</label>
-                <div className="flex h-10 w-full items-center rounded-md border border-input bg-secondary px-3 py-2 text-sm text-muted-foreground">
-                  {users.find(u => u.id === form.getValues('userId'))?.username || '未知用户'}
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">开发状态</label>
-                <Select onValueChange={(val) => form.setValue('devStatusCode', val)} defaultValue={form.getValues('devStatusCode')}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择状态" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {devStatuses.map(item => (
-                      <SelectItem key={item.itemValue} value={item.itemValue}>{item.itemLabel}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">国家</label>
-                <Select onValueChange={(val) => form.setValue('countryCode', val)} defaultValue={form.getValues('countryCode')}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择国家" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {countries.map(item => (
-                      <SelectItem key={item.itemValue} value={item.itemValue}>{item.itemLabel}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">城市</label>
-                <Select onValueChange={(val) => form.setValue('cityCode', val)} defaultValue={form.getValues('cityCode')}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择城市" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cities.map(item => (
-                      <SelectItem key={item.itemValue} value={item.itemValue}>{item.itemLabel}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">类别</label>
-                <Select onValueChange={(val) => form.setValue('categoryCode', val)} defaultValue={form.getValues('categoryCode')}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择类别" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(item => (
-                      <SelectItem key={item.itemValue} value={item.itemValue}>{item.itemLabel}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">封面图 URL</label>
-              <Input {...form.register('coverUrl')} placeholder="https://..." />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">简介</label>
-              <Textarea {...form.register('summary')} placeholder="作品一句话简介..." />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">团队成员</label>
-              <Textarea {...form.register('teamMembers')} placeholder="每行一个成员姓名，或使用逗号分隔" rows={4} />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">团队介绍</label>
-              <Textarea {...form.register('teamIntro')} placeholder="介绍团队背景与分工..." rows={3} />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">联系电话</label>
-                <Input {...form.register('contactPhone')} placeholder="选填" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">联系邮箱</label>
-                <Input {...form.register('contactEmail')} placeholder="选填" />
-                {form.formState.errors.contactEmail && <p className="text-red-500 text-xs">{form.formState.errors.contactEmail.message}</p>}
-              </div>
-            </div>
-
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>取消</Button>
-              <Button type="submit" disabled={isSaving}>
-                {isSaving ? '保存中...' : '保存'}
-              </Button>
-            </DialogFooter>
-          </form>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[800px] max-h-[85vh] overflow-y-auto p-0">
+          {editingWork && (
+            <EditForm 
+              initialData={editingWork as any} 
+              onSuccess={handleEditSuccess} 
+              onCancel={() => setIsDialogOpen(false)}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
