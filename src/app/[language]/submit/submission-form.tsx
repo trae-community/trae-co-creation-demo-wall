@@ -10,8 +10,10 @@ import { v4 as uuidv4 } from "uuid";
 import { AlertCircle, CheckCircle, UploadCloud, Link as LinkIcon, Users, MapPin, FileText, Image as ImageIcon, Globe, Plus, Trash2, Tag, LayoutGrid } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from 'next-intl';
+import { useUser } from "@clerk/nextjs";
 
-export function SubmissionForm({ user }: { user?: { id: string; email: string | null; username: string; avatarUrl: string | null } }) {
+export function SubmissionForm() {
+  const { user } = useUser();
   const t = useTranslations('Submit');
   const locale = useLocale();
   const [isSubmitted, setIsSubmitted] = useState(false);
