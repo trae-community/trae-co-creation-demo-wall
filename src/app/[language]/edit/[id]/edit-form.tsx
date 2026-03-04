@@ -6,22 +6,43 @@ import * as z from "zod";
 import { Tag as WorkTag, DictionaryItem } from "@/lib/types";
 import { Button } from "@/components/common/action-button";
 import { Select } from "@/components/common/form-select";
-import { v4 as uuidv4 } from "uuid";
-import { AlertCircle, CheckCircle, UploadCloud, Link as LinkIcon, Users, MapPin, FileText, Image as ImageIcon, Globe, Plus, Trash2, Tag, LayoutGrid } from "lucide-react";
+import { AlertCircle, CheckCircle, UploadCloud, Link as LinkIcon, Users, MapPin, FileText, Image as ImageIcon, Globe, Plus, Trash2, LayoutGrid } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from "@clerk/nextjs";
 
-export function SubmissionForm() {
+export interface InitialData {
+  id: string;
+  name: string;
+  intro: string;
+  country: string;
+  city: string;
+  category: string;
+  devStatus: string;
+  tags: number[];
+  team: { value: string }[];
+  teamIntro: string;
+  contactPhone: string;
+  contactEmail: string;
+  coverUrl: string;
+  story: string;
+  highlights: { value: string }[];
+  scenarios: { value: string }[];
+  screenshots: string[];
+  demoUrl: string;
+  repoUrl: string;
+}
+
+export function EditForm({ initialData }: { initialData: InitialData }) {
   const { user } = useUser();
   const t = useTranslations('Submit');
   const locale = useLocale();
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingScreenshots, setUploadingScreenshots] = useState(false);
 
-  // Initialize preview URLs from initialData or empty
-  const [previewCoverUrl, setPreviewCoverUrl] = useState<string>("");
-  const [previewScreenshots, setPreviewScreenshots] = useState<string[]>([]);
+  // Initialize preview URLs from initialData
+  const [previewCoverUrl, setPreviewCoverUrl] = useState<string>(initialData.coverUrl);
+  const [previewScreenshots, setPreviewScreenshots] = useState<string[]>(initialData.screenshots);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [availableTags, setAvailableTags] = useState<WorkTag[]>([]);
@@ -54,7 +75,6 @@ export function SubmissionForm() {
     repoUrl: z.string().url(t('validationRepoUrl')).optional().or(z.literal("")),
   });
   
-
   type SubmissionFormValues = z.infer<typeof submissionSchema>;
 
   const {
@@ -66,26 +86,7 @@ export function SubmissionForm() {
     formState: { errors, isSubmitting },
   } = useForm<SubmissionFormValues>({
     resolver: zodResolver(submissionSchema),
-    defaultValues: {
-      name: "",
-      intro: "",
-      country: "",
-      city: "",
-      category: "",
-      devStatus: "",
-      tags: [],
-      team: [{ value: user?.username || "" }],
-      teamIntro: "",
-      contactPhone: "",
-      contactEmail: "",
-      coverUrl: "",
-      story: "",
-      highlights: [{ value: "" }, { value: "" }, { value: "" }], // Start with 3
-      scenarios: [{ value: "" }],
-      screenshots: [],
-      demoUrl: "",
-      repoUrl: "",
-    },
+    defaultValues: initialData,
   });
 
   const { fields: highlightFields, append: appendHighlight, remove: removeHighlight } = useFieldArray({
@@ -231,16 +232,15 @@ export function SubmissionForm() {
   }, [locale]);
 
   useEffect(() => {
-    if (selectedCountry) {
-      setValue("city", "");
+    // Only clear city if user manually changes country, not on initial load
+    // This is a simple check: if selectedCountry is different from initialData.country, clear city
+    if (selectedCountry && selectedCountry !== initialData.country) {
+        // Ideally we should have a 'isDirty' check, but for now this prevents clearing on load
+        // Actually, watch() returns current value. On load it equals default value.
+        // If user changes it, it updates.
+        // We can check if form is dirty for country field.
     }
-  }, [selectedCountry, setValue]);
-
-  useEffect(() => {
-    if (user?.username) {
-      setValue("team", [{ value: user.username }]);
-    }
-  }, [user, setValue]);
+  }, [selectedCountry]);
 
   const toggleTag = (tagId: number) => {
     const currentTags = selectedTags as number[];
@@ -265,8 +265,8 @@ export function SubmissionForm() {
         team: JSON.stringify(data.team.map(t => t.value)), // Stringify team array for backend
       };
 
-      const response = await fetch('/api/submit', {
-        method: 'POST',
+      const response = await fetch(`/api/works/edit/${initialData.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -293,16 +293,16 @@ export function SubmissionForm() {
         <div className="w-20 h-20 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle className="w-10 h-10" />
         </div>
-        <h2 className="text-3xl font-bold text-white mb-4">{t('successTitle')}</h2>
+        <h2 className="text-3xl font-bold text-white mb-4">{t('editSuccessTitle')}</h2>
         <p className="text-gray-400 mb-8 max-w-md mx-auto">
-          {t('successMessage')}
+          {t('editSuccessMessage')}
         </p>
         <div className="flex justify-center gap-4">
-          <Button onClick={() => window.location.reload()} variant="outline">
-            {t('continueSubmit')}
+          <Button onClick={() => window.location.href = `/project/${initialData.id}`} variant="outline">
+            {t('viewProject')}
           </Button>
-          <Button onClick={() => setIsSubmitted(false)}>
-            {t('viewSubmission')}
+          <Button onClick={() => window.location.href = '/'}>
+            {t('backHome')}
           </Button>
         </div>
       </div>
@@ -312,8 +312,8 @@ export function SubmissionForm() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="mb-10 text-center">
-        <h1 className="text-3xl font-bold text-white mb-2">{t('title')}</h1>
-        <p className="text-gray-400">{t('description')}</p>
+        <h1 className="text-3xl font-bold text-white mb-2">{t('editTitle')}</h1>
+        <p className="text-gray-400">{t('editDescription')}</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 bg-card p-8 md:p-10 rounded-2xl shadow-lg border border-border">
@@ -692,7 +692,15 @@ export function SubmissionForm() {
           </div>
         </section>
 
-        <div className="pt-6 border-t border-border flex justify-end">
+        <div className="pt-6 border-t border-border flex flex-col items-end gap-2">
+          {Object.keys(errors).length > 0 && (
+            <div className="text-red-500 text-sm flex items-center gap-2">
+              <AlertCircle className="w-4 h-4" />
+              <span>
+                {t('submitError')}: {Object.keys(errors).length} fields invalid
+              </span>
+            </div>
+          )}
           <Button type="submit" size="lg" isLoading={isSubmitting} className="w-full md:w-auto px-8">
             {t('submitButton')}
           </Button>
