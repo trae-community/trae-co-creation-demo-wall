@@ -193,20 +193,37 @@ export async function GET(req: Request) {
     const countryCodes = country?.split(',').filter(Boolean) || [];
     const categoryCodes = category?.split(',').filter(Boolean) || [];
 
-    const where: Prisma.WorkBaseWhereInput = {
-      // Basic filtering
-      ...(search && {
+    // 构建过滤条件
+    const whereFilters: Prisma.WorkBaseWhereInput[] = [
+      {
+        statistic: {
+          auditStatus: 1,
+          displayStatus: 1
+        }
+      }
+    ];
+
+    if (search) {
+      whereFilters.push({
         OR: [
           { title: { contains: search, mode: 'insensitive' } },
           { summary: { contains: search, mode: 'insensitive' } },
         ],
-      }),
-      ...(cityCodes.length > 0 && { cityCode: { in: cityCodes } }),
-      ...(countryCodes.length > 0 && { countryCode: { in: countryCodes } }),
-      ...(categoryCodes.length > 0 && { categoryCode: { in: categoryCodes } }),
-      
-      // Tag filtering
-      ...(tags && tags.length > 0 && {
+      });
+    }
+
+    if (cityCodes.length > 0) {
+      whereFilters.push({ cityCode: { in: cityCodes } });
+    }
+    if (countryCodes.length > 0) {
+      whereFilters.push({ countryCode: { in: countryCodes } });
+    }
+    if (categoryCodes.length > 0) {
+      whereFilters.push({ categoryCode: { in: categoryCodes } });
+    }
+
+    if (tags && tags.length > 0) {
+      whereFilters.push({
         tags: {
           some: {
             tag: {
@@ -214,14 +231,10 @@ export async function GET(req: Request) {
             }
           }
         }
-      }),
+      });
+    }
 
-      // Temporarily remove displayStatus and auditStatus checks to show all works
-      // statistic: {
-      //   displayStatus: 1, // Assuming 1 means published/visible
-      //   auditStatus: 1,   // Assuming 1 means approved
-      // }
-    };
+    const where: Prisma.WorkBaseWhereInput = { AND: whereFilters };
 
     // Sorting logic
     let orderBy: Prisma.WorkBaseOrderByWithRelationInput = { createdAt: 'desc' };

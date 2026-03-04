@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Link, usePathname } from '@/lib/language/navigation'
+import React, { useState, useEffect } from 'react'
+import { Link, usePathname, useRouter } from '@/lib/language/navigation'
 import { 
   LayoutDashboard, 
   FolderKanban, 
@@ -23,9 +23,24 @@ export default function ConsoleLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [userRoles, setUserRoles] = useState<{ id: number; roleCode: string }[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const navItems = [
+  useEffect(() => {
+    fetch('/api/profile')
+      .then(res => res.json())
+      .then(data => {
+        if (data?.profile?.roles) {
+          setUserRoles(data.profile.roles)
+        }
+      })
+      .catch(err => console.error('Failed to fetch user roles:', err))
+      .finally(() => setIsLoading(false))
+  }, [])
+
+  const allNavItems = [
     { name: '概览', href: '/console', icon: LayoutDashboard },
     { name: '用户管理', href: '/console/users', icon: Users },
     { name: '角色管理', href: '/console/roles', icon: Shield },
@@ -36,6 +51,49 @@ export default function ConsoleLayout({
     { name: '登录注册日志', href: '/console/auth-logs', icon: ShieldCheck },
     { name: '操作日志', href: '/console/operation-logs', icon: Logs },
   ]
+
+  // Filter nav items based on roles
+  // Root user (role id = 1) has access to everything
+  // Admin user (role id = 2) has limited access
+  // Others have NO access
+  const isRoot = userRoles.some(role => role.id === 1)
+  const isAdmin = userRoles.some(role => role.id === 2)
+  const hasAccess = isRoot || isAdmin
+
+  const allowedItems = ['用户管理', '作品管理', '标签管理']
+  
+  const navItems = isRoot 
+    ? allNavItems 
+    : isAdmin 
+      ? allNavItems.filter(item => allowedItems.includes(item.name))
+      : []
+
+  // Route protection
+  useEffect(() => {
+    if (isLoading) return
+    
+    // If no access (not role 1 or 2), redirect to home
+    if (!hasAccess) {
+      router.push('/')
+      return
+    }
+
+    const isAllowed = navItems.some(item => 
+      pathname === item.href || pathname.startsWith(`${item.href}/`)
+    )
+
+    if (!isAllowed) {
+      if (navItems.length > 0) {
+        router.push(navItems[0].href)
+      } else {
+        router.push('/')
+      }
+    }
+  }, [pathname, isLoading, hasAccess, navItems, router])
+
+  if (isLoading) {
+    return null // or a loading spinner
+  }
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 relative">

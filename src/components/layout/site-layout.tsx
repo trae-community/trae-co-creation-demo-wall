@@ -24,6 +24,18 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
+  const [userRoles, setUserRoles] = useState<{ id: number; roleCode: string }[]>([])
+
+  useEffect(() => {
+    fetch('/api/profile')
+      .then(res => res.json())
+      .then(data => {
+        if (data?.profile?.roles) {
+          setUserRoles(data.profile.roles)
+        }
+      })
+      .catch(err => console.error('Failed to fetch user roles:', err))
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -43,6 +55,9 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   };
 
   const currentOption = LOCALE_OPTIONS.find(o => o.code === locale) ?? LOCALE_OPTIONS[0];
+
+  // Check if user has access to console (role id 1 or 2)
+  const showConsole = userRoles.some(role => role.id === 1 || role.id === 2)
 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans text-foreground relative z-0">
@@ -85,19 +100,36 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               {t('submit')}
             </Link>
 
-            <Link
-              href="/console"
-              prefetch={false}
-              className={cn(
-                "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
-                pathname && pathname.startsWith("/console")
-                  ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
-              )}
-            >
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              {t('console')}
-            </Link>
+            {showConsole && (
+              <Link
+                href="/console"
+                prefetch={false}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
+                  pathname && pathname.startsWith("/console")
+                    ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                {t('console')}
+              </Link>
+            )}
+
+            <SignedIn>
+              <Link
+                href="/profile"
+                className={cn(
+                  "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
+                  pathname === "/profile"
+                    ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <UserRound className="w-3.5 h-3.5" />
+                {tProfile('menu')}
+              </Link>
+            </SignedIn>
 
             <SignedOut>
               <Link
@@ -116,15 +148,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
             <SignedIn>
               <div className="flex items-center gap-2 px-4 py-1.5">
-                <UserButton>
-                  <UserButton.MenuItems>
-                    <UserButton.Link
-                      href={`/${locale}/profile`}
-                      label={tProfile('menu')}
-                      labelIcon={<UserRound className="w-4 h-4" />}
-                    />
-                  </UserButton.MenuItems>
-                </UserButton>
+                <UserButton />
               </div>
             </SignedIn>
 
