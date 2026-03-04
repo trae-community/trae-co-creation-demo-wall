@@ -43,8 +43,10 @@ interface WorkTag {
 const tagSchema = z.object({
   name: z.string().min(1, '请输入标签名称'),
   isAutoAudit: z.enum(['true', 'false']),
-  auditStartTime: z.string().optional(),
-  auditEndTime: z.string().optional(),
+  auditStartDate: z.string().optional(),
+  auditStartClock: z.string().optional(),
+  auditEndDate: z.string().optional(),
+  auditEndClock: z.string().optional(),
 })
 
 export default function TagsPage() {
@@ -66,8 +68,10 @@ export default function TagsPage() {
     defaultValues: {
       name: '',
       isAutoAudit: 'false',
-      auditStartTime: '',
-      auditEndTime: '',
+      auditStartDate: '',
+      auditStartClock: '',
+      auditEndDate: '',
+      auditEndClock: '',
     }
   })
 
@@ -100,8 +104,10 @@ export default function TagsPage() {
     fetchTags()
   }, [fetchTags])
 
-  const formatDateValue = (value: string | null) => {
-    if (!value) return ''
+  const splitDateTime = (value: string | null) => {
+    if (!value) {
+      return { date: '', time: '' }
+    }
     const date = new Date(value)
     const pad = (num: number) => `${num}`.padStart(2, '0')
     const yyyy = date.getFullYear()
@@ -109,14 +115,61 @@ export default function TagsPage() {
     const dd = pad(date.getDate())
     const hh = pad(date.getHours())
     const min = pad(date.getMinutes())
-    return `${yyyy}-${mm}-${dd}T${hh}:${min}`
+    return {
+      date: `${yyyy}-${mm}-${dd}`,
+      time: `${hh}:${min}`,
+    }
+  }
+
+  const mergeDateTime = (date: string | undefined, time: string | undefined) => {
+    if (!date?.trim()) return null
+    const dateStr = `${date}T${time?.trim() ? time : '00:00'}`
+    const dateObj = new Date(dateStr)
+    // If date is invalid, return null or original string (though it shouldn't happen with date inputs)
+    if (isNaN(dateObj.getTime())) return null
+    return dateObj.toISOString()
   }
 
   const filteredTags = useMemo(() => tags, [tags])
+  const isAutoAuditEnabled = tagForm.watch('isAutoAudit') === 'true'
+
+  const setQuickRange = (offsetHours: number) => {
+    const start = new Date()
+    const end = new Date(start.getTime() + offsetHours * 60 * 60 * 1000)
+    const toDate = (date: Date) => {
+      const pad = (num: number) => `${num}`.padStart(2, '0')
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+    }
+    const toTime = (date: Date) => {
+      const pad = (num: number) => `${num}`.padStart(2, '0')
+      return `${pad(date.getHours())}:${pad(date.getMinutes())}`
+    }
+
+    tagForm.setValue('auditStartDate', toDate(start), { shouldDirty: true })
+    tagForm.setValue('auditStartClock', toTime(start), { shouldDirty: true })
+    tagForm.setValue('auditEndDate', toDate(end), { shouldDirty: true })
+    tagForm.setValue('auditEndClock', toTime(end), { shouldDirty: true })
+  }
+
+  const clearRange = () => {
+    tagForm.setValue('auditStartDate', '', { shouldDirty: true })
+    tagForm.setValue('auditStartClock', '', { shouldDirty: true })
+    tagForm.setValue('auditEndDate', '', { shouldDirty: true })
+    tagForm.setValue('auditEndClock', '', { shouldDirty: true })
+  }
 
   useEffect(() => {
     setCurrentPage(1)
   }, [searchTerm, filterMode])
+
+  useEffect(() => {
+    if (!isAutoAuditEnabled) {
+      tagForm.setValue('auditStartDate', '', { shouldDirty: true })
+      tagForm.setValue('auditStartClock', '', { shouldDirty: true })
+      tagForm.setValue('auditEndDate', '', { shouldDirty: true })
+      tagForm.setValue('auditEndClock', '', { shouldDirty: true })
+    }
+  }, [isAutoAuditEnabled, tagForm])
 
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
   const current = Math.min(currentPage, totalPages)
@@ -129,19 +182,25 @@ export default function TagsPage() {
     tagForm.reset({
       name: '',
       isAutoAudit: 'false',
-      auditStartTime: '',
-      auditEndTime: '',
+      auditStartDate: '',
+      auditStartClock: '',
+      auditEndDate: '',
+      auditEndClock: '',
     })
     setIsDialogOpen(true)
   }
 
   const openEditDialog = (tag: WorkTag) => {
+    const start = splitDateTime(tag.auditStartTime)
+    const end = splitDateTime(tag.auditEndTime)
     setEditingTag(tag)
     tagForm.reset({
       name: tag.name,
       isAutoAudit: tag.isAutoAudit ? 'true' : 'false',
-      auditStartTime: formatDateValue(tag.auditStartTime),
-      auditEndTime: formatDateValue(tag.auditEndTime),
+      auditStartDate: start.date,
+      auditStartClock: start.time,
+      auditEndDate: end.date,
+      auditEndClock: end.time,
     })
     setIsDialogOpen(true)
   }
@@ -153,8 +212,8 @@ export default function TagsPage() {
         id: editingTag?.id,
         name: values.name,
         isAutoAudit: values.isAutoAudit === 'true',
-        auditStartTime: values.auditStartTime || null,
-        auditEndTime: values.auditEndTime || null,
+        auditStartTime: mergeDateTime(values.auditStartDate, values.auditStartClock),
+        auditEndTime: mergeDateTime(values.auditEndDate, values.auditEndClock),
       }
       const res = await fetch('/api/tags', {
         method: editingTag ? 'PUT' : 'POST',
@@ -307,8 +366,8 @@ export default function TagsPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">是否开启自动过审</label>
               <Select
-                onValueChange={(val) => tagForm.setValue('isAutoAudit', val as 'true' | 'false')}
-                defaultValue={tagForm.getValues('isAutoAudit')}
+                onValueChange={(val) => tagForm.setValue('isAutoAudit', val as 'true' | 'false', { shouldDirty: true })}
+                value={tagForm.watch('isAutoAudit')}
               >
                 <SelectTrigger className="bg-background border-border">
                   <SelectValue placeholder="选择" />
@@ -322,12 +381,53 @@ export default function TagsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">自动过审开始时间</label>
-                <Input type="datetime-local" {...tagForm.register('auditStartTime')} className="bg-background border-border" />
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="date"
+                    {...tagForm.register('auditStartDate')}
+                    className="bg-background border-border"
+                    disabled={!isAutoAuditEnabled}
+                    onFocus={(event) => event.currentTarget.showPicker?.()}
+                  />
+                  <Input
+                    type="time"
+                    {...tagForm.register('auditStartClock')}
+                    className="bg-background border-border w-36"
+                    disabled={!isAutoAuditEnabled}
+                    onFocus={(event) => event.currentTarget.showPicker?.()}
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">自动过审结束时间</label>
-                <Input type="datetime-local" {...tagForm.register('auditEndTime')} className="bg-background border-border" />
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="date"
+                    {...tagForm.register('auditEndDate')}
+                    className="bg-background border-border"
+                    disabled={!isAutoAuditEnabled}
+                    onFocus={(event) => event.currentTarget.showPicker?.()}
+                  />
+                  <Input
+                    type="time"
+                    {...tagForm.register('auditEndClock')}
+                    className="bg-background border-border w-36"
+                    disabled={!isAutoAuditEnabled}
+                    onFocus={(event) => event.currentTarget.showPicker?.()}
+                  />
+                </div>
               </div>
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+              <Button type="button" variant="outline" size="sm" onClick={() => setQuickRange(24)} disabled={!isAutoAuditEnabled}>
+                当前时间起24小时
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => setQuickRange(168)} disabled={!isAutoAuditEnabled}>
+                当前时间起7天
+              </Button>
+              <Button type="button" variant="ghost" size="sm" onClick={clearRange} disabled={!isAutoAuditEnabled}>
+                清空时间
+              </Button>
             </div>
             <DialogFooter>
               <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={isSaving}>
