@@ -11,38 +11,93 @@ import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from "@clerk/nextjs";
 
-export interface InitialData {
+export interface BackendWorkData {
   id: string;
-  name: string;
-  intro: string;
-  country: string;
-  city: string;
-  category: string;
-  devStatus: string;
-  tags: number[];
-  team: { value: string }[];
-  teamIntro: string;
-  contactPhone: string;
-  contactEmail: string;
-  coverUrl: string;
-  story: string;
-  highlights: { value: string }[];
-  scenarios: { value: string }[];
-  screenshots: string[];
-  demoUrl: string;
-  repoUrl: string;
+  userId: string;
+  title: string;
+  summary: string | null;
+  coverUrl: string | null;
+  countryCode: string | null;
+  cityCode: string | null;
+  categoryCode: string | null;
+  devStatusCode: string | null;
+  tags: { tag: { id: number; name: string } }[];
+  detail: {
+    story: string | null;
+    highlights: unknown;
+    scenarios: unknown;
+    demoUrl: string | null;
+    repoUrl: string | null;
+  } | null;
+  images: {
+    imageUrl: string;
+  }[];
+  team: {
+    members: unknown;
+    teamIntro: string | null;
+    contactPhone: string | null;
+    contactEmail: string | null;
+  } | null;
 }
 
-export function EditForm({ initialData }: { initialData: InitialData }) {
+export function EditForm({ initialData, onSuccess, onCancel }: { initialData: BackendWorkData; onSuccess?: () => void; onCancel?: () => void }) {
   const { user } = useUser();
   const t = useTranslations('Submit');
   const locale = useLocale();
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingScreenshots, setUploadingScreenshots] = useState(false);
 
-  // Initialize preview URLs from initialData
-  const [previewCoverUrl, setPreviewCoverUrl] = useState<string>(initialData.coverUrl);
-  const [previewScreenshots, setPreviewScreenshots] = useState<string[]>(initialData.screenshots);
+  // Helper to safely parse JSON or return as array
+  const normalizeStringList = (input: unknown): string[] => {
+    if (!input) return [];
+    if (Array.isArray(input)) return input.map(String);
+    try {
+      if (typeof input === 'string') {
+        const parsed = JSON.parse(input);
+        if (Array.isArray(parsed)) return parsed.map(String);
+      }
+    } catch (e) {
+      console.warn("Failed to parse list:", input);
+    }
+    return [];
+  };
+
+  // Transform backend data to form values
+  const defaultValues = {
+    name: initialData.title,
+    intro: initialData.summary || "",
+    country: initialData.countryCode || "",
+    city: initialData.cityCode || "",
+    category: initialData.categoryCode || "",
+    devStatus: initialData.devStatusCode || "",
+    tags: initialData.tags.map(t => t.tag.id),
+    team: initialData.team?.members 
+      ? normalizeStringList(initialData.team.members).map(m => ({ value: m })) 
+      : [{ value: "" }],
+    teamIntro: initialData.team?.teamIntro || "",
+    contactPhone: initialData.team?.contactPhone || "",
+    contactEmail: initialData.team?.contactEmail || "",
+    coverUrl: initialData.coverUrl || "",
+    story: initialData.detail?.story || "",
+    highlights: initialData.detail?.highlights 
+      ? normalizeStringList(initialData.detail.highlights).map(h => ({ value: h })) 
+      : [{ value: "" }, { value: "" }, { value: "" }],
+    scenarios: initialData.detail?.scenarios 
+      ? normalizeStringList(initialData.detail.scenarios).map(s => ({ value: s })) 
+      : [{ value: "" }],
+    screenshots: (initialData.images || []).map(img => img.imageUrl),
+    demoUrl: initialData.detail?.demoUrl || "",
+    repoUrl: initialData.detail?.repoUrl || "",
+  };
+
+  // Ensure minimum items
+  if (defaultValues.team.length === 0) defaultValues.team.push({ value: "" });
+  if (defaultValues.highlights.length === 0) defaultValues.highlights.push({ value: "" }, { value: "" }, { value: "" });
+  if (defaultValues.scenarios.length === 0) defaultValues.scenarios.push({ value: "" });
+
+  // Initialize preview URLs from transformed data
+  const [previewCoverUrl, setPreviewCoverUrl] = useState<string>(defaultValues.coverUrl);
+  const [previewScreenshots, setPreviewScreenshots] = useState<string[]>(defaultValues.screenshots);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [availableTags, setAvailableTags] = useState<WorkTag[]>([]);
@@ -86,7 +141,7 @@ export function EditForm({ initialData }: { initialData: InitialData }) {
     formState: { errors, isSubmitting },
   } = useForm<SubmissionFormValues>({
     resolver: zodResolver(submissionSchema),
-    defaultValues: initialData,
+    defaultValues: defaultValues,
   });
 
   const { fields: highlightFields, append: appendHighlight, remove: removeHighlight } = useFieldArray({
@@ -233,12 +288,8 @@ export function EditForm({ initialData }: { initialData: InitialData }) {
 
   useEffect(() => {
     // Only clear city if user manually changes country, not on initial load
-    // This is a simple check: if selectedCountry is different from initialData.country, clear city
-    if (selectedCountry && selectedCountry !== initialData.country) {
-        // Ideally we should have a 'isDirty' check, but for now this prevents clearing on load
-        // Actually, watch() returns current value. On load it equals default value.
-        // If user changes it, it updates.
-        // We can check if form is dirty for country field.
+    if (selectedCountry && selectedCountry !== initialData.countryCode) {
+      setValue("city", "");
     }
   }, [selectedCountry]);
 
@@ -277,6 +328,9 @@ export function EditForm({ initialData }: { initialData: InitialData }) {
 
       if (response.ok && result.success) {
         setIsSubmitted(true);
+        if (onSuccess) {
+          onSuccess();
+        }
       } else {
         console.error("Submission error:", result.error, result.details);
         alert(t('submitError') || result.error || "Submission failed");
@@ -289,20 +343,17 @@ export function EditForm({ initialData }: { initialData: InitialData }) {
 
   if (isSubmitted) {
     return (
-      <div className="max-w-2xl mx-auto text-center py-20 bg-card rounded-2xl shadow-sm border border-border px-8">
-        <div className="w-20 h-20 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle className="w-10 h-10" />
+      <div className="text-center py-10 px-8">
+        <div className="w-16 h-16 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle className="w-8 h-8" />
         </div>
-        <h2 className="text-3xl font-bold text-white mb-4">{t('editSuccessTitle')}</h2>
-        <p className="text-gray-400 mb-8 max-w-md mx-auto">
+        <h2 className="text-2xl font-bold text-white mb-2">{t('editSuccessTitle')}</h2>
+        <p className="text-gray-400 mb-6 max-w-md mx-auto">
           {t('editSuccessMessage')}
         </p>
         <div className="flex justify-center gap-4">
-          <Button onClick={() => window.location.href = `/project/${initialData.id}`} variant="outline">
-            {t('viewProject')}
-          </Button>
-          <Button onClick={() => window.location.href = '/'}>
-            {t('backHome')}
+          <Button onClick={onCancel} variant="outline">
+            {t('close')}
           </Button>
         </div>
       </div>
@@ -311,12 +362,12 @@ export function EditForm({ initialData }: { initialData: InitialData }) {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="mb-10 text-center">
-        <h1 className="text-3xl font-bold text-white mb-2">{t('editTitle')}</h1>
-        <p className="text-gray-400">{t('editDescription')}</p>
+      <div className="mb-6 text-center">
+        <h1 className="text-2xl font-bold text-white mb-1">{t('editTitle')}</h1>
+        <p className="text-sm text-gray-400">{t('editDescription')}</p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 bg-card p-8 md:p-10 rounded-2xl shadow-lg border border-border">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Basic Info */}
         <section className="space-y-6">
           <h2 className="text-xl font-bold text-white flex items-center gap-2 border-b border-border pb-2">
@@ -701,9 +752,14 @@ export function EditForm({ initialData }: { initialData: InitialData }) {
               </span>
             </div>
           )}
-          <Button type="submit" size="lg" isLoading={isSubmitting} className="w-full md:w-auto px-8">
-            {t('submitButton')}
-          </Button>
+          <div className="flex gap-4">
+            <Button type="button" variant="outline" size="lg" onClick={onCancel}>
+              {t('cancel')}
+            </Button>
+            <Button type="submit" size="lg" isLoading={isSubmitting}>
+              {t('saveUpdate')}
+            </Button>
+          </div>
         </div>
       </form>
     </div>
