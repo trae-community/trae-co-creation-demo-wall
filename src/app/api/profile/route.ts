@@ -22,7 +22,8 @@ const buildProfilePayload = async (
     phone: string | null;
     lastSignInAt: Date | null;
   },
-  metadataLocation: { country?: string; city?: string }
+  metadataLocation: { country?: string; city?: string },
+  roles: { id: number; roleCode: string; roleName: string }[] = []
 ) => {
   const works = await prisma.workBase.findMany({
     where: { userId: user.id },
@@ -76,6 +77,7 @@ const buildProfilePayload = async (
       workCount: worksPayload.length,
       totalViews,
       totalLikes,
+      roles,
     },
     works: worksPayload,
   };
@@ -91,6 +93,12 @@ export async function GET() {
     const clerkUser = await currentUser();
     const metadata = clerkUser?.publicMetadata ?? {};
 
+    const roles = sysUser.roles.map((r) => ({
+      id: r.role.id,
+      roleCode: r.role.roleCode,
+      roleName: r.role.roleName,
+    }));
+
     const payload = await buildProfilePayload(
       {
         id: sysUser.id,
@@ -104,7 +112,8 @@ export async function GET() {
       {
         country: typeof metadata.profileCountry === "string" ? metadata.profileCountry : "",
         city: typeof metadata.profileCity === "string" ? metadata.profileCity : "",
-      }
+      },
+      roles
     );
 
     return NextResponse.json(payload);
