@@ -87,6 +87,8 @@ model SysUser {
   grantedHonors WorkHonor[] @relation("GrantedBy")
   auditedLogs WorkAuditLog[] @relation("Auditor")
   likes       WorkLike[]
+  authLogs    SysAuthLog[] @relation("UserAuthLogs")
+  operationLogs SysOperationLog[] @relation("UserOperationLogs")
 
   @@map("sys_user")
 }
@@ -354,4 +356,49 @@ model WorkLike {
   @@index([workId])
   @@index([userId])
   @@map("work_like")
+}
+
+model SysAuthLog {
+  id          BigInt    @id @default(autoincrement())
+  userId      BigInt?   @map("user_id")
+  clerkId     String?   @map("clerk_id") @db.VarChar(255)
+  authType    String    @map("auth_type") @db.VarChar(50)
+  authChannel String?   @map("auth_channel") @db.VarChar(50)
+  authStatus  String    @map("auth_status") @db.VarChar(20)
+  ipAddress   String?   @map("ip_address") @db.VarChar(64)
+  userAgent   String?   @map("user_agent") @db.VarChar(512)
+  metadata    Json?
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamptz
+
+  user SysUser? @relation("UserAuthLogs", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([clerkId])
+  @@index([authType])
+  @@index([createdAt])
+  @@map("sys_auth_log")
+}
+
+model SysOperationLog {
+  id            BigInt    @id @default(autoincrement())
+  operatorId    BigInt?   @map("operator_id")
+  module        String    @db.VarChar(50)
+  action        String    @db.VarChar(50)
+  targetType    String?   @map("target_type") @db.VarChar(50)
+  targetId      String?   @map("target_id") @db.VarChar(255)
+  success       Boolean?  @default(true)
+  errorMessage  String?   @map("error_message") @db.VarChar(500)
+  requestMethod String?   @map("request_method") @db.VarChar(16)
+  requestPath   String?   @map("request_path") @db.VarChar(255)
+  ipAddress     String?   @map("ip_address") @db.VarChar(64)
+  userAgent     String?   @map("user_agent") @db.VarChar(512)
+  payload       Json?
+  createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamptz
+
+  operator SysUser? @relation("UserOperationLogs", fields: [operatorId], references: [id], onDelete: SetNull)
+
+  @@index([operatorId])
+  @@index([module, action])
+  @@index([createdAt])
+  @@map("sys_operation_log")
 }

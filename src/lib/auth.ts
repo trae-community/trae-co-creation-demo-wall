@@ -1,5 +1,11 @@
 import { currentUser, clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { writeAuthLog, writeOperationLog } from "@/lib/audit-log";
+
+type GetOrSyncUserOptions = {
+  trigger?: "auth_callback" | "default";
+  request?: Request;
+};
 
 /**
  * Retrieves the current Clerk user and synchronizes them with the local SysUser database.
@@ -8,7 +14,7 @@ import { prisma } from "@/lib/prisma";
  *
  * @returns The synchronized SysUser object from the local database, or null if not authenticated.
  */
-export async function getOrSyncUser() {
+export async function getOrSyncUser(options: GetOrSyncUserOptions = {}) {
   console.log("[Auth] Starting getOrSyncUser...");
   try {
     const user = await currentUser();
@@ -40,6 +46,14 @@ export async function getOrSyncUser() {
     // Determine password status
     const passwordEnabled = user.passwordEnabled;
     const passwordHashValue = passwordEnabled ? 'managed_by_clerk' : null;
+    const existingUser = await prisma.sysUser.findUnique({
+      where: {
+        clerkId: user.id
+      },
+      select: {
+        id: true
+      }
+    });
 
     console.log("[Auth] Upserting user to database...");
     // Use Upsert to handle both Create and Update in one atomic operation
@@ -136,6 +150,36 @@ export async function getOrSyncUser() {
         } catch (err) {
             console.error("[Auth] Failed to update Clerk metadata:", err);
         }
+    }
+
+    if (options.trigger === "auth_callback") {
+      const authType = existingUser ? "sign_in" : "sign_up";
+      const providers = user.externalAccounts.map(account => account.provider);
+
+      await writeAuthLog({
+        userId: finalUser.id,
+        clerkId: user.id,
+        authType,
+        authChannel: "clerk",
+        authStatus: "success",
+        metadata: {
+          email,
+          providers
+        },
+        request: options.request
+      });
+
+      await writeOperationLog({
+        operatorId: finalUser.id,
+        module: "auth",
+        action: authType,
+        targetType: "sys_user",
+        targetId: finalUser.id,
+        payload: {
+          clerkId: user.id
+        },
+        request: options.request
+      });
     }
 
     return finalUser;
