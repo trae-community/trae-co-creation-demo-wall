@@ -58,9 +58,9 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
 
   const toggleFilter = (type: keyof FilterState, value: string) => {
     const currentValues = filters[type];
-    const newValues = currentValues.includes(value)
-      ? currentValues.filter((item) => item !== value)
-      : [...currentValues, value];
+    
+    // Single select logic
+    const newValues = currentValues.includes(value) ? [] : [value];
 
     const newFilters = {
       ...filters,
@@ -68,12 +68,7 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
     };
 
     if (type === 'countries') {
-      if (newValues.length === 0) {
-        newFilters.cities = [];
-      } else {
-        const validCityValues = cities.map((city) => city.value);
-        newFilters.cities = filters.cities.filter((city) => validCityValues.includes(city));
-      }
+      newFilters.cities = [];
     }
 
     onFilterChange(newFilters);
