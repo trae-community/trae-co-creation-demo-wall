@@ -118,7 +118,6 @@
     "validationScenariosMin": "At least 1 scenario required",
     "validationScenarioRequired": "Please enter usage scenario",
     "validationScreenshotsMin": "At least 1 screenshot required",
-    "validationScreenshotsMin": "At least 1 screenshot required",
     "validationScreenshotsMax": "Max 5 screenshots allowed",
     "validationDemoUrl": "Please enter a valid Demo link",
     "validationRepoUrl": "Please enter a valid repository link",
