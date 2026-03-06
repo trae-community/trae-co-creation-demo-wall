@@ -31,7 +31,7 @@ model SysDict {
 }
 
 // 2. 系统字典项表 (sys_dict_item)
-/// 系统字典项表: 存储具体的字典值，支持动态增量添加
+/// 系统字典项表：存储具体的字典值，支持动态增量添加
 model SysDictItem {
   /// 主键
   id        BigInt   @id @default(autoincrement())
@@ -43,9 +43,11 @@ model SysDictItem {
   labelI18n Json?    @map("label_i18n")
   /// 存储值 (e.g., 'CN', 'tool', 'community_pick')
   itemValue String   @map("item_value") @db.VarChar(100)
+  /// 父级值 (用于层级关系，如城市属于哪个国家：'CN')
+  parentValue String? @map("parent_value") @db.VarChar(100)
   /// 排序权重
   sortOrder Int?     @default(0) @map("sort_order")
-  /// 启用状态 (1=启用, 0=禁用)
+  /// 启用状态 (1=启用，0=禁用)
   status    Boolean? @default(true)
 
   dict SysDict @relation(fields: [dictCode], references: [dictCode], onDelete: Cascade)

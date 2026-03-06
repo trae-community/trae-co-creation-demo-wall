@@ -136,6 +136,7 @@ export async function POST(req: NextRequest) {
         itemLabel: data.itemLabel,
         itemValue: data.itemValue,
         labelI18n: data.labelI18n, // Support v0.3 JSONB
+        parentValue: data.parentValue, // Support hierarchical relationships (v0.5)
         sortOrder: data.sortOrder ?? 0,
         status: data.status ?? true
       }
@@ -179,6 +180,7 @@ export async function PUT(req: NextRequest) {
         itemLabel: data.itemLabel,
         itemValue: data.itemValue,
         labelI18n: data.labelI18n, // Support v0.3 JSONB
+        parentValue: data.parentValue, // Support hierarchical relationships (v0.5)
         sortOrder: data.sortOrder,
         status: data.status
       }
