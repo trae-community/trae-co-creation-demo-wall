@@ -96,14 +96,35 @@ src/
    - 公共常量与过滤参数放 `src/lib/crud.ts`。  
    - 公共函数放 `src/lib/utils.ts`。
 
-5. 国际化  
-   - 所有用户可见文案走 `next-intl`。  
+## 5. 国际化
+   - 所有用户可见文案走 `next-intl`。
    - 文案文件放在 `src/assets/translations/*.json`。
 
-## E2E 测试
+## 5. 数据库迁移
 
-项目使用 **Playwright** 进行端到端测试，用例位于 `e2e/` 目录。
+项目使用 **Prisma** 作为 ORM，迁移脚本位于 `docs/db/` 目录。
 
-*   **运行测试**：`npm run test:e2e`（需先启动开发服务 `npm run dev`，或由 Playwright 复用已有服务）。
-*   **UI 模式**：`npm run test:e2e:ui` 可打开 Playwright 界面调试。
-*   **覆盖范围**：首页展示与导航、作品详情页、浏览量/点赞展示、未登录点赞跳转登录等。
+### 运行迁移
+
+```bash
+# 生成 Prisma 客户端（schema 变更后需要）
+npx prisma generate
+
+# 推送 schema 变更到数据库
+npx prisma db push
+```
+
+### 迁移脚本命名规范
+
+- 格式：`migration_v{版本号}_{描述}.sql`
+- 示例：`migration_v0.5_add_parent_value_to_city.sql`
+
+### 重要迁移记录
+
+| 版本 | 描述 |
+|------|------|
+| v0.1 | 初始数据库 schema |
+| v0.2 | 作品相关表扩展 |
+| v0.3 | 多语言支持、字典表结构升级 |
+| v0.4 | 登录日志、操作日志表 |
+| v0.5 | 字典项层级关系支持（parent_value） |
