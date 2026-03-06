@@ -224,6 +224,8 @@
     "worksTitle": "自分の作品",
     "noWorks": "まだ作品がありません。",
     "submitFirstWork": "最初の作品を投稿",
+    "likedWorksTitle": "いいねした作品",
+    "noLikedWorks": "いいねした作品がありません。",
     "noCover": "カバーなし",
     "noSummary": "概要なし",
     "worksMeta": "閲覧 {views} | いいね {likes}",

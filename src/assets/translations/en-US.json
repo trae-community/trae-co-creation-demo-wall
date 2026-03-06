@@ -216,6 +216,8 @@
     "worksTitle": "My Works",
     "noWorks": "No works yet.",
     "submitFirstWork": "Submit your first work",
+    "likedWorksTitle": "My Likes",
+    "noLikedWorks": "No liked works yet.",
     "noCover": "No Cover",
     "noSummary": "No summary",
     "worksMeta": "Views {views} | Likes {likes}",

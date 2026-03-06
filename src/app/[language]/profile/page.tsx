@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Loader2, MapPin, Save, ShieldCheck, Sparkles, User, LogOut } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { WorksManagement } from "@/components/work/works-management";
+import { LikedWorks } from "@/components/work/liked-works";
 
 interface ProfileData {
   profile: {
@@ -254,6 +255,11 @@ export default function ProfilePage() {
               userId={data.profile.id}
               allowedActions={['view', 'edit', 'tag', 'delete']} 
             />
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-card p-6">
+            <h2 className="text-lg font-semibold text-white mb-4">{t("likedWorksTitle")}</h2>
+            <LikedWorks userId={data.profile.id} />
           </div>
         </div>
 

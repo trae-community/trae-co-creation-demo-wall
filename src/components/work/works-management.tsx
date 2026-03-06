@@ -229,7 +229,7 @@ export function WorksManagement({
         params.append('userId', userId)
       }
 
-      const res = await fetch(`/api/works/console?${params.toString()}`)
+      const res = await fetch(`/api/console/works?${params.toString()}`)
       if (res.ok) {
         const data = await res.json()
         setWorks(data.items || [])
@@ -279,7 +279,7 @@ export function WorksManagement({
     
     try {
       setDeletingWorkId(id)
-      const res = await fetch(`/api/works/console?id=${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/console/works?id=${id}`, { method: 'DELETE' })
       
       if (res.ok) {
         fetchWorks()
@@ -314,7 +314,7 @@ export function WorksManagement({
     if (!selectedWork) return
     try {
       setIsSavingTags(true)
-      const res = await fetch('/api/works/console', {
+      const res = await fetch('/api/console/works', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -361,7 +361,7 @@ export function WorksManagement({
     if (!selectedWork) return
     try {
       setIsSavingHonors(true)
-      const res = await fetch('/api/works/console', {
+      const res = await fetch('/api/console/works', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -403,7 +403,7 @@ export function WorksManagement({
       setIsSavingAudit(true)
       console.log('Saving audit status:', selectedAuditStatus, 'reason:', auditReason, 'for work:', selectedWork.id)
       
-      const res = await fetch('/api/works/console', {
+      const res = await fetch('/api/console/works', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

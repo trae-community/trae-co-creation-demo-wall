@@ -217,6 +217,8 @@
     "worksTitle": "我的作品",
     "noWorks": "还没有作品。",
     "submitFirstWork": "提交第一份作品",
+    "likedWorksTitle": "我的点赞",
+    "noLikedWorks": "还没有点赞的作品。",
     "noCover": "暂无封面",
     "noSummary": "暂无简介",
     "worksMeta": "浏览 {views} | 点赞 {likes}",
