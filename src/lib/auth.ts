@@ -66,7 +66,7 @@ export async function getOrSyncUser(options: GetOrSyncUserOptions = {}) {
         username,
         avatarUrl: user.imageUrl,
         lastSignInAt: new Date(user.lastSignInAt || Date.now()),
-        identities: identities as any,
+        identities: identities as object,
         passwordHash: passwordHashValue,
       },
       create: {
@@ -75,7 +75,7 @@ export async function getOrSyncUser(options: GetOrSyncUserOptions = {}) {
         username,
         avatarUrl: user.imageUrl,
         lastSignInAt: new Date(user.lastSignInAt || Date.now()),
-        identities: identities as any,
+        identities: identities as object,
         passwordHash: passwordHashValue,
       },
       include: {

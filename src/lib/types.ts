@@ -61,6 +61,7 @@ export interface DictionaryItem {
   dictCode: string;
   itemLabel: string;
   itemValue: string;
+  parentValue?: string; // For hierarchical relationships (e.g., city belongs to country)
   sortOrder: number;
   lang: string;
 }

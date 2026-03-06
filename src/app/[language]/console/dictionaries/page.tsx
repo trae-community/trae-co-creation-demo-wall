@@ -39,6 +39,7 @@ interface DictItem {
   itemLabel: string
   itemValue: string
   labelI18n?: Record<string, string> | null
+  parentValue?: string | null // For hierarchical relationships
   sortOrder: number
   status: boolean
 }
@@ -65,6 +66,7 @@ const itemSchema = z.object({
   labelZh: z.string().optional(),
   labelEn: z.string().optional(),
   labelJa: z.string().optional(),
+  parentValue: z.string().optional(), // For hierarchical relationships (e.g., city belongs to country)
   sortOrder: z.preprocess((value) => {
     if (value === '' || value === null || value === undefined) return 0
     const num = Number(value)
@@ -115,6 +117,7 @@ export default function DictionariesPage() {
       labelZh: '',
       labelEn: '',
       labelJa: '',
+      parentValue: '',
       sortOrder: 0,
     }
   })
@@ -236,6 +239,7 @@ export default function DictionariesPage() {
           itemLabel: values.itemLabel,
           itemValue: values.itemValue,
           labelI18n: Object.keys(labelI18n).length > 0 ? labelI18n : undefined,
+          parentValue: values.parentValue || undefined,
           sortOrder: values.sortOrder,
           dictCode: currentDictCode,
           status: true
@@ -333,6 +337,7 @@ export default function DictionariesPage() {
       labelZh: i18n['zh-CN'] || '',
       labelEn: i18n['en-US'] || '',
       labelJa: i18n['ja-JP'] || '',
+      parentValue: item.parentValue || '',
       sortOrder: item.sortOrder
     })
     setIsItemDialogOpen(true)
@@ -553,6 +558,18 @@ export default function DictionariesPage() {
               <Input {...itemForm.register('itemLabel')} placeholder="例如: 男, Male" className="bg-background border-border" />
               {itemForm.formState.errors.itemLabel && <p className="text-red-500 text-xs">{itemForm.formState.errors.itemLabel.message}</p>}
             </div>
+
+            {/* Parent Value - Only show for city dictionary */}
+            {currentDictCode === 'city' && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  所属国家 (Parent)
+                  <span className="text-muted-foreground text-xs ml-2 font-normal">例如: CN, US, JP</span>
+                </label>
+                <Input {...itemForm.register('parentValue')} placeholder="输入国家代码，如 CN" className="bg-background border-border" />
+                <p className="text-xs text-muted-foreground">设置后，城市将只在该国家下拉列表中显示</p>
+              </div>
+            )}
 
             <div className="space-y-2 pt-2 border-t border-border">
               <label className="text-sm font-medium flex items-center gap-2">

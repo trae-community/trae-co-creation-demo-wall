@@ -8,7 +8,7 @@ import { Button } from "@/components/common/action-button";
 import { Select } from "@/components/common/form-select";
 import { v4 as uuidv4 } from "uuid";
 import { AlertCircle, CheckCircle, UploadCloud, Link as LinkIcon, Users, MapPin, FileText, Image as ImageIcon, Globe, Plus, Trash2, Tag, LayoutGrid } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from "@clerk/nextjs";
 
@@ -224,6 +224,12 @@ export function SubmissionForm() {
     }
   };
 
+  // Filter cities based on selected country
+  const filteredCities = useMemo(() => {
+    if (!selectedCountry) return [];
+    return availableCities.filter(city => city.parentValue === selectedCountry);
+  }, [availableCities, selectedCountry]);
+
   useEffect(() => {
     fetchTags();
     fetchCategories();
@@ -351,7 +357,7 @@ export function SubmissionForm() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">{t('city')} <span className="text-red-500">*</span></label>
               <Select
-                options={availableCities.map(city => ({ label: city.itemLabel, value: city.itemValue }))}
+                options={filteredCities.map(city => ({ label: city.itemLabel, value: city.itemValue }))}
                 value={watch("city")}
                 onChange={(value) => setValue("city", value)}
                 placeholder={t('cityPlaceholder')}

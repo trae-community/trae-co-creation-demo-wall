@@ -16,8 +16,8 @@ export const ParticlesBackground = () => {
     });
   }, []);
 
-  const particlesLoaded = async (_container?: Container) => {
-    // console.log(container);
+  const particlesLoaded = async (container?: Container) => {
+    void container; // reserved for future use
   };
 
   const options: ISourceOptions = useMemo(

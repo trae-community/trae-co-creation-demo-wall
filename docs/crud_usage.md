@@ -130,12 +130,32 @@ POST /api/dictionaries
     "dictCode": "gender",
     "itemLabel": "男",
     "itemValue": "1",
-    "lang": "zh-CN",
+    "labelI18n": {"zh-CN": "男", "en-US": "Male"},
     "sortOrder": 0,
     "status": true
   }
 }
 ```
+
+**v0.5 新增：层级关系**
+
+对于需要层级关系的字典（如城市属于国家），可使用 `parentValue` 字段：
+```json
+{
+  "type": "item",
+  "data": {
+    "dictCode": "city",
+    "itemLabel": "北京",
+    "itemValue": "110100",
+    "labelI18n": {"zh-CN": "北京", "en-US": "Beijing"},
+    "parentValue": "CN",
+    "sortOrder": 0,
+    "status": true
+  }
+}
+```
+- `parentValue`：父级值，用于建立层级关系（如城市→国家）
+- 前端会根据选择的父级自动过滤子级选项
 
 ### 3.4 更新字典
 ```
@@ -163,7 +183,8 @@ PUT /api/dictionaries
   "data": {
     "itemLabel": "Male",
     "itemValue": "1",
-    "lang": "en-US",
+    "labelI18n": {"zh-CN": "男", "en-US": "Male"},
+    "parentValue": "CN",
     "sortOrder": 0,
     "status": true
   }

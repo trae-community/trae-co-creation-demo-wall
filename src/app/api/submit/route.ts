@@ -18,6 +18,7 @@ const submissionSchema = z.object({
   coverUrl: z.string().min(1), // URL string expected
   story: z.string().min(20),
   category: z.string().min(1),
+  devStatus: z.string().optional(),
   tags: z.array(z.number()).min(1).max(5),
   highlights: z.array(z.string().max(10)).min(3).max(5),
   scenarios: z.array(z.string()).min(1),

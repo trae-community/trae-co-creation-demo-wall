@@ -7,7 +7,7 @@ import { Tag as WorkTag, DictionaryItem } from "@/lib/types";
 import { Button } from "@/components/common/action-button";
 import { Select } from "@/components/common/form-select";
 import { AlertCircle, CheckCircle, UploadCloud, Link as LinkIcon, Users, MapPin, FileText, Image as ImageIcon, Globe, Plus, Trash2, LayoutGrid } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from "@clerk/nextjs";
 
@@ -293,6 +293,12 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
     }
   }, [selectedCountry]);
 
+  // Filter cities based on selected country
+  const filteredCities = useMemo(() => {
+    if (!selectedCountry) return [];
+    return availableCities.filter(city => city.parentValue === selectedCountry);
+  }, [availableCities, selectedCountry]);
+
   const toggleTag = (tagId: number) => {
     const currentTags = selectedTags as number[];
     if (currentTags.includes(tagId)) {
@@ -402,7 +408,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">{t('city')} <span className="text-red-500">*</span></label>
               <Select
-                options={availableCities.map(city => ({ label: city.itemLabel, value: city.itemValue }))}
+                options={filteredCities.map(city => ({ label: city.itemLabel, value: city.itemValue }))}
                 value={watch("city")}
                 onChange={(value) => setValue("city", value)}
                 placeholder={t('cityPlaceholder')}

@@ -1,9 +1,9 @@
 'use client'
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp, Mail, Award, ChevronLeft, ChevronRight, Download, Link2, Check } from "lucide-react";
 import { Button } from "@/components/common/action-button";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/lib/language/navigation';
 import { Work } from "@/lib/types";
@@ -34,17 +34,21 @@ export function WorkDetailView() {
   const t = useTranslations('Work');
   const locale = useLocale();
   const params = useParams();
+  const router = useRouter();
   const id = params?.id as string;
   const [work, setWork] = useState<Work | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
+  const [viewsCount, setViewsCount] = useState(0);
   const [activeScreenshotIndex, setActiveScreenshotIndex] = useState(0);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [shareImageUrl, setShareImageUrl] = useState('');
   const [isShareGenerating, setIsShareGenerating] = useState(false);
   const [shareActionDone, setShareActionDone] = useState<'copied' | ''>('');
+  const viewRecorded = useRef(false);
 
+  // 获取作品详情和统计数据
   useEffect(() => {
     const fetchWork = async () => {
       if (!id) {
@@ -53,14 +57,26 @@ export function WorkDetailView() {
       }
 
       try {
-        const response = await fetch(`/api/works/${id}?lang=${encodeURIComponent(locale)}`);
-        if (!response.ok) {
+        const [workRes, statsRes] = await Promise.all([
+          fetch(`/api/works/${id}?lang=${encodeURIComponent(locale)}`),
+          fetch(`/api/works/${id}/stats`),
+        ]);
+        
+        if (!workRes.ok) {
           setWork(null);
           return;
         }
-        const data: Work = await response.json();
+        
+        const data: Work = await workRes.json();
         setWork(data);
-        setLikesCount(data.likes || 0);
+        
+        // 获取统计数据
+        if (statsRes.ok) {
+          const stats = await statsRes.json();
+          setLikesCount(stats.likeCount || 0);
+          setViewsCount(stats.viewCount || 0);
+          setLiked(stats.liked || false);
+        }
       } catch {
         setWork(null);
       } finally {
@@ -70,6 +86,20 @@ export function WorkDetailView() {
 
     fetchWork();
   }, [id, locale]);
+
+  // 记录浏览量（使用 ref 去重，避免 Strict Mode 双次）
+  useEffect(() => {
+    if (!id || viewRecorded.current) return;
+    
+    viewRecorded.current = true;
+    
+    fetch(`/api/works/${id}/view`, { method: 'POST' })
+      .then((res) => res.ok ? res.json() : null)
+      .then(() => {
+        setViewsCount((prev) => prev + 1);
+      })
+      .catch(() => {});
+  }, [id]);
 
   useEffect(() => {
     setActiveScreenshotIndex(0);
@@ -90,13 +120,24 @@ export function WorkDetailView() {
   const normalizeLabel = (label: string) => label.replace(/[:：]\s*$/, '');
   const withColon = (label: string) => `${normalizeLabel(label)}：`;
 
-  const handleLike = () => {
-    if (liked) {
-      setLikesCount(prev => prev - 1);
-    } else {
-      setLikesCount(prev => prev + 1);
+  const handleLike = async () => {
+    try {
+      const res = await fetch(`/api/works/${id}/like`, { method: 'POST' });
+      
+      if (res.status === 401) {
+        // 未登录，跳转到登录页
+        router.push(`/${locale}/sign-in`);
+        return;
+      }
+      
+      if (!res.ok) return;
+      
+      const data = await res.json();
+      setLiked(data.liked);
+      setLikesCount((prev) => data.liked ? prev + 1 : Math.max(0, prev - 1));
+    } catch {
+      // 忽略错误
     }
-    setLiked(!liked);
   };
 
   if (isLoading) {
@@ -197,7 +238,7 @@ export function WorkDetailView() {
   <text x="104" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">${safe(teamLabel)} ${safe(String(teamMembers.length || 0))}</text>
   <text x="372" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">${safe(submitLabel)} ${safe(createdAtText)}</text>
   <text x="710" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">${safe(likeLabel)} ${safe(String(work.likes || 0))}</text>
-  <text x="930" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">Views：${safe(String(work.views || 0))}</text>
+  <text x="930" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">Views：${safe(String(viewsCount || 0))}</text>
   <text x="76" y="574" fill="#64748b" font-size="16" font-family="Arial, sans-serif">${safe(currentPageUrl)}</text>
   <text x="1124" y="574" text-anchor="end" fill="#22c55e" font-size="18" font-family="Arial, sans-serif" font-weight="700">${safe(siteTitle)} · ${safe(authorLine)}</text>
 </svg>`;
