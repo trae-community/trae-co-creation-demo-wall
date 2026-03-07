@@ -140,7 +140,7 @@ export default function ConsoleLayout({
   // Helper to flatten items for route checking
   const allowedHrefs = useMemo(() => {
     const getAllAllowedHrefs = (items: NavItem[]): string[] => {
-      let hrefs: string[] = [];
+      const hrefs: string[] = [];
       items.forEach(item => {
         if (item.href) hrefs.push(item.href);
         if (item.children) hrefs.push(...getAllAllowedHrefs(item.children));
