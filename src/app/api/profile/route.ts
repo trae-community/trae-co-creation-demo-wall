@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clerkClient, currentUser } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { getOrSyncUser } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 
 const toSafeString = (value: unknown, maxLength = 255): string => {
   if (typeof value !== "string") return "";
@@ -85,13 +85,31 @@ const buildProfilePayload = async (
 
 export async function GET() {
   try {
-    const sysUser = await getOrSyncUser();
-    if (!sysUser) {
+    const authUser = await getAuthUser();
+    if (!authUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const clerkUser = await currentUser();
-    const metadata = clerkUser?.publicMetadata ?? {};
+    // Fetch full user record from DB (bio, phone, roles — not in JWT)
+    const sysUser = await prisma.sysUser.findUnique({
+      where: { id: authUser.userId },
+      include: {
+        roles: {
+          include: { role: true },
+        },
+      },
+    });
+
+    if (!sysUser) {
+      return NextResponse.json(
+        { error: "Account setup in progress, please retry in a moment." },
+        { status: 503 }
+      );
+    }
+
+    // Read location from JWT publicMetadata — no extra Clerk network call
+    const { sessionClaims } = await auth();
+    const metadata = sessionClaims?.publicMetadata as Record<string, unknown> ?? {};
 
     const roles = sysUser.roles.map((r) => ({
       id: r.role.id,
@@ -125,8 +143,8 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   try {
-    const sysUser = await getOrSyncUser();
-    if (!sysUser) {
+    const authUser = await getAuthUser();
+    if (!authUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -137,7 +155,7 @@ export async function PUT(req: NextRequest) {
     const locationCity = toSafeString(body.locationCity, 100);
 
     const updatedUser = await prisma.sysUser.update({
-      where: { id: sysUser.id },
+      where: { id: authUser.userId },
       data: {
         bio: toNullable(bio),
         phone: toNullable(phone),
@@ -153,15 +171,17 @@ export async function PUT(req: NextRequest) {
       },
     });
 
-    const clerkUser = await currentUser();
-    if (clerkUser) {
+    // Write profileCountry/profileCity to Clerk metadata using clerkId from JWT
+    try {
       const client = await clerkClient();
-      await client.users.updateUserMetadata(clerkUser.id, {
+      await client.users.updateUserMetadata(authUser.clerkId, {
         publicMetadata: {
           profileCountry: locationCountry,
           profileCity: locationCity,
         },
       });
+    } catch (err) {
+      console.error("[API] Failed to update Clerk location metadata:", err);
     }
 
     const payload = await buildProfilePayload(updatedUser, {
@@ -175,4 +195,3 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });
   }
 }
-

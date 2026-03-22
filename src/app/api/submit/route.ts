@@ -1,9 +1,18 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getOrSyncUser } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { writeOperationLog } from "@/lib/audit-log";
 import { z } from "zod";
+import sanitizeHtml from "sanitize-html";
+
+const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: ['p','br','strong','em','u','s','h2','h3','ul','ol','li','a','blockquote','code'],
+  allowedAttributes: { a: ['href', 'target', 'rel'] },
+  allowedSchemes: ['http', 'https', 'mailto'],
+};
+
+const stripHtmlTags = (html: string) => html.replace(/<[^>]*>/g, '').trim();
 
 // Schema matching the frontend form
 const submissionSchema = z.object({
@@ -15,8 +24,9 @@ const submissionSchema = z.object({
   teamIntro: z.string().optional(),
   contactPhone: z.string().optional(),
   contactEmail: z.string().email().optional().or(z.literal("")),
-  coverUrl: z.string().min(1), // URL string expected
-  story: z.string().min(20),
+  coverUrl: z.string().min(1),
+  // story may be HTML from Tiptap — validate on stripped plain text
+  story: z.string().refine(s => stripHtmlTags(s).length >= 10, '创作故事至少10个字符'),
   category: z.string().min(1),
   devStatus: z.string().optional(),
   tags: z.array(z.number()).min(1).max(5),
@@ -29,7 +39,7 @@ const submissionSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const user = await getOrSyncUser();
+    const user = await getAuthUser();
     if (!user) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
@@ -48,12 +58,14 @@ export async function POST(request: Request) {
     }
 
     const data = validationResult.data;
+    // Sanitize HTML story before persisting — prevents stored XSS
+    const cleanStory = sanitizeHtml(data.story, SANITIZE_OPTIONS);
     const now = new Date();
 
     const result = await prisma.$transaction(async (tx) => {
       const work = await tx.workBase.create({
         data: {
-          userId: user.id,
+          userId: user.userId,
           title: data.name,
           summary: data.intro,
           cityCode: data.city,
@@ -92,7 +104,7 @@ export async function POST(request: Request) {
       await tx.workDetail.create({
         data: {
           workId: work.id,
-          story: data.story,
+          story: cleanStory,
           highlights: data.highlights,
           scenarios: data.scenarios,
           demoUrl: data.demoUrl,
@@ -151,7 +163,7 @@ export async function POST(request: Request) {
     });
 
     await writeOperationLog({
-      operatorId: user.id,
+      operatorId: user.userId,
       module: "submit",
       action: "create_work",
       targetType: "work_base",

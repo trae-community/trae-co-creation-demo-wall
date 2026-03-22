@@ -1,6 +1,6 @@
 'use client'
 
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Tag as WorkTag, DictionaryItem } from "@/lib/types";
@@ -10,6 +10,7 @@ import { AlertCircle, CheckCircle, UploadCloud, Link as LinkIcon, Users, MapPin,
 import { useState, useEffect, useMemo } from "react";
 import { useLocale, useTranslations } from 'next-intl';
 import { useUser } from "@clerk/nextjs";
+import { RichTextEditor } from "@/app/[language]/submit/editor/RichTextEditor";
 
 export interface BackendWorkData {
   id: string;
@@ -546,11 +547,17 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-300">{t('story')} <span className="text-red-500">*</span></label>
             <p className="text-xs text-zinc-500 mb-2">{t('storyDesc')}</p>
-            <textarea
-              {...register("story")}
-              rows={8}
-              className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
-              placeholder={t('storyPlaceholder')}
+            <Controller
+              name="story"
+              control={control}
+              render={({ field }) => (
+                <RichTextEditor
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={t('storyPlaceholder')}
+                  hasError={!!errors.story}
+                />
+              )}
             />
             {errors.story && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.story.message}</p>}
           </div>

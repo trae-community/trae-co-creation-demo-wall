@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
-import { getOrSyncUser } from '@/lib/auth';
+import { getAuthUser } from '@/lib/auth';
 import { writeOperationLog } from '@/lib/audit-log';
 
 // Helper to sanitize object
@@ -93,7 +93,7 @@ export async function GET(req: NextRequest) {
 // POST: 创建作品
 export async function POST(req: NextRequest) {
   try {
-    const operator = await getOrSyncUser();
+    const operator = await getAuthUser();
     const body = await req.json();
     const { 
       userId, 
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
     });
 
     await writeOperationLog({
-      operatorId: operator?.id,
+      operatorId: operator?.userId,
       module: 'works',
       action: 'create',
       targetType: 'work_base',
@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
 // PUT: 更新作品
 export async function PUT(req: NextRequest) {
   try {
-    const operator = await getOrSyncUser();
+    const operator = await getAuthUser();
     const body = await req.json();
     const { 
       id, 
@@ -202,7 +202,7 @@ export async function PUT(req: NextRequest) {
     if (auditStatus !== undefined) {
       console.log('Updating audit status for work:', id, 'to:', auditStatus)
       const bodyAuditorId = body.auditorId ? BigInt(body.auditorId) : undefined
-      const auditorId = operator?.id ?? bodyAuditorId
+      const auditorId = operator?.userId ?? bodyAuditorId
       if (!auditorId) {
         return NextResponse.json({ error: 'Auditor ID is required for audit action' }, { status: 401 })
       }
@@ -381,7 +381,7 @@ export async function PUT(req: NextRequest) {
     });
 
     await writeOperationLog({
-      operatorId: operator?.id,
+      operatorId: operator?.userId,
       module: 'works',
       action: 'update',
       targetType: 'work_base',
@@ -418,7 +418,7 @@ export async function PUT(req: NextRequest) {
 // DELETE: 删除作品
 export async function DELETE(req: NextRequest) {
   try {
-    const operator = await getOrSyncUser();
+    const operator = await getAuthUser();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
@@ -431,7 +431,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     await writeOperationLog({
-      operatorId: operator?.id,
+      operatorId: operator?.userId,
       module: 'works',
       action: 'delete',
       targetType: 'work_base',

@@ -25,7 +25,11 @@
     "prevPage": "Previous",
     "nextPage": "Next",
     "loadMore": "Load More",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "heroBadge": "Showcasing real TRAE creations worldwide",
+    "resultCount": "",
+    "resultCountUnit": "works found",
+    "showing": "Showing"
   },
   "Submit": {
     "title": "Welcome to submit your TRAE Demo!",
@@ -123,7 +127,11 @@
     "validationRepoUrl": "Please enter a valid repository link",
     "validationTeamMemberRequired": "Team member name required",
     "validationTeamMin": "At least 1 team member required",
-    "validationEmail": "Please enter a valid email"
+    "validationEmail": "Please enter a valid email",
+    "nextStep": "Next",
+    "prevStep": "Back",
+    "uploadError": "Upload failed, please retry",
+    "uploading": "Uploading…"
   },
   "Work": {
     "notFound": "Project Not Found",
@@ -173,7 +181,8 @@
     "cityPick": "City Pick",
     "cityTrending": "Trending",
     "cityCurated": "City Curated",
-    "communityRecommended": "Community Pick"
+    "communityRecommended": "Community Pick",
+    "people": " members"
   },
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",

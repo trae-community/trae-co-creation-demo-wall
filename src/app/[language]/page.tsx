@@ -4,9 +4,11 @@ import { useState, useEffect, useCallback } from "react";
 import { Work } from "@/lib/types";
 import { WorkCard } from "@/components/work/work-card";
 import { CityFilter, FilterState } from "@/components/work/city-filter";
-import { Search, Clock, ThumbsUp, Eye, Loader2 } from "lucide-react";
+import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/lib/language/navigation';
+import { useWorksStore } from '@/store/works-store';
+import { cn } from "@/lib/utils";
 
 export default function Page() {
   const t = useTranslations('Home');
@@ -26,33 +28,50 @@ export default function Page() {
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 12;
 
+  const { listCache, setListCache } = useWorksStore();
+
   const fetchProjects = useCallback(async () => {
+    const params = new URLSearchParams({
+      page: String(page),
+      pageSize: String(pageSize),
+      search: searchQuery,
+      sort: sortBy === 'time' ? 'newest' : sortBy,
+      lang: locale,
+    });
+
+    if (filters.cities.length > 0) params.append('city', filters.cities.join(','));
+    if (filters.countries.length > 0) params.append('country', filters.countries.join(','));
+    if (filters.categories.length > 0) params.append('category', filters.categories.join(','));
+    if (filters.tags.length > 0) params.append('tags', filters.tags.join(','));
+
+    const cacheKey = params.toString();
+
+    const cached = listCache.get(cacheKey);
+    if (cached) {
+      setWorks(cached.items);
+      setTotalItems(cached.total);
+      setTotalPages(cached.totalPages);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      const params = new URLSearchParams({
-        page: String(page),
-        pageSize: String(pageSize),
-        search: searchQuery,
-        sort: sortBy === 'time' ? 'newest' : sortBy,
-        lang: locale,
-      });
-
-      if (filters.cities.length > 0) params.append('city', filters.cities.join(','));
-      if (filters.countries.length > 0) params.append('country', filters.countries.join(','));
-      if (filters.categories.length > 0) params.append('category', filters.categories.join(','));
-      if (filters.tags.length > 0) params.append('tags', filters.tags.join(','));
-      
-      const response = await fetch(`/api/works?${params.toString()}`);
+      const response = await fetch(`/api/works?${cacheKey}`);
       const data = await response.json();
-      setWorks(data.items || []);
-      setTotalItems(data.total || 0);
-      setTotalPages(Math.max(1, data.totalPages || 1));
+      const items = data.items || [];
+      const total = data.total || 0;
+      const pages = Math.max(1, data.totalPages || 1);
+      setWorks(items);
+      setTotalItems(total);
+      setTotalPages(pages);
+      setListCache(cacheKey, { items, total, totalPages: pages });
     } catch (error) {
       console.error("Failed to fetch projects:", error);
     } finally {
       setLoading(false);
     }
-  }, [filters, searchQuery, sortBy, locale, page, pageSize]);
+  }, [filters, searchQuery, sortBy, locale, page, pageSize, listCache, setListCache]);
 
   useEffect(() => {
     setPage(1);
@@ -65,174 +84,226 @@ export default function Page() {
     return () => clearTimeout(timer);
   }, [fetchProjects]);
 
-  const startIndex = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
-  const endIndex = Math.min(page * pageSize, totalItems);
+  // Pagination page numbers to show
+  const getPageNumbers = () => {
+    if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (page <= 3) return [1, 2, 3, 4, null, totalPages];
+    if (page >= totalPages - 2) return [1, null, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    return [1, null, page - 1, page, page + 1, null, totalPages];
+  };
+
+  const sortOptions = [
+    { key: 'time' as const, icon: <Clock className="w-3 h-3" />, label: t('sortNewest') },
+    { key: 'likes' as const, icon: <ThumbsUp className="w-3 h-3" />, label: t('sortLikes') },
+    { key: 'views' as const, icon: <Eye className="w-3 h-3" />, label: t('sortViews') },
+  ];
 
   return (
     <div className="space-y-8">
-      {/* Banner */}
-      <section className="relative rounded-3xl p-8 md:p-16 text-white overflow-hidden border border-white/20 shadow-2xl group">
-        <div className="absolute inset-0 bg-gradient-to-br from-zinc-900/50 via-background to-background z-0"></div>
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center opacity-30 z-0"></div>
+      {/* ── HERO BANNER ── */}
+      <section className="relative rounded-3xl p-10 md:p-16 text-white overflow-hidden border border-white/15 shadow-2xl">
+        <div className="absolute inset-0 z-0" style={{ background: '#0d1117' }} />
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.18,
+          }}
+        />
+        <div
+          className="absolute inset-0 z-0"
+          style={{ background: 'linear-gradient(135deg,rgba(0,0,0,0.75) 0%,rgba(0,0,0,0.3) 50%,rgba(34,197,94,0.05) 100%)' }}
+        />
 
-        <div className="relative z-10 max-w-3xl">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight leading-tight">
-            {t('heroTitle')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#22c55e] to-gray-300">TRAE</span>
-          </h1>
-
-          <div className="mb-10 max-w-xl">
-            <p className="text-xl md:text-2xl font-light text-gray-300">
-              {t('heroSubtitle1')} <span className="font-bold text-white">{t('heroSubtitleTRAE')}</span>. {t('heroSubtitle2')} <span className="font-bold text-white">{t('heroSubtitleFriends')}</span>.
-            </p>
+        <div className="relative z-10 max-w-2xl">
+          {/* Live badge */}
+          <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1 text-xs text-green-400 font-medium mb-6">
+            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+            {t('heroBadge') || '正在展示来自全球的 TRAE 创作'}
           </div>
 
-          <div className="flex flex-wrap gap-4">
+          <h1 className="text-5xl md:text-6xl font-bold mb-5 tracking-tight leading-tight">
+            {t('heroTitle')}{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#22c55e] to-[#86efac]">TRAE</span>
+          </h1>
+
+          <p className="text-lg text-zinc-400 mb-8 max-w-lg leading-relaxed">
+            {t('heroSubtitle1')}{' '}
+            <span className="font-semibold text-zinc-200">{t('heroSubtitleTRAE')}</span>.{' '}
+            {t('heroSubtitle2')}{' '}
+            <span className="font-semibold text-zinc-200">{t('heroSubtitleFriends')}</span>.
+          </p>
+
+          <div className="flex flex-wrap gap-3">
             <Link
               href="/submit"
-              className="px-8 py-4 rounded-full font-bold bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-black hover:opacity-90 transition-all shadow-[0_0_20px_rgba(34,197,94,0.2)] hover:shadow-[0_0_30px_rgba(34,197,94,0.4)] flex items-center gap-2 group/btn"
+              className="px-6 py-3 rounded-full font-bold text-sm text-black flex items-center gap-2 transition-all hover:opacity-90"
+              style={{ background: 'linear-gradient(to right, #22C55E, #16A34A)', boxShadow: '0 0 20px rgba(34,197,94,0.3)' }}
             >
               {t('submitWork')}
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover/btn:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </Link>
             <a
               href="#projects"
-              className="px-8 py-4 rounded-full font-bold bg-white/5 text-white border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md"
+              className="px-6 py-3 rounded-full font-semibold text-sm text-zinc-300 border border-white/10 bg-white/5 hover:bg-white/10 transition-all backdrop-blur-md"
             >
               {t('browseWork')}
             </a>
           </div>
         </div>
 
-        {/* Decorative elements */}
-        <div className="absolute top-1/2 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-emerald-600/5 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
+        {/* Glow */}
+        <div
+          className="absolute top-1/2 right-0 pointer-events-none z-0"
+          style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%)', transform: 'translate(30%, -50%)' }}
+        />
       </section>
 
-      {/* Filter & Search */}
-      <div id="projects" className="bg-zinc-950/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 space-y-6 transition-all duration-300">
-        <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
-          {/* Search Input */}
-          <div className="relative w-full md:flex-1 md:max-w-md group">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-500 group-focus-within:text-[#22C55E] transition-colors duration-300" />
+      {/* ── FILTER TOOLBAR ── */}
+      <div id="projects" className="space-y-4">
+        {/* Row 1: Search (left) + Sort (right) */}
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+          {/* Search — takes up remaining space */}
+          <div className="relative flex-1 group">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+              <Search className="w-4 h-4 text-zinc-600 group-focus-within:text-green-500 transition-colors" />
             </div>
             <input
               type="text"
               placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="block w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-gray-200 placeholder:text-gray-500 focus:outline-none focus:bg-white/10 focus:ring-2 focus:ring-[#22C55E]/50 focus:border-[#22C55E]/50 text-sm transition-all duration-300 shadow-inner"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-zinc-200 placeholder-zinc-600 border border-white/10 focus:outline-none focus:ring-1 focus:ring-green-500/40 focus:border-green-500/35 transition-all"
+              style={{ background: 'rgba(255,255,255,0.04)' }}
             />
           </div>
 
-          {/* Sort Buttons */}
-          <div className="flex items-center p-1.5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md">
-            <button
-              onClick={() => setSortBy('time')}
-              className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all duration-300 ${
-                sortBy === 'time'
-                  ? 'bg-[#22C55E] text-black shadow-[0_0_20px_rgba(34,197,94,0.3)] font-bold'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Clock className="w-4 h-4" />
-              <span>{t('sortNewest')}</span>
-            </button>
-            <button
-              onClick={() => setSortBy('likes')}
-              className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all duration-300 ${
-                sortBy === 'likes'
-                  ? 'bg-[#22C55E] text-black shadow-[0_0_20px_rgba(34,197,94,0.3)] font-bold'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <ThumbsUp className="w-4 h-4" />
-              <span>{t('sortLikes')}</span>
-            </button>
-            <button
-              onClick={() => setSortBy('views')}
-              className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all duration-300 ${
-                sortBy === 'views'
-                  ? 'bg-[#22C55E] text-black shadow-[0_0_20px_rgba(34,197,94,0.3)] font-bold'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Eye className="w-4 h-4" />
-              <span>{t('sortViews')}</span>
-            </button>
+          {/* Sort tabs — fixed right */}
+          <div
+            className="flex items-center rounded-xl border border-white/10 p-1 gap-0.5 shrink-0"
+            style={{ background: 'rgba(255,255,255,0.03)' }}
+          >
+            {sortOptions.map(({ key, icon, label }) => (
+              <button
+                key={key}
+                onClick={() => setSortBy(key)}
+                className={cn(
+                  "flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-all border",
+                  sortBy === key
+                    ? "bg-green-500/15 text-green-400 border-green-500/25"
+                    : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
+                )}
+              >
+                {icon}
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
+        {/* Row 2: Filter pills */}
         <CityFilter filters={filters} onFilterChange={setFilters} />
+
+        {/* Result count — always visible once loaded */}
+        {!loading && (
+          <p className="text-xs text-zinc-600">
+            {t('resultCount') || '共'}{' '}
+            <span className="text-zinc-400 font-medium">{totalItems}</span>{' '}
+            {t('resultCountUnit') || '个作品'}
+          </p>
+        )}
       </div>
 
-      {/* Project Grid */}
+      {/* ── WORK GRID ── */}
       {loading && works.length === 0 ? (
-        <div className="flex justify-center py-20">
-          <Loader2 className="w-10 h-10 text-[#22C55E] animate-spin" />
+        /* Skeleton */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="rounded-2xl overflow-hidden border border-white/6" style={{ background: '#111318' }}>
+              <div className="animate-pulse bg-white/5" style={{ aspectRatio: '4/3' }} />
+              <div className="p-5 space-y-3">
+                <div className="animate-pulse h-4 bg-white/5 rounded-md w-3/4" />
+                <div className="animate-pulse h-3 bg-white/5 rounded-md w-full" />
+                <div className="animate-pulse h-3 bg-white/5 rounded-md w-5/6" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : works.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 transition-opacity duration-300", loading && "opacity-60")}>
           {works.map((work) => (
             <WorkCard key={work.id} work={work} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 bg-white/5 rounded-xl border border-dashed border-white/10 backdrop-blur-sm">
-          <p className="text-gray-400 text-lg">{t('noResults')}</p>
+        <div className="text-center py-20 rounded-2xl border border-dashed border-white/8" style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <div className="text-3xl mb-3">🔍</div>
+          <p className="text-zinc-400 text-sm mb-3">{t('noResults')}</p>
           <button
             onClick={() => {
-              setFilters({
-                cities: [],
-                categories: [],
-                tags: [],
-                countries: [],
-              });
+              setFilters({ cities: [], categories: [], tags: [], countries: [] });
               setSearchQuery("");
             }}
-            className="text-primary font-medium mt-2 hover:underline"
+            className="text-green-500 text-sm font-medium hover:underline"
           >
             {t('clearFilters')}
           </button>
         </div>
       )}
 
-      {works.length > 0 && (
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-8">
-          <div className="text-sm text-gray-400">
-            {t('paginationInfo', { start: startIndex, end: endIndex, total: totalItems })}
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              disabled={loading || page <= 1}
-              className="px-4 py-2 rounded-full font-medium bg-white/5 text-white border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md disabled:opacity-50"
-            >
-              {t('prevPage')}
-            </button>
-            <span className="px-3 text-sm text-gray-300">
-              {page} / {totalPages}
-            </span>
-            <button
-              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-              disabled={loading || page >= totalPages}
-              className="px-4 py-2 rounded-full font-medium bg-white/5 text-white border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md disabled:opacity-50"
-            >
-              {t('nextPage')}
-            </button>
-          </div>
-        </div>
-      )}
+      {/* ── PAGINATION ── */}
+      {!loading && totalItems > 0 && (
+        <div className="flex items-center justify-between pt-2">
+          <p className="text-xs text-zinc-600">
+            <span className="text-zinc-400">{(page - 1) * pageSize + 1}–{Math.min(page * pageSize, totalItems)}</span>
+            {' / '}<span className="text-zinc-400">{totalItems}</span>
+          </p>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-600 border border-white/10 hover:border-white/20 hover:text-white transition-all disabled:opacity-30"
+                style={{ background: 'rgba(255,255,255,0.04)' }}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
 
-      {loading && works.length > 0 && (
-        <div className="flex justify-center">
-          <button
-            disabled
-            className="px-6 py-3 rounded-full font-medium bg-white/5 text-white border border-white/10 transition-all backdrop-blur-md flex items-center gap-2 opacity-70"
-          >
-            <Loader2 className="w-4 h-4 animate-spin" />
-            {t('loading')}
-          </button>
+              {getPageNumbers().map((p, i) =>
+                p === null ? (
+                  <span key={`ellipsis-${i}`} className="text-zinc-700 px-1 text-sm">…</span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={cn(
+                      "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all",
+                      p === page
+                        ? "text-black font-bold"
+                        : "text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white"
+                    )}
+                    style={p === page
+                      ? { background: 'linear-gradient(to right, #22C55E, #16A34A)' }
+                      : { background: 'rgba(255,255,255,0.04)' }
+                    }
+                  >
+                    {p}
+                  </button>
+                )
+              )}
+
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-600 border border-white/10 hover:border-white/20 hover:text-white transition-all disabled:opacity-30"
+                style={{ background: 'rgba(255,255,255,0.04)' }}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

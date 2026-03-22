@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getOrSyncUser } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 
 /**
  * GET /api/works/[id]/stats
@@ -19,7 +19,7 @@ export async function GET(
         where: { workId },
         select: { viewCount: true, likeCount: true },
       }),
-      getOrSyncUser(),
+      getAuthUser(),
     ]);
 
     const viewCount = Number(stat?.viewCount ?? 0);
@@ -29,7 +29,7 @@ export async function GET(
     if (user) {
       const like = await prisma.workLike.findUnique({
         where: {
-          userId_workId: { userId: user.id, workId },
+          userId_workId: { userId: user.userId, workId },
         },
       });
       liked = !!like;

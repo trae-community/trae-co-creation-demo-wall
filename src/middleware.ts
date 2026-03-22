@@ -7,8 +7,12 @@ const handleI18nRouting = createMiddleware(routing);
 
 const isProtectedRoute = createRouteMatcher(['/:language/submit(.*)', '/:language/console(.*)', '/:language/profile(.*)']);
 const isApiRoute = createRouteMatcher(['/api(.*)']);
+const isWebhookRoute = createRouteMatcher(['/api/webhooks(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
+  // Webhook routes must be publicly accessible — Clerk sends unsigned POST requests here
+  if (isWebhookRoute(req)) return NextResponse.next();
+
   const isPrefetchRequest =
     req.headers.get('purpose') === 'prefetch' ||
     req.headers.has('next-router-prefetch');

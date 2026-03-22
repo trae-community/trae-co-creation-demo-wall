@@ -5,9 +5,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <html>
-      <body>{children}</body>
-    </html>
-  )
+  // html/body are rendered by [language]/layout.tsx to support per-locale lang attribute
+  return children as React.ReactElement
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getOrSyncUser } from '@/lib/auth'
+import { getAuthUser } from '@/lib/auth'
 import { z } from 'zod'
 
 const toStringArray = (value: unknown): string[] => {
@@ -198,7 +198,7 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getOrSyncUser()
+    const user = await getAuthUser()
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -237,7 +237,7 @@ export async function PUT(
       )
     }
 
-    if (existingWork.userId !== user.id) {
+    if (existingWork.userId !== user.userId) {
       return NextResponse.json(
         { success: false, error: 'Forbidden' },
         { status: 403 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getOrSyncUser } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 
 /**
  * POST /api/works/[id]/like
@@ -12,7 +12,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getOrSyncUser();
+    const user = await getAuthUser();
     if (!user) {
       return NextResponse.json(
         { error: "Unauthorized", code: "LOGIN_REQUIRED" },
@@ -33,14 +33,14 @@ export async function POST(
 
     const existing = await prisma.workLike.findUnique({
       where: {
-        userId_workId: { userId: user.id, workId },
+        userId_workId: { userId: user.userId, workId },
       },
     });
 
     if (existing) {
       await prisma.workLike.delete({
         where: {
-          userId_workId: { userId: user.id, workId },
+          userId_workId: { userId: user.userId, workId },
         },
       });
       const stat = await prisma.workStatistic.findUnique({ where: { workId } });
@@ -55,7 +55,7 @@ export async function POST(
 
     await prisma.$transaction([
       prisma.workLike.create({
-        data: { userId: user.id, workId },
+        data: { userId: user.userId, workId },
       }),
       prisma.workStatistic.upsert({
         where: { workId },
