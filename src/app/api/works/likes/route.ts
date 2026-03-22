@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getOrSyncUser } from '@/lib/auth';
+import { getAuthUser } from '@/lib/auth';
 
 /**
  * GET /api/works/likes
@@ -8,7 +8,7 @@ import { getOrSyncUser } from '@/lib/auth';
  */
 export async function GET(req: Request) {
   try {
-    const user = await getOrSyncUser();
+    const user = await getAuthUser();
     if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -22,10 +22,10 @@ export async function GET(req: Request) {
 
     const [total, likes] = await Promise.all([
       prisma.workLike.count({
-        where: { userId: user.id },
+        where: { userId: user.userId },
       }),
       prisma.workLike.findMany({
-        where: { userId: user.id },
+        where: { userId: user.userId },
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * pageSize,
         take: pageSize,

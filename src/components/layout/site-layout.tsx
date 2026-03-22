@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound } from "lucide-react";
 import { ParticlesBackground } from "./particles-background";
-import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut, UserButton, useAuth } from '@clerk/nextjs';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/language/navigation';
 
@@ -23,18 +23,29 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
-  const [userRoles, setUserRoles] = useState<{ id: number; roleCode: string }[]>([])
 
+  // Read roles from local JWT — zero network call in the happy path
+  const { sessionClaims, userId: clerkUserId } = useAuth();
+  const jwtRoles = (sessionClaims?.publicMetadata as { roles?: string[] })?.roles ?? [];
+  const [fallbackRoles, setFallbackRoles] = useState<string[]>([]);
+
+  // Fallback: if JWT has no roles but user is logged in (webhook not yet fired / JWT not refreshed),
+  // fetch once from /api/profile to get roles from DB.
   useEffect(() => {
+    if (!clerkUserId || jwtRoles.length > 0) return;
     fetch('/api/profile')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (data?.profile?.roles) {
-          setUserRoles(data.profile.roles)
-        }
+        const profileRoles: string[] = (data?.profile?.roles ?? []).map(
+          (r: { roleCode: string }) => r.roleCode
+        );
+        if (profileRoles.length > 0) setFallbackRoles(profileRoles);
       })
-      .catch(err => console.error('Failed to fetch user roles:', err))
-  }, [])
+      .catch(() => {});
+  }, [clerkUserId, jwtRoles.length]);
+
+  const roles = jwtRoles.length > 0 ? jwtRoles : fallbackRoles;
+  const showConsole = roles.some(r => r === 'root' || r === 'admin');
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -54,9 +65,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   };
 
   const currentOption = LOCALE_OPTIONS.find(o => o.code === locale) ?? LOCALE_OPTIONS[0];
-
-  // Check if user has access to console (role id 1 or 2)
-  const showConsole = userRoles.some(role => role.id === 1 || role.id === 2)
 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans text-foreground relative z-0">

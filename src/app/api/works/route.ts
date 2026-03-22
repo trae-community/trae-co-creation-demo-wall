@@ -1,6 +1,35 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import { unstable_cache } from 'next/cache';
+
+// Cache raw dict data for 5 minutes — resolveLabelMap runs per-request with lang param
+const getRawDictionaries = unstable_cache(
+  async () => {
+    const [countryDict, cityDict, categoryDict, honorDict] = await Promise.all([
+      prisma.sysDict.findUnique({ where: { dictCode: 'country' }, include: { items: true } }),
+      prisma.sysDict.findUnique({ where: { dictCode: 'city' }, include: { items: true } }),
+      prisma.sysDict.findUnique({ where: { dictCode: 'category_code' }, include: { items: true } }),
+      prisma.sysDict.findUnique({ where: { dictCode: 'honor_type' }, include: { items: true } }),
+    ]);
+    // Serialize BigInt fields so unstable_cache can JSON.stringify the result
+    const serialize = (obj: unknown): unknown =>
+      JSON.parse(JSON.stringify(obj, (_, v) => (typeof v === 'bigint' ? v.toString() : v)));
+    return {
+      countryDict: serialize(countryDict),
+      cityDict: serialize(cityDict),
+      categoryDict: serialize(categoryDict),
+      honorDict: serialize(honorDict),
+    } as {
+      countryDict: typeof countryDict;
+      cityDict: typeof cityDict;
+      categoryDict: typeof categoryDict;
+      honorDict: typeof honorDict;
+    };
+  },
+  ['works-raw-dicts'],
+  { revalidate: 300 }
+);
 
 export async function GET(req: Request) {
   try {
@@ -70,24 +99,7 @@ export async function GET(req: Request) {
       orderBy = { statistic: { viewCount: 'desc' } };
     }
 
-    const [countryDict, cityDict, categoryDict, honorDict] = await Promise.all([
-      prisma.sysDict.findUnique({
-        where: { dictCode: 'country' },
-        include: { items: true }
-      }),
-      prisma.sysDict.findUnique({
-        where: { dictCode: 'city' },
-        include: { items: true }
-      }),
-      prisma.sysDict.findUnique({
-        where: { dictCode: 'category_code' },
-        include: { items: true }
-      }),
-      prisma.sysDict.findUnique({
-        where: { dictCode: 'honor_type' },
-        include: { items: true }
-      })
-    ]);
+    const { countryDict, cityDict, categoryDict, honorDict } = await getRawDictionaries();
 
     const resolveLabelMap = (items: Array<{ itemValue: string; itemLabel: string; labelI18n: Prisma.JsonValue | null }>) => {
       return items.reduce<Record<string, string>>((acc, item) => {

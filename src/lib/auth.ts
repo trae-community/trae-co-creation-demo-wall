@@ -1,20 +1,75 @@
-import { currentUser, clerkClient } from "@clerk/nextjs/server";
+import { auth, currentUser, clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { writeAuthLog, writeOperationLog } from "@/lib/audit-log";
 
-type GetOrSyncUserOptions = {
+export type AuthUser = {
+  clerkId: string;
+  userId: bigint;
+  roles: string[];
+};
+
+/**
+ * Reads identity from the local Clerk JWT — zero network calls in the happy path.
+ *
+ * Fast path: JWT publicMetadata already contains userId (written by webhook/sync).
+ * Fallback path: userId not yet in JWT (webhook not fired or JWT not refreshed yet).
+ *   → One DB lookup by clerkId to resolve the local userId.
+ *   → This only triggers during the race window between sign-in and first JWT refresh.
+ */
+export async function getAuthUser(): Promise<AuthUser | null> {
+  const { userId: clerkId, sessionClaims } = await auth();
+  if (!clerkId) return null;
+
+  const meta = sessionClaims?.publicMetadata as
+    | { userId?: string; roles?: string[] }
+    | undefined;
+
+  // Fast path: JWT already has userId
+  if (meta?.userId) {
+    try {
+      return {
+        clerkId,
+        userId: BigInt(meta.userId),
+        roles: meta.roles ?? [],
+      };
+    } catch {
+      // BigInt parse failed — fall through to DB lookup
+    }
+  }
+
+  // Fallback: userId not yet in JWT — look up DB by clerkId
+  // This happens when webhook hasn't fired or JWT hasn't refreshed yet.
+  try {
+    const dbUser = await prisma.sysUser.findUnique({
+      where: { clerkId },
+      select: {
+        id: true,
+        roles: { include: { role: { select: { roleCode: true } } } },
+      },
+    });
+
+    if (!dbUser) return null;
+
+    return {
+      clerkId,
+      userId: dbUser.id,
+      roles: dbUser.roles.map(r => r.role.roleCode),
+    };
+  } catch {
+    return null;
+  }
+}
+
+type SyncUserOptions = {
   trigger?: "auth_callback" | "default";
   request?: Request;
 };
 
 /**
  * Retrieves the current Clerk user and synchronizes them with the local SysUser database.
- * If the user does not exist in the local database, they are created.
- * If they exist, their basic information (email, username, avatar) is updated.
- *
- * @returns The synchronized SysUser object from the local database, or null if not authenticated.
+ * Used only by the Clerk webhook handler — not called on every API request.
  */
-export async function getOrSyncUser(options: GetOrSyncUserOptions = {}) {
+export async function syncUserFromClerk(options: SyncUserOptions = {}) {
   console.log("[Auth] Starting getOrSyncUser...");
   try {
     const user = await currentUser();

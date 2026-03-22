@@ -2,17 +2,18 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import { Link, usePathname, useRouter } from '@/lib/language/navigation'
-import { 
-  LayoutDashboard, 
-  FolderKanban, 
-  BookOpen, 
-  Building2, 
+import { useAuth } from '@clerk/nextjs'
+import {
+  LayoutDashboard,
+  FolderKanban,
+  BookOpen,
+  Building2,
   Tags,
   Users,
   Shield,
   Logs,
   ShieldCheck,
-  Menu, 
+  Menu,
   X,
   ChevronDown
 } from 'lucide-react'
@@ -33,21 +34,38 @@ export default function ConsoleLayout({
   const pathname = usePathname()
   const router = useRouter()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [userRoles, setUserRoles] = useState<{ id: number; roleCode: string }[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [expandedGroups, setExpandedGroups] = useState<string[]>([])
 
+  // Read roles from local JWT — zero network call in the happy path
+  const { sessionClaims, userId: clerkUserId } = useAuth()
+  const jwtRoles = (sessionClaims?.publicMetadata as { roles?: string[] })?.roles ?? []
+  const [fallbackRoles, setFallbackRoles] = useState<string[]>([])
+  const [fallbackFetched, setFallbackFetched] = useState(false)
+
+  // Fallback: if JWT has no roles but user is logged in, fetch from DB once
   useEffect(() => {
+    if (!clerkUserId || jwtRoles.length > 0) {
+      setFallbackFetched(true)
+      return
+    }
     fetch('/api/profile')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (data?.profile?.roles) {
-          setUserRoles(data.profile.roles)
-        }
+        const profileRoles: string[] = (data?.profile?.roles ?? []).map(
+          (r: { roleCode: string }) => r.roleCode
+        )
+        setFallbackRoles(profileRoles)
       })
-      .catch(err => console.error('Failed to fetch user roles:', err))
-      .finally(() => setIsLoading(false))
-  }, [])
+      .catch(() => {})
+      .finally(() => setFallbackFetched(true))
+  }, [clerkUserId, jwtRoles.length])
+
+  const roles = jwtRoles.length > 0 ? jwtRoles : fallbackRoles
+  const isRoot = roles.includes('root')
+  const isAdmin = roles.includes('admin')
+  const hasAccess = isRoot || isAdmin
+  // Only enforce access after roles are actually resolved (fetch done or not needed)
+  const rolesResolved = !clerkUserId || fallbackFetched
 
   const navItems = useMemo(() => {
     const allNavItems: NavItem[] = [
@@ -86,8 +104,8 @@ export default function ConsoleLayout({
       },
     ]
 
-    const isRoot = userRoles.some(role => role.id === 1)
-    const isAdmin = userRoles.some(role => role.id === 2)
+    const isRoot = roles.includes('root')
+    const isAdmin = roles.includes('admin')
     const allowedItems = ['用户管理', '作品管理', '标签管理']
 
     const filterNavItems = (items: NavItem[]): NavItem[] => {
@@ -112,7 +130,7 @@ export default function ConsoleLayout({
     }
 
     return filterNavItems(allNavItems);
-  }, [userRoles])
+  }, [roles])
 
   // Initialize expanded groups based on active route
   useEffect(() => {
@@ -150,25 +168,19 @@ export default function ConsoleLayout({
     return getAllAllowedHrefs(navItems);
   }, [navItems])
 
-  const isRoot = userRoles.some(role => role.id === 1)
-  const isAdmin = userRoles.some(role => role.id === 2)
-  const hasAccess = isRoot || isAdmin
-
-  // Route protection
+  // Route protection — wait for roles to be resolved before enforcing
   useEffect(() => {
-    if (isLoading) return
-    
+    if (!rolesResolved) return
+
     if (!hasAccess) {
       router.push('/')
       return
     }
 
-    const isAllowed = allowedHrefs.some(href => 
+    const isAllowed = allowedHrefs.some(href =>
       pathname === href || pathname.startsWith(`${href}/`)
     )
 
-    // Allow root path '/console' if it's in the allowed list (Overview)
-    // Note: If Overview is filtered out for Admin, they should be redirected
     if (!isAllowed) {
       if (allowedHrefs.length > 0) {
         router.push(allowedHrefs[0])
@@ -176,11 +188,7 @@ export default function ConsoleLayout({
         router.push('/')
       }
     }
-  }, [pathname, isLoading, hasAccess, allowedHrefs, router])
-
-  if (isLoading) {
-    return null
-  }
+  }, [pathname, hasAccess, allowedHrefs, router, rolesResolved])
 
   const renderNavItem = (item: NavItem, depth = 0) => {
     if (item.children) {

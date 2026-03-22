@@ -25,7 +25,11 @@
     "prevPage": "上一页",
     "nextPage": "下一页",
     "loadMore": "加载更多",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "heroBadge": "正在展示来自全球的 TRAE 创作",
+    "resultCount": "共",
+    "resultCountUnit": "个作品",
+    "showing": "显示"
   },
   "Submit": {
     "title": "欢迎提交你的 TRAE Demo！",
@@ -124,7 +128,10 @@
     "validationTeamMemberRequired": "请填写团队成员姓名",
     "validationTeamMin": "至少需要1名团队成员",
     "validationEmail": "请输入有效的邮箱地址",
-    "validationCover": "请上传封面图"
+    "nextStep": "下一步",
+    "prevStep": "上一步",
+    "uploadError": "上传失败，请重试",
+    "uploading": "上传中…"
   },
   "Work": {
     "notFound": "项目未找到",
@@ -174,7 +181,8 @@
     "cityPick": "城市精选",
     "cityTrending": "城市人气",
     "cityCurated": "城市人气",
-    "communityRecommended": "社区推荐"
+    "communityRecommended": "社区推荐",
+    "people": "人团队"
   },
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",

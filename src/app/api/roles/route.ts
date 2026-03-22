@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
-import { getOrSyncUser } from '@/lib/auth';
+import { getAuthUser } from '@/lib/auth';
 import { writeOperationLog } from '@/lib/audit-log';
 
 // Helper to sanitize object
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
 // POST: 创建角色
 export async function POST(req: NextRequest) {
   try {
-    const operator = await getOrSyncUser();
+    const operator = await getAuthUser();
     const body = await req.json();
     const { roleCode, roleName, description } = body;
 
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
     });
 
     await writeOperationLog({
-      operatorId: operator?.id,
+      operatorId: operator?.userId,
       module: 'roles',
       action: 'create',
       targetType: 'sys_role',
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
 // PUT: 更新角色
 export async function PUT(req: NextRequest) {
   try {
-    const operator = await getOrSyncUser();
+    const operator = await getAuthUser();
     const body = await req.json();
     const { id, roleCode, roleName, description } = body;
 
@@ -126,7 +126,7 @@ export async function PUT(req: NextRequest) {
     });
 
     await writeOperationLog({
-      operatorId: operator?.id,
+      operatorId: operator?.userId,
       module: 'roles',
       action: 'update',
       targetType: 'sys_role',
@@ -156,7 +156,7 @@ export async function PUT(req: NextRequest) {
 // DELETE: 删除角色
 export async function DELETE(req: NextRequest) {
   try {
-    const operator = await getOrSyncUser();
+    const operator = await getAuthUser();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
@@ -169,7 +169,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     await writeOperationLog({
-      operatorId: operator?.id,
+      operatorId: operator?.userId,
       module: 'roles',
       action: 'delete',
       targetType: 'sys_role',

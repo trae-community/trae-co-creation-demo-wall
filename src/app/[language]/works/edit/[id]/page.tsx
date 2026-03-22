@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { getOrSyncUser } from "@/lib/auth";
+import { getAuthUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { EditForm } from "../../../../../components/work/edit-form";
 
@@ -29,7 +29,7 @@ interface PageInitialData {
 
 export default async function EditPage({ params }: { params: Promise<{ id: string; language: string }> }) {
   const { id, language } = await params;
-  const user = await getOrSyncUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect(`/${language}/sign-in`);
@@ -55,7 +55,7 @@ export default async function EditPage({ params }: { params: Promise<{ id: strin
   }
 
   // Check ownership
-  if (work.userId !== user.id) {
+  if (work.userId !== user.userId) {
     return <div>Unauthorized</div>;
   }
 

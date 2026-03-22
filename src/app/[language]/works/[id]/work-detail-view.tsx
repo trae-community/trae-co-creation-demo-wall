@@ -8,6 +8,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/lib/language/navigation';
 import { Work } from "@/lib/types";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useWorksStore } from '@/store/works-store';
 
 const toStringList = (value: unknown): string[] => {
   if (Array.isArray(value)) {
@@ -48,11 +49,32 @@ export function WorkDetailView() {
   const [shareActionDone, setShareActionDone] = useState<'copied' | ''>('');
   const viewRecorded = useRef(false);
 
-  // 获取作品详情和统计数据
+  const { detailCache, setDetailCache } = useWorksStore();
+
+  // 获取作品详情 (cache-first) + stats (always fresh)
   useEffect(() => {
     const fetchWork = async () => {
       if (!id) {
         setIsLoading(false);
+        return;
+      }
+
+      // Cache hit: render immediately, skip detail network request
+      const cached = detailCache.get(id);
+      if (cached) {
+        setWork(cached);
+        setIsLoading(false);
+        // Still fetch fresh stats in background
+        fetch(`/api/works/${id}/stats`)
+          .then(r => r.ok ? r.json() : null)
+          .then(stats => {
+            if (stats) {
+              setLikesCount(stats.likeCount || 0);
+              setViewsCount(stats.viewCount || 0);
+              setLiked(stats.liked || false);
+            }
+          })
+          .catch(() => {});
         return;
       }
 
@@ -61,16 +83,16 @@ export function WorkDetailView() {
           fetch(`/api/works/${id}?lang=${encodeURIComponent(locale)}`),
           fetch(`/api/works/${id}/stats`),
         ]);
-        
+
         if (!workRes.ok) {
           setWork(null);
           return;
         }
-        
+
         const data: Work = await workRes.json();
         setWork(data);
-        
-        // 获取统计数据
+        setDetailCache(id, data);
+
         if (statsRes.ok) {
           const stats = await statsRes.json();
           setLikesCount(stats.likeCount || 0);
@@ -85,7 +107,7 @@ export function WorkDetailView() {
     };
 
     fetchWork();
-  }, [id, locale]);
+  }, [id, locale, detailCache, setDetailCache]);
 
   // 记录浏览量（使用 ref 去重，避免 Strict Mode 双次）
   useEffect(() => {
@@ -398,9 +420,10 @@ export function WorkDetailView() {
               <span className="w-1 h-6 bg-primary rounded-full"></span>
               {t('story')}
             </h2>
-            <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed">
-              {work.story || '-'}
-            </div>
+            <div
+                className="prose prose-invert max-w-none text-gray-300 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: work.story || '<p>-</p>' }}
+              />
           </section>
 
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
