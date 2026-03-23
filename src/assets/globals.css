@@ -3,52 +3,120 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: rgb(26, 27, 29);
+    --foreground: rgb(245, 249, 254);
+    --card: rgb(34, 36, 39);
+    --card-foreground: rgb(245, 249, 254);
+    --popover: rgb(26, 27, 29);
+    --popover-foreground: rgb(245, 249, 254);
+    --primary: rgb(50, 240, 140);
+    --primary-foreground: rgb(26, 27, 29);
+    --secondary: rgb(26, 27, 29);
+    --secondary-foreground: rgb(245, 249, 254);
+    --muted: rgb(42, 45, 49);
+    --muted-foreground: rgb(245, 249, 254);
+    --accent: rgb(42, 45, 49);
+    --accent-foreground: rgb(245, 249, 254);
+    --destructive: rgb(239, 68, 68);
+    --destructive-foreground: rgb(255, 255, 255);
+    --border: rgb(46, 47, 51);
+    --input: rgb(70, 71, 78);
+    --ring: rgb(245, 249, 254);
+    --chart-1: rgb(50, 240, 140);
+    --chart-2: rgb(102, 75, 236);
+    --chart-3: rgb(148, 189, 255);
+    --chart-4: rgb(224, 112, 255);
+    --chart-5: rgb(219, 244, 255);
+    --sidebar: rgb(18, 18, 18);
+    --sidebar-foreground: rgb(209, 211, 219);
+    --sidebar-primary: rgb(255, 192, 203);
+    --sidebar-primary-foreground: rgb(24, 24, 24);
+    --sidebar-accent: rgb(50, 240, 140);
+    --sidebar-accent-foreground: rgb(24, 24, 24);
+    --sidebar-border: rgb(13, 13, 13);
+    --sidebar-ring: rgb(255, 192, 203);
+    --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
+    --font-serif: Aleo, ui-serif, serif;
+    --font-mono: Roboto Mono, monospace;
+    --radius: 0.35rem;
+    --shadow-x: 0px;
+    --shadow-y: 2px;
+    --shadow-blur: 6px;
+    --shadow-spread: 0px;
+    --shadow-opacity: 0.1;
+    --shadow-color: #242523;
+    --shadow-2xs: 0px 2px 6px 0px hsl(90.0000 2.7778% 14.1176% / 0.05);
+    --shadow-xs: 0px 2px 6px 0px hsl(90.0000 2.7778% 14.1176% / 0.05);
+    --shadow-sm: 0px 2px 6px 0px hsl(90.0000 2.7778% 14.1176% / 0.10), 0px 1px 2px -1px hsl(90.0000 2.7778% 14.1176% / 0.10);
+    --shadow: 0px 2px 6px 0px hsl(90.0000 2.7778% 14.1176% / 0.10), 0px 1px 2px -1px hsl(90.0000 2.7778% 14.1176% / 0.10);
+    --shadow-md: 0px 2px 6px 0px hsl(90.0000 2.7778% 14.1176% / 0.10), 0px 2px 4px -1px hsl(90.0000 2.7778% 14.1176% / 0.10);
+    --shadow-lg: 0px 2px 6px 0px hsl(90.0000 2.7778% 14.1176% / 0.10), 0px 4px 6px -1px hsl(90.0000 2.7778% 14.1176% / 0.10);
+    --shadow-xl: 0px 2px 6px 0px hsl(90.0000 2.7778% 14.1176% / 0.10), 0px 8px 10px -1px hsl(90.0000 2.7778% 14.1176% / 0.10);
+    --shadow-2xl: 0px 2px 6px 0px hsl(90.0000 2.7778% 14.1176% / 0.25);
+    --tracking-normal: 0em;
+    --spacing: 0.28rem;
+  }
+
+  .dark {
+    --background: rgb(26, 29, 35);
+    --foreground: rgb(229, 229, 229);
+    --card: rgb(47, 52, 54);
+    --card-foreground: rgb(229, 229, 229);
+    --popover: rgb(47, 52, 54);
+    --popover-foreground: rgb(229, 229, 229);
+    --primary: rgb(255, 153, 204);
+    --primary-foreground: rgb(0, 0, 0);
+    --secondary: rgb(51, 204, 51);
+    --secondary-foreground: rgb(0, 0, 0);
+    --muted: rgb(68, 68, 68);
+    --muted-foreground: rgb(163, 163, 163);
+    --accent: rgb(135, 206, 235);
+    --accent-foreground: rgb(0, 0, 0);
+    --destructive: rgb(239, 68, 68);
+    --destructive-foreground: rgb(255, 255, 255);
+    --border: rgb(68, 68, 68);
+    --input: rgb(68, 68, 68);
+    --ring: rgb(255, 153, 204);
+    --chart-1: rgb(255, 153, 204);
+    --chart-2: rgb(51, 204, 51);
+    --chart-3: rgb(135, 206, 235);
+    --chart-4: rgb(255, 255, 0);
+    --chart-5: rgb(255, 204, 0);
+    --sidebar: rgb(26, 29, 35);
+    --sidebar-foreground: rgb(229, 229, 229);
+    --sidebar-primary: rgb(255, 153, 204);
+    --sidebar-primary-foreground: rgb(0, 0, 0);
+    --sidebar-accent: rgb(135, 206, 235);
+    --sidebar-accent-foreground: rgb(0, 0, 0);
+    --sidebar-border: rgb(68, 68, 68);
+    --sidebar-ring: rgb(255, 153, 204);
+    --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
+    --font-serif: Aleo, ui-serif, serif;
+    --font-mono: Roboto Mono, monospace;
+    --radius: 0.35rem;
+    --shadow-x: 0px;
+    --shadow-y: 2px;
+    --shadow-blur: 6px;
+    --shadow-spread: 0px;
+    --shadow-opacity: 0.1;
+    --shadow-color: oklch(0 0 0);
+    --shadow-2xs: 0px 2px 6px 0px hsl(0 0% 0% / 0.05);
+    --shadow-xs: 0px 2px 6px 0px hsl(0 0% 0% / 0.05);
+    --shadow-sm: 0px 2px 6px 0px hsl(0 0% 0% / 0.10), 0px 1px 2px -1px hsl(0 0% 0% / 0.10);
+    --shadow: 0px 2px 6px 0px hsl(0 0% 0% / 0.10), 0px 1px 2px -1px hsl(0 0% 0% / 0.10);
+    --shadow-md: 0px 2px 6px 0px hsl(0 0% 0% / 0.10), 0px 2px 4px -1px hsl(0 0% 0% / 0.10);
+    --shadow-lg: 0px 2px 6px 0px hsl(0 0% 0% / 0.10), 0px 4px 6px -1px hsl(0 0% 0% / 0.10);
+    --shadow-xl: 0px 2px 6px 0px hsl(0 0% 0% / 0.10), 0px 8px 10px -1px hsl(0 0% 0% / 0.10);
+    --shadow-2xl: 0px 2px 6px 0px hsl(0 0% 0% / 0.25);
+  }
+}
+
+@layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
-    background-image: radial-gradient(circle at 50% 0%, #0f1113 0%, #030304 70%);
-    background-attachment: fixed;
   }
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  @apply bg-background;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-secondary rounded-full;
-}
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-primary/50;
-}
-
-/* Selection Color */
-::selection {
-  @apply bg-primary/30 text-white;
-}
-
-/* Utility classes for Trae-like effects */
-.glass-panel {
-  @apply bg-card/60 backdrop-blur-md border border-white/5 shadow-xl;
-}
-
-.text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#22C55E] to-[#16A34A];
-}
-
-.btn-glow {
-  @apply relative overflow-hidden;
-}
-.btn-glow::after {
-  content: '';
-  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] transition-transform duration-500;
-}
-.btn-glow:hover::after {
-  @apply translate-x-[100%];
 }
