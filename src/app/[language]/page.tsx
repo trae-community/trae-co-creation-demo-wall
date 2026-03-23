@@ -121,7 +121,7 @@ export default function Page() {
           {/* Live badge */}
           <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1 text-xs text-green-400 font-medium mb-6">
             <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-            {t('heroBadge') || '正在展示来自全球的 TRAE 创作'}
+            {t('heroBadge') || '在这里，看见全国各地用户的 TRAE 创作作品'}
           </div>
 
           <h1 className="text-5xl md:text-6xl font-bold mb-5 tracking-tight leading-tight">
