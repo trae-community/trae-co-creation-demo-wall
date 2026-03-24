@@ -173,7 +173,7 @@
   "Filter": {
     "all": "All",
     "type": "Type",
-    "country": "Country",
+    "country": "Province",
     "city": "City"
   },
   "Card": {

@@ -173,7 +173,7 @@
   "Filter": {
     "all": "全部",
     "type": "类型",
-    "country": "国家",
+    "country": "省份",
     "city": "城市"
   },
   "Card": {

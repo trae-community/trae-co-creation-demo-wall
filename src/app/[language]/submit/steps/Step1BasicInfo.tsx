@@ -151,6 +151,27 @@ export function Step1BasicInfo({
           )}
         </div>
       </div>
+      
+      {/* Category */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-300">
+          {t('category')} <span className="text-red-500">*</span>
+        </label>
+        <Select
+          options={availableCategories.map(c => ({ label: c.itemLabel, value: c.itemValue }))}
+          value={watch('category')}
+          onChange={value => setValue('category', value, { shouldValidate: true })}
+          placeholder={t('categoryPlaceholder')}
+          icon={<LayoutGrid className="w-4 h-4" />}
+        />
+        <input type="hidden" {...register('category')} />
+        {errors.category && (
+          <p className="text-red-500 text-xs flex items-center gap-1">
+            <AlertCircle className="w-3 h-3" />
+            {errors.category.message}
+          </p>
+        )}
+      </div>
 
       {/* Dev Status */}
       <div className="space-y-2">

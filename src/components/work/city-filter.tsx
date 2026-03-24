@@ -20,6 +20,7 @@ interface CityFilterProps {
 type FilterOption = {
   label: string;
   value: string;
+  parentValue?: string;
 };
 
 const Pill = ({
@@ -67,7 +68,7 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
         ]);
         setCategories(((categoryData?.items as DictionaryItem[] | undefined) || []).map(item => ({ label: item.itemLabel, value: item.itemValue })));
         setCountries(((countryData?.items as DictionaryItem[] | undefined) || []).map(item => ({ label: item.itemLabel, value: item.itemValue })));
-        setCities(((cityData?.items as DictionaryItem[] | undefined) || []).map(item => ({ label: item.itemLabel, value: item.itemValue })));
+        setCities(((cityData?.items as DictionaryItem[] | undefined) || []).map(item => ({ label: item.itemLabel, value: item.itemValue, parentValue: item.parentValue })));
       } catch (error) {
         console.error('Failed to load filter options:', error);
       }
@@ -89,10 +90,10 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
     onFilterChange(newFilters);
   };
 
-  const availableCities = useMemo(
-    () => (filters.countries.length > 0 ? cities : []),
-    [filters.countries.length, cities]
-  );
+  const availableCities = useMemo(() => {
+    if (filters.countries.length === 0) return [];
+    return cities.filter(city => city.parentValue && filters.countries.includes(city.parentValue));
+  }, [filters.countries, cities]);
 
   const FilterRow = ({
     label,
@@ -105,9 +106,9 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
     type: keyof FilterState;
     selected: string[];
   }) => (
-    <div className="flex items-center gap-3 overflow-x-auto pb-0.5" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}>
-      <span className="text-xs text-zinc-500 font-medium w-10 shrink-0 select-none">{label}</span>
-      <div className="flex gap-1.5 flex-nowrap">
+    <div className="flex items-start gap-3 pb-0.5">
+      <span className="text-xs text-zinc-500 font-medium w-10 shrink-0 select-none mt-2">{label}</span>
+      <div className="flex flex-wrap gap-2">
         <Pill active={selected.length === 0} onClick={() => handleClear(type)}>
           {t('all')}
         </Pill>
