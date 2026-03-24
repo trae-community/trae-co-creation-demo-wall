@@ -23,6 +23,9 @@ const fontMono = Roboto_Mono({
 
 export const metadata: Metadata = {
   title: 'TRAE DEMO WALL',
+  icons: {
+    icon: '/trae.ico',
+  },
   description: 'Showcasing every real completed work',
 };
 
