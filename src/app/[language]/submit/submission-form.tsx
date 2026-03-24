@@ -84,7 +84,7 @@ export function SubmissionForm() {
   const [uploadingCover, setUploadingCover] = useState(false)
   const [uploadingScreenshots, setUploadingScreenshots] = useState(false)
 
-  // ── Dictionary data ──
+  // ── Options State ──
   const [availableTags, setAvailableTags] = useState<WorkTag[]>([])
   const [availableCategories, setAvailableCategories] = useState<DictionaryItem[]>([])
   const [availableCountries, setAvailableCountries] = useState<DictionaryItem[]>([])
@@ -102,7 +102,7 @@ export function SubmissionForm() {
       country: '',
       city: '',
       category: '',
-      devStatus: '',
+      devStatus: '', 
       tags: [],
       team: [{ value: user?.username || '' }],
       teamIntro: '',
@@ -132,8 +132,9 @@ export function SubmissionForm() {
 
   // ── Reset city on country change ──
   useEffect(() => {
-    setValue('city', '')
-  }, [selectedCountry, setValue])
+    // We intentionally don't clear the city here if the component is just mounting
+    // Let the Step1BasicInfo handle city reset via its onChange handler if needed
+  }, [selectedCountry]);
 
   // ── Filtered cities ──
   const filteredCities = useMemo(() => {
@@ -186,6 +187,7 @@ export function SubmissionForm() {
         console.error('Failed to fetch locations:', e)
       }
     }
+
 
     fetchTags()
     fetchCategories()
@@ -346,7 +348,7 @@ export function SubmissionForm() {
               availableTags={availableTags}
               filteredCities={filteredCities}
             />
-          </div>
+          </div> 
 
           <div className={currentStep === 2 ? '' : 'hidden'}>
             <Step2VisualAssets

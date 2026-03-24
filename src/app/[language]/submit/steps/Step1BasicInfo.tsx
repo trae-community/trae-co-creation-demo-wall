@@ -40,6 +40,7 @@ interface Step1Props {
 export function Step1BasicInfo({
   form,
   availableCountries,
+  availableCities,
   availableCategories,
   availableDevStatuses,
   availableTags,
@@ -104,7 +105,7 @@ export function Step1BasicInfo({
         )}
       </div>
 
-      {/* Country + City */}
+      {/* Province + City */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-300">
@@ -115,7 +116,7 @@ export function Step1BasicInfo({
             value={selectedCountry}
             onChange={value => {
               setValue('country', value, { shouldValidate: true })
-              setValue('city', '')
+              setValue('city', '', { shouldValidate: false })
             }}
             placeholder={t('countryPlaceholder')}
             icon={<Globe className="w-4 h-4" />}
@@ -149,27 +150,6 @@ export function Step1BasicInfo({
             </p>
           )}
         </div>
-      </div>
-
-      {/* Category */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-300">
-          {t('category')} <span className="text-red-500">*</span>
-        </label>
-        <Select
-          options={availableCategories.map(c => ({ label: c.itemLabel, value: c.itemValue }))}
-          value={watch('category')}
-          onChange={value => setValue('category', value, { shouldValidate: true })}
-          placeholder={t('categoryPlaceholder')}
-          icon={<LayoutGrid className="w-4 h-4" />}
-        />
-        <input type="hidden" {...register('category')} />
-        {errors.category && (
-          <p className="text-red-500 text-xs flex items-center gap-1">
-            <AlertCircle className="w-3 h-3" />
-            {errors.category.message}
-          </p>
-        )}
       </div>
 
       {/* Dev Status */}
