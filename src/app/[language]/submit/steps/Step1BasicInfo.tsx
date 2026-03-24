@@ -23,7 +23,7 @@ export type SubmissionFormValues = {
   highlights: { value: string }[]
   scenarios: { value: string }[]
   screenshots: string[]
-  demoUrl: string
+  demoUrl?: string
   repoUrl?: string
 }
 
