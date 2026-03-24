@@ -33,7 +33,7 @@ const submissionSchema = z.object({
   highlights: z.array(z.string().max(10)).min(3).max(5),
   scenarios: z.array(z.string()).min(1),
   screenshots: z.array(z.string()).min(1).max(5),
-  demoUrl: z.string().url(),
+  demoUrl: z.string().url().optional().or(z.literal("")),
   repoUrl: z.string().url().optional().or(z.literal("")),
 });
 
