@@ -10,10 +10,10 @@
   },
   "Home": {
     "heroTitle": "Ship Faster with",
-    "heroSubtitle1": "Built with",
-    "heroSubtitle2": "Built by",
-    "heroSubtitleTRAE": "TRAE",
-    "heroSubtitleFriends": "Friends",
+    "heroDescription": "コミュニティの TRAE 作品を閲覧・投稿できます。",
+    "featuredPanelTitle": "最新作品",
+    "noFeaturedYet": "まだ作品がありません。投稿をお待ちしています。",
+    "browseSectionTitle": "作品を探す",
     "submitWork": "作品を投稿",
     "browseWork": "作品を閲覧",
     "searchPlaceholder": "プロジェクトを検索...",
@@ -192,7 +192,8 @@
   },
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
-    "slogan": "すべてのリアルな完成作品を展示する"
+    "slogan": "すべてのリアルな完成作品を展示する",
+    "tagline": "コミュニティからの TRAE 作品をまとめて紹介。"
   },
   "Admin": {
     "title": "管理画面",

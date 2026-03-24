@@ -333,49 +333,50 @@ export function WorkDetailView() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="mx-auto max-w-6xl space-y-8">
       <Link
         href="/"
-        className="inline-flex items-center text-gray-400 hover:text-primary transition-colors mb-4"
+        className="mb-4 inline-flex items-center text-gray-400 transition-colors hover:text-primary"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
         {t('backList')}
       </Link>
 
-      <div className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border">
-        <div className="aspect-video w-full bg-zinc-900 relative">
+      <div className="panel-shell overflow-hidden rounded-[2rem]">
+        <div className="relative w-full overflow-hidden bg-zinc-900 aspect-video">
+          <div className="absolute inset-0 hero-mesh opacity-40 z-10" />
           <img
             src={work.coverUrl}
             alt={work.name}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
-            <div className="p-8 text-white w-full">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="bg-primary text-black text-xs font-bold px-2 py-1 rounded">
+          <div className="absolute inset-0 z-20 flex items-end bg-gradient-to-t from-[#060a0e]/95 via-[#060a0e]/45 to-transparent">
+            <div className="w-full p-6 text-white md:p-8 lg:p-10">
+              <div className="mb-4 flex flex-wrap items-center gap-3">
+                <span className="rounded-full border border-emerald-300/20 bg-emerald-300/12 px-3 py-1.5 text-xs font-bold text-emerald-200">
                   {work.city} · {work.country}
                 </span>
                 {(work.honors || []).map((honor) => (
-                  <span key={honor} className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+                  <span key={honor} className="flex items-center gap-1 rounded-full border border-amber-300/20 bg-amber-300/12 px-3 py-1.5 text-xs font-bold text-amber-200">
                     <Award className="w-3 h-3" />
                     {honor}
                   </span>
                 ))}
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">{work.name}</h1>
-              <p className="text-gray-200 text-lg max-w-2xl">{work.intro}</p>
+              <h1 className="font-display text-4xl font-bold leading-[0.95] md:text-5xl lg:max-w-4xl lg:text-6xl">{work.name}</h1>
+              <p className="mt-4 max-w-2xl text-base text-gray-200 md:text-lg">{work.intro}</p>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between p-6 bg-card border-b border-border gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/6 bg-black/10 p-6">
             <div className="flex flex-col gap-4">
               <div className="flex flex-wrap gap-2">
-                <span className="bg-white/10 text-white text-xs font-medium px-2.5 py-1 rounded-full border border-white/10">
+                <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-xs font-medium text-white">
                   {work.category}
                 </span>
                 {work.tags.map((tag) => (
-                  <span key={tag} className="bg-zinc-800 text-gray-300 text-xs font-medium px-2.5 py-1 rounded-full border border-zinc-700">
+                  <span key={tag} className="rounded-full border border-zinc-700 bg-zinc-800 text-xs font-medium text-gray-300 px-2.5 py-1">
                     #{tag}
                   </span>
                 ))}
@@ -399,8 +400,8 @@ export function WorkDetailView() {
                 onClick={handleLike}
                 className={`gap-2 transition-all duration-300 px-6 py-2.5 rounded-full font-medium ${
                   liked
-                    ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)] border-transparent scale-105"
-                    : "bg-zinc-800/80 text-gray-300 hover:text-white hover:bg-zinc-800 border border-white/10 backdrop-blur-md hover:border-green-500/50 hover:shadow-[0_0_15px_rgba(34,197,94,0.1)]"
+                    ? "scale-105 border-transparent bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+                    : "border border-white/10 bg-zinc-800/80 text-gray-300 backdrop-blur-md hover:border-green-500/50 hover:bg-zinc-800 hover:text-white hover:shadow-[0_0_15px_rgba(34,197,94,0.1)]"
                 }`}
               >
                 <ThumbsUp className={`w-4 h-4 ${liked ? "fill-current animate-bounce" : "group-hover:scale-110 transition-transform"}`} />
@@ -413,9 +414,9 @@ export function WorkDetailView() {
           </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 space-y-8">
-          <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className="space-y-8 md:col-span-2">
+          <section className="panel-shell rounded-[1.75rem] p-8">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary rounded-full"></span>
               {t('story')}
@@ -426,14 +427,14 @@ export function WorkDetailView() {
               />
           </section>
 
-          <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
+          <section className="panel-shell rounded-[1.75rem] p-8">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary rounded-full"></span>
               {t('features')}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {featureLines.map((feature, index) => (
-                <div key={index} className="flex items-start gap-3 bg-zinc-900/50 p-4 rounded-xl border border-white/5">
+                <div key={index} className="flex items-start gap-3 rounded-xl border border-white/5 bg-zinc-900/50 p-4">
                   <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-primary text-xs font-bold">{index + 1}</span>
                   </div>
@@ -443,14 +444,14 @@ export function WorkDetailView() {
             </div>
           </section>
 
-          <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
+          <section className="panel-shell rounded-[1.75rem] p-8">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary rounded-full"></span>
               {t('scenarios')}
             </h2>
             <div className="grid grid-cols-1 gap-3">
               {scenarioLines.map((scenario, index) => (
-                <div key={`${scenario}-${index}`} className="flex items-start gap-4 bg-zinc-900/30 p-4 rounded-xl border border-white/5">
+                <div key={`${scenario}-${index}`} className="flex items-start gap-4 rounded-xl border border-white/5 bg-zinc-900/30 p-4">
                   <div className="mt-1.5">
                     <div className="w-2 h-2 rounded-full bg-primary/60 ring-4 ring-primary/10"></div>
                   </div>
@@ -460,7 +461,7 @@ export function WorkDetailView() {
             </div>
           </section>
 
-          <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
+          <section className="panel-shell rounded-[1.75rem] p-8">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary rounded-full"></span>
               {t('screenshots')}
@@ -515,7 +516,7 @@ export function WorkDetailView() {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 flex flex-col gap-3">
+          <div className="panel-shell flex flex-col gap-3 rounded-[1.6rem] p-6">
             <a href={work.demoUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
               <Button className="w-full gap-2 font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40">
                 <ExternalLink className="w-4 h-4" />
@@ -542,7 +543,7 @@ export function WorkDetailView() {
             </Button>
           </div>
 
-          <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+          <div className="panel-shell rounded-[1.6rem] p-6">
             <h3 className="font-bold text-primary mb-2">{t('aboutProject')}</h3>
             <p className="text-gray-400 text-sm mb-4">{t('aboutProjectDesc')}</p>
             <div className="text-sm text-gray-300 space-y-2">
@@ -551,29 +552,33 @@ export function WorkDetailView() {
             </div>
           </div>
 
-          <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
-            <h3 className="font-bold text-primary mb-4 flex items-center gap-2">
+          <div className="panel-shell noise-overlay rounded-[1.6rem] p-6">
+            <h3 className="mb-4 flex items-center gap-2 font-bold text-primary">
               <Users className="w-4 h-4" />
               {t('aboutAuthor')}
             </h3>
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-4 rounded-2xl border border-white/6 bg-white/[0.025] p-4">
                 {work.author.avatar ? (
                   <img
                     src={work.author.avatar}
                     alt={work.author.name}
-                    className="w-10 h-10 rounded-full object-cover border border-zinc-700"
+                    className="h-12 w-12 rounded-full border border-zinc-700 object-cover glow-ring"
                   />
-                ) : null}
-                <div>
-                  <p className="text-sm text-gray-200 font-medium">{work.author.name || '-'}</p>
-                  <p className="text-xs text-gray-500 mt-1">{work.author.bio || '-'}</p>
+                ) : (
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-slate-700 text-sm font-bold text-slate-200 glow-ring">
+                    {(work.author.name || '?').charAt(0)}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="font-display text-xl font-bold text-gray-100">{work.author.name || '-'}</p>
+                  <p className="mt-1 text-sm leading-6 text-gray-400">{work.author.bio || '-'}</p>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-zinc-800">
+              <div className="border-t border-zinc-800 pt-4">
                 {emailList.map((email) => (
-                  <div key={email} className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                  <div key={email} className="mb-2 flex items-center gap-2 text-sm text-gray-400">
                     <Mail className="w-4 h-4" />
                     <span>{withColon(t('email'))}{email}</span>
                   </div>
@@ -589,7 +594,7 @@ export function WorkDetailView() {
                     <p className="text-gray-500 text-sm mb-2">{withColon(t('teamMembers'))}</p>
                     <div className="flex flex-wrap gap-2">
                       {teamMembers.map((member) => (
-                        <span key={member} className="bg-zinc-800 text-gray-300 text-xs font-medium px-2.5 py-1 rounded-full border border-zinc-700">
+                        <span key={member} className="rounded-full border border-zinc-700 bg-zinc-800 px-2.5 py-1 text-xs font-medium text-gray-300">
                           {member}
                         </span>
                       ))}

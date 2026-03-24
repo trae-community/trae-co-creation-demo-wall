@@ -9,10 +9,10 @@
   },
   "Home": {
     "heroTitle": "Ship Faster with",
-    "heroSubtitle1": "Built with",
-    "heroSubtitle2": "Built by",
-    "heroSubtitleTRAE": "TRAE",
-    "heroSubtitleFriends": "Friends",
+    "heroDescription": "Browse and submit real TRAE projects from the community.",
+    "featuredPanelTitle": "Latest",
+    "noFeaturedYet": "No works yet — submit yours.",
+    "browseSectionTitle": "Browse projects",
     "submitWork": "Submit My Work",
     "browseWork": "Browse Works",
     "searchPlaceholder": "Search projects...",
@@ -186,7 +186,8 @@
   },
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
-    "slogan": "Showcasing every real completed work"
+    "slogan": "Showcasing every real completed work",
+    "tagline": "Community TRAE projects in one showcase."
   },
   "Admin": {
     "title": "Admin Dashboard",
