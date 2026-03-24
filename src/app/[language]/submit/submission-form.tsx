@@ -31,7 +31,7 @@ function buildSchema(t: (k: string) => string) {
       .min(1, t('validationTeamMin')),
     teamIntro: z.string().optional(),
     contactPhone: z.string().optional(),
-    contactEmail: z.string().email(t('validationEmail')).optional().or(z.literal('')),
+    contactEmail: z.union([z.string().email(t('validationEmail')), z.literal('')]).optional(),
     coverUrl: z.string().min(1, t('validationCover')),
     story: z.string().min(10, t('validationStoryMin')),
     highlights: z
@@ -52,8 +52,8 @@ function buildSchema(t: (k: string) => string) {
       .array(z.string())
       .min(1, t('validationScreenshotsMin'))
       .max(5, t('validationScreenshotsMax')),
-    demoUrl: z.string().url(t('validationDemoUrl')).optional().or(z.literal('')),
-    repoUrl: z.string().url(t('validationRepoUrl')).optional().or(z.literal('')),
+    demoUrl: z.union([z.string().url(t('validationDemoUrl')), z.literal('')]).optional(),
+    repoUrl: z.union([z.string().url(t('validationRepoUrl')), z.literal('')]).optional(),
   })
 }
 
