@@ -7,6 +7,8 @@ import { ParticlesBackground } from "./particles-background";
 import { SignedIn, SignedOut, UserButton, useAuth } from '@clerk/nextjs';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/language/navigation';
+import Image from 'next/image';
+import logo from '@/assets/logo.svg';
 
 const LOCALE_OPTIONS = [
   { code: 'zh-CN', label: '中文', flag: '🇨🇳' },
@@ -73,11 +75,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-50 border-b border-white/5 bg-background/50 backdrop-blur-xl supports-[backdrop-filter]:bg-background/20">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-lg font-bold text-white tracking-tight group">
-            <svg viewBox="0 0 100 70" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-7 w-auto shrink-0 shadow-[0_0_15px_rgba(34,197,94,0.5)] group-hover:shadow-[0_0_25px_rgba(34,197,94,0.8)] transition-all duration-300">
-              <path fillRule="evenodd" clipRule="evenodd" d="M0 0H100V70H0V0ZM20 18H80V52H20V18Z" fill="#22C55E"/>
-              <path d="M38 27L46 35L38 43L30 35Z" fill="#22C55E"/>
-              <path d="M62 27L70 35L62 43L54 35Z" fill="#22C55E"/>
-            </svg>
+            <Image src={logo} alt="logo" className="w-8 h-8" />
             <span className="hidden sm:inline truncate bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:to-white transition-all">TRAE DEMO WALL</span>
           </Link>
 

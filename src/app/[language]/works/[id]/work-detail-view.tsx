@@ -428,12 +428,12 @@ export function WorkDetailView() {
 
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-primary/80 rounded-full"></span>
+              <span className="w-1 h-6 bg-primary rounded-full"></span>
               {t('features')}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {featureLines.map((feature, index) => (
-                <div key={index} className="flex items-start gap-3 bg-zinc-900/50 p-4 rounded-xl border border-white/5 hover:border-primary/20 transition-colors">
+                <div key={index} className="flex items-start gap-3 bg-zinc-900/50 p-4 rounded-xl border border-white/5">
                   <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-primary text-xs font-bold">{index + 1}</span>
                   </div>
@@ -445,19 +445,24 @@ export function WorkDetailView() {
 
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-primary/60 rounded-full"></span>
+              <span className="w-1 h-6 bg-primary rounded-full"></span>
               {t('scenarios')}
             </h2>
-            <div className="space-y-2 text-gray-300 leading-relaxed">
+            <div className="grid grid-cols-1 gap-3">
               {scenarioLines.map((scenario, index) => (
-                <p key={`${scenario}-${index}`}>- {scenario}</p>
+                <div key={`${scenario}-${index}`} className="flex items-start gap-4 bg-zinc-900/30 p-4 rounded-xl border border-white/5">
+                  <div className="mt-1.5">
+                    <div className="w-2 h-2 rounded-full bg-primary/60 ring-4 ring-primary/10"></div>
+                  </div>
+                  <p className="text-gray-300 leading-relaxed">{scenario}</p>
+                </div>
               ))}
             </div>
           </section>
 
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-primary/40 rounded-full"></span>
+              <span className="w-1 h-6 bg-primary rounded-full"></span>
               {t('screenshots')}
             </h2>
             {screenshotList.length > 0 ? (
@@ -507,15 +512,6 @@ export function WorkDetailView() {
             )}
           </section>
 
-          <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-primary/20 rounded-full"></span>
-              {t('techStack')}
-            </h2>
-            <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed">
-              {work.techStack || '-'}
-            </div>
-          </section>
         </div>
 
         <div className="space-y-6">
