@@ -92,6 +92,14 @@ export default function Page() {
     return [1, null, page - 1, page, page + 1, null, totalPages];
   };
 
+  // Mobile: show fewer page numbers
+  const getMobilePageNumbers = () => {
+    if (totalPages <= 3) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (page === 1) return [1, 2, null, totalPages];
+    if (page === totalPages) return [1, null, totalPages - 1, totalPages];
+    return [1, null, page, null, totalPages];
+  };
+
   const sortOptions = [
     { key: 'time' as const, icon: <Clock className="w-3 h-3" />, label: t('sortNewest') },
     { key: 'likes' as const, icon: <ThumbsUp className="w-3 h-3" />, label: t('sortLikes') },
@@ -101,7 +109,7 @@ export default function Page() {
   return (
     <div className="space-y-8">
       {/* ── HERO BANNER ── */}
-      <section className="relative rounded-3xl p-10 md:p-16 text-white overflow-hidden border border-white/15 shadow-2xl">
+      <section className="relative rounded-2xl md:rounded-3xl p-6 md:p-10 lg:p-16 text-white overflow-hidden border border-white/15 shadow-2xl">
         <div className="absolute inset-0 z-0" style={{ background: '#0d1117' }} />
         <div
           className="absolute inset-0 z-0"
@@ -119,27 +127,27 @@ export default function Page() {
 
         <div className="relative z-10 max-w-2xl">
           {/* Live badge */}
-          <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1 text-xs text-green-400 font-medium mb-6">
+          <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1 text-xs text-green-400 font-medium mb-4 md:mb-6">
             <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
             {t('heroBadge') || '在这里，看见全国各地用户的 TRAE 创作作品'}
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-bold mb-5 tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-5 tracking-tight leading-tight">
             {t('heroTitle')}{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#22c55e] to-[#86efac]">TRAE</span>
           </h1>
 
-          <p className="text-lg text-zinc-400 mb-8 max-w-lg leading-relaxed">
+          <p className="text-base md:text-lg text-zinc-400 mb-6 md:mb-8 max-w-lg leading-relaxed">
             {t('heroSubtitle1')}{' '}
             <span className="font-semibold text-zinc-200">{t('heroSubtitleTRAE')}</span>.{' '}
             {t('heroSubtitle2')}{' '}
             <span className="font-semibold text-zinc-200">{t('heroSubtitleFriends')}</span>.
           </p>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
             <Link
               href="/submit"
-              className="px-6 py-3 rounded-full font-bold text-sm text-black flex items-center gap-2 transition-all hover:opacity-90"
+              className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-bold text-sm text-black flex items-center justify-center gap-2 transition-all hover:opacity-90"
               style={{ background: 'linear-gradient(to right, #22C55E, #16A34A)', boxShadow: '0 0 20px rgba(34,197,94,0.3)' }}
             >
               {t('submitWork')}
@@ -147,7 +155,7 @@ export default function Page() {
             </Link>
             <a
               href="#projects"
-              className="px-6 py-3 rounded-full font-semibold text-sm text-zinc-300 border border-white/10 bg-white/5 hover:bg-white/10 transition-all backdrop-blur-md"
+              className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-semibold text-sm text-zinc-300 border border-white/10 bg-white/5 hover:bg-white/10 transition-all backdrop-blur-md text-center"
             >
               {t('browseWork')}
             </a>
@@ -190,14 +198,14 @@ export default function Page() {
                 key={key}
                 onClick={() => setSortBy(key)}
                 className={cn(
-                  "flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-all border",
+                  "flex items-center gap-1.5 px-2 sm:px-3.5 py-2 rounded-lg text-sm font-medium transition-all border",
                   sortBy === key
                     ? "bg-green-500/15 text-green-400 border-green-500/25"
                     : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
                 )}
               >
                 {icon}
-                {label}
+                <span className="hidden sm:inline">{label}</span>
               </button>
             ))}
           </div>
@@ -271,28 +279,57 @@ export default function Page() {
                 <ChevronLeft className="w-4 h-4" />
               </button>
 
-              {getPageNumbers().map((p, i) =>
-                p === null ? (
-                  <span key={`ellipsis-${i}`} className="text-zinc-700 px-1 text-sm">…</span>
-                ) : (
-                  <button
-                    key={p}
-                    onClick={() => setPage(p)}
-                    className={cn(
-                      "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all",
-                      p === page
-                        ? "text-black font-bold"
-                        : "text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white"
-                    )}
-                    style={p === page
-                      ? { background: 'linear-gradient(to right, #22C55E, #16A34A)' }
-                      : { background: 'rgba(255,255,255,0.04)' }
-                    }
-                  >
-                    {p}
-                  </button>
-                )
-              )}
+              {/* Desktop pagination */}
+              <div className="hidden sm:flex items-center gap-1">
+                {getPageNumbers().map((p, i) =>
+                  p === null ? (
+                    <span key={`ellipsis-${i}`} className="text-zinc-700 px-1 text-sm">…</span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={cn(
+                        "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all",
+                        p === page
+                          ? "text-black font-bold"
+                          : "text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white"
+                      )}
+                      style={p === page
+                        ? { background: 'linear-gradient(to right, #22C55E, #16A34A)' }
+                        : { background: 'rgba(255,255,255,0.04)' }
+                      }
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
+              </div>
+
+              {/* Mobile pagination */}
+              <div className="flex sm:hidden items-center gap-1">
+                {getMobilePageNumbers().map((p, i) =>
+                  p === null ? (
+                    <span key={`ellipsis-${i}`} className="text-zinc-700 px-1 text-sm">…</span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={cn(
+                        "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all",
+                        p === page
+                          ? "text-black font-bold"
+                          : "text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white"
+                      )}
+                      style={p === page
+                        ? { background: 'linear-gradient(to right, #22C55E, #16A34A)' }
+                        : { background: 'rgba(255,255,255,0.04)' }
+                      }
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
+              </div>
 
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
