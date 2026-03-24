@@ -4,42 +4,39 @@
 
 @layer base {
   :root {
-    --background: rgb(26, 27, 29);
-    --foreground: rgb(245, 249, 254);
-    --card: rgb(34, 36, 39);
-    --card-foreground: rgb(245, 249, 254);
-    --popover: rgb(26, 27, 29);
-    --popover-foreground: rgb(245, 249, 254);
-    --primary: rgb(50, 240, 140);
-    --primary-foreground: rgb(26, 27, 29);
-    --secondary: rgb(26, 27, 29);
-    --secondary-foreground: rgb(245, 249, 254);
-    --muted: rgb(42, 45, 49);
-    --muted-foreground: rgb(245, 249, 254);
-    --accent: rgb(42, 45, 49);
-    --accent-foreground: rgb(245, 249, 254);
+    --background: rgb(8, 11, 15);
+    --foreground: rgb(240, 247, 252);
+    --card: rgb(13, 18, 24);
+    --card-foreground: rgb(240, 247, 252);
+    --popover: rgb(10, 14, 20);
+    --popover-foreground: rgb(240, 247, 252);
+    --primary: rgb(122, 255, 190);
+    --primary-foreground: rgb(7, 12, 10);
+    --secondary: rgb(14, 19, 25);
+    --secondary-foreground: rgb(240, 247, 252);
+    --muted: rgb(18, 24, 31);
+    --muted-foreground: rgb(145, 162, 178);
+    --accent: rgb(17, 22, 29);
+    --accent-foreground: rgb(240, 247, 252);
     --destructive: rgb(239, 68, 68);
     --destructive-foreground: rgb(255, 255, 255);
-    --border: rgb(46, 47, 51);
-    --input: rgb(70, 71, 78);
-    --ring: rgb(245, 249, 254);
-    --chart-1: rgb(50, 240, 140);
-    --chart-2: rgb(102, 75, 236);
-    --chart-3: rgb(148, 189, 255);
-    --chart-4: rgb(224, 112, 255);
-    --chart-5: rgb(219, 244, 255);
-    --sidebar: rgb(18, 18, 18);
-    --sidebar-foreground: rgb(209, 211, 219);
-    --sidebar-primary: rgb(255, 192, 203);
-    --sidebar-primary-foreground: rgb(24, 24, 24);
-    --sidebar-accent: rgb(50, 240, 140);
-    --sidebar-accent-foreground: rgb(24, 24, 24);
-    --sidebar-border: rgb(13, 13, 13);
-    --sidebar-ring: rgb(255, 192, 203);
-    --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
-    --font-serif: Aleo, ui-serif, serif;
-    --font-mono: Roboto Mono, monospace;
-    --radius: 0.35rem;
+    --border: rgb(32, 41, 53);
+    --input: rgb(24, 31, 39);
+    --ring: rgb(122, 255, 190);
+    --chart-1: rgb(122, 255, 190);
+    --chart-2: rgb(103, 176, 255);
+    --chart-3: rgb(255, 167, 94);
+    --chart-4: rgb(186, 139, 255);
+    --chart-5: rgb(255, 222, 130);
+    --sidebar: rgb(7, 10, 13);
+    --sidebar-foreground: rgb(209, 217, 224);
+    --sidebar-primary: rgb(122, 255, 190);
+    --sidebar-primary-foreground: rgb(7, 12, 10);
+    --sidebar-accent: rgb(103, 176, 255);
+    --sidebar-accent-foreground: rgb(8, 11, 15);
+    --sidebar-border: rgb(25, 31, 40);
+    --sidebar-ring: rgb(122, 255, 190);
+    --radius: 0.9rem;
     --shadow-x: 0px;
     --shadow-y: 2px;
     --shadow-blur: 6px;
@@ -56,45 +53,45 @@
     --shadow-2xl: 0px 2px 6px 0px hsl(90.0000 2.7778% 14.1176% / 0.25);
     --tracking-normal: 0em;
     --spacing: 0.28rem;
+    --grid-line: rgba(160, 185, 210, 0.012);
+    --panel-glow: rgba(122, 255, 190, 0.22);
+    --panel-shadow: 0 30px 80px rgba(0, 0, 0, 0.34);
   }
 
   .dark {
-    --background: rgb(26, 29, 35);
-    --foreground: rgb(229, 229, 229);
-    --card: rgb(47, 52, 54);
-    --card-foreground: rgb(229, 229, 229);
-    --popover: rgb(47, 52, 54);
-    --popover-foreground: rgb(229, 229, 229);
-    --primary: rgb(255, 153, 204);
-    --primary-foreground: rgb(0, 0, 0);
-    --secondary: rgb(51, 204, 51);
-    --secondary-foreground: rgb(0, 0, 0);
-    --muted: rgb(68, 68, 68);
-    --muted-foreground: rgb(163, 163, 163);
-    --accent: rgb(135, 206, 235);
-    --accent-foreground: rgb(0, 0, 0);
+    --background: rgb(8, 11, 15);
+    --foreground: rgb(240, 247, 252);
+    --card: rgb(13, 18, 24);
+    --card-foreground: rgb(240, 247, 252);
+    --popover: rgb(10, 14, 20);
+    --popover-foreground: rgb(240, 247, 252);
+    --primary: rgb(122, 255, 190);
+    --primary-foreground: rgb(7, 12, 10);
+    --secondary: rgb(14, 19, 25);
+    --secondary-foreground: rgb(240, 247, 252);
+    --muted: rgb(18, 24, 31);
+    --muted-foreground: rgb(145, 162, 178);
+    --accent: rgb(17, 22, 29);
+    --accent-foreground: rgb(240, 247, 252);
     --destructive: rgb(239, 68, 68);
     --destructive-foreground: rgb(255, 255, 255);
-    --border: rgb(68, 68, 68);
-    --input: rgb(68, 68, 68);
-    --ring: rgb(255, 153, 204);
-    --chart-1: rgb(255, 153, 204);
-    --chart-2: rgb(51, 204, 51);
-    --chart-3: rgb(135, 206, 235);
-    --chart-4: rgb(255, 255, 0);
-    --chart-5: rgb(255, 204, 0);
-    --sidebar: rgb(26, 29, 35);
-    --sidebar-foreground: rgb(229, 229, 229);
-    --sidebar-primary: rgb(255, 153, 204);
-    --sidebar-primary-foreground: rgb(0, 0, 0);
-    --sidebar-accent: rgb(135, 206, 235);
-    --sidebar-accent-foreground: rgb(0, 0, 0);
-    --sidebar-border: rgb(68, 68, 68);
-    --sidebar-ring: rgb(255, 153, 204);
-    --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
-    --font-serif: Aleo, ui-serif, serif;
-    --font-mono: Roboto Mono, monospace;
-    --radius: 0.35rem;
+    --border: rgb(32, 41, 53);
+    --input: rgb(24, 31, 39);
+    --ring: rgb(122, 255, 190);
+    --chart-1: rgb(122, 255, 190);
+    --chart-2: rgb(103, 176, 255);
+    --chart-3: rgb(255, 167, 94);
+    --chart-4: rgb(186, 139, 255);
+    --chart-5: rgb(255, 222, 130);
+    --sidebar: rgb(7, 10, 13);
+    --sidebar-foreground: rgb(209, 217, 224);
+    --sidebar-primary: rgb(122, 255, 190);
+    --sidebar-primary-foreground: rgb(7, 12, 10);
+    --sidebar-accent: rgb(103, 176, 255);
+    --sidebar-accent-foreground: rgb(8, 11, 15);
+    --sidebar-border: rgb(25, 31, 40);
+    --sidebar-ring: rgb(122, 255, 190);
+    --radius: 0.9rem;
     --shadow-x: 0px;
     --shadow-y: 2px;
     --shadow-blur: 6px;
@@ -116,7 +113,126 @@
   * {
     @apply border-border;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans), ui-sans-serif, sans-serif;
+    background:
+      radial-gradient(circle at 12% 18%, rgba(122, 255, 190, 0.08), transparent 26%),
+      radial-gradient(circle at 85% 20%, rgba(103, 176, 255, 0.08), transparent 24%),
+      radial-gradient(circle at 50% 100%, rgba(255, 167, 94, 0.07), transparent 30%),
+      linear-gradient(180deg, #070b10 0%, #091018 40%, #070b10 100%);
+    letter-spacing: 0.01em;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 120px 120px;
+    mask-image: radial-gradient(circle at center, black 18%, rgba(0, 0, 0, 0.2) 42%, transparent 76%);
+    opacity: 0.045;
+    z-index: -2;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.1) 56%, rgba(0, 0, 0, 0.45) 100%);
+    z-index: -1;
+  }
+
+  ::selection {
+    background: rgba(122, 255, 190, 0.24);
+    color: rgb(246, 255, 250);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(122, 255, 190, 0.38), rgba(103, 176, 255, 0.3));
+    border-radius: 9999px;
+    border: 2px solid rgba(8, 11, 15, 0.9);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-serif), ui-serif, serif;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .panel-shell {
+    background:
+      linear-gradient(180deg, rgba(18, 25, 33, 0.88), rgba(9, 14, 20, 0.94));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--panel-shadow);
+  }
+
+  .noise-overlay {
+    position: relative;
+  }
+
+  .noise-overlay::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.07;
+    mix-blend-mode: screen;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.5) 0 0.7px, transparent 0.8px),
+      radial-gradient(circle at 80% 35%, rgba(255, 255, 255, 0.35) 0 0.7px, transparent 0.8px),
+      radial-gradient(circle at 35% 75%, rgba(255, 255, 255, 0.25) 0 0.7px, transparent 0.8px);
+    background-size: 24px 24px, 30px 30px, 18px 18px;
+  }
+
+  .accent-line {
+    position: relative;
+  }
+
+  .accent-line::before {
+    content: "";
+    position: absolute;
+    inset: auto auto 0 0;
+    width: 88px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(122, 255, 190, 0), rgba(122, 255, 190, 0.92), rgba(103, 176, 255, 0.55));
+  }
+
+  .glow-ring {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 0 0 6px rgba(122, 255, 190, 0.04),
+      0 18px 40px rgba(0, 0, 0, 0.34);
+  }
+
+  .hero-mesh {
+    background:
+      radial-gradient(circle at 0% 0%, rgba(122, 255, 190, 0.18), transparent 34%),
+      radial-gradient(circle at 100% 10%, rgba(103, 176, 255, 0.15), transparent 32%),
+      radial-gradient(circle at 45% 100%, rgba(255, 167, 94, 0.12), transparent 30%),
+      linear-gradient(135deg, rgba(9, 14, 20, 0.98), rgba(14, 19, 25, 0.88));
   }
 }

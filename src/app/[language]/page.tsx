@@ -106,130 +106,156 @@ export default function Page() {
     { key: 'views' as const, icon: <Eye className="w-3 h-3" />, label: t('sortViews') },
   ];
 
-  return (
-    <div className="space-y-8">
-      {/* ── HERO BANNER ── */}
-      <section className="relative rounded-2xl md:rounded-3xl p-6 md:p-10 lg:p-16 text-white overflow-hidden border border-white/15 shadow-2xl">
-        <div className="absolute inset-0 z-0" style={{ background: '#0d1117' }} />
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.18,
-          }}
-        />
-        <div
-          className="absolute inset-0 z-0"
-          style={{ background: 'linear-gradient(135deg,rgba(0,0,0,0.75) 0%,rgba(0,0,0,0.3) 50%,rgba(34,197,94,0.05) 100%)' }}
-        />
+  const featuredWorks = works.slice(0, 3);
+  const topSignals = [
+    { label: t('resultCountUnit') || '个作品', value: totalItems || works.length || 0 },
+    { label: t('sortViews'), value: works.reduce((sum, item) => sum + item.views, 0) },
+    { label: t('sortLikes'), value: works.reduce((sum, item) => sum + item.likes, 0) },
+  ];
 
-        <div className="relative z-10 max-w-2xl">
-          {/* Live badge */}
-          <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1 text-xs text-green-400 font-medium mb-4 md:mb-6">
-            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-            {t('heroBadge') || '在这里，看见全国各地用户的 TRAE 创作作品'}
+  return (
+    <div className="space-y-10 lg:space-y-12">
+      <section className="relative overflow-hidden rounded-[2rem] border border-white/10 hero-mesh noise-overlay shadow-[0_30px_90px_rgba(0,0,0,0.35)]">
+        <div className="absolute inset-0 bg-[linear-gradient(130deg,rgba(255,255,255,0.04),transparent_28%,transparent_72%,rgba(255,255,255,0.03))]" />
+        <div className="relative grid gap-8 px-6 py-8 md:px-10 md:py-12 lg:grid-cols-[1.25fr_0.75fr] lg:px-14 lg:py-16">
+          <div className="space-y-8">
+            <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-emerald-200/85">
+              <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_20px_rgba(122,255,190,0.8)]" />
+              {t('heroBadge') || '在这里，看见全国各地用户的 TRAE 创作作品'}
+            </div>
+
+            <div className="max-w-4xl space-y-5">
+              <h1 className="font-display text-balance text-4xl font-extrabold leading-[0.92] text-white sm:text-5xl lg:text-7xl">
+                {t('heroTitle')}{" "}
+                <span className="bg-gradient-to-r from-[#7affbe] via-[#d8fff0] to-[#67b0ff] bg-clip-text text-transparent">
+                  TRAE
+                </span>
+              </h1>
+              <p className="max-w-2xl text-balance text-sm leading-7 text-slate-300/88 sm:text-base md:text-lg">
+                {t('heroDescription')}
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link
+                href="/submit"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-200/20 bg-[linear-gradient(135deg,#7affbe,#4ed39f)] px-6 py-3 text-sm font-bold text-slate-950 transition-transform duration-300 hover:-translate-y-0.5"
+              >
+                {t('submitWork')}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </Link>
+              <a
+                href="#projects"
+                className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-100 transition hover:bg-white/10"
+              >
+                {t('browseWork')}
+              </a>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              {topSignals.map((signal) => (
+                <div key={signal.label} className="rounded-2xl border border-white/8 bg-white/[0.035] px-4 py-4 backdrop-blur-sm">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-slate-400">
+                    {signal.label}
+                  </p>
+                  <p className="mt-2 font-display text-2xl font-bold text-white">
+                    {signal.value >= 1000 ? `${(signal.value / 1000).toFixed(1)}k` : signal.value}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-5 tracking-tight leading-tight">
-            {t('heroTitle')}{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#22c55e] to-[#86efac]">TRAE</span>
-          </h1>
-
-          <p className="text-base md:text-lg text-zinc-400 mb-6 md:mb-8 max-w-lg leading-relaxed">
-            {t('heroSubtitle1')}{' '}
-            <span className="font-semibold text-zinc-200">{t('heroSubtitleTRAE')}</span>.{' '}
-            {t('heroSubtitle2')}{' '}
-            <span className="font-semibold text-zinc-200">{t('heroSubtitleFriends')}</span>.
-          </p>
-
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
-            <Link
-              href="/submit"
-              className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-bold text-sm text-black flex items-center justify-center gap-2 transition-all hover:opacity-90"
-              style={{ background: 'linear-gradient(to right, #22C55E, #16A34A)', boxShadow: '0 0 20px rgba(34,197,94,0.3)' }}
-            >
-              {t('submitWork')}
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </Link>
-            <a
-              href="#projects"
-              className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-semibold text-sm text-zinc-300 border border-white/10 bg-white/5 hover:bg-white/10 transition-all backdrop-blur-md text-center"
-            >
-              {t('browseWork')}
-            </a>
+          <div className="grid gap-4 lg:pt-10">
+            <div className="panel-shell relative overflow-hidden rounded-[1.75rem] p-5">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300/70 to-transparent" />
+              <p className="text-[13px] font-semibold tracking-wide text-slate-200">
+                {t('featuredPanelTitle')}
+              </p>
+              <div className="mt-5 space-y-4">
+                {featuredWorks.length > 0 ? featuredWorks.map((work, index) => (
+                  <div key={work.id} className="flex items-start gap-4 rounded-2xl border border-white/6 bg-white/[0.025] p-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-zinc-950 text-xs font-bold text-emerald-200">
+                      0{index + 1}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="line-clamp-1 text-sm font-semibold text-white">{work.name}</p>
+                      <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-400">{work.intro}</p>
+                    </div>
+                  </div>
+                )) : (
+                  <div className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">
+                    {loading ? t('loading') : t('noFeaturedYet')}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Glow */}
-        <div
-          className="absolute top-1/2 right-0 pointer-events-none z-0"
-          style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%)', transform: 'translate(30%, -50%)' }}
-        />
       </section>
 
-      {/* ── FILTER TOOLBAR ── */}
-      <div id="projects" className="space-y-4">
-        {/* Row 1: Search (left) + Sort (right) */}
-        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-          {/* Search — takes up remaining space */}
-          <div className="relative flex-1 group">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <Search className="w-4 h-4 text-zinc-600 group-focus-within:text-green-500 transition-colors" />
+      <section id="projects" className="space-y-4">
+        <div className="panel-shell rounded-[1.75rem] p-4 md:p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="space-y-3 lg:max-w-sm">
+              <h2 className="font-display text-2xl font-bold text-white accent-line pb-3">
+                {t('browseSectionTitle')}
+              </h2>
+              {!loading && (
+                <p className="text-sm text-slate-400">
+                  {t('resultCount') || '共'}{" "}
+                  <span className="font-semibold text-white">{totalItems}</span>{" "}
+                  {t('resultCountUnit') || '个作品'}
+                </p>
+              )}
             </div>
-            <input
-              type="text"
-              placeholder={t('searchPlaceholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-zinc-200 placeholder-zinc-600 border border-white/10 focus:outline-none focus:ring-1 focus:ring-green-500/40 focus:border-green-500/35 transition-all"
-              style={{ background: 'rgba(255,255,255,0.04)' }}
-            />
-          </div>
 
-          {/* Sort tabs — fixed right */}
-          <div
-            className="flex items-center rounded-xl border border-white/10 p-1 gap-0.5 shrink-0"
-            style={{ background: 'rgba(255,255,255,0.03)' }}
-          >
-            {sortOptions.map(({ key, icon, label }) => (
-              <button
-                key={key}
-                onClick={() => setSortBy(key)}
-                className={cn(
-                  "flex items-center gap-1.5 px-2 sm:px-3.5 py-2 rounded-lg text-sm font-medium transition-all border",
-                  sortBy === key
-                    ? "bg-green-500/15 text-green-400 border-green-500/25"
-                    : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
-                )}
-              >
-                {icon}
-                <span className="hidden sm:inline">{label}</span>
-              </button>
-            ))}
+            <div className="flex-1 space-y-4">
+              <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+                <div className="relative flex-1">
+                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                  <input
+                    type="text"
+                    placeholder={t('searchPlaceholder')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full rounded-2xl border border-white/10 bg-white/[0.035] py-3 pl-11 pr-4 text-sm text-slate-100 placeholder:text-slate-500 focus:border-emerald-300/30 focus:outline-none focus:ring-2 focus:ring-emerald-300/10"
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-1">
+                  {sortOptions.map(({ key, icon, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => setSortBy(key)}
+                      className={cn(
+                        "inline-flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-all",
+                        sortBy === key
+                          ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-200"
+                          : "border-transparent text-slate-400 hover:bg-white/[0.05] hover:text-white"
+                      )}
+                    >
+                      {icon}
+                      <span className="hidden sm:inline">{label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/6 bg-black/10 p-3">
+                <CityFilter filters={filters} onFilterChange={setFilters} />
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Row 2: Filter pills */}
-        <CityFilter filters={filters} onFilterChange={setFilters} />
-
-        {/* Result count — always visible once loaded */}
-        {!loading && (
-          <p className="text-xs text-zinc-600">
-            {t('resultCount') || '共'}{' '}
-            <span className="text-zinc-400 font-medium">{totalItems}</span>{' '}
-            {t('resultCountUnit') || '个作品'}
-          </p>
-        )}
-      </div>
+      </section>
 
       {/* ── WORK GRID ── */}
       {loading && works.length === 0 ? (
         /* Skeleton */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-2xl overflow-hidden border border-white/6" style={{ background: '#111318' }}>
+            <div key={i} className="panel-shell overflow-hidden rounded-[1.6rem]">
               <div className="animate-pulse bg-white/5" style={{ aspectRatio: '4/3' }} />
               <div className="p-5 space-y-3">
                 <div className="animate-pulse h-4 bg-white/5 rounded-md w-3/4" />
@@ -240,15 +266,15 @@ export default function Page() {
           ))}
         </div>
       ) : works.length > 0 ? (
-        <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 transition-opacity duration-300", loading && "opacity-60")}>
+        <div className={cn("grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 transition-opacity duration-300", loading && "opacity-60")}>
           {works.map((work) => (
             <WorkCard key={work.id} work={work} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 rounded-2xl border border-dashed border-white/8" style={{ background: 'rgba(255,255,255,0.02)' }}>
-          <div className="text-3xl mb-3">🔍</div>
-          <p className="text-zinc-400 text-sm mb-3">{t('noResults')}</p>
+        <div className="panel-shell rounded-[1.75rem] border-dashed py-20 text-center">
+          <div className="mb-4 text-4xl">◌</div>
+          <p className="text-sm text-zinc-400 mb-3">{t('noResults')}</p>
           <button
             onClick={() => {
               setFilters({ cities: [], categories: [], tags: [], countries: [] });
@@ -263,8 +289,8 @@ export default function Page() {
 
       {/* ── PAGINATION ── */}
       {!loading && totalItems > 0 && (
-        <div className="flex items-center justify-between pt-2">
-          <p className="text-xs text-zinc-600">
+        <div className="panel-shell flex items-center justify-between rounded-[1.5rem] px-4 py-3">
+          <p className="text-xs text-zinc-500">
             <span className="text-zinc-400">{(page - 1) * pageSize + 1}–{Math.min(page * pageSize, totalItems)}</span>
             {' / '}<span className="text-zinc-400">{totalItems}</span>
           </p>

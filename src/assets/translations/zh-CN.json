@@ -9,10 +9,10 @@
   },
   "Home": {
     "heroTitle": "Ship Faster with",
-    "heroSubtitle1": "Built with",
-    "heroSubtitle2": "Built by",
-    "heroSubtitleTRAE": "TRAE",
-    "heroSubtitleFriends": "Friends",
+    "heroDescription": "浏览与提交由 TRAE 与社区共创的实战作品。",
+    "featuredPanelTitle": "最新作品",
+    "noFeaturedYet": "暂无作品，欢迎先提交",
+    "browseSectionTitle": "浏览作品",
     "submitWork": "提交我的作品",
     "browseWork": "浏览作品",
     "searchPlaceholder": "搜索项目...",
@@ -187,7 +187,8 @@
   },
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
-    "slogan": "展示每一个真实完成的作品"
+    "slogan": "展示每一个真实完成的作品",
+    "tagline": "社区提交的 TRAE 作品展示墙。"
   },
   "Admin": {
     "title": "后台管理",

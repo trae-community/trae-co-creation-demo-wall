@@ -1,23 +1,24 @@
 import type { Metadata } from 'next';
-import { Inter, Aleo, Roboto_Mono } from 'next/font/google';
+import { IBM_Plex_Mono, Spline_Sans, Syne } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ClerkProvider } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
 import { SiteLayout } from '@/components/layout/site-layout';
 
-const fontSans = Inter({
+const fontSans = Spline_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-const fontSerif = Aleo({
+const fontSerif = Syne({
   subsets: ["latin"],
   variable: "--font-serif",
 });
 
-const fontMono = Roboto_Mono({
+const fontMono = IBM_Plex_Mono({
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
   variable: "--font-mono",
 });
 
@@ -44,11 +45,11 @@ export default async function LocaleLayout({
       appearance={{
         baseTheme: dark,
         variables: {
-          colorPrimary: "rgb(50, 240, 140)",
-          colorBackground: "rgb(34, 36, 39)",
-          colorInputBackground: "rgb(70, 71, 78)",
-          colorText: "rgb(245, 249, 254)",
-          colorTextSecondary: "rgb(245, 249, 254)",
+          colorPrimary: "rgb(122, 255, 190)",
+          colorBackground: "rgb(9, 12, 16)",
+          colorInputBackground: "rgb(17, 22, 29)",
+          colorText: "rgb(241, 247, 252)",
+          colorTextSecondary: "rgb(149, 167, 183)",
         },
       }}
     >
