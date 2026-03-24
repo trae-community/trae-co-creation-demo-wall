@@ -174,7 +174,8 @@
     "all": "全部",
     "type": "类型",
     "country": "省份",
-    "city": "城市"
+    "city": "城市",
+    "filters": "筛选"
   },
   "Card": {
     "viewDetails": "查看详情",
