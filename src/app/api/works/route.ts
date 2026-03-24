@@ -2,6 +2,29 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { unstable_cache } from 'next/cache';
+import { getAuthUser } from '@/lib/auth'
+import { z } from 'zod'
+
+const updateSchema = z.object({
+  name: z.string().min(2).max(50),
+  intro: z.string().min(10).max(100),
+  country: z.string().min(1),
+  city: z.string().min(1),
+  team: z.string().min(2),
+  teamIntro: z.string().optional(),
+  contactPhone: z.string().optional(),
+  contactEmail: z.string().email().optional().or(z.literal('')),
+  coverUrl: z.string().min(1),
+  story: z.string().min(20),
+  category: z.string().min(1),
+  devStatus: z.string().min(1),
+  tags: z.array(z.number()).min(1).max(5),
+  highlights: z.array(z.string().max(10)).min(3).max(5),
+  scenarios: z.array(z.string()).min(1),
+  screenshots: z.array(z.string()).min(1).max(5),
+  demoUrl: z.string().url(),
+  repoUrl: z.string().url().optional().or(z.literal('')),
+})
 
 // Cache raw dict data for 5 minutes — resolveLabelMap runs per-request with lang param
 const getRawDictionaries = unstable_cache(
@@ -201,5 +224,138 @@ export async function GET(req: Request) {
       { error: 'Failed to fetch works' },
       { status: 500 }
     );
+  }
+}
+
+export async function PUT(req: Request) {
+  try {
+    const user = await getAuthUser()
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const body = await req.json()
+    const { id, ...updateData } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: 'Work ID is required' }, { status: 400 })
+    }
+
+    const validationResult = updateSchema.safeParse(updateData)
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { success: false, error: 'Validation failed', details: validationResult.error.issues },
+        { status: 400 }
+      )
+    }
+
+    const data = validationResult.data
+    const workId = BigInt(id)
+
+    // Verify ownership
+    const existingWork = await prisma.workBase.findUnique({
+      where: { id: workId },
+      select: { userId: true }
+    })
+
+    if (!existingWork) {
+      return NextResponse.json(
+        { success: false, error: 'Work not found' },
+        { status: 404 }
+      )
+    }
+
+    if (existingWork.userId !== user.userId) {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden' },
+        { status: 403 }
+      )
+    }
+
+    // Update database using transaction
+    await prisma.$transaction(async (tx) => {
+      await tx.workBase.update({
+        where: { id: workId },
+        data: {
+          title: data.name,
+          summary: data.intro,
+          cityCode: data.city,
+          countryCode: data.country,
+          coverUrl: data.coverUrl,
+          categoryCode: data.category,
+          devStatusCode: data.devStatus,
+          updatedAt: new Date(),
+        },
+      })
+
+      await tx.workTagRelation.deleteMany({ where: { workId } })
+      if (data.tags.length > 0) {
+        await tx.workTagRelation.createMany({
+          data: data.tags.map(tagId => ({ workId, tagId }))
+        })
+      }
+
+      await tx.workDetail.upsert({
+        where: { workId },
+        create: {
+          workId,
+          story: data.story,
+          highlights: data.highlights,
+          scenarios: data.scenarios,
+          demoUrl: data.demoUrl,
+          repoUrl: data.repoUrl || null,
+        },
+        update: {
+          story: data.story,
+          highlights: data.highlights,
+          scenarios: data.scenarios,
+          demoUrl: data.demoUrl,
+          repoUrl: data.repoUrl || null,
+        },
+      })
+
+      await tx.workImage.deleteMany({
+        where: { workId, imageType: 'screenshot' }
+      })
+      if (data.screenshots.length > 0) {
+        await tx.workImage.createMany({
+          data: data.screenshots.map((url, index) => ({
+            workId,
+            imageUrl: url,
+            imageType: 'screenshot',
+            sortOrder: index,
+          })),
+        })
+      }
+
+      await tx.workTeam.upsert({
+        where: { workId },
+        create: {
+          workId,
+          members: data.team,
+          teamIntro: data.teamIntro || null,
+          contactPhone: data.contactPhone || null,
+          contactEmail: data.contactEmail || null,
+        },
+        update: {
+          members: data.team,
+          teamIntro: data.teamIntro || null,
+          contactPhone: data.contactPhone || null,
+          contactEmail: data.contactEmail || null,
+        },
+      })
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Update error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    )
   }
 }
