@@ -39,8 +39,8 @@
     "basicInfo": "Basic Information",
     "projectName": "Project Name",
     "projectNamePlaceholder": "Give your project a catchy name",
-    "country": "Country",
-    "countryPlaceholder": "Select a country",
+    "country": "Province / Region",
+    "countryPlaceholder": "Select Province",
     "city": "City",
     "cityPlaceholder": "Select a city",
     "category": "Category",
@@ -173,7 +173,7 @@
   "Filter": {
     "all": "All",
     "type": "Type",
-    "country": "Country",
+    "country": "Province",
     "city": "City"
   },
   "Card": {

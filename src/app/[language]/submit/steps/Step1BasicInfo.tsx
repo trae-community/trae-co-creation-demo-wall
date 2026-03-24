@@ -40,6 +40,7 @@ interface Step1Props {
 export function Step1BasicInfo({
   form,
   availableCountries,
+  availableCities,
   availableCategories,
   availableDevStatuses,
   availableTags,
@@ -104,7 +105,7 @@ export function Step1BasicInfo({
         )}
       </div>
 
-      {/* Country + City */}
+      {/* Province + City */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-300">
@@ -115,7 +116,7 @@ export function Step1BasicInfo({
             value={selectedCountry}
             onChange={value => {
               setValue('country', value, { shouldValidate: true })
-              setValue('city', '')
+              setValue('city', '', { shouldValidate: false })
             }}
             placeholder={t('countryPlaceholder')}
             icon={<Globe className="w-4 h-4" />}
@@ -150,7 +151,7 @@ export function Step1BasicInfo({
           )}
         </div>
       </div>
-
+      
       {/* Category */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-300">

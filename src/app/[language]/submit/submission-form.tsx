@@ -52,7 +52,7 @@ function buildSchema(t: (k: string) => string) {
       .array(z.string())
       .min(1, t('validationScreenshotsMin'))
       .max(5, t('validationScreenshotsMax')),
-    demoUrl: z.string().url(t('validationDemoUrl')),
+    demoUrl: z.string().url(t('validationDemoUrl')).optional().or(z.literal('')),
     repoUrl: z.string().url(t('validationRepoUrl')).optional().or(z.literal('')),
   })
 }
@@ -258,6 +258,13 @@ export function SubmissionForm() {
   const handleNext = async () => {
     setIsNavigating(true)
     const valid = await trigger(STEP_FIELDS[currentStep] as Parameters<typeof trigger>[0])
+    
+    // Log validation errors for debugging if not valid
+    if (!valid) {
+      console.log('Validation failed for Step', currentStep);
+      console.log('Errors:', form.formState.errors);
+    }
+    
     setIsNavigating(false)
     if (valid) setCurrentStep(s => Math.min(s + 1, 4) as StepNumber)
   }

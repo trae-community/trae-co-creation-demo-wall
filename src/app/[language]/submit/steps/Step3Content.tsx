@@ -183,7 +183,7 @@ export function Step3Content({ form }: Step3Props) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-300">
-              {t('demoUrl')} <span className="text-red-500">*</span>
+              {t('demoUrl')}
             </label>
             <input
               {...register('demoUrl')}

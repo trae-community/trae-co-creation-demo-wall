@@ -40,8 +40,8 @@
     "basicInfo": "基本情報",
     "projectName": "プロジェクト名",
     "projectNamePlaceholder": "プロジェクトに素敵な名前をつけましょう",
-    "country": "国",
-    "countryPlaceholder": "国を選択",
+    "country": "都道府県",
+    "countryPlaceholder": "都道府県を選択",
     "city": "都市",
     "cityPlaceholder": "都市を選択",
     "category": "カテゴリ",
@@ -179,7 +179,7 @@
   "Filter": {
     "all": "すべて",
     "type": "タイプ",
-    "country": "国",
+    "country": "都道府県",
     "city": "都市"
   },
   "Card": {
