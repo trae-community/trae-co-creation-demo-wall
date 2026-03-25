@@ -155,15 +155,6 @@ export default function Page() {
 
         {/* Row 2: Filter pills */}
         <CityFilter filters={filters} onFilterChange={setFilters} />
-
-        {/* Result count — always visible once loaded */}
-        {!loading && (
-          <p className="text-xs text-zinc-600">
-            {t('resultCount') || '共'}{' '}
-            <span className="text-zinc-400 font-medium">{totalItems}</span>{' '}
-            {t('resultCountUnit') || '个作品'}
-          </p>
-        )}
       </div>
 
       {/* ── WORK GRID ── */}
@@ -206,12 +197,13 @@ export default function Page() {
       {/* ── PAGINATION ── */}
       {!loading && totalItems > 0 && (
         <div className="flex items-center justify-between pt-2">
-          <p className="text-xs text-zinc-600">
-            <span className="text-zinc-400">{(page - 1) * pageSize + 1}–{Math.min(page * pageSize, totalItems)}</span>
-            {' / '}<span className="text-zinc-400">{totalItems}</span>
+          <p className="text-sm text-zinc-500">
+            {t('resultCount') || '共'}{' '}
+            <span className="text-zinc-300 font-medium">{totalItems}</span>{' '}
+            {t('resultCountUnit') || '个作品'}
           </p>
           {totalPages > 1 && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page <= 1}
@@ -237,7 +229,7 @@ export default function Page() {
                           : "text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white"
                       )}
                       style={p === page
-                        ? { background: 'linear-gradient(to right, #22C55E, #16A34A)' }
+                        ? { background: '#32F08C', color: '#000' }
                         : { background: 'rgba(255,255,255,0.04)' }
                       }
                     >
@@ -263,7 +255,7 @@ export default function Page() {
                           : "text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white"
                       )}
                       style={p === page
-                        ? { background: 'linear-gradient(to right, #22C55E, #16A34A)' }
+                        ? { background: '#32F08C', color: '#000' }
                         : { background: 'rgba(255,255,255,0.04)' }
                       }
                     >

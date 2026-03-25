@@ -37,8 +37,8 @@
     --sidebar-border: rgb(13, 13, 13);
     --sidebar-ring: rgb(255, 192, 203);
     --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
-    --font-serif: Aleo, ui-serif, serif;
-    --font-mono: Roboto Mono, monospace;
+    --font-chinese: "Noto Sans SC", sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
     --radius: 0.25rem;
     --shadow-x: 0px;
     --shadow-y: 2px;
@@ -92,8 +92,8 @@
     --sidebar-border: rgb(68, 68, 68);
     --sidebar-ring: rgb(255, 153, 204);
     --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
-    --font-serif: Aleo, ui-serif, serif;
-    --font-mono: Roboto Mono, monospace;
+    --font-chinese: "Noto Sans SC", sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
     --radius: 0.35rem;
     --shadow-x: 0px;
     --shadow-y: 2px;
