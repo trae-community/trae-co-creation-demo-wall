@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Aleo, Roboto_Mono } from 'next/font/google';
+import { Inter, Noto_Sans_SC, JetBrains_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { ClerkProvider } from '@clerk/nextjs';
@@ -11,12 +11,13 @@ const fontSans = Inter({
   variable: "--font-sans",
 });
 
-const fontSerif = Aleo({
+const fontChinese = Noto_Sans_SC({
   subsets: ["latin"],
-  variable: "--font-serif",
+  weight: ["400", "500", "700"],
+  variable: "--font-chinese",
 });
 
-const fontMono = Roboto_Mono({
+const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 });
@@ -53,7 +54,7 @@ export default async function LocaleLayout({
       }}
     >
       <html lang={language}>
-        <body className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}>
+        <body className={`${fontSans.variable} ${fontChinese.variable} ${fontMono.variable} antialiased`}>
           <NextIntlClientProvider messages={messages}>
             <SiteLayout>{children}</SiteLayout>
           </NextIntlClientProvider>

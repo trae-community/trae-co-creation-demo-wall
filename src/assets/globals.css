@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: rgb(26, 27, 29);
+    --background: rgb(0, 0, 0);
     --foreground: rgb(245, 249, 254);
     --card: rgb(34, 36, 39);
     --card-foreground: rgb(245, 249, 254);
@@ -37,9 +37,9 @@
     --sidebar-border: rgb(13, 13, 13);
     --sidebar-ring: rgb(255, 192, 203);
     --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
-    --font-serif: Aleo, ui-serif, serif;
-    --font-mono: Roboto Mono, monospace;
-    --radius: 0.35rem;
+    --font-chinese: "Noto Sans SC", sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+    --radius: 0.25rem;
     --shadow-x: 0px;
     --shadow-y: 2px;
     --shadow-blur: 6px;
@@ -92,8 +92,8 @@
     --sidebar-border: rgb(68, 68, 68);
     --sidebar-ring: rgb(255, 153, 204);
     --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
-    --font-serif: Aleo, ui-serif, serif;
-    --font-mono: Roboto Mono, monospace;
+    --font-chinese: "Noto Sans SC", sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
     --radius: 0.35rem;
     --shadow-x: 0px;
     --shadow-y: 2px;
