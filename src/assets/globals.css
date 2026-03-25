@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: rgb(26, 27, 29);
+    --background: rgb(0, 0, 0);
     --foreground: rgb(245, 249, 254);
     --card: rgb(34, 36, 39);
     --card-foreground: rgb(245, 249, 254);
@@ -39,7 +39,7 @@
     --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
     --font-serif: Aleo, ui-serif, serif;
     --font-mono: Roboto Mono, monospace;
-    --radius: 0.35rem;
+    --radius: 0.25rem;
     --shadow-x: 0px;
     --shadow-y: 2px;
     --shadow-blur: 6px;

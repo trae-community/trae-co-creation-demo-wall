@@ -76,7 +76,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-lg font-bold text-white tracking-tight group">
             <Image src={logo} alt="logo" className="w-8 h-8" />
-            <span className="hidden sm:inline truncate bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:to-white transition-all">TRAE DEMO WALL</span>
+            <span className="hidden sm:inline truncate">TRAE DEMO WALL</span>
           </Link>
 
           {/* Desktop Navigation */}

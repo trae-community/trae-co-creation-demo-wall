@@ -9,6 +9,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/lib/language/navigation';
 import { useWorksStore } from '@/store/works-store';
 import { cn } from "@/lib/utils";
+import { HeroBanner } from "@/components/home/hero-banner";
 
 export default function Page() {
   const t = useTranslations('Home');
@@ -108,66 +109,7 @@ export default function Page() {
 
   return (
     <div className="space-y-8">
-      {/* ── HERO BANNER ── */}
-      <section className="relative rounded-2xl md:rounded-3xl p-6 md:p-10 lg:p-16 text-white overflow-hidden border border-white/15 shadow-2xl">
-        <div className="absolute inset-0 z-0" style={{ background: '#0d1117' }} />
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.18,
-          }}
-        />
-        <div
-          className="absolute inset-0 z-0"
-          style={{ background: 'linear-gradient(135deg,rgba(0,0,0,0.75) 0%,rgba(0,0,0,0.3) 50%,rgba(34,197,94,0.05) 100%)' }}
-        />
-
-        <div className="relative z-10 max-w-2xl">
-          {/* Live badge */}
-          <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1 text-xs text-green-400 font-medium mb-4 md:mb-6">
-            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-            {t('heroBadge') || '在这里，看见全国各地用户的 TRAE 创作作品'}
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-5 tracking-tight leading-tight">
-            {t('heroTitle')}{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#22c55e] to-[#86efac]">TRAE</span>
-          </h1>
-
-          <p className="text-base md:text-lg text-zinc-400 mb-6 md:mb-8 max-w-lg leading-relaxed">
-            {t('heroSubtitle1')}{' '}
-            <span className="font-semibold text-zinc-200">{t('heroSubtitleTRAE')}</span>.{' '}
-            {t('heroSubtitle2')}{' '}
-            <span className="font-semibold text-zinc-200">{t('heroSubtitleFriends')}</span>.
-          </p>
-
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
-            <Link
-              href="/submit"
-              className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-bold text-sm text-black flex items-center justify-center gap-2 transition-all hover:opacity-90"
-              style={{ background: 'linear-gradient(to right, #22C55E, #16A34A)', boxShadow: '0 0 20px rgba(34,197,94,0.3)' }}
-            >
-              {t('submitWork')}
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </Link>
-            <a
-              href="#projects"
-              className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-semibold text-sm text-zinc-300 border border-white/10 bg-white/5 hover:bg-white/10 transition-all backdrop-blur-md text-center"
-            >
-              {t('browseWork')}
-            </a>
-          </div>
-        </div>
-
-        {/* Glow */}
-        <div
-          className="absolute top-1/2 right-0 pointer-events-none z-0"
-          style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%)', transform: 'translate(30%, -50%)' }}
-        />
-      </section>
+      <HeroBanner />
 
       {/* ── FILTER TOOLBAR ── */}
       <div id="projects" className="space-y-4">
@@ -227,7 +169,7 @@ export default function Page() {
       {/* ── WORK GRID ── */}
       {loading && works.length === 0 ? (
         /* Skeleton */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="rounded-2xl overflow-hidden border border-white/6" style={{ background: '#111318' }}>
               <div className="animate-pulse bg-white/5" style={{ aspectRatio: '4/3' }} />
@@ -240,7 +182,7 @@ export default function Page() {
           ))}
         </div>
       ) : works.length > 0 ? (
-        <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 transition-opacity duration-300", loading && "opacity-60")}>
+        <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 transition-opacity duration-300", loading && "opacity-60")}>
           {works.map((work) => (
             <WorkCard key={work.id} work={work} />
           ))}
