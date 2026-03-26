@@ -30,7 +30,6 @@ async function getRawDictionaries() {
   // 尝试从 Edge Config 读取
   const cached = await getDictionaries()
   if (cached) return cached as any
-
   // 回退到数据库查询
   const [countryDict, cityDict, categoryDict, honorDict] = await Promise.all([
     prisma.sysDict.findUnique({ where: { dictCode: 'country' }, include: { items: true } }),
