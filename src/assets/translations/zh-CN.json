@@ -214,6 +214,8 @@
     "statsViews": "总浏览量",
     "statsLikes": "总点赞数",
     "basicsTitle": "基础信息",
+    "usernameLabel": "用户名",
+    "usernamePlaceholder": "输入你的用户名（2-20个字符）",
     "introLabel": "个人简介",
     "introPlaceholder": "告诉大家你正在做什么。",
     "phoneLabel": "联系电话",

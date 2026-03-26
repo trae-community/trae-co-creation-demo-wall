@@ -149,14 +149,21 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
+    const username = toSafeString(body.username, 50);
     const bio = toSafeString(body.bio, 500);
     const phone = toSafeString(body.phone, 50);
     const locationCountry = toSafeString(body.locationCountry, 100);
     const locationCity = toSafeString(body.locationCity, 100);
 
+    // Validate username
+    if (username.length < 2 || username.length > 20) {
+      return NextResponse.json({ error: "用户名长度需在 2-20 个字符之间" }, { status: 400 });
+    }
+
     const updatedUser = await prisma.sysUser.update({
       where: { id: authUser.userId },
       data: {
+        username,
         bio: toNullable(bio),
         phone: toNullable(phone),
       },

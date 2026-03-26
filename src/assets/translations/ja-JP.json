@@ -219,6 +219,8 @@
     "statsViews": "総閲覧数",
     "statsLikes": "総いいね数",
     "basicsTitle": "基本情報",
+    "usernameLabel": "ユーザー名",
+    "usernamePlaceholder": "ユーザー名を入力（2〜20文字）",
     "introLabel": "自己紹介",
     "introPlaceholder": "今取り組んでいることを紹介してください。",
     "phoneLabel": "電話番号",

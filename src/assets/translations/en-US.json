@@ -213,6 +213,8 @@
     "statsViews": "Total Views",
     "statsLikes": "Total Likes",
     "basicsTitle": "Profile Basics",
+    "usernameLabel": "Username",
+    "usernamePlaceholder": "Enter your username (2-20 characters)",
     "introLabel": "Personal Introduction",
     "introPlaceholder": "Tell others what you are building.",
     "phoneLabel": "Phone",
