@@ -13,7 +13,7 @@ export type SubmissionFormValues = {
   city: string
   category: string
   devStatus: string
-  tags: number[]
+  tags: number
   team: { value: string }[]
   teamIntro?: string
   contactPhone?: string
@@ -50,18 +50,10 @@ export function Step1BasicInfo({
   const { register, watch, setValue, formState: { errors } } = form
 
   const selectedCountry = watch('country')
-  const selectedTags = (watch('tags') || []) as number[]
+  const selectedTag = watch('tags') || 0
 
-  const toggleTag = (tagId: number) => {
-    if (selectedTags.includes(tagId)) {
-      setValue('tags', selectedTags.filter(id => id !== tagId), { shouldValidate: true })
-    } else {
-      if (selectedTags.length >= 5) {
-        alert(t('tagsLimitError'))
-        return
-      }
-      setValue('tags', [...selectedTags, tagId], { shouldValidate: true })
-    }
+  const selectTag = (tagId: number) => {
+    setValue('tags', tagId, { shouldValidate: true })
   }
 
   const inputClass =
@@ -196,23 +188,18 @@ export function Step1BasicInfo({
 
       {/* Tags */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-gray-300 flex items-center gap-1.5">
-            <Tag className="w-4 h-4 text-zinc-400" />
-            {t('tags')} <span className="text-red-500">*</span>
-          </label>
-          <span className="text-xs text-zinc-500">
-            {selectedTags.length}/5
-          </span>
-        </div>
+        <label className="text-sm font-medium text-gray-300 flex items-center gap-1.5">
+          <Tag className="w-4 h-4 text-zinc-400" />
+          作品来源 <span className="text-red-500">*</span>
+        </label>
         <div className="flex flex-wrap gap-2">
           {availableTags.map(tag => {
-            const isSelected = selectedTags.includes(tag.id)
+            const isSelected = selectedTag === tag.id
             return (
               <button
                 key={tag.id}
                 type="button"
-                onClick={() => toggleTag(tag.id)}
+                onClick={() => selectTag(tag.id)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
                   isSelected
                     ? 'bg-primary text-black border-primary'
@@ -231,7 +218,6 @@ export function Step1BasicInfo({
             {errors.tags.message}
           </p>
         )}
-        <p className="text-xs text-zinc-500">{t('tagsDesc')}</p>
       </div>
     </div>
   )

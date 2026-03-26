@@ -257,9 +257,22 @@ export function WorksManagement({
   }, [searchTerm])
 
   // Handlers
-  const handleEdit = (work: WorkItem) => {
-    setEditingWork(work)
-    setIsDialogOpen(true)
+  const handleEdit = async (work: WorkItem) => {
+    try {
+      setIsLoading(true)
+      const res = await fetch(`/api/console/works?id=${work.id}`)
+      if (res.ok) {
+        const data = await res.json()
+        setEditingWork(data)
+        setIsDialogOpen(true)
+      } else {
+        showFeedback('error', '获取作品详情失败')
+      }
+    } catch (error) {
+      showFeedback('error', '获取作品详情失败')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleEditSuccess = () => {
@@ -641,10 +654,13 @@ export function WorksManagement({
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="bg-card border border-border text-foreground sm:max-w-[800px] max-h-[85vh] overflow-y-auto p-0">
+          <DialogHeader className="sr-only">
+            <DialogTitle>编辑作品</DialogTitle>
+          </DialogHeader>
           {editingWork && (
-            <EditForm 
-              initialData={editingWork as any} 
-              onSuccess={handleEditSuccess} 
+            <EditForm
+              initialData={editingWork as any}
+              onSuccess={handleEditSuccess}
               onCancel={() => setIsDialogOpen(false)}
             />
           )}

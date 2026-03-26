@@ -5,6 +5,7 @@ import { getMessages } from 'next-intl/server';
 import { ClerkProvider } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
 import { SiteLayout } from '@/components/layout/site-layout';
+import { QueryProvider } from '@/components/providers/query-provider';
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -55,9 +56,11 @@ export default async function LocaleLayout({
     >
       <html lang={language}>
         <body className={`${fontSans.variable} ${fontChinese.variable} ${fontMono.variable} antialiased`}>
-          <NextIntlClientProvider messages={messages}>
-            <SiteLayout>{children}</SiteLayout>
-          </NextIntlClientProvider>
+          <QueryProvider>
+            <NextIntlClientProvider messages={messages}>
+              <SiteLayout>{children}</SiteLayout>
+            </NextIntlClientProvider>
+          </QueryProvider>
         </body>
       </html>
     </ClerkProvider>

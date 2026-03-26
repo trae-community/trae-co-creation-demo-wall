@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
-import { unstable_cache } from 'next/cache';
+import { getDictionaries } from '@/lib/edge-config';
 import { getAuthUser } from '@/lib/auth'
 import { z } from 'zod'
 
@@ -26,33 +26,59 @@ const updateSchema = z.object({
   repoUrl: z.string().url().optional().or(z.literal('')),
 })
 
-// Cache raw dict data for 5 minutes — resolveLabelMap runs per-request with lang param
-const getRawDictionaries = unstable_cache(
-  async () => {
-    const [countryDict, cityDict, categoryDict, honorDict] = await Promise.all([
-      prisma.sysDict.findUnique({ where: { dictCode: 'country' }, include: { items: true } }),
-      prisma.sysDict.findUnique({ where: { dictCode: 'city' }, include: { items: true } }),
-      prisma.sysDict.findUnique({ where: { dictCode: 'category_code' }, include: { items: true } }),
-      prisma.sysDict.findUnique({ where: { dictCode: 'honor_type' }, include: { items: true } }),
-    ]);
-    // Serialize BigInt fields so unstable_cache can JSON.stringify the result
-    const serialize = (obj: unknown): unknown =>
-      JSON.parse(JSON.stringify(obj, (_, v) => (typeof v === 'bigint' ? v.toString() : v)));
-    return {
-      countryDict: serialize(countryDict),
-      cityDict: serialize(cityDict),
-      categoryDict: serialize(categoryDict),
-      honorDict: serialize(honorDict),
-    } as {
-      countryDict: typeof countryDict;
-      cityDict: typeof cityDict;
-      categoryDict: typeof categoryDict;
-      honorDict: typeof honorDict;
-    };
-  },
-  ['works-raw-dicts'],
-  { revalidate: 300 }
-);
+async function getRawDictionaries() {
+  // 尝试从 Edge Config 读取
+  const cached = await getDictionaries()
+  if (cached) return cached
+
+  // 回退到数据库查询
+  const [countryDict, cityDict, categoryDict, honorDict] = await Promise.all([
+    prisma.sysDict.findUnique({ where: { dictCode: 'country' }, include: { items: true } }),
+    prisma.sysDict.findUnique({ where: { dictCode: 'city' }, include: { items: true } }),
+    prisma.sysDict.findUnique({ where: { dictCode: 'category_code' }, include: { items: true } }),
+    prisma.sysDict.findUnique({ where: { dictCode: 'honor_type' }, include: { items: true } }),
+  ])
+
+  const serialize = (obj: unknown) =>
+    JSON.parse(JSON.stringify(obj, (_, v) => (typeof v === 'bigint' ? v.toString() : v)))
+
+  const result = {
+    countryDict: serialize(countryDict),
+    cityDict: serialize(cityDict),
+    categoryDict: serialize(categoryDict),
+    honorDict: serialize(honorDict),
+  }
+
+  // 后台异步更新 Edge Config（不阻塞响应）
+  if (process.env.EDGE_CONFIG) {
+    updateEdgeConfig(result).catch(console.error)
+  }
+
+  return result
+}
+
+async function updateEdgeConfig(data: any) {
+  try {
+    const edgeConfigId = process.env.EDGE_CONFIG?.match(/ecfg_[a-z0-9]+/)?.[0]
+    if (!edgeConfigId || !process.env.VERCEL_API_TOKEN) return
+
+    await fetch(
+      `https://api.vercel.com/v1/edge-config/${edgeConfigId}/items`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${process.env.VERCEL_API_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: [{ operation: 'upsert', key: 'dictionaries', value: data }],
+        }),
+      }
+    )
+  } catch (error) {
+    console.error('Failed to update Edge Config:', error)
+  }
+}
 
 export async function GET(req: Request) {
   try {

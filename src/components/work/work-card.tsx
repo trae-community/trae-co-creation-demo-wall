@@ -107,7 +107,7 @@ export function WorkCard({ work }: WorkCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-5">
+      <div className="p-5 flex flex-col h-[180px]">
         <h3 className="font-bold text-white text-base mb-1.5 line-clamp-1 group-hover:text-green-400 transition-colors">
           {work.name}
         </h3>
@@ -137,7 +137,7 @@ export function WorkCard({ work }: WorkCardProps) {
         )}
 
         {/* Footer: author + stats */}
-        <div className="flex items-center justify-between pt-3.5 border-t border-white/6">
+        <div className="flex items-center justify-between pt-3.5 border-t border-white/6 mt-auto">
           {/* Author / team */}
           <div className="flex items-center gap-2">
             {isTeam ? (

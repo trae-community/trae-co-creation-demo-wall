@@ -12,15 +12,39 @@ const sanitize = (data: any) => {
   ));
 };
 
-// GET: 获取作品列表
+// GET: 获取作品列表或单个作品
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    // 如果有 id 参数，返回单个作品详情
+    if (id) {
+      const work = await prisma.workBase.findUnique({
+        where: { id: BigInt(id) },
+        include: {
+          user: { select: { username: true, email: true, avatarUrl: true } },
+          tags: { include: { tag: true } },
+          honors: { include: { dictItem: true } },
+          statistic: true,
+          detail: true,
+          images: { orderBy: { sortOrder: 'asc' } },
+          team: true
+        }
+      });
+
+      if (!work) {
+        return NextResponse.json({ error: 'Work not found' }, { status: 404 });
+      }
+
+      return NextResponse.json(sanitize(work));
+    }
+
     const page = Number(searchParams.get(CRUD_QUERY_PARAMS.page) || '1');
     const pageSize = Number(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10');
     const query = searchParams.get(CRUD_QUERY_PARAMS.query) || '';
     const userId = searchParams.get('userId');
-    
+
     // 构建过滤条件
     const whereFilters: Prisma.WorkBaseWhereInput[] = [];
     if (userId) {
@@ -46,7 +70,18 @@ export async function GET(req: NextRequest) {
       prisma.workBase.count({ where: whereClause }),
       prisma.workBase.findMany({
         where: whereClause,
-        include: {
+        select: {
+          id: true,
+          userId: true,
+          title: true,
+          summary: true,
+          coverUrl: true,
+          countryCode: true,
+          cityCode: true,
+          categoryCode: true,
+          devStatusCode: true,
+          createdAt: true,
+          updatedAt: true,
           user: {
             select: {
               username: true,
@@ -55,22 +90,60 @@ export async function GET(req: NextRequest) {
             }
           },
           tags: {
-            include: {
-              tag: true
+            select: {
+              tag: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
             }
           },
           honors: {
-            include: {
-              dictItem: true
+            select: {
+              id: true,
+              dictItem: {
+                select: {
+                  id: true,
+                  itemLabel: true,
+                  itemValue: true,
+                  labelI18n: true
+                }
+              }
             }
           },
-          statistic: true
-          ,
-          detail: true,
+          statistic: {
+            select: {
+              auditStatus: true,
+              displayStatus: true,
+              viewCount: true,
+              likeCount: true,
+              lastAuditAt: true
+            }
+          },
+          detail: {
+            select: {
+              demoUrl: true,
+              repoUrl: true
+            }
+          },
           images: {
+            select: {
+              id: true,
+              imageUrl: true,
+              imageType: true,
+              sortOrder: true
+            },
             orderBy: { sortOrder: 'asc' }
           },
-          team: true
+          team: {
+            select: {
+              members: true,
+              teamIntro: true,
+              contactPhone: true,
+              contactEmail: true
+            }
+          }
         },
         orderBy: { createdAt: 'desc' },
         skip,
