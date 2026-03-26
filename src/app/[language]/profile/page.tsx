@@ -39,6 +39,7 @@ interface ProfileData {
 }
 
 interface ProfileFormState {
+  username: string;
   bio: string;
   phone: string;
   locationCountry: string;
@@ -50,6 +51,7 @@ export default function ProfilePage() {
   const t = useTranslations("Profile");
   const [data, setData] = useState<ProfileData | null>(null);
   const [form, setForm] = useState<ProfileFormState>({
+    username: "",
     bio: "",
     phone: "",
     locationCountry: "",
@@ -71,6 +73,7 @@ export default function ProfilePage() {
       const payload = await response.json();
       setData(payload);
       setForm({
+        username: payload.profile.username ?? "",
         bio: payload.profile.bio ?? "",
         phone: payload.profile.phone ?? "",
         locationCountry: payload.profile.locationCountry ?? "",
@@ -91,6 +94,7 @@ export default function ProfilePage() {
   const hasChanges = useMemo(() => {
     if (!data) return false;
     return (
+      form.username !== (data.profile.username ?? "") ||
       form.bio !== (data.profile.bio ?? "") ||
       form.phone !== (data.profile.phone ?? "") ||
       form.locationCountry !== (data.profile.locationCountry ?? "") ||
@@ -120,6 +124,7 @@ export default function ProfilePage() {
       const payload = await response.json();
       setData(payload);
       setForm({
+        username: payload.profile.username ?? "",
         bio: payload.profile.bio ?? "",
         phone: payload.profile.phone ?? "",
         locationCountry: payload.profile.locationCountry ?? "",
@@ -214,6 +219,17 @@ export default function ProfilePage() {
             ) : null}
 
             <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm text-gray-300">{t("usernameLabel")}</label>
+                <input
+                  value={form.username}
+                  onChange={(event) => setForm((prev) => ({ ...prev, username: event.target.value }))}
+                  className="w-full rounded-xl border border-white/10 bg-zinc-900/60 text-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  placeholder={t("usernamePlaceholder")}
+                  maxLength={20}
+                />
+              </div>
+
               <div className="space-y-2">
                 <label className="text-sm text-gray-300">{t("introLabel")}</label>
                 <textarea

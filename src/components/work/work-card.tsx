@@ -79,14 +79,19 @@ export function WorkCard({ work }: WorkCardProps) {
           </span>
         </div>
 
-        {/* Honor badge — top left */}
+        {/* Honor badges — top left */}
         {hasHonors && (
-          <div className="absolute top-3 left-3">
-            <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-amber-300 border border-amber-500/30 backdrop-blur-sm"
-              style={{ background: 'rgba(245,158,11,0.15)' }}>
-              <Award className="w-3 h-3" />
-              {(work.honors || [])[0]}
-            </span>
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+            {(work.honors || []).map((honor) => (
+              <span
+                key={honor}
+                className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-amber-300 border border-amber-500/30 backdrop-blur-sm"
+                style={{ background: 'rgba(245,158,11,0.15)' }}
+              >
+                <Award className="w-3 h-3" />
+                {honor}
+              </span>
+            ))}
           </div>
         )}
 
