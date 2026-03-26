@@ -202,6 +202,25 @@
     "systemSettingsDesc": "配置平台参数、维护系统设置",
     "comingSoon": "功能开发中..."
   },
+  "Cities": {
+    "title": "城市数据",
+    "subtitle": "查看各城市的作品分布与数据统计",
+    "loadError": "加载城市数据失败",
+    "totalCities": "城市总数",
+    "activeCities": "活跃城市",
+    "totalWorks": "作品总数",
+    "totalViews": "总浏览量",
+    "approvedWorks": "已上架作品",
+    "pendingWorks": "待审核作品",
+    "views": "浏览量",
+    "likes": "点赞数",
+    "hasWorks": "有作品",
+    "noWorks": "暂无作品",
+    "filterByProvince": "按省份筛选",
+    "allProvinces": "全部省份",
+    "clearFilter": "清除筛选",
+    "noCitiesInProvince": "该省份暂无城市数据"
+  },
   "Profile": {
     "menu": "个人主页",
     "loadError": "加载个人资料失败，请刷新后重试。",

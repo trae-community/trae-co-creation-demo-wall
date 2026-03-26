@@ -83,6 +83,7 @@ export default function ConsoleLayout({
         icon: FolderKanban,
         children: [
           { name: '作品管理', href: '/console/works' },
+          { name: '城市数据', href: '/console/cities' },
         ]
       },
       { 
@@ -91,7 +92,6 @@ export default function ConsoleLayout({
         children: [
           { name: '字典管理', href: '/console/dictionaries' },
           { name: '标签管理', href: '/console/tags' },
-          { name: '城市管理', href: '/console/cities' },
         ]
       },
       { 

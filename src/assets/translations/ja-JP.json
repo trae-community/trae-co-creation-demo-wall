@@ -207,6 +207,25 @@
     "systemSettingsDesc": "プラットフォームパラメータの設定とシステムメンテナンス",
     "comingSoon": "開発中..."
   },
+  "Cities": {
+    "title": "都市データ",
+    "subtitle": "各都市の作品分布とデータ統計を確認",
+    "loadError": "都市データの読み込みに失敗しました",
+    "totalCities": "都市総数",
+    "activeCities": "アクティブ都市",
+    "totalWorks": "作品総数",
+    "totalViews": "総閲覧数",
+    "approvedWorks": "公開済み作品",
+    "pendingWorks": "審査待ち作品",
+    "views": "閲覧数",
+    "likes": "いいね数",
+    "hasWorks": "作品あり",
+    "noWorks": "作品なし",
+    "filterByProvince": "都道府県で絞り込み",
+    "allProvinces": "すべての都道府県",
+    "clearFilter": "絞り込みを解除",
+    "noCitiesInProvince": "この都道府県には都市がありません"
+  },
   "Profile": {
     "menu": "プロフィール",
     "loadError": "プロフィールの読み込みに失敗しました。再読み込みしてください。",
