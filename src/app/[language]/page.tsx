@@ -1,15 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback } from "react";
-import { Work } from "@/lib/types";
+import { useState, useEffect } from "react";
 import { WorkCard } from "@/components/work/work-card";
 import { CityFilter, FilterState } from "@/components/work/city-filter";
 import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocale, useTranslations } from 'next-intl';
-import { Link } from '@/lib/language/navigation';
-import { useWorksStore } from '@/store/works-store';
 import { cn } from "@/lib/utils";
 import { HeroBanner } from "@/components/home/hero-banner";
+import { useWorks } from "@/hooks/use-works";
 
 export default function Page() {
   const t = useTranslations('Home');
@@ -21,69 +19,35 @@ export default function Page() {
     countries: [],
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [sortBy, setSortBy] = useState<'time' | 'likes' | 'views'>('time');
-  const [works, setWorks] = useState<Work[]>([]);
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const pageSize = 12;
 
-  const { listCache, setListCache } = useWorksStore();
-
-  const fetchProjects = useCallback(async () => {
-    const params = new URLSearchParams({
-      page: String(page),
-      pageSize: String(pageSize),
-      search: searchQuery,
-      sort: sortBy === 'time' ? 'newest' : sortBy,
-      lang: locale,
-    });
-
-    if (filters.cities.length > 0) params.append('city', filters.cities.join(','));
-    if (filters.countries.length > 0) params.append('country', filters.countries.join(','));
-    if (filters.categories.length > 0) params.append('category', filters.categories.join(','));
-    if (filters.tags.length > 0) params.append('tags', filters.tags.join(','));
-
-    const cacheKey = params.toString();
-
-    const cached = listCache.get(cacheKey);
-    if (cached) {
-      setWorks(cached.items);
-      setTotalItems(cached.total);
-      setTotalPages(cached.totalPages);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/works?${cacheKey}`);
-      const data = await response.json();
-      const items = data.items || [];
-      const total = data.total || 0;
-      const pages = Math.max(1, data.totalPages || 1);
-      setWorks(items);
-      setTotalItems(total);
-      setTotalPages(pages);
-      setListCache(cacheKey, { items, total, totalPages: pages });
-    } catch (error) {
-      console.error("Failed to fetch projects:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, searchQuery, sortBy, locale, page, pageSize, listCache, setListCache]);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   useEffect(() => {
     setPage(1);
-  }, [filters, searchQuery, sortBy, locale]);
+  }, [filters, debouncedSearch, sortBy]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchProjects();
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [fetchProjects]);
+  const { data, isLoading } = useWorks({
+    page,
+    pageSize,
+    search: debouncedSearch,
+    sort: sortBy === 'time' ? 'newest' : sortBy,
+    lang: locale,
+    city: filters.cities.join(','),
+    country: filters.countries.join(','),
+    category: filters.categories.join(','),
+    tags: filters.tags.join(','),
+  });
+
+  const works = data?.items || [];
+  const totalItems = data?.total || 0;
+  const totalPages = data?.totalPages || 1;
 
   // Pagination page numbers to show
   const getPageNumbers = () => {
@@ -158,7 +122,7 @@ export default function Page() {
       </div>
 
       {/* ── WORK GRID ── */}
-      {loading && works.length === 0 ? (
+      {isLoading && works.length === 0 ? (
         /* Skeleton */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -173,7 +137,7 @@ export default function Page() {
           ))}
         </div>
       ) : works.length > 0 ? (
-        <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 transition-opacity duration-300", loading && "opacity-60")}>
+        <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 transition-opacity duration-300", isLoading && "opacity-60")}>
           {works.map((work) => (
             <WorkCard key={work.id} work={work} />
           ))}
@@ -195,7 +159,7 @@ export default function Page() {
       )}
 
       {/* ── PAGINATION ── */}
-      {!loading && totalItems > 0 && (
+      {!isLoading && totalItems > 0 && (
         <div className="flex items-center justify-between pt-2">
           <p className="text-sm text-zinc-500">
             {t('resultCount') || '共'}{' '}

@@ -25,7 +25,7 @@ function buildSchema(t: (k: string) => string) {
     city: z.string().min(1, t('validationCity')),
     category: z.string().min(1, t('validationCategory')),
     devStatus: z.string().min(1, t('validationDevStatus')),
-    tags: z.array(z.number()).min(1, t('validationTagsMin')).max(5, t('validationTagsMax')),
+    tags: z.number().min(1, t('validationTagsRequired')),
     team: z
       .array(z.object({ value: z.string().min(1, t('validationTeamMemberRequired')) }))
       .min(1, t('validationTeamMin')),
@@ -103,7 +103,7 @@ export function SubmissionForm() {
       city: '',
       category: '',
       devStatus: '',
-      tags: [],
+      tags: 0,
       team: [{ value: user?.username || '' }],
       teamIntro: '',
       contactPhone: '',
