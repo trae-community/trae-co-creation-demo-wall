@@ -156,7 +156,7 @@ export default function ConsolePage() {
             <select
               value={String(windowDays)}
               onChange={(event) => setWindowDays(Number(event.target.value) as OverviewWindow)}
-              className="bg-secondary/50 border border-border rounded-lg text-sm px-3 py-1 text-muted-foreground outline-none"
+              className="bg-zinc-800 border border-border rounded-lg text-sm px-3 py-1 text-white outline-none cursor-pointer hover:bg-zinc-700 transition-colors"
             >
               <option value="7">最近7天</option>
               <option value="30">最近30天</option>
