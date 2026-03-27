@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@/lib/language/navigation";
-import { SignOutButton, UserProfile } from "@clerk/nextjs";
+import { signOut } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2, MapPin, Save, ShieldCheck, Sparkles, User, LogOut } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader2, MapPin, Save, ShieldCheck, Sparkles, User, LogOut, Camera } from "lucide-react";
+import { toast } from 'sonner';
 import { WorksManagement } from "@/components/work/works-management";
 import { LikedWorks } from "@/components/work/liked-works";
 
@@ -59,7 +59,7 @@ export default function ProfilePage() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isAccountDialogOpen, setIsAccountDialogOpen] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -139,6 +139,41 @@ export default function ProfilePage() {
     }
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('头像大小不能超过 2MB');
+      return;
+    }
+
+    try {
+      setIsUploadingAvatar(true);
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success('头像上传成功');
+        await fetchProfile();
+      } else {
+        toast.error(result.error || '上传失败');
+      }
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      toast.error('上传失败');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -161,14 +196,30 @@ export default function ProfilePage() {
     <div className="max-w-6xl mx-auto space-y-8">
       <section className="rounded-3xl border border-white/10 bg-card/80 backdrop-blur-md p-6 md:p-8">
         <div className="flex flex-col md:flex-row md:items-center gap-6">
-          <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 bg-zinc-900">
-            {data.profile.avatarUrl ? (
-              <img src={data.profile.avatarUrl} alt={data.profile.username} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">
-                <User className="w-8 h-8" />
-              </div>
-            )}
+          <div className="relative group">
+            <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 bg-zinc-900">
+              {data.profile.avatarUrl ? (
+                <img src={data.profile.avatarUrl} alt={data.profile.username} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <User className="w-8 h-8" />
+                </div>
+              )}
+            </div>
+            <label className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-2xl">
+              {isUploadingAvatar ? (
+                <Loader2 className="w-6 h-6 text-white animate-spin" />
+              ) : (
+                <Camera className="w-6 h-6 text-white" />
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                disabled={isUploadingAvatar}
+                className="hidden"
+              />
+            </label>
           </div>
 
           <div className="flex-1">
@@ -179,12 +230,13 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          <SignOutButton redirectUrl="/">
-            <button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
-              <LogOut className="w-4 h-4" />
-              {t("signOut")}
-            </button>
-          </SignOutButton>
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            {t("signOut")}
+          </button>
         </div>
       </section>
 
@@ -278,45 +330,7 @@ export default function ProfilePage() {
             <LikedWorks userId={data.profile.id} />
           </div>
         </div>
-
-        <div className="space-y-6">
-          <div className="rounded-2xl border border-white/10 bg-card p-6">
-            <div className="flex items-center gap-2 mb-3">
-              <ShieldCheck className="w-4 h-4 text-primary" />
-              <h2 className="text-lg font-semibold text-white">{t("securityTitle")}</h2>
-            </div>
-            <p className="text-sm text-gray-400 mb-4">
-              {t("securityDesc")}
-            </p>
-            <button
-              onClick={() => setIsAccountDialogOpen(true)}
-              className="w-full rounded-xl border border-white/10 bg-zinc-900/60 text-white px-4 py-2.5 text-sm hover:bg-zinc-900 transition-colors"
-            >
-              {t("openSettings")}
-            </button>
-          </div>
-        </div>
       </section>
-      <Dialog open={isAccountDialogOpen} onOpenChange={setIsAccountDialogOpen}>
-        <DialogContent className="w-[96vw] max-w-5xl h-[90vh] bg-zinc-950 border-zinc-800 p-0">
-          <DialogHeader className="px-6 pt-6 pb-2">
-            <DialogTitle className="text-white">{t("settingsModalTitle")}</DialogTitle>
-            <DialogDescription>{t("settingsModalDesc")}</DialogDescription>
-          </DialogHeader>
-          <div className="px-2 pb-2 h-[calc(90vh-80px)] overflow-auto">
-            <UserProfile
-              routing="hash"
-              appearance={{
-                elements: {
-                  rootBox: "w-full",
-                  cardBox: "w-full",
-                  card: "w-full max-w-none border-0 shadow-none bg-transparent",
-                },
-              }}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "线上社区",
+    "is_auto_audit": false,
+    "audit_start_time": null,
+    "audit_end_time": null
+  },
+  {
+    "id": 2,
+    "name": "站内投稿",
+    "is_auto_audit": false,
+    "audit_start_time": null,
+    "audit_end_time": null
+  },
+  {
+    "id": 6,
+    "name": "TRAE on Campus（校园活动）",
+    "is_auto_audit": false,
+    "audit_start_time": null,
+    "audit_end_time": null
+  },
+  {
+    "id": 7,
+    "name": "TRAE Friends（城市活动）",
+    "is_auto_audit": true,
+    "audit_start_time": "2026-03-28 04:00:00+00:00",
+    "audit_end_time": "2026-03-29 16:00:00+00:00"
+  }
+]

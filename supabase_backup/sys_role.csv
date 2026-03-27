@@ -1,0 +1,4 @@
+id,role_code,role_name,description
+1,root,根用户,
+2,admin,管理员,
+3,common,普通角色,

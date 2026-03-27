@@ -1,0 +1,147 @@
+x-app-build: &app-build
+  context: .
+  dockerfile: Dockerfile
+  args:
+    COS_SECRET_ID: ${COS_SECRET_ID}
+    COS_SECRET_KEY: ${COS_SECRET_KEY}
+    COS_BUCKET: ${COS_BUCKET}
+    COS_REGION: ${COS_REGION}
+    NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+
+x-app-env: &app-env
+  NODE_ENV: production
+  DATABASE_URL: postgresql://postgres:postgres@db:5432/trae_demo_wall?schema=public&connection_limit=50&pool_timeout=20&connect_timeout=10
+  DIRECT_URL: postgresql://postgres:postgres@db:5432/trae_demo_wall
+  REDIS_URL: redis://redis:6379
+  COS_SECRET_ID: ${COS_SECRET_ID}
+  COS_SECRET_KEY: ${COS_SECRET_KEY}
+  COS_BUCKET: ${COS_BUCKET}
+  COS_REGION: ${COS_REGION}
+  NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+  NEXTAUTH_URL: ${NEXTAUTH_URL}
+  AUTH_TRUST_HOST: "true"
+
+x-app-service: &app-service
+  build: *app-build
+  environment:
+    <<: *app-env
+    RUN_DB_INIT: "false"
+  depends_on:
+    app-init:
+      condition: service_completed_successfully
+  restart: unless-stopped
+  networks:
+    - trae-network
+  cpus: 1
+  mem_limit: 1g
+  deploy:
+    resources:
+      limits:
+        cpus: "1"
+        memory: 1G
+
+services:
+  nginx-lb:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx-lb.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app-1
+      - app-2
+      - app-3
+      - app-4
+    restart: unless-stopped
+    networks:
+      - trae-network
+    cpus: 0.5
+    mem_limit: 512m
+
+  app-init:
+    build: *app-build
+    environment:
+      <<: *app-env
+      RUN_DB_INIT: "true"
+      START_SERVER: "false"
+    depends_on:
+      db:
+        condition: service_started
+      redis:
+        condition: service_started
+    restart: "no"
+    networks:
+      - trae-network
+
+  app-1:
+    <<: *app-service
+
+  app-2:
+    <<: *app-service
+
+  app-3:
+    <<: *app-service
+
+  app-4:
+    <<: *app-service
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: trae_demo_wall
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=300"
+      - "-c"
+      - "shared_buffers=512MB"
+      - "-c"
+      - "effective_cache_size=2GB"
+      - "-c"
+      - "work_mem=32MB"
+      - "-c"
+      - "maintenance_work_mem=128MB"
+      - "-c"
+      - "checkpoint_completion_target=0.9"
+      - "-c"
+      - "wal_buffers=16MB"
+      - "-c"
+      - "random_page_cost=1.1"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - trae-network
+    cpus: 2
+    mem_limit: 2g
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 1gb --maxmemory-policy allkeys-lru --save 60 1000 --appendonly yes
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - trae-network
+    cpus: 0.5
+    mem_limit: 1536m
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 1.5G
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  trae-network:
+    driver: bridge

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import { Link, usePathname, useRouter } from '@/lib/language/navigation'
-import { useAuth } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import {
   LayoutDashboard,
   FolderKanban,
@@ -36,36 +36,33 @@ export default function ConsoleLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [expandedGroups, setExpandedGroups] = useState<string[]>([])
 
-  // Read roles from local JWT — zero network call in the happy path
-  const { sessionClaims, userId: clerkUserId } = useAuth()
-  const jwtRoles = (sessionClaims?.publicMetadata as { roles?: string[] })?.roles ?? []
-  const [fallbackRoles, setFallbackRoles] = useState<string[]>([])
-  const [fallbackFetched, setFallbackFetched] = useState(false)
+  // Fetch user roles from API
+  const { data: session, status } = useSession()
+  const [roles, setRoles] = useState<string[]>([])
+  const [rolesLoaded, setRolesLoaded] = useState(false)
 
-  // Fallback: if JWT has no roles but user is logged in, fetch from DB once
   useEffect(() => {
-    if (!clerkUserId || jwtRoles.length > 0) {
-      setFallbackFetched(true)
+    if (status !== 'authenticated') {
+      setRolesLoaded(true)
       return
     }
+
     fetch('/api/profile')
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         const profileRoles: string[] = (data?.profile?.roles ?? []).map(
           (r: { roleCode: string }) => r.roleCode
         )
-        setFallbackRoles(profileRoles)
+        setRoles(profileRoles)
       })
       .catch(() => {})
-      .finally(() => setFallbackFetched(true))
-  }, [clerkUserId, jwtRoles.length])
+      .finally(() => setRolesLoaded(true))
+  }, [status])
 
-  const roles = jwtRoles.length > 0 ? jwtRoles : fallbackRoles
   const isRoot = roles.includes('root')
   const isAdmin = roles.includes('admin')
   const hasAccess = isRoot || isAdmin
-  // Only enforce access after roles are actually resolved (fetch done or not needed)
-  const rolesResolved = !clerkUserId || fallbackFetched
+  const rolesResolved = status !== 'loading' && rolesLoaded
 
   const navItems = useMemo(() => {
     const allNavItems: NavItem[] = [

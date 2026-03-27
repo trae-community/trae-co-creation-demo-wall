@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { WorkCard } from "@/components/work/work-card";
 import { CityFilter, FilterState } from "@/components/work/city-filter";
 import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight } from "lucide-react";
@@ -12,16 +13,19 @@ import { useWorks } from "@/hooks/use-works";
 export default function Page() {
   const t = useTranslations('Home');
   const locale = useLocale();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [filters, setFilters] = useState<FilterState>({
-    cities: [],
-    categories: [],
-    tags: [],
-    countries: [],
+    cities: searchParams.get('cities')?.split(',').filter(Boolean) || [],
+    categories: searchParams.get('categories')?.split(',').filter(Boolean) || [],
+    tags: searchParams.get('tags')?.split(',').filter(Boolean) || [],
+    countries: searchParams.get('countries')?.split(',').filter(Boolean) || [],
   });
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [sortBy, setSortBy] = useState<'time' | 'likes' | 'views'>('time');
-  const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || "");
+  const [debouncedSearch, setDebouncedSearch] = useState(searchParams.get('search') || "");
+  const [sortBy, setSortBy] = useState<'time' | 'likes' | 'views'>((searchParams.get('sort') as any) || 'time');
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const pageSize = 12;
 
   useEffect(() => {
@@ -32,6 +36,21 @@ export default function Page() {
   useEffect(() => {
     setPage(1);
   }, [filters, debouncedSearch, sortBy]);
+
+  // 同步状态到 URL
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (filters.cities.length) params.set('cities', filters.cities.join(','));
+    if (filters.categories.length) params.set('categories', filters.categories.join(','));
+    if (filters.tags.length) params.set('tags', filters.tags.join(','));
+    if (filters.countries.length) params.set('countries', filters.countries.join(','));
+    if (debouncedSearch) params.set('search', debouncedSearch);
+    if (sortBy !== 'time') params.set('sort', sortBy);
+    if (page > 1) params.set('page', page.toString());
+
+    const newUrl = params.toString() ? `?${params.toString()}` : '';
+    router.replace(`/${locale}${newUrl}`, { scroll: false });
+  }, [filters, debouncedSearch, sortBy, page, router, locale]);
 
   const { data, isLoading } = useWorks({
     page,

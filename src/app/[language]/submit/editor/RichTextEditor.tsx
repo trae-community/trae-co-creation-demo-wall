@@ -6,6 +6,7 @@ import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import { useEffect } from 'react'
+import { toast } from 'sonner'
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   Heading2, Heading3, List, ListOrdered, Link as LinkIcon, RemoveFormatting
@@ -94,7 +95,7 @@ export function RichTextEditor({ value, onChange, placeholder, hasError }: RichT
     const url = window.prompt('请输入链接地址 (https://...)')
     if (!url) return
     if (!/^https?:\/\//.test(url) && !url.startsWith('mailto:')) {
-      window.alert('请输入有效的 http/https 或 mailto 链接')
+      toast.error('请输入有效的 http/https 或 mailto 链接')
       return
     }
     editor.chain().focus().setLink({ href: url }).run()
