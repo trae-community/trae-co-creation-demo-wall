@@ -5,10 +5,10 @@ ARG DEBIAN_MIRROR=mirrors.tuna.tsinghua.edu.cn
 
 RUN set -eux; \
     if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
-      sed -i "s|http://deb.debian.org/debian|https://${DEBIAN_MIRROR}/debian|g; s|http://deb.debian.org/debian-security|https://${DEBIAN_MIRROR}/debian-security|g" /etc/apt/sources.list.d/debian.sources; \
+      sed -i "s|http://deb.debian.org/debian|http://${DEBIAN_MIRROR}/debian|g; s|http://deb.debian.org/debian-security|http://${DEBIAN_MIRROR}/debian-security|g" /etc/apt/sources.list.d/debian.sources; \
     fi; \
     if [ -f /etc/apt/sources.list ]; then \
-      sed -i "s|http://deb.debian.org/debian|https://${DEBIAN_MIRROR}/debian|g; s|http://deb.debian.org/debian-security|https://${DEBIAN_MIRROR}/debian-security|g" /etc/apt/sources.list; \
+      sed -i "s|http://deb.debian.org/debian|http://${DEBIAN_MIRROR}/debian|g; s|http://deb.debian.org/debian-security|http://${DEBIAN_MIRROR}/debian-security|g" /etc/apt/sources.list; \
     fi; \
     apt-get update; \
     apt-get install -y --no-install-recommends \

@@ -11,6 +11,8 @@ test('dockerfile uses a shared base stage and a configurable Debian mirror for a
   assert.match(dockerfile, /^FROM .+ AS base$/m)
   assert.match(dockerfile, /^ARG DEBIAN_MIRROR=/m)
   assert.match(dockerfile, /sed -i .*debian\.sources/)
+  assert.match(dockerfile, /http:\/\/\$\{DEBIAN_MIRROR\}\/debian/)
+  assert.doesNotMatch(dockerfile, /https:\/\/\$\{DEBIAN_MIRROR\}\/debian/)
   assert.match(dockerfile, /^FROM base AS builder$/m)
   assert.match(dockerfile, /^FROM base AS runner$/m)
 })
