@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { cos, COS_BUCKET, COS_REGION } from "@/lib/cos";
 import { v4 as uuidv4 } from "uuid";
-
-const BUCKET_NAME = "TRAE";
 
 export async function POST(request: Request) {
   try {
@@ -18,7 +16,6 @@ export async function POST(request: Request) {
     }
 
     // 2. Validate file
-    // Max size 5MB
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json(
         { success: false, error: "File size exceeds 5MB limit" },
@@ -26,7 +23,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Allowed types
     const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
@@ -38,34 +34,31 @@ export async function POST(request: Request) {
     // 3. Generate unique filename
     const fileExt = file.name.split(".").pop();
     const fileName = `${uuidv4()}.${fileExt}`;
-    // Simple path structure: uploads/YYYY-MM-DD/filename
     const dateStr = new Date().toISOString().split('T')[0];
     const filePath = `uploads/${dateStr}/${fileName}`;
 
-    // 4. Upload to Supabase Storage
-    const { data, error } = await supabase.storage
-      .from(BUCKET_NAME)
-      .upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: false,
+    // 4. Upload to Tencent COS
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    await new Promise((resolve, reject) => {
+      cos.putObject({
+        Bucket: COS_BUCKET,
+        Region: COS_REGION,
+        Key: filePath,
+        Body: buffer,
+        ContentType: file.type,
+      }, (err, data) => {
+        if (err) reject(err);
+        else resolve(data);
       });
+    });
 
-    if (error) {
-      console.error("Supabase storage upload error:", error);
-      return NextResponse.json(
-        { success: false, error: "Failed to upload file to storage", details: error.message, fullError: error },
-        { status: 500 }
-      );
-    }
-
-    // 5. Get Public URL
-    const { data: publicUrlData } = supabase.storage
-      .from(BUCKET_NAME)
-      .getPublicUrl(filePath);
+    // 5. Generate public URL
+    const publicUrl = `https://${COS_BUCKET}.cos.${COS_REGION}.myqcloud.com/${filePath}`;
 
     return NextResponse.json({
       success: true,
-      url: publicUrlData.publicUrl,
+      url: publicUrl,
       path: filePath,
     });
 
@@ -80,7 +73,6 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    // 1. Parse request body
     const body = await request.json();
     const { path, url } = body;
 
@@ -91,16 +83,15 @@ export async function DELETE(request: Request) {
       );
     }
 
-    // 2. Determine file path
     let filePath = path;
     if (!filePath && url) {
       try {
         const urlObj = new URL(url);
-        const pathParts = urlObj.pathname.split(`/${BUCKET_NAME}/`);
-        if (pathParts.length > 1) {
-          filePath = decodeURIComponent(pathParts[1]);
+        const pathMatch = urlObj.pathname.match(/\/(.+)$/);
+        if (pathMatch) {
+          filePath = decodeURIComponent(pathMatch[1]);
         } else {
-           return NextResponse.json(
+          return NextResponse.json(
             { success: false, error: "Invalid URL format" },
             { status: 400 }
           );
@@ -113,18 +104,16 @@ export async function DELETE(request: Request) {
       }
     }
 
-    // 3. Delete from Supabase Storage
-    const { error } = await supabase.storage
-      .from(BUCKET_NAME)
-      .remove([filePath]);
-
-    if (error) {
-      console.error("Supabase storage delete error:", error);
-      return NextResponse.json(
-        { success: false, error: "Failed to delete file" },
-        { status: 500 }
-      );
-    }
+    await new Promise((resolve, reject) => {
+      cos.deleteObject({
+        Bucket: COS_BUCKET,
+        Region: COS_REGION,
+        Key: filePath,
+      }, (err, data) => {
+        if (err) reject(err);
+        else resolve(data);
+      });
+    });
 
     return NextResponse.json({ success: true });
 

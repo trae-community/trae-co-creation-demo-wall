@@ -1,0 +1,122 @@
+[
+  {
+    "work_id": 2,
+    "audit_status": 1,
+    "display_status": 1,
+    "view_count": 115,
+    "like_count": 103,
+    "last_audit_at": "2026-03-03 08:44:50.173000+00:00"
+  },
+  {
+    "work_id": 23,
+    "audit_status": 0,
+    "display_status": 0,
+    "view_count": 1,
+    "like_count": 0,
+    "last_audit_at": null
+  },
+  {
+    "work_id": 18,
+    "audit_status": 0,
+    "display_status": 0,
+    "view_count": 0,
+    "like_count": 0,
+    "last_audit_at": null
+  },
+  {
+    "work_id": 19,
+    "audit_status": 0,
+    "display_status": 0,
+    "view_count": 0,
+    "like_count": 0,
+    "last_audit_at": null
+  },
+  {
+    "work_id": 20,
+    "audit_status": 0,
+    "display_status": 0,
+    "view_count": 0,
+    "like_count": 0,
+    "last_audit_at": null
+  },
+  {
+    "work_id": 10,
+    "audit_status": 0,
+    "display_status": 0,
+    "view_count": 100,
+    "like_count": 100,
+    "last_audit_at": "2026-03-04 04:08:48.468000+00:00"
+  },
+  {
+    "work_id": 22,
+    "audit_status": 0,
+    "display_status": 0,
+    "view_count": 0,
+    "like_count": 0,
+    "last_audit_at": null
+  },
+  {
+    "work_id": 21,
+    "audit_status": 0,
+    "display_status": 0,
+    "view_count": 0,
+    "like_count": 0,
+    "last_audit_at": null
+  },
+  {
+    "work_id": 1,
+    "audit_status": 1,
+    "display_status": 1,
+    "view_count": 112,
+    "like_count": 103,
+    "last_audit_at": "2026-03-04 02:24:22.727000+00:00"
+  },
+  {
+    "work_id": 17,
+    "audit_status": 0,
+    "display_status": 0,
+    "view_count": 0,
+    "like_count": 0,
+    "last_audit_at": null
+  },
+  {
+    "work_id": 14,
+    "audit_status": 1,
+    "display_status": 1,
+    "view_count": 17,
+    "like_count": 2,
+    "last_audit_at": "2026-03-26 09:23:58.396000+00:00"
+  },
+  {
+    "work_id": 3,
+    "audit_status": 1,
+    "display_status": 1,
+    "view_count": 60,
+    "like_count": 4,
+    "last_audit_at": "2026-03-05 06:15:14.632000+00:00"
+  },
+  {
+    "work_id": 16,
+    "audit_status": 1,
+    "display_status": 1,
+    "view_count": 45,
+    "like_count": 3,
+    "last_audit_at": "2026-03-26 09:23:25.324000+00:00"
+  },
+  {
+    "work_id": 4,
+    "audit_status": 1,
+    "display_status": 1,
+    "view_count": 42,
+    "like_count": 3,
+    "last_audit_at": "2026-03-04 07:19:01.097000+00:00"
+  },
+  {
+    "work_id": 15,
+    "audit_status": 1,
+    "display_status": 1,
+    "view_count": 37,
+    "like_count": 3,
+    "last_audit_at": "2026-03-26 08:14:33.127000+00:00"
+  }
+]

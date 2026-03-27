@@ -1,0 +1,126 @@
+[
+  {
+    "id": 8,
+    "work_id": 10,
+    "team_intro": "一个优秀的团队，大佬多多",
+    "contact_phone": "110",
+    "contact_email": "110@qq.com",
+    "members": [
+      "岳贵超"
+    ]
+  },
+  {
+    "id": 2,
+    "work_id": 2,
+    "team_intro": "1,2,3",
+    "contact_phone": "1388888888",
+    "contact_email": "test@email.com",
+    "members": [
+      "岳贵超"
+    ]
+  },
+  {
+    "id": 4,
+    "work_id": 4,
+    "team_intro": null,
+    "contact_phone": null,
+    "contact_email": null,
+    "members": "[\"yeatsliao\"]"
+  },
+  {
+    "id": 1,
+    "work_id": 1,
+    "team_intro": "你",
+    "contact_phone": "1388888888",
+    "contact_email": "test@email.com",
+    "members": "[\"岳贵超\"]"
+  },
+  {
+    "id": 3,
+    "work_id": 3,
+    "team_intro": "一个伟大的团队",
+    "contact_phone": "110",
+    "contact_email": "yueguichao@gmail.com",
+    "members": "[\"岳贵超\",\"廖轶超\"]"
+  },
+  {
+    "id": 11,
+    "work_id": 14,
+    "team_intro": "1个人+Trae就是一个超级团队",
+    "contact_phone": null,
+    "contact_email": null,
+    "members": "[\"宋鑫\"]"
+  },
+  {
+    "id": 14,
+    "work_id": 16,
+    "team_intro": "1个人+Trae就是一个超级团队",
+    "contact_phone": null,
+    "contact_email": null,
+    "members": "[\"宋鑫\"]"
+  },
+  {
+    "id": 15,
+    "work_id": 17,
+    "team_intro": null,
+    "contact_phone": null,
+    "contact_email": null,
+    "members": "[\"jaguarliuu\"]"
+  },
+  {
+    "id": 16,
+    "work_id": 18,
+    "team_intro": null,
+    "contact_phone": null,
+    "contact_email": null,
+    "members": "[\"yeatsliao\"]"
+  },
+  {
+    "id": 17,
+    "work_id": 19,
+    "team_intro": null,
+    "contact_phone": null,
+    "contact_email": null,
+    "members": "[\"yeatsliao\"]"
+  },
+  {
+    "id": 18,
+    "work_id": 20,
+    "team_intro": "TRAE Demo-Y3",
+    "contact_phone": "TRAE Demo-Y3",
+    "contact_email": null,
+    "members": "[\"yeatsliao\"]"
+  },
+  {
+    "id": 12,
+    "work_id": 15,
+    "team_intro": "一人+AI=可抵千军万马",
+    "contact_phone": null,
+    "contact_email": null,
+    "members": "[\"杨CC\"]"
+  },
+  {
+    "id": 20,
+    "work_id": 21,
+    "team_intro": "一个人+Trae搭子的团队",
+    "contact_phone": null,
+    "contact_email": null,
+    "members": "[\"蓝海豚\"]"
+  },
+  {
+    "id": 21,
+    "work_id": 22,
+    "team_intro": "test",
+    "contact_phone": "13344445555",
+    "contact_email": "mihelzhao@gmail.com",
+    "members": "[\"赵赵\"]"
+  },
+  {
+    "id": 22,
+    "work_id": 23,
+    "team_intro": null,
+    "contact_phone": null,
+    "contact_email": null,
+    "members": "[\"yeatsliao\"]"
+  }
+]

@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X } from "lucide-react";
 import { ParticlesBackground } from "./particles-background";
-import { SignedIn, SignedOut, UserButton, useAuth } from '@clerk/nextjs';
+import { useSession } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/language/navigation';
 import Image from 'next/image';
@@ -27,28 +27,28 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
 
-  // Read roles from local JWT — zero network call in the happy path
-  const { sessionClaims, userId: clerkUserId } = useAuth();
-  const jwtRoles = (sessionClaims?.publicMetadata as { roles?: string[] })?.roles ?? [];
-  const [fallbackRoles, setFallbackRoles] = useState<string[]>([]);
+  // Fetch user roles from API
+  const { data: session, status } = useSession();
+  const [roles, setRoles] = useState<string[]>([]);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
-  // Fallback: if JWT has no roles but user is logged in (webhook not yet fired / JWT not refreshed),
-  // fetch once from /api/profile to get roles from DB.
   useEffect(() => {
-    if (!clerkUserId || jwtRoles.length > 0) return;
+    if (status !== 'authenticated') return;
+
     fetch('/api/profile')
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         const profileRoles: string[] = (data?.profile?.roles ?? []).map(
           (r: { roleCode: string }) => r.roleCode
         );
-        if (profileRoles.length > 0) setFallbackRoles(profileRoles);
+        if (profileRoles.length > 0) setRoles(profileRoles);
+        setAvatarUrl(data?.profile?.avatarUrl ?? null);
       })
       .catch(() => {});
-  }, [clerkUserId, jwtRoles.length]);
+  }, [status]);
 
-  const roles = jwtRoles.length > 0 ? jwtRoles : fallbackRoles;
   const showConsole = roles.some(r => r === 'root' || r === 'admin');
+  const isAuthenticated = status === 'authenticated';
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -123,22 +123,27 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               </Link>
             )}
 
-            <SignedIn>
+            {isAuthenticated && (
               <Link
                 href="/profile"
                 className={cn(
-                  "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
+                  "flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 overflow-hidden",
                   pathname === "/profile"
-                    ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    ? "ring-2 ring-green-500 ring-offset-2 ring-offset-background"
+                    : "hover:ring-2 hover:ring-white/20"
                 )}
               >
-                <UserRound className="w-3.5 h-3.5" />
-                {tProfile('menu')}
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
+                    <UserRound className="w-5 h-5 text-zinc-500" />
+                  </div>
+                )}
               </Link>
-            </SignedIn>
+            )}
 
-            <SignedOut>
+            {!isAuthenticated && (
               <Link
                 href="/sign-in"
                 className={cn(
@@ -151,13 +156,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 <LogIn className="w-3.5 h-3.5" />
                 {t('login')}
               </Link>
-            </SignedOut>
-
-            <SignedIn>
-              <div className="flex items-center gap-2 px-4 py-1.5">
-                <UserButton />
-              </div>
-            </SignedIn>
+            )}
 
             <div className="relative" ref={langMenuRef}>
               <button
@@ -194,9 +193,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
           {/* Mobile Menu Button */}
           <div className="flex lg:hidden items-center gap-3">
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
@@ -253,7 +249,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 </Link>
               )}
 
-              <SignedIn>
+              {isAuthenticated && (
                 <Link
                   href="/profile"
                   onClick={() => setMobileMenuOpen(false)}
@@ -264,12 +260,18 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                       : "text-gray-400 hover:text-white hover:bg-white/5"
                   )}
                 >
-                  <UserRound className="w-4 h-4" />
+                  <div className="w-6 h-6 rounded-full overflow-hidden bg-zinc-800 flex items-center justify-center flex-shrink-0">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <UserRound className="w-4 h-4 text-zinc-500" />
+                    )}
+                  </div>
                   {tProfile('menu')}
                 </Link>
-              </SignedIn>
+              )}
 
-              <SignedOut>
+              {!isAuthenticated && (
                 <Link
                   href="/sign-in"
                   onClick={() => setMobileMenuOpen(false)}
@@ -283,7 +285,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                   <LogIn className="w-4 h-4" />
                   {t('login')}
                 </Link>
-              </SignedOut>
+              )}
 
               <div className="pt-2 border-t border-white/5">
                 <p className="px-4 py-2 text-xs text-gray-500">{t('language') || 'Language'}</p>

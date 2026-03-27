@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import { Inter, Noto_Sans_SC, JetBrains_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { ClerkProvider } from '@clerk/nextjs';
-import { dark } from '@clerk/themes';
+import { SessionProvider } from 'next-auth/react';
 import { SiteLayout } from '@/components/layout/site-layout';
 import { QueryProvider } from '@/components/providers/query-provider';
+import { Toaster } from 'sonner';
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -42,18 +42,7 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: dark,
-        variables: {
-          colorPrimary: "rgb(50, 240, 140)",
-          colorBackground: "rgb(34, 36, 39)",
-          colorInputBackground: "rgb(70, 71, 78)",
-          colorText: "rgb(245, 249, 254)",
-          colorTextSecondary: "rgb(245, 249, 254)",
-        },
-      }}
-    >
+    <SessionProvider>
       <html lang={language}>
         <body className={`${fontSans.variable} ${fontChinese.variable} ${fontMono.variable} antialiased`}>
           <QueryProvider>
@@ -61,8 +50,9 @@ export default async function LocaleLayout({
               <SiteLayout>{children}</SiteLayout>
             </NextIntlClientProvider>
           </QueryProvider>
+          <Toaster position="top-center" theme="dark" richColors />
         </body>
       </html>
-    </ClerkProvider>
+    </SessionProvider>
   )
 }

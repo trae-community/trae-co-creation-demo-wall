@@ -1,0 +1,7 @@
+id,dict_code,dict_name,description,is_system
+1,audit_status,审核状态,作品审核流程状态,True
+2,dev_status,开发状态,作品当前的开发阶段,True
+5,city,城市,城市列表,True
+6,honor_type,荣誉类型,作品获得的荣誉类型,True
+3,category_code,作品分类,作品所属的类别,True
+4,country,省份,省份列表,True

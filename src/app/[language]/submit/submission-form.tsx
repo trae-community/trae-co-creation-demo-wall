@@ -5,8 +5,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useState, useEffect, useMemo } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { CheckCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Tag as WorkTag, DictionaryItem } from '@/lib/types'
 import { Button } from '@/components/common/action-button'
 import { StepIndicator, StepNumber } from './steps/StepIndicator'
@@ -40,11 +41,11 @@ function buildSchema(t: (k: string) => string) {
           value: z
             .string()
             .min(1, t('validationHighlightRequired'))
-            .max(10, t('validationHighlightMax')),
+            .max(30, t('validationHighlightMax')),
         })
       )
-      .min(3, t('validationHighlightsMin'))
-      .max(5, t('validationHighlightsMax')),
+      .min(1, t('validationHighlightsMin'))
+      .max(3, t('validationHighlightsMax')),
     scenarios: z
       .array(z.object({ value: z.string().min(1, t('validationScenarioRequired')) }))
       .min(1, t('validationScenariosMin')),
@@ -69,7 +70,7 @@ const STEP_FIELDS: Record<StepNumber, (keyof SubmissionFormValues)[]> = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function SubmissionForm() {
-  const { user } = useUser()
+  const { data: session } = useSession()
   const t = useTranslations('Submit')
   const locale = useLocale()
 
@@ -104,13 +105,13 @@ export function SubmissionForm() {
       category: '',
       devStatus: '',
       tags: 0,
-      team: [{ value: user?.username || '' }],
+      team: [{ value: session?.user?.name || '' }],
       teamIntro: '',
       contactPhone: '',
       contactEmail: '',
       coverUrl: '',
       story: '',
-      highlights: [{ value: '' }, { value: '' }, { value: '' }],
+      highlights: [{ value: '' }],
       scenarios: [{ value: '' }],
       screenshots: [],
       demoUrl: '',
@@ -125,10 +126,10 @@ export function SubmissionForm() {
 
   // ── Sync user ──
   useEffect(() => {
-    if (user?.username) {
-      setValue('team', [{ value: user.username }])
+    if (session?.user?.name) {
+      setValue('team', [{ value: session.user.name }])
     }
-  }, [user, setValue])
+  }, [session, setValue])
 
   // ── Reset city on country change ──
   useEffect(() => {
@@ -206,7 +207,7 @@ export function SubmissionForm() {
     const file = e.target.files?.[0]
     if (!file) return
     if (file.size > 5 * 1024 * 1024) {
-      alert(t('uploadSizeError'))
+      toast.error(t('uploadSizeError'))
       return
     }
     try {
@@ -216,7 +217,7 @@ export function SubmissionForm() {
       setValue('coverUrl', url, { shouldValidate: true })
     } catch (err) {
       console.error('Cover upload failed:', err)
-      alert(t('uploadError') || 'Upload failed')
+      toast.error(t('uploadError') || 'Upload failed')
     } finally {
       setUploadingCover(false)
     }
@@ -226,7 +227,7 @@ export function SubmissionForm() {
     const files = e.target.files
     if (!files) return
     if (files.length + screenshots.length > 5) {
-      alert(t('uploadLimitError'))
+      toast.error(t('uploadLimitError'))
       return
     }
     try {
@@ -242,7 +243,7 @@ export function SubmissionForm() {
       setValue('screenshots', next, { shouldValidate: true })
     } catch (err) {
       console.error('Screenshot upload failed:', err)
-      alert(t('uploadError') || 'Upload failed')
+      toast.error(t('uploadError') || 'Upload failed')
     } finally {
       setUploadingScreenshots(false)
     }
@@ -298,11 +299,11 @@ export function SubmissionForm() {
         setIsSubmitted(true)
       } else {
         console.error('Submission error:', result.error, result.details)
-        alert(t('submitError') || result.error || 'Submission failed')
+        toast.error(t('submitError') || result.error || 'Submission failed')
       }
     } catch (err) {
       console.error('Submission failed:', err)
-      alert(t('submitError') || 'An unexpected error occurred')
+      toast.error(t('submitError') || 'An unexpected error occurred')
     }
   }
 

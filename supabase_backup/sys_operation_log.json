@@ -1,0 +1,2500 @@
+[
+  {
+    "id": 1,
+    "operator_id": 6,
+    "module": "works",
+    "action": "audit",
+    "target_type": "work_base",
+    "target_id": "1",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/works/console",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "auditReason": "Manual update via console",
+      "auditStatus": 1
+    },
+    "created_at": "2026-03-04 02:24:23.462000+00:00"
+  },
+  {
+    "id": 2,
+    "operator_id": 6,
+    "module": "works",
+    "action": "update",
+    "target_type": "work_base",
+    "target_id": "1",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/works/console",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "id": "1",
+      "hasTagUpdate": false,
+      "hasTeamUpdate": false,
+      "hasHonorUpdate": false
+    },
+    "created_at": "2026-03-04 02:24:25.621000+00:00"
+  },
+  {
+    "id": 3,
+    "operator_id": 6,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "6",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3ALS68XWw1n2rjB5JvypMhkGyI6"
+    },
+    "created_at": "2026-03-04 02:29:01.397000+00:00"
+  },
+  {
+    "id": 4,
+    "operator_id": 6,
+    "module": "tags",
+    "action": "update",
+    "target_type": "work_tag",
+    "target_id": "7",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/tags",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "id": 7,
+      "name": "Hackathon 2026",
+      "isAutoAudit": true
+    },
+    "created_at": "2026-03-04 06:32:17.217000+00:00"
+  },
+  {
+    "id": 5,
+    "operator_id": 6,
+    "module": "submit",
+    "action": "create_work",
+    "target_type": "work_base",
+    "target_id": "4",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/submit",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "title": "TRAE Demo-Y1",
+      "category": "game",
+      "autoApproved": true,
+      "autoAuditTags": [
+        "Hackathon 2026"
+      ]
+    },
+    "created_at": "2026-03-04 07:19:02.731000+00:00"
+  },
+  {
+    "id": 6,
+    "operator_id": null,
+    "module": "submit",
+    "action": "auto_audit",
+    "target_type": "work_base",
+    "target_id": "4",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/submit",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "tags": [
+        "Hackathon 2026"
+      ],
+      "auditor": "system",
+      "auditStatus": 1,
+      "displayStatus": 1
+    },
+    "created_at": "2026-03-04 07:19:03.140000+00:00"
+  },
+  {
+    "id": 7,
+    "operator_id": 5,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "5",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3AKtqLElwpyrPSb6QYjKUOaRGQ3"
+    },
+    "created_at": "2026-03-05 01:32:30.218000+00:00"
+  },
+  {
+    "id": 8,
+    "operator_id": 1,
+    "module": "works",
+    "action": "audit",
+    "target_type": "work_base",
+    "target_id": "3",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/works/console",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "auditReason": "Manual update via console",
+      "auditStatus": 1
+    },
+    "created_at": "2026-03-05 06:15:15.322000+00:00"
+  },
+  {
+    "id": 9,
+    "operator_id": 1,
+    "module": "works",
+    "action": "update",
+    "target_type": "work_base",
+    "target_id": "3",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/works/console",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "id": "3",
+      "hasTagUpdate": false,
+      "hasTeamUpdate": false,
+      "hasHonorUpdate": false
+    },
+    "created_at": "2026-03-05 06:15:17.264000+00:00"
+  },
+  {
+    "id": 10,
+    "operator_id": 5,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "5",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "210.79.151.26",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3AKtqLElwpyrPSb6QYjKUOaRGQ3"
+    },
+    "created_at": "2026-03-07 01:56:25.874000+00:00"
+  },
+  {
+    "id": 11,
+    "operator_id": 6,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "6",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "58.152.25.127",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3ALS68XWw1n2rjB5JvypMhkGyI6"
+    },
+    "created_at": "2026-03-09 02:17:03.686000+00:00"
+  },
+  {
+    "id": 12,
+    "operator_id": 5,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "5",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3AKtqLElwpyrPSb6QYjKUOaRGQ3"
+    },
+    "created_at": "2026-03-10 15:05:57.056000+00:00"
+  },
+  {
+    "id": 13,
+    "operator_id": 5,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "5",
+    "success": true,
+    "error_message": null,
+    "request_method": null,
+    "request_path": null,
+    "ip_address": null,
+    "user_agent": null,
+    "payload": {
+      "clerkId": "user_3AKtqLElwpyrPSb6QYjKUOaRGQ3"
+    },
+    "created_at": "2026-03-22 02:31:07.454000+00:00"
+  },
+  {
+    "id": 14,
+    "operator_id": 5,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "5",
+    "success": true,
+    "error_message": null,
+    "request_method": null,
+    "request_path": null,
+    "ip_address": null,
+    "user_agent": null,
+    "payload": {
+      "clerkId": "user_3AKtqLElwpyrPSb6QYjKUOaRGQ3"
+    },
+    "created_at": "2026-03-22 02:34:34.044000+00:00"
+  },
+  {
+    "id": 15,
+    "operator_id": 6,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "6",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3ALS68XWw1n2rjB5JvypMhkGyI6"
+    },
+    "created_at": "2026-03-22 07:36:33.415000+00:00"
+  },
+  {
+    "id": 16,
+    "operator_id": 3,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "3",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "54.216.8.72",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BKyOYnLH90IbnG2h0aOtD9d5U7"
+    },
+    "created_at": "2026-03-23 07:47:14.031000+00:00"
+  },
+  {
+    "id": 17,
+    "operator_id": 1,
+    "module": "works",
+    "action": "update",
+    "target_type": "work_base",
+    "target_id": "3",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/console/works",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "id": "3",
+      "hasTagUpdate": false,
+      "hasTeamUpdate": false,
+      "hasHonorUpdate": true
+    },
+    "created_at": "2026-03-24 03:28:44.500000+00:00"
+  },
+  {
+    "id": 18,
+    "operator_id": 8,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "8",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "52.215.16.239",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BRFsQGUf9aB8j3gj4tuQDqgcve"
+    },
+    "created_at": "2026-03-25 13:14:55.464000+00:00"
+  },
+  {
+    "id": 19,
+    "operator_id": 9,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "9",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "52.215.16.239",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BRGxsB1SYtxApllHkLuzOSjuGP"
+    },
+    "created_at": "2026-03-25 13:18:54.574000+00:00"
+  },
+  {
+    "id": 20,
+    "operator_id": 7,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "7",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "63.33.109.123",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BRGPgXxM5UhymRY0oaAedEMFJY"
+    },
+    "created_at": "2026-03-25 13:19:38.302000+00:00"
+  },
+  {
+    "id": 21,
+    "operator_id": 8,
+    "module": "submit",
+    "action": "create_work",
+    "target_type": "work_base",
+    "target_id": "14",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/submit",
+    "ip_address": "23.247.137.197",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "payload": {
+      "title": "2号相机",
+      "category": "utility",
+      "autoApproved": false,
+      "autoAuditTags": []
+    },
+    "created_at": "2026-03-25 13:22:41.979000+00:00"
+  },
+  {
+    "id": 22,
+    "operator_id": 7,
+    "module": "submit",
+    "action": "create_work",
+    "target_type": "work_base",
+    "target_id": "15",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/submit",
+    "ip_address": "112.120.103.15",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "title": "杨CC资源站-你所见的100%都是trae开发",
+      "category": "utility",
+      "autoApproved": false,
+      "autoAuditTags": []
+    },
+    "created_at": "2026-03-25 13:28:22.033000+00:00"
+  },
+  {
+    "id": 23,
+    "operator_id": 10,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "10",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "54.216.8.72",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BRINsUdpXnIwONKs6JppLJNeqT"
+    },
+    "created_at": "2026-03-25 13:30:27.755000+00:00"
+  },
+  {
+    "id": 24,
+    "operator_id": 10,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "10",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BRINsUdpXnIwONKs6JppLJNeqT"
+    },
+    "created_at": "2026-03-25 13:30:29.155000+00:00"
+  },
+  {
+    "id": 25,
+    "operator_id": 10,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "10",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BRINsUdpXnIwONKs6JppLJNeqT"
+    },
+    "created_at": "2026-03-25 13:30:36.072000+00:00"
+  },
+  {
+    "id": 26,
+    "operator_id": 8,
+    "module": "submit",
+    "action": "create_work",
+    "target_type": "work_base",
+    "target_id": "16",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/submit",
+    "ip_address": "23.247.137.197",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "payload": {
+      "title": "回本了么",
+      "category": "utility",
+      "autoApproved": false,
+      "autoAuditTags": []
+    },
+    "created_at": "2026-03-25 13:38:39.502000+00:00"
+  },
+  {
+    "id": 27,
+    "operator_id": 11,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "11",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "63.33.109.123",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BRTP5N9KImcnuOysLUWYte0o8K"
+    },
+    "created_at": "2026-03-25 15:01:04.056000+00:00"
+  },
+  {
+    "id": 28,
+    "operator_id": 1,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "1",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "153.122.173.98",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3ALYpwiqrKyodf5Ebl6SrKJZ1pm"
+    },
+    "created_at": "2026-03-26 06:00:59.100000+00:00"
+  },
+  {
+    "id": 29,
+    "operator_id": 2,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "2",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "38.54.98.142",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3AOOOtMINZ9KmzgIRXf5iZOPLhk"
+    },
+    "created_at": "2026-03-26 06:04:26.877000+00:00"
+  },
+  {
+    "id": 30,
+    "operator_id": 1,
+    "module": "users",
+    "action": "update",
+    "target_type": "sys_user",
+    "target_id": "3",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/users",
+    "ip_address": "101.70.128.95",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "id": "3",
+      "hasRoleUpdate": true
+    },
+    "created_at": "2026-03-26 08:04:25.998000+00:00"
+  },
+  {
+    "id": 31,
+    "operator_id": 3,
+    "module": "tags",
+    "action": "update",
+    "target_type": "work_tag",
+    "target_id": "7",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/tags",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "id": 7,
+      "name": "TRAE Friends",
+      "isAutoAudit": true
+    },
+    "created_at": "2026-03-26 08:08:55.276000+00:00"
+  },
+  {
+    "id": 32,
+    "operator_id": 3,
+    "module": "tags",
+    "action": "update",
+    "target_type": "work_tag",
+    "target_id": "6",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/tags",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "id": 6,
+      "name": "TRAE on Campus",
+      "isAutoAudit": false
+    },
+    "created_at": "2026-03-26 08:10:32.175000+00:00"
+  },
+  {
+    "id": 33,
+    "operator_id": 6,
+    "module": "works",
+    "action": "audit",
+    "target_type": "work_base",
+    "target_id": "15",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/console/works",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "auditReason": "Manual update via console",
+      "auditStatus": 1
+    },
+    "created_at": "2026-03-26 08:14:34.033000+00:00"
+  },
+  {
+    "id": 34,
+    "operator_id": 6,
+    "module": "works",
+    "action": "update",
+    "target_type": "work_base",
+    "target_id": "15",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/console/works",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "id": "15",
+      "hasTagUpdate": false,
+      "hasTeamUpdate": false,
+      "hasHonorUpdate": false
+    },
+    "created_at": "2026-03-26 08:14:36.238000+00:00"
+  },
+  {
+    "id": 35,
+    "operator_id": 3,
+    "module": "tags",
+    "action": "delete",
+    "target_type": "work_tag",
+    "target_id": "5",
+    "success": true,
+    "error_message": null,
+    "request_method": "DELETE",
+    "request_path": "/api/tags",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": null,
+    "created_at": "2026-03-26 08:15:09.947000+00:00"
+  },
+  {
+    "id": 36,
+    "operator_id": 3,
+    "module": "tags",
+    "action": "delete",
+    "target_type": "work_tag",
+    "target_id": "1",
+    "success": true,
+    "error_message": null,
+    "request_method": "DELETE",
+    "request_path": "/api/tags",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": null,
+    "created_at": "2026-03-26 08:15:11.500000+00:00"
+  },
+  {
+    "id": 37,
+    "operator_id": 3,
+    "module": "tags",
+    "action": "delete",
+    "target_type": "work_tag",
+    "target_id": "2",
+    "success": true,
+    "error_message": null,
+    "request_method": "DELETE",
+    "request_path": "/api/tags",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": null,
+    "created_at": "2026-03-26 08:15:18.722000+00:00"
+  },
+  {
+    "id": 38,
+    "operator_id": 3,
+    "module": "tags",
+    "action": "delete",
+    "target_type": "work_tag",
+    "target_id": "3",
+    "success": true,
+    "error_message": null,
+    "request_method": "DELETE",
+    "request_path": "/api/tags",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": null,
+    "created_at": "2026-03-26 08:15:25.935000+00:00"
+  },
+  {
+    "id": 39,
+    "operator_id": 3,
+    "module": "tags",
+    "action": "delete",
+    "target_type": "work_tag",
+    "target_id": "4",
+    "success": true,
+    "error_message": null,
+    "request_method": "DELETE",
+    "request_path": "/api/tags",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": null,
+    "created_at": "2026-03-26 08:15:34.919000+00:00"
+  },
+  {
+    "id": 40,
+    "operator_id": 12,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "12",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "54.216.8.72",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BTWScv5TLX4docnlio9LEGZ3vN"
+    },
+    "created_at": "2026-03-26 08:25:49.072000+00:00"
+  },
+  {
+    "id": 41,
+    "operator_id": 6,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "6",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "188.253.121.54",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3ALS68XWw1n2rjB5JvypMhkGyI6"
+    },
+    "created_at": "2026-03-26 08:37:43.345000+00:00"
+  },
+  {
+    "id": 42,
+    "operator_id": 3,
+    "module": "tags",
+    "action": "create",
+    "target_type": "work_tag",
+    "target_id": "1",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/tags",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "name": "线上社区",
+      "isAutoAudit": false
+    },
+    "created_at": "2026-03-26 08:46:52.143000+00:00"
+  },
+  {
+    "id": 43,
+    "operator_id": 10,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "10",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "203.208.167.149",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BRINsUdpXnIwONKs6JppLJNeqT"
+    },
+    "created_at": "2026-03-26 09:04:10.294000+00:00"
+  },
+  {
+    "id": 44,
+    "operator_id": 5,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "5",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "210.79.151.26",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3AKtqLElwpyrPSb6QYjKUOaRGQ3"
+    },
+    "created_at": "2026-03-26 09:15:51.764000+00:00"
+  },
+  {
+    "id": 45,
+    "operator_id": 5,
+    "module": "submit",
+    "action": "create_work",
+    "target_type": "work_base",
+    "target_id": "17",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/submit",
+    "ip_address": "210.79.151.26",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "title": "香港资讯科技学院",
+      "category": "utility",
+      "autoApproved": false,
+      "autoAuditTags": []
+    },
+    "created_at": "2026-03-26 09:22:21.601000+00:00"
+  },
+  {
+    "id": 46,
+    "operator_id": 5,
+    "module": "works",
+    "action": "audit",
+    "target_type": "work_base",
+    "target_id": "16",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/console/works",
+    "ip_address": "210.79.151.26",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "auditReason": "通过",
+      "auditStatus": 1
+    },
+    "created_at": "2026-03-26 09:23:27.209000+00:00"
+  },
+  {
+    "id": 47,
+    "operator_id": 5,
+    "module": "works",
+    "action": "update",
+    "target_type": "work_base",
+    "target_id": "16",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/console/works",
+    "ip_address": "210.79.151.26",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "id": "16",
+      "hasTagUpdate": false,
+      "hasTeamUpdate": false,
+      "hasHonorUpdate": false
+    },
+    "created_at": "2026-03-26 09:23:32.073000+00:00"
+  },
+  {
+    "id": 48,
+    "operator_id": 5,
+    "module": "works",
+    "action": "audit",
+    "target_type": "work_base",
+    "target_id": "14",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/console/works",
+    "ip_address": "210.79.151.26",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "auditReason": "已通过",
+      "auditStatus": 1
+    },
+    "created_at": "2026-03-26 09:24:00.241000+00:00"
+  },
+  {
+    "id": 49,
+    "operator_id": 5,
+    "module": "works",
+    "action": "update",
+    "target_type": "work_base",
+    "target_id": "14",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/console/works",
+    "ip_address": "210.79.151.26",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "id": "14",
+      "hasTagUpdate": false,
+      "hasTeamUpdate": false,
+      "hasHonorUpdate": false
+    },
+    "created_at": "2026-03-26 09:24:05.033000+00:00"
+  },
+  {
+    "id": 50,
+    "operator_id": 13,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "13",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "54.216.8.72",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BTgUjXDqsqSnHDVYw2x7xwejZC"
+    },
+    "created_at": "2026-03-26 09:48:19.730000+00:00"
+  },
+  {
+    "id": 51,
+    "operator_id": 13,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "13",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "112.37.103.209",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BTgUjXDqsqSnHDVYw2x7xwejZC"
+    },
+    "created_at": "2026-03-26 09:48:20.163000+00:00"
+  },
+  {
+    "id": 52,
+    "operator_id": 13,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "13",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "112.37.103.209",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BTgUjXDqsqSnHDVYw2x7xwejZC"
+    },
+    "created_at": "2026-03-26 09:48:27.357000+00:00"
+  },
+  {
+    "id": 53,
+    "operator_id": 6,
+    "module": "submit",
+    "action": "create_work",
+    "target_type": "work_base",
+    "target_id": "18",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/submit",
+    "ip_address": "188.253.121.54",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "title": "TRAE Demo-Y2",
+      "category": "utility",
+      "autoApproved": false,
+      "autoAuditTags": []
+    },
+    "created_at": "2026-03-26 11:16:28.978000+00:00"
+  },
+  {
+    "id": 54,
+    "operator_id": 6,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "6",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "188.253.121.54",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3ALS68XWw1n2rjB5JvypMhkGyI6"
+    },
+    "created_at": "2026-03-26 11:19:05.520000+00:00"
+  },
+  {
+    "id": 55,
+    "operator_id": 6,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "6",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "188.253.121.54",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3ALS68XWw1n2rjB5JvypMhkGyI6"
+    },
+    "created_at": "2026-03-26 11:19:09.529000+00:00"
+  },
+  {
+    "id": 56,
+    "operator_id": 6,
+    "module": "submit",
+    "action": "create_work",
+    "target_type": "work_base",
+    "target_id": "19",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/submit",
+    "ip_address": "188.253.121.54",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "title": "TRAE Demo-Y3",
+      "category": "scenario",
+      "autoApproved": false,
+      "autoAuditTags": []
+    },
+    "created_at": "2026-03-26 11:21:06.678000+00:00"
+  },
+  {
+    "id": 57,
+    "operator_id": 6,
+    "module": "submit",
+    "action": "create_work",
+    "target_type": "work_base",
+    "target_id": "20",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/submit",
+    "ip_address": "188.253.121.54",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "title": "TRAE Demo-Y3",
+      "category": "scenario",
+      "autoApproved": false,
+      "autoAuditTags": []
+    },
+    "created_at": "2026-03-26 11:21:24.085000+00:00"
+  },
+  {
+    "id": 58,
+    "operator_id": 14,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "14",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "54.216.8.72",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BTuahDXioTQbpzAJN4tfw2ewi7"
+    },
+    "created_at": "2026-03-26 11:44:14.800000+00:00"
+  },
+  {
+    "id": 59,
+    "operator_id": 14,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "14",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "23.185.208.5",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BTuahDXioTQbpzAJN4tfw2ewi7"
+    },
+    "created_at": "2026-03-26 11:44:15.054000+00:00"
+  },
+  {
+    "id": 60,
+    "operator_id": 14,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "14",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "23.185.208.5",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BTuahDXioTQbpzAJN4tfw2ewi7"
+    },
+    "created_at": "2026-03-26 11:44:21.658000+00:00"
+  },
+  {
+    "id": 61,
+    "operator_id": 3,
+    "module": "tags",
+    "action": "update",
+    "target_type": "work_tag",
+    "target_id": "7",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/tags",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "id": 7,
+      "name": "TRAE Friends",
+      "isAutoAudit": true
+    },
+    "created_at": "2026-03-26 11:46:47.995000+00:00"
+  },
+  {
+    "id": 62,
+    "operator_id": 3,
+    "module": "tags",
+    "action": "create",
+    "target_type": "work_tag",
+    "target_id": "2",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/tags",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "name": "站内投稿",
+      "isAutoAudit": false
+    },
+    "created_at": "2026-03-26 11:48:44.919000+00:00"
+  },
+  {
+    "id": 63,
+    "operator_id": 3,
+    "module": "tags",
+    "action": "update",
+    "target_type": "work_tag",
+    "target_id": "6",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/tags",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "id": 6,
+      "name": "TRAE on Campus（校园活动）",
+      "isAutoAudit": false
+    },
+    "created_at": "2026-03-26 11:52:44.328000+00:00"
+  },
+  {
+    "id": 64,
+    "operator_id": 3,
+    "module": "tags",
+    "action": "update",
+    "target_type": "work_tag",
+    "target_id": "7",
+    "success": true,
+    "error_message": null,
+    "request_method": "PUT",
+    "request_path": "/api/tags",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "id": 7,
+      "name": "TRAE Friends（城市活动）",
+      "isAutoAudit": true
+    },
+    "created_at": "2026-03-26 11:52:58.031000+00:00"
+  },
+  {
+    "id": 65,
+    "operator_id": 14,
+    "module": "submit",
+    "action": "create_work",
+    "target_type": "work_base",
+    "target_id": "21",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/submit",
+    "ip_address": "23.185.208.5",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "title": "效率搭子",
+      "category": "utility",
+      "autoApproved": false,
+      "autoAuditTags": []
+    },
+    "created_at": "2026-03-26 12:03:09.497000+00:00"
+  },
+  {
+    "id": 66,
+    "operator_id": 15,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "15",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "52.215.16.239",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BTxuKIetHMXVuOZ50dXP7kiaMF"
+    },
+    "created_at": "2026-03-26 12:11:30.687000+00:00"
+  },
+  {
+    "id": 67,
+    "operator_id": 15,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "15",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "27.190.146.157",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0",
+    "payload": {
+      "clerkId": "user_3BTxuKIetHMXVuOZ50dXP7kiaMF"
+    },
+    "created_at": "2026-03-26 12:11:31.069000+00:00"
+  },
+  {
+    "id": 68,
+    "operator_id": 15,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "15",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "27.190.146.157",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0",
+    "payload": {
+      "clerkId": "user_3BTxuKIetHMXVuOZ50dXP7kiaMF"
+    },
+    "created_at": "2026-03-26 12:11:38.073000+00:00"
+  },
+  {
+    "id": 69,
+    "operator_id": 16,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "16",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "52.215.16.239",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BU0nRTGqNQfDlQStCQUDjFg0MN"
+    },
+    "created_at": "2026-03-26 12:35:15.414000+00:00"
+  },
+  {
+    "id": 70,
+    "operator_id": 16,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "16",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "92.223.71.140",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BU0nRTGqNQfDlQStCQUDjFg0MN"
+    },
+    "created_at": "2026-03-26 12:35:15.589000+00:00"
+  },
+  {
+    "id": 71,
+    "operator_id": 16,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "16",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "92.223.71.140",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BU0nRTGqNQfDlQStCQUDjFg0MN"
+    },
+    "created_at": "2026-03-26 12:35:22.387000+00:00"
+  },
+  {
+    "id": 72,
+    "operator_id": 17,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "17",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "180.141.37.68",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BU1FydfJJ3YcpadxA3iY38ZJ4R"
+    },
+    "created_at": "2026-03-26 12:39:01.179000+00:00"
+  },
+  {
+    "id": 73,
+    "operator_id": 17,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "17",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "63.33.109.123",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BU1FydfJJ3YcpadxA3iY38ZJ4R"
+    },
+    "created_at": "2026-03-26 12:39:01.809000+00:00"
+  },
+  {
+    "id": 74,
+    "operator_id": 17,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "17",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "180.141.37.68",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BU1FydfJJ3YcpadxA3iY38ZJ4R"
+    },
+    "created_at": "2026-03-26 12:39:08.067000+00:00"
+  },
+  {
+    "id": 75,
+    "operator_id": 18,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "18",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "54.216.8.72",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BU1KTkZIhQgS7G8lOkbe7piVvJ"
+    },
+    "created_at": "2026-03-26 12:39:37.976000+00:00"
+  },
+  {
+    "id": 76,
+    "operator_id": 18,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "18",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "60.5.113.67",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BU1KTkZIhQgS7G8lOkbe7piVvJ"
+    },
+    "created_at": "2026-03-26 12:39:40.625000+00:00"
+  },
+  {
+    "id": 77,
+    "operator_id": 18,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "18",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "60.5.113.67",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BU1KTkZIhQgS7G8lOkbe7piVvJ"
+    },
+    "created_at": "2026-03-26 12:39:47.348000+00:00"
+  },
+  {
+    "id": 78,
+    "operator_id": 19,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "19",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "120.235.237.104",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BU1RSbkGNZK06GS7WQaL2udYbX"
+    },
+    "created_at": "2026-03-26 12:40:34.534000+00:00"
+  },
+  {
+    "id": 79,
+    "operator_id": 19,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "19",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "63.33.109.123",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BU1RSbkGNZK06GS7WQaL2udYbX"
+    },
+    "created_at": "2026-03-26 12:40:34.611000+00:00"
+  },
+  {
+    "id": 80,
+    "operator_id": 19,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "19",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "120.235.237.104",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BU1RSbkGNZK06GS7WQaL2udYbX"
+    },
+    "created_at": "2026-03-26 12:40:45.026000+00:00"
+  },
+  {
+    "id": 81,
+    "operator_id": 20,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "20",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "52.215.16.239",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BU25fvUgzhV3m6A78ug9tGLsqi"
+    },
+    "created_at": "2026-03-26 12:45:54.560000+00:00"
+  },
+  {
+    "id": 82,
+    "operator_id": 20,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "20",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "223.104.160.181",
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Mobile/15E148 Safari/604.1",
+    "payload": {
+      "clerkId": "user_3BU25fvUgzhV3m6A78ug9tGLsqi"
+    },
+    "created_at": "2026-03-26 12:45:55.069000+00:00"
+  },
+  {
+    "id": 83,
+    "operator_id": 20,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "20",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "223.104.160.181",
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Mobile/15E148 Safari/604.1",
+    "payload": {
+      "clerkId": "user_3BU25fvUgzhV3m6A78ug9tGLsqi"
+    },
+    "created_at": "2026-03-26 12:46:02.908000+00:00"
+  },
+  {
+    "id": 84,
+    "operator_id": 21,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "21",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "63.33.109.123",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BU2LPSgxVX2DyodYIqF5EpFKvK"
+    },
+    "created_at": "2026-03-26 12:47:59.482000+00:00"
+  },
+  {
+    "id": 85,
+    "operator_id": 20,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "20",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "223.104.160.149",
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Mobile/15E148 Safari/604.1",
+    "payload": {
+      "clerkId": "user_3BU25fvUgzhV3m6A78ug9tGLsqi"
+    },
+    "created_at": "2026-03-26 12:48:51.085000+00:00"
+  },
+  {
+    "id": 86,
+    "operator_id": 8,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "8",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "23.247.137.216",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BRFsQGUf9aB8j3gj4tuQDqgcve"
+    },
+    "created_at": "2026-03-26 12:49:55.511000+00:00"
+  },
+  {
+    "id": 87,
+    "operator_id": 20,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "20",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "223.104.160.156",
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 26_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.70(0x18004626) NetType/4G Language/zh_CN",
+    "payload": {
+      "clerkId": "user_3BU25fvUgzhV3m6A78ug9tGLsqi"
+    },
+    "created_at": "2026-03-26 12:54:13.084000+00:00"
+  },
+  {
+    "id": 88,
+    "operator_id": 20,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "20",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "223.104.160.156",
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 26_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.70(0x18004626) NetType/4G Language/zh_CN",
+    "payload": {
+      "clerkId": "user_3BU25fvUgzhV3m6A78ug9tGLsqi"
+    },
+    "created_at": "2026-03-26 12:54:19.892000+00:00"
+  },
+  {
+    "id": 89,
+    "operator_id": 22,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "22",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "63.33.109.123",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BU39rERE67n8pMDH7NTSYoJb6S"
+    },
+    "created_at": "2026-03-26 12:54:40.249000+00:00"
+  },
+  {
+    "id": 90,
+    "operator_id": 22,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "22",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "203.198.248.42",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 NetType/WIFI MicroMessenger/7.0.20.1781(0x6700143B) WindowsWechat(0x63090a13) UnifiedPCWindowsWechat(0xf254173b) XWEB/19027 Flue",
+    "payload": {
+      "clerkId": "user_3BU39rERE67n8pMDH7NTSYoJb6S"
+    },
+    "created_at": "2026-03-26 12:54:42.296000+00:00"
+  },
+  {
+    "id": 91,
+    "operator_id": 21,
+    "module": "submit",
+    "action": "create_work",
+    "target_type": "work_base",
+    "target_id": "22",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/submit",
+    "ip_address": "23.249.17.216",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "title": "Test",
+      "category": "assistant",
+      "autoApproved": false,
+      "autoAuditTags": []
+    },
+    "created_at": "2026-03-26 13:02:43.001000+00:00"
+  },
+  {
+    "id": 92,
+    "operator_id": 23,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "23",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "223.95.50.203",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BU6syfK7cHzyW143y7cmDUcSGY"
+    },
+    "created_at": "2026-03-26 13:25:18.840000+00:00"
+  },
+  {
+    "id": 93,
+    "operator_id": 23,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "23",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "63.33.109.123",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BU6syfK7cHzyW143y7cmDUcSGY"
+    },
+    "created_at": "2026-03-26 13:25:19.875000+00:00"
+  },
+  {
+    "id": 94,
+    "operator_id": 3,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "3",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "63.216.146.178",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BKyOYnLH90IbnG2h0aOtD9d5U7"
+    },
+    "created_at": "2026-03-26 14:00:30.396000+00:00"
+  },
+  {
+    "id": 95,
+    "operator_id": 23,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "23",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "223.95.50.203",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BU6syfK7cHzyW143y7cmDUcSGY"
+    },
+    "created_at": "2026-03-26 14:18:30.266000+00:00"
+  },
+  {
+    "id": 96,
+    "operator_id": 24,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "24",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "112.120.103.7",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BUDgHHybAKM3Ue5ijL49OwMTX4"
+    },
+    "created_at": "2026-03-26 14:21:12.176000+00:00"
+  },
+  {
+    "id": 97,
+    "operator_id": 24,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "24",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "63.33.109.123",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BUDgHHybAKM3Ue5ijL49OwMTX4"
+    },
+    "created_at": "2026-03-26 14:21:12.627000+00:00"
+  },
+  {
+    "id": 98,
+    "operator_id": 24,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "24",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "112.120.103.7",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BUDgHHybAKM3Ue5ijL49OwMTX4"
+    },
+    "created_at": "2026-03-26 14:21:18.681000+00:00"
+  },
+  {
+    "id": 99,
+    "operator_id": 25,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "25",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "63.33.109.123",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BUEG1Y1ABuWg4HLyA6CcRW5ZOZ"
+    },
+    "created_at": "2026-03-26 14:25:56.416000+00:00"
+  },
+  {
+    "id": 100,
+    "operator_id": 25,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "25",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "27.213.31.171",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0",
+    "payload": {
+      "clerkId": "user_3BUEG1Y1ABuWg4HLyA6CcRW5ZOZ"
+    },
+    "created_at": "2026-03-26 14:25:59.469000+00:00"
+  },
+  {
+    "id": 101,
+    "operator_id": 5,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "5",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "154.40.60.216",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3AKtqLElwpyrPSb6QYjKUOaRGQ3"
+    },
+    "created_at": "2026-03-26 15:21:49.652000+00:00"
+  },
+  {
+    "id": 102,
+    "operator_id": 26,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "26",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "52.215.16.239",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BUX0AMIUTQEIv1wErqPJj0QlxG"
+    },
+    "created_at": "2026-03-26 17:00:05.357000+00:00"
+  },
+  {
+    "id": 103,
+    "operator_id": 26,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "26",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "104.28.158.105",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BUX0AMIUTQEIv1wErqPJj0QlxG"
+    },
+    "created_at": "2026-03-26 17:00:09.992000+00:00"
+  },
+  {
+    "id": 104,
+    "operator_id": 27,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "27",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "52.215.16.239",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BVTMDd8wc7oMCKZzxiK6VVWXN6"
+    },
+    "created_at": "2026-03-27 00:59:55.718000+00:00"
+  },
+  {
+    "id": 105,
+    "operator_id": 27,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "27",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "203.10.97.121",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BVTMDd8wc7oMCKZzxiK6VVWXN6"
+    },
+    "created_at": "2026-03-27 00:59:57.345000+00:00"
+  },
+  {
+    "id": 106,
+    "operator_id": 27,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "27",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "203.10.97.121",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BVTMDd8wc7oMCKZzxiK6VVWXN6"
+    },
+    "created_at": "2026-03-27 01:00:05.600000+00:00"
+  },
+  {
+    "id": 107,
+    "operator_id": 6,
+    "module": "submit",
+    "action": "create_work",
+    "target_type": "work_base",
+    "target_id": "23",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/submit",
+    "ip_address": "::1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "title": "TRAE Demo-Y4",
+      "category": "utility",
+      "autoApproved": false,
+      "autoAuditTags": []
+    },
+    "created_at": "2026-03-27 01:13:55.857000+00:00"
+  },
+  {
+    "id": 108,
+    "operator_id": 13,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "13",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "138.124.60.128",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BTgUjXDqsqSnHDVYw2x7xwejZC"
+    },
+    "created_at": "2026-03-27 01:31:00.557000+00:00"
+  },
+  {
+    "id": 109,
+    "operator_id": 13,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "13",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "138.124.60.128",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BTgUjXDqsqSnHDVYw2x7xwejZC"
+    },
+    "created_at": "2026-03-27 01:31:08.803000+00:00"
+  },
+  {
+    "id": 110,
+    "operator_id": 28,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "28",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "106.32.137.24",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 NetType/WIFI MicroMessenger/7.0.20.1781(0x6700143B) WindowsWechat(0x63090a13) UnifiedPCWindowsWechat(0xf2541022) XWEB/16467 Flue",
+    "payload": {
+      "clerkId": "user_3BVg5pq6mYbf4qgiayxkLdDThnF"
+    },
+    "created_at": "2026-03-27 02:44:37.969000+00:00"
+  },
+  {
+    "id": 111,
+    "operator_id": 28,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "28",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "54.216.8.72",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BVg5pq6mYbf4qgiayxkLdDThnF"
+    },
+    "created_at": "2026-03-27 02:44:38.134000+00:00"
+  },
+  {
+    "id": 112,
+    "operator_id": 28,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "28",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "106.32.137.24",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 NetType/WIFI MicroMessenger/7.0.20.1781(0x6700143B) WindowsWechat(0x63090a13) UnifiedPCWindowsWechat(0xf2541022) XWEB/16467 Flue",
+    "payload": {
+      "clerkId": "user_3BVg5pq6mYbf4qgiayxkLdDThnF"
+    },
+    "created_at": "2026-03-27 02:44:44.895000+00:00"
+  },
+  {
+    "id": 113,
+    "operator_id": 29,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "29",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "52.215.16.239",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BVgQCHMvpkqeq9RbLrGmZLh4gB"
+    },
+    "created_at": "2026-03-27 02:47:20.947000+00:00"
+  },
+  {
+    "id": 114,
+    "operator_id": 30,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "30",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "106.32.137.24",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BVgRsQimtmlY7iZ5zc753Zm1l1"
+    },
+    "created_at": "2026-03-27 02:47:33.588000+00:00"
+  },
+  {
+    "id": 115,
+    "operator_id": 30,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "30",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "52.215.16.239",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BVgRsQimtmlY7iZ5zc753Zm1l1"
+    },
+    "created_at": "2026-03-27 02:47:35.088000+00:00"
+  },
+  {
+    "id": 116,
+    "operator_id": 30,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "30",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "106.32.137.24",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BVgRsQimtmlY7iZ5zc753Zm1l1"
+    },
+    "created_at": "2026-03-27 02:47:39.158000+00:00"
+  },
+  {
+    "id": 117,
+    "operator_id": 26,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "26",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "104.28.152.130",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BUX0AMIUTQEIv1wErqPJj0QlxG"
+    },
+    "created_at": "2026-03-27 02:58:54.104000+00:00"
+  },
+  {
+    "id": 118,
+    "operator_id": 31,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "31",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "112.255.13.190",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BViGln6stTdSmgBOrIOAv1OWwy"
+    },
+    "created_at": "2026-03-27 03:02:31.995000+00:00"
+  },
+  {
+    "id": 119,
+    "operator_id": 31,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "31",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "52.215.16.239",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BViGln6stTdSmgBOrIOAv1OWwy"
+    },
+    "created_at": "2026-03-27 03:02:32.361000+00:00"
+  },
+  {
+    "id": 120,
+    "operator_id": 31,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "31",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "112.255.13.190",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BViGln6stTdSmgBOrIOAv1OWwy"
+    },
+    "created_at": "2026-03-27 03:02:39.105000+00:00"
+  },
+  {
+    "id": 121,
+    "operator_id": 32,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "32",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "63.33.109.123",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BViTKDIB0dVsssvtPfdKCfgL1M"
+    },
+    "created_at": "2026-03-27 03:04:12.998000+00:00"
+  },
+  {
+    "id": 122,
+    "operator_id": 32,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "32",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "106.32.137.24",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BViTKDIB0dVsssvtPfdKCfgL1M"
+    },
+    "created_at": "2026-03-27 03:04:15.353000+00:00"
+  },
+  {
+    "id": 123,
+    "operator_id": 32,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "32",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "106.32.137.24",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BViTKDIB0dVsssvtPfdKCfgL1M"
+    },
+    "created_at": "2026-03-27 03:04:22.264000+00:00"
+  },
+  {
+    "id": 124,
+    "operator_id": 33,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "33",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "52.215.16.239",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BWFg5UiUG6kfwugrVcoDoIsWld"
+    },
+    "created_at": "2026-03-27 07:37:14.852000+00:00"
+  },
+  {
+    "id": 125,
+    "operator_id": 33,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "33",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "218.58.59.106",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BWFg5UiUG6kfwugrVcoDoIsWld"
+    },
+    "created_at": "2026-03-27 07:37:17.500000+00:00"
+  },
+  {
+    "id": 126,
+    "operator_id": 33,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "33",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "218.58.59.106",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "payload": {
+      "clerkId": "user_3BWFg5UiUG6kfwugrVcoDoIsWld"
+    },
+    "created_at": "2026-03-27 07:37:24.434000+00:00"
+  },
+  {
+    "id": 127,
+    "operator_id": 34,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "34",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "52.215.16.239",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BWFm1zRHYOTJVeY9jfl8TnLrFe"
+    },
+    "created_at": "2026-03-27 07:38:01.809000+00:00"
+  },
+  {
+    "id": 128,
+    "operator_id": 34,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "34",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "154.85.18.134",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0",
+    "payload": {
+      "clerkId": "user_3BWFm1zRHYOTJVeY9jfl8TnLrFe"
+    },
+    "created_at": "2026-03-27 07:38:01.964000+00:00"
+  },
+  {
+    "id": 129,
+    "operator_id": 34,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "34",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "154.85.18.134",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0",
+    "payload": {
+      "clerkId": "user_3BWFm1zRHYOTJVeY9jfl8TnLrFe"
+    },
+    "created_at": "2026-03-27 07:38:08.325000+00:00"
+  },
+  {
+    "id": 130,
+    "operator_id": 35,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "35",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "54.216.8.72",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BWFxvAj9Bal8jcc4tOhMts0Umw"
+    },
+    "created_at": "2026-03-27 07:39:35.885000+00:00"
+  },
+  {
+    "id": 131,
+    "operator_id": 36,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "36",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "54.216.8.72",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BWG7qziAiwzh8jYujf4oEkhg4C"
+    },
+    "created_at": "2026-03-27 07:40:56.275000+00:00"
+  },
+  {
+    "id": 132,
+    "operator_id": 36,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "36",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "123.234.82.246",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0",
+    "payload": {
+      "clerkId": "user_3BWG7qziAiwzh8jYujf4oEkhg4C"
+    },
+    "created_at": "2026-03-27 07:40:58.978000+00:00"
+  },
+  {
+    "id": 133,
+    "operator_id": 36,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "36",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "123.234.82.246",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0",
+    "payload": {
+      "clerkId": "user_3BWG7qziAiwzh8jYujf4oEkhg4C"
+    },
+    "created_at": "2026-03-27 07:41:05.541000+00:00"
+  },
+  {
+    "id": 134,
+    "operator_id": 37,
+    "module": "auth",
+    "action": "sign_up",
+    "target_type": "sys_user",
+    "target_id": "37",
+    "success": true,
+    "error_message": null,
+    "request_method": "POST",
+    "request_path": "/api/webhooks/clerk",
+    "ip_address": "63.33.109.123",
+    "user_agent": "Svix-Webhooks/1.84.0 (sender-9YMgn; +https://www.svix.com/http-sender/)",
+    "payload": {
+      "clerkId": "user_3BWGloaRMjK8F2IirBOZg81nWKJ"
+    },
+    "created_at": "2026-03-27 07:46:13.936000+00:00"
+  },
+  {
+    "id": 135,
+    "operator_id": 37,
+    "module": "auth",
+    "action": "sign_in",
+    "target_type": "sys_user",
+    "target_id": "37",
+    "success": true,
+    "error_message": null,
+    "request_method": "GET",
+    "request_path": "/api/auth/callback",
+    "ip_address": "222.173.87.66",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0",
+    "payload": {
+      "clerkId": "user_3BWGloaRMjK8F2IirBOZg81nWKJ"
+    },
+    "created_at": "2026-03-27 07:46:16.288000+00:00"
+  }
+]
