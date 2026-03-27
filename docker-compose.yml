@@ -23,10 +23,42 @@ services:
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - NEXTAUTH_URL=${NEXTAUTH_URL}
       - AUTH_TRUST_HOST=true
+      - RUN_DB_INIT=false
+    depends_on:
+      app-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    networks:
+      - trae-network
+
+  app-init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - COS_SECRET_ID=${COS_SECRET_ID}
+        - COS_SECRET_KEY=${COS_SECRET_KEY}
+        - COS_BUCKET=${COS_BUCKET}
+        - COS_REGION=${COS_REGION}
+        - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/trae_demo_wall?schema=public&connection_limit=20&pool_timeout=20&connect_timeout=10
+      - DIRECT_URL=postgresql://postgres:postgres@db:5432/trae_demo_wall
+      - REDIS_URL=redis://redis:6379
+      - COS_SECRET_ID=${COS_SECRET_ID}
+      - COS_SECRET_KEY=${COS_SECRET_KEY}
+      - COS_BUCKET=${COS_BUCKET}
+      - COS_REGION=${COS_REGION}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - AUTH_TRUST_HOST=true
+      - RUN_DB_INIT=true
+      - START_SERVER=false
     depends_on:
       - db
       - redis
-    restart: unless-stopped
+    restart: "no"
     networks:
       - trae-network
 

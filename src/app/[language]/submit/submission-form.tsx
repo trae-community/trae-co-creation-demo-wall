@@ -6,6 +6,7 @@ import * as z from 'zod'
 import { useState, useEffect, useMemo } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { Tag as WorkTag, DictionaryItem } from '@/lib/types'
@@ -76,11 +77,13 @@ export function SubmissionForm() {
   const { data: session } = useSession()
   const t = useTranslations('Submit')
   const locale = useLocale()
+  const router = useRouter()
 
   // ── Wizard state ──
   const [currentStep, setCurrentStep] = useState<StepNumber>(1)
   const [isNavigating, setIsNavigating] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [submittedWorkId, setSubmittedWorkId] = useState<string | null>(null)
 
   // ── Upload / preview state (lives here, passed to Step2) ──
   const [previewCoverUrl, setPreviewCoverUrl] = useState('')
@@ -299,6 +302,7 @@ export function SubmissionForm() {
       const result = await res.json()
 
       if (res.ok && result.success) {
+        setSubmittedWorkId(result.id)
         setIsSubmitted(true)
       } else {
         console.error('Submission error:', result.error, result.details)
@@ -320,10 +324,12 @@ export function SubmissionForm() {
         <h2 className="text-3xl font-bold text-white mb-4">{t('successTitle')}</h2>
         <p className="text-gray-400 mb-8 max-w-md mx-auto">{t('successMessage')}</p>
         <div className="flex justify-center gap-4">
-          <Button onClick={() => window.location.reload()} variant="outline">
-            {t('continueSubmit')}
-          </Button>
-          <Button onClick={() => setIsSubmitted(false)}>{t('viewSubmission')}</Button>
+          {submittedWorkId && (
+            <Button onClick={() => router.push(`/${locale}/works/${submittedWorkId}`)} variant="outline">
+              {t('viewProject')}
+            </Button>
+          )}
+          <Button onClick={() => router.push(`/${locale}`)}>{t('backHome')}</Button>
         </div>
       </div>
     )

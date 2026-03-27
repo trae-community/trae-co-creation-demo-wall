@@ -28,3 +28,14 @@ test('submit form requires 3-5 highlights to match the backend submit contract',
     /highlights:\s*\[\s*\{\s*value:\s*''\s*\},\s*\{\s*value:\s*''\s*\},\s*\{\s*value:\s*''\s*\}\s*\]/,
   )
 })
+
+test('submit success screen navigates away from the old form instead of reopening it for duplicate submission', () => {
+  assert.match(submitFormSource, /submittedWorkId/)
+  assert.match(submitFormSource, /setSubmittedWorkId\(result\.id\)/)
+  assert.match(submitFormSource, /t\('viewProject'\)/)
+  assert.match(submitFormSource, /t\('backHome'\)/)
+  assert.doesNotMatch(submitFormSource, /window\.location\.reload\(\)/)
+  assert.doesNotMatch(submitFormSource, /setIsSubmitted\(false\)/)
+  assert.doesNotMatch(submitFormSource, /t\('continueSubmit'\)/)
+  assert.doesNotMatch(submitFormSource, /t\('viewSubmission'\)/)
+})
