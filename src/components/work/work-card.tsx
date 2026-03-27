@@ -1,9 +1,10 @@
 'use client'
 
+import { useSearchParams } from "next/navigation";
 import { Work } from "@/lib/types";
 import { MapPin, Users, Award, Eye, ThumbsUp } from "lucide-react";
 import { useTranslations } from 'next-intl';
-import { Link } from '@/lib/language/navigation';
+import { Link, usePathname } from '@/lib/language/navigation';
 
 interface WorkCardProps {
   work: Work;
@@ -42,9 +43,16 @@ const normalizeTeamMembers = (team: unknown): string[] => {
 
 export function WorkCard({ work }: WorkCardProps) {
   const t = useTranslations('Card');
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const teamMembers = normalizeTeamMembers(work.team);
   const isTeam = teamMembers.length > 1;
   const hasHonors = (work.honors || []).length > 0;
+  const currentListHref = (() => {
+    const query = searchParams.toString();
+    return query ? `${pathname}?${query}` : pathname;
+  })();
+  const detailHref = `/works/${work.id}?from=${encodeURIComponent(currentListHref)}`;
 
   // Show at most 3 tags, prioritise "special" ones
   const specialTags = work.tags.filter(tag => ["已上线", "开源", "持续更新"].includes(tag));
@@ -53,7 +61,7 @@ export function WorkCard({ work }: WorkCardProps) {
 
   return (
     <Link
-      href={`/works/${work.id}`}
+      href={detailHref}
       className="group block rounded-2xl overflow-hidden border border-white/8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(34,197,94,0.2)] hover:border-green-500/35"
       style={{ background: '#111318' }}
     >

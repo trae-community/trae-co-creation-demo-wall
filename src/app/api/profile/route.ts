@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 
@@ -107,10 +106,6 @@ export async function GET() {
       );
     }
 
-    // Read location from JWT publicMetadata — no extra Clerk network call
-    const { sessionClaims } = await auth();
-    const metadata = sessionClaims?.publicMetadata as Record<string, unknown> ?? {};
-
     const roles = sysUser.roles.map((r) => ({
       id: r.role.id,
       roleCode: r.role.roleCode,
@@ -127,10 +122,7 @@ export async function GET() {
         phone: sysUser.phone,
         lastSignInAt: sysUser.lastSignInAt,
       },
-      {
-        country: typeof metadata.profileCountry === "string" ? metadata.profileCountry : "",
-        city: typeof metadata.profileCity === "string" ? metadata.profileCity : "",
-      },
+      {},
       roles
     );
 
@@ -177,19 +169,6 @@ export async function PUT(req: NextRequest) {
         lastSignInAt: true,
       },
     });
-
-    // Write profileCountry/profileCity to Clerk metadata using clerkId from JWT
-    try {
-      const client = await clerkClient();
-      await client.users.updateUserMetadata(authUser.clerkId, {
-        publicMetadata: {
-          profileCountry: locationCountry,
-          profileCity: locationCity,
-        },
-      });
-    } catch (err) {
-      console.error("[API] Failed to update Clerk location metadata:", err);
-    }
 
     const payload = await buildProfilePayload(updatedUser, {
       country: locationCountry,

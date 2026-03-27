@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "dict_code": "audit_status",
+    "dict_name": "审核状态",
+    "description": "作品审核流程状态",
+    "is_system": true
+  },
+  {
+    "id": 2,
+    "dict_code": "dev_status",
+    "dict_name": "开发状态",
+    "description": "作品当前的开发阶段",
+    "is_system": true
+  },
+  {
+    "id": 5,
+    "dict_code": "city",
+    "dict_name": "城市",
+    "description": "城市列表",
+    "is_system": true
+  },
+  {
+    "id": 6,
+    "dict_code": "honor_type",
+    "dict_name": "荣誉类型",
+    "description": "作品获得的荣誉类型",
+    "is_system": true
+  },
+  {
+    "id": 3,
+    "dict_code": "category_code",
+    "dict_name": "作品分类",
+    "description": "作品所属的类别",
+    "is_system": true
+  },
+  {
+    "id": 4,
+    "dict_code": "country",
+    "dict_name": "省份",
+    "description": "省份列表",
+    "is_system": true
+  }
+]

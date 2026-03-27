@@ -1,0 +1,119 @@
+[
+  {
+    "id": 1,
+    "work_id": 1,
+    "auditor_id": 6,
+    "prev_status": 0,
+    "new_status": 1,
+    "reason": "Manual update via console",
+    "created_at": "2026-03-03 11:03:34.694000+00:00"
+  },
+  {
+    "id": 2,
+    "work_id": 1,
+    "auditor_id": 6,
+    "prev_status": 1,
+    "new_status": 2,
+    "reason": "Manual update via console",
+    "created_at": "2026-03-03 11:07:28.699000+00:00"
+  },
+  {
+    "id": 3,
+    "work_id": 1,
+    "auditor_id": 6,
+    "prev_status": 2,
+    "new_status": 1,
+    "reason": "Manual update via console",
+    "created_at": "2026-03-03 13:36:00.994000+00:00"
+  },
+  {
+    "id": 4,
+    "work_id": 10,
+    "auditor_id": 6,
+    "prev_status": 0,
+    "new_status": 1,
+    "reason": "Manual update via console",
+    "created_at": "2026-03-03 13:37:03.735000+00:00"
+  },
+  {
+    "id": 6,
+    "work_id": 1,
+    "auditor_id": 6,
+    "prev_status": 1,
+    "new_status": 0,
+    "reason": "Manual update via console",
+    "created_at": "2026-03-04 01:50:45.463000+00:00"
+  },
+  {
+    "id": 7,
+    "work_id": 1,
+    "auditor_id": 6,
+    "prev_status": 0,
+    "new_status": 1,
+    "reason": "Manual update via console",
+    "created_at": "2026-03-04 02:24:23.086000+00:00"
+  },
+  {
+    "id": 8,
+    "work_id": 10,
+    "auditor_id": 1,
+    "prev_status": 1,
+    "new_status": 1,
+    "reason": "Manual update via console",
+    "created_at": "2026-03-04 04:08:30.290000+00:00"
+  },
+  {
+    "id": 9,
+    "work_id": 10,
+    "auditor_id": 1,
+    "prev_status": 1,
+    "new_status": 0,
+    "reason": "Manual update via console",
+    "created_at": "2026-03-04 04:08:48.857000+00:00"
+  },
+  {
+    "id": 10,
+    "work_id": 4,
+    "auditor_id": null,
+    "prev_status": 0,
+    "new_status": 1,
+    "reason": "Auto approved by system via tags: Hackathon 2026",
+    "created_at": "2026-03-04 07:19:01.098000+00:00"
+  },
+  {
+    "id": 11,
+    "work_id": 3,
+    "auditor_id": 1,
+    "prev_status": 0,
+    "new_status": 1,
+    "reason": "Manual update via console",
+    "created_at": "2026-03-05 06:15:14.969000+00:00"
+  },
+  {
+    "id": 12,
+    "work_id": 15,
+    "auditor_id": 6,
+    "prev_status": 0,
+    "new_status": 1,
+    "reason": "Manual update via console",
+    "created_at": "2026-03-26 08:14:33.564000+00:00"
+  },
+  {
+    "id": 13,
+    "work_id": 16,
+    "auditor_id": 5,
+    "prev_status": 0,
+    "new_status": 1,
+    "reason": "通过",
+    "created_at": "2026-03-26 09:23:26.265000+00:00"
+  },
+  {
+    "id": 14,
+    "work_id": 14,
+    "auditor_id": 5,
+    "prev_status": 0,
+    "new_status": 1,
+    "reason": "已通过",
+    "created_at": "2026-03-26 09:23:59.318000+00:00"
+  }
+]

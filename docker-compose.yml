@@ -1,0 +1,88 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - COS_SECRET_ID=${COS_SECRET_ID}
+        - COS_SECRET_KEY=${COS_SECRET_KEY}
+        - COS_BUCKET=${COS_BUCKET}
+        - COS_REGION=${COS_REGION}
+        - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/trae_demo_wall?schema=public&connection_limit=20&pool_timeout=20&connect_timeout=10
+      - DIRECT_URL=postgresql://postgres:postgres@db:5432/trae_demo_wall
+      - REDIS_URL=redis://redis:6379
+      - COS_SECRET_ID=${COS_SECRET_ID}
+      - COS_SECRET_KEY=${COS_SECRET_KEY}
+      - COS_BUCKET=${COS_BUCKET}
+      - COS_REGION=${COS_REGION}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - AUTH_TRUST_HOST=true
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    networks:
+      - trae-network
+
+  db:
+    image: docker.cnb.cool/jaguarliu.cool/wenyuan-ai/docker-sync/postgres:16-alpine_amd64
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=trae_demo_wall
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=100"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "effective_cache_size=1GB"
+      - "-c"
+      - "work_mem=16MB"
+      - "-c"
+      - "maintenance_work_mem=64MB"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - trae-network
+
+  redis:
+    image: docker.cnb.cool/jaguarliu.cool/wenyuan-ai/docker-sync/redis:7-alpine_amd64
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save 60 1000
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - trae-network
+
+  nginx:
+    image: docker.cnb.cool/jaguarliu.cool/wenyuan-ai/docker-sync/nginx:alpine_amd64
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - trae-network
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  trae-network:
+    driver: bridge

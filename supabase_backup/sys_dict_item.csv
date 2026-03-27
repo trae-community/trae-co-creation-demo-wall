@@ -1,0 +1,94 @@
+id,dict_code,item_label,item_value,sort_order,status,label_i18n,parent_value
+1,audit_status,待审核,0,0,True,"{'en-US': 'Pending', 'zh-CN': '待审核'}",
+2,audit_status,已通过,1,1,True,"{'en-US': 'Approved', 'zh-CN': '已通过'}",
+3,audit_status,已拒绝,2,2,True,"{'en-US': 'Rejected', 'zh-CN': '已拒绝'}",
+4,dev_status,创意构思,ideation,0,True,"{'en-US': 'Ideation', 'zh-CN': '创意构思'}",
+16,city,北京,110100,0,True,"{'en-US': 'Beijing', 'zh-CN': '北京'}",BJ
+6,dev_status,功能完成,completed,2,True,"{'en-US': 'Completed', 'zh-CN': '功能完成'}",
+28,city,重庆,500100,5,True,"{'en-US': 'Chongqing', 'zh-CN': '重庆'}",CQ
+32,city,福州,350100,9,True,"{'en-US': 'Fuzhou', 'zh-CN': '福州'}",FJ
+54,city,泉州,350500,31,True,"{'en-US': 'Quanzhou', 'zh-CN': '泉州'}",FJ
+24,city,百色,451000,1,True,"{'en-US': 'Baise', 'zh-CN': '百色'}",GX
+21,honor_type,城市人气,city_star,1,True,"{'en-US': 'City Star', 'zh-CN': '城市人气'}",
+34,city,桂林,450300,11,True,"{'en-US': 'Guilin', 'zh-CN': '桂林'}",GX
+20,honor_type,社区精选,community_choice,0,True,"{'en-US': 'Community Choice', 'zh-CN': '社区精选'}",
+7,dev_status,已可体验,released,3,True,"{'en-US': 'Released', 'zh-CN': '已上线'}",
+44,city,兰州,620100,21,True,"{'en-US': 'Lanzhou', 'zh-CN': '兰州'}",GS
+36,city,合肥,340100,13,True,"{'en-US': 'Hefei', 'zh-CN': '合肥'}",AH
+18,city,深圳,440300,2,True,"{'en-US': 'Shenzhen', 'zh-CN': '深圳'}",GD
+5,dev_status,初步原型,prototype,1,True,"{'en-US': 'Prototype', 'zh-CN': '初步原型'}",
+30,city,东莞,441900,7,True,"{'en-US': 'Dongguan', 'zh-CN': '东莞'}",GD
+31,city,佛山,440600,8,True,"{'en-US': 'Foshan', 'zh-CN': '佛山'}",GD
+33,city,广州,440100,10,True,"{'en-US': 'Guangzhou', 'zh-CN': '广州'}",GD
+38,city,惠州,441300,15,True,"{'en-US': 'Huizhou', 'zh-CN': '惠州'}",GD
+39,city,江门,440700,16,True,"{'en-US': 'Jiangmen', 'zh-CN': '江门'}",GD
+53,city,清远,441800,30,True,"{'en-US': 'Qingyuan', 'zh-CN': '清远'}",GD
+48,city,南宁,450100,25,True,"{'en-US': 'Nanning', 'zh-CN': '南宁'}",GX
+35,city,邯郸,130400,12,True,"{'en-US': 'Handan', 'zh-CN': '邯郸'}",HE
+45,city,廊坊,131000,22,True,"{'en-US': 'Langfang', 'zh-CN': '廊坊'}",HE
+23,city,安阳,410500,0,True,"{'en-US': 'Anyang', 'zh-CN': '安阳'}",HA
+47,city,洛阳,410300,24,True,"{'en-US': 'Luoyang', 'zh-CN': '洛阳'}",HA
+26,city,常州,320400,3,True,"{'en-US': 'Changzhou', 'zh-CN': '常州'}",JS
+49,city,南通,320600,26,True,"{'en-US': 'Nantong', 'zh-CN': '南通'}",JS
+50,city,南京,320100,27,True,"{'en-US': 'Nanjing', 'zh-CN': '南京'}",JS
+56,city,苏州,320500,33,True,"{'en-US': 'Suzhou', 'zh-CN': '苏州'}",JS
+25,city,长春,220100,2,True,"{'en-US': 'Changchun', 'zh-CN': '长春'}",JL
+29,city,大连,210200,6,True,"{'en-US': 'Dalian', 'zh-CN': '大连'}",LN
+55,city,沈阳,210100,32,True,"{'en-US': 'Shenyang', 'zh-CN': '沈阳'}",LN
+40,city,济南,370100,17,True,"{'en-US': 'Jinan', 'zh-CN': '济南'}",SD
+41,city,济宁,370800,18,True,"{'en-US': 'Jining', 'zh-CN': '济宁'}",SD
+46,city,临沂,371300,23,True,"{'en-US': 'Linyi', 'zh-CN': '临沂'}",SD
+52,city,青岛,370200,29,True,"{'en-US': 'Qingdao', 'zh-CN': '青岛'}",SD
+17,city,上海,310100,1,True,"{'en-US': 'Shanghai', 'zh-CN': '上海'}",SH
+27,city,成都,510100,4,True,"{'en-US': 'Chengdu', 'zh-CN': '成都'}",SC
+43,city,昆明,530100,20,True,"{'en-US': 'Kunming', 'zh-CN': '昆明'}",YN
+19,city,杭州,330100,3,True,"{'en-US': 'Hangzhou', 'zh-CN': '杭州'}",ZJ
+37,city,湖州,330500,14,True,"{'en-US': 'Huzhou', 'zh-CN': '湖州'}",ZJ
+42,city,金华,330700,19,True,"{'en-US': 'Jinhua', 'zh-CN': '金华'}",ZJ
+51,city,宁波,330200,28,True,"{'en-US': 'Ningbo', 'zh-CN': '宁波'}",ZJ
+22,honor_type,城市推荐,best_of_year,2,True,"{'en-US': 'Best of Year', 'zh-CN': '城市推荐'}",
+73,category_code,实用工具,utility,5,True,"{'en-US': 'Utility Tool', 'zh-CN': '实用工具'}",
+74,category_code,场景应用,scenario,6,True,"{'en-US': 'Scenario App', 'zh-CN': '场景应用'}",
+75,category_code,智能助手,assistant,7,True,"{'en-US': 'AI Assistant', 'zh-CN': '智能助手'}",
+76,category_code,内容创作,content,8,True,"{'en-US': 'Content Creation', 'zh-CN': '内容创作'}",
+77,category_code,创意实验,creative,9,True,"{'en-US': 'Creative Experiment', 'zh-CN': '创意实验'}",
+78,category_code,其他类型,other,10,True,"{'en-US': 'Other', 'zh-CN': '其他类型'}",
+79,country,安徽,AH,0,True,"{'en-US': 'Anhui', 'zh-CN': '安徽'}",
+80,country,北京,BJ,1,True,"{'en-US': 'Beijing', 'zh-CN': '北京'}",
+81,country,重庆,CQ,2,True,"{'en-US': 'Chongqing', 'zh-CN': '重庆'}",
+82,country,福建,FJ,3,True,"{'en-US': 'Fujian', 'zh-CN': '福建'}",
+83,country,甘肃,GS,4,True,"{'en-US': 'Gansu', 'zh-CN': '甘肃'}",
+84,country,广东,GD,5,True,"{'en-US': 'Guangdong', 'zh-CN': '广东'}",
+85,country,广西,GX,6,True,"{'en-US': 'Guangxi', 'zh-CN': '广西'}",
+86,country,贵州,GZ,7,True,"{'en-US': 'Guizhou', 'zh-CN': '贵州'}",
+87,country,河北,HE,8,True,"{'en-US': 'Hebei', 'zh-CN': '河北'}",
+88,country,河南,HA,9,True,"{'en-US': 'Henan', 'zh-CN': '河南'}",
+89,country,湖北,HB,10,True,"{'en-US': 'Hubei', 'zh-CN': '湖北'}",
+90,country,江苏,JS,11,True,"{'en-US': 'Jiangsu', 'zh-CN': '江苏'}",
+91,country,吉林,JL,12,True,"{'en-US': 'Jilin', 'zh-CN': '吉林'}",
+92,country,辽宁,LN,13,True,"{'en-US': 'Liaoning', 'zh-CN': '辽宁'}",
+93,country,山东,SD,14,True,"{'en-US': 'Shandong', 'zh-CN': '山东'}",
+94,country,山西,SX,15,True,"{'en-US': 'Shanxi', 'zh-CN': '山西'}",
+95,country,陕西,SN,16,True,"{'en-US': 'Shaanxi', 'zh-CN': '陕西'}",
+96,country,上海,SH,17,True,"{'en-US': 'Shanghai', 'zh-CN': '上海'}",
+97,country,四川,SC,18,True,"{'en-US': 'Sichuan', 'zh-CN': '四川'}",
+98,country,天津,TJ,19,True,"{'en-US': 'Tianjin', 'zh-CN': '天津'}",
+99,country,新疆,XJ,20,True,"{'en-US': 'Xinjiang', 'zh-CN': '新疆'}",
+100,country,云南,YN,21,True,"{'en-US': 'Yunnan', 'zh-CN': '云南'}",
+101,country,浙江,ZJ,22,True,"{'en-US': 'Zhejiang', 'zh-CN': '浙江'}",
+66,city,厦门,350200,43,True,"{'en-US': 'Xiamen', 'zh-CN': '厦门'}",FJ
+65,city,珠海,440400,42,True,"{'en-US': 'Zhuhai', 'zh-CN': '珠海'}",GD
+71,city,中山,442000,48,True,"{'en-US': 'Zhongshan', 'zh-CN': '中山'}",GD
+67,city,兴义,522301,44,True,"{'en-US': 'Xingyi', 'zh-CN': '兴义'}",GZ
+72,city,遵义,520300,49,True,"{'en-US': 'Zunyi', 'zh-CN': '遵义'}",GZ
+60,city,唐山,130200,37,True,"{'en-US': 'Tangshan', 'zh-CN': '唐山'}",HE
+70,city,郑州,410100,47,True,"{'en-US': 'Zhengzhou', 'zh-CN': '郑州'}",HA
+63,city,武汉,420100,40,True,"{'en-US': 'Wuhan', 'zh-CN': '武汉'}",HB
+57,city,泰安,370900,34,True,"{'en-US': ""Tai'an"", 'zh-CN': '泰安'}",SD
+61,city,淄博,370300,38,True,"{'en-US': 'Zibo', 'zh-CN': '淄博'}",SD
+69,city,烟台,370600,46,True,"{'en-US': 'Yantai', 'zh-CN': '烟台'}",SD
+58,city,太原,140100,35,True,"{'en-US': 'Taiyuan', 'zh-CN': '太原'}",SX
+68,city,西安,610100,45,True,"{'en-US': ""Xi'an"", 'zh-CN': '西安'}",SN
+59,city,天津,120100,36,True,"{'en-US': 'Tianjin', 'zh-CN': '天津'}",TJ
+62,city,乌鲁木齐,650100,39,True,"{'en-US': 'Urumqi', 'zh-CN': '乌鲁木齐'}",XJ
+64,city,温州,330300,41,True,"{'en-US': 'Wenzhou', 'zh-CN': '温州'}",ZJ

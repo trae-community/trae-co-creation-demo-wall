@@ -65,11 +65,13 @@ model SysUser {
   username     String   @db.VarChar(255)
   /// 邮箱 (登录账号)
   email        String   @unique @db.VarChar(255)
+  /// 邮箱验证时间 (NextAuth)
+  emailVerified DateTime? @map("email_verified") @db.Timestamptz
   /// 手机号 (选填)
   phone        String?  @db.VarChar(50)
-  /// Clerk 用户ID
+  /// Clerk 用户ID (兼容旧数据)
   clerkId      String?  @unique @map("clerk_id") @db.VarChar(255)
-  /// 密码哈希 (Clerk 用户为空)
+  /// 密码哈希
   passwordHash String?  @map("password_hash") @db.VarChar(255)
   /// 头像链接
   avatarUrl    String?  @map("avatar_url") @db.VarChar(255)
@@ -91,6 +93,8 @@ model SysUser {
   likes       WorkLike[]
   authLogs    SysAuthLog[] @relation("UserAuthLogs")
   operationLogs SysOperationLog[] @relation("UserOperationLogs")
+  accounts    Account[]
+  sessions    Session[]
 
   @@map("sys_user")
 }
@@ -403,4 +407,45 @@ model SysOperationLog {
   @@index([module, action])
   @@index([createdAt])
   @@map("sys_operation_log")
+}
+
+// NextAuth.js Tables
+model Account {
+  id                BigInt  @id @default(autoincrement())
+  userId            BigInt  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user SysUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("account")
+}
+
+model Session {
+  id           BigInt   @id @default(autoincrement())
+  sessionToken String   @unique @map("session_token")
+  userId       BigInt   @map("user_id")
+  expires      DateTime
+
+  user SysUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_token")
 }

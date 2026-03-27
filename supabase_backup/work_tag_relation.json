@@ -1,0 +1,46 @@
+[
+  {
+    "work_id": 10,
+    "tag_id": 7
+  },
+  {
+    "work_id": 4,
+    "tag_id": 7
+  },
+  {
+    "work_id": 3,
+    "tag_id": 7
+  },
+  {
+    "work_id": 17,
+    "tag_id": 7
+  },
+  {
+    "work_id": 18,
+    "tag_id": 1
+  },
+  {
+    "work_id": 19,
+    "tag_id": 1
+  },
+  {
+    "work_id": 20,
+    "tag_id": 1
+  },
+  {
+    "work_id": 15,
+    "tag_id": 1
+  },
+  {
+    "work_id": 21,
+    "tag_id": 7
+  },
+  {
+    "work_id": 22,
+    "tag_id": 7
+  },
+  {
+    "work_id": 23,
+    "tag_id": 1
+  }
+]

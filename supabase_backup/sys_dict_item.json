@@ -1,0 +1,1211 @@
+[
+  {
+    "id": 1,
+    "dict_code": "audit_status",
+    "item_label": "待审核",
+    "item_value": "0",
+    "sort_order": 0,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Pending",
+      "zh-CN": "待审核"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 2,
+    "dict_code": "audit_status",
+    "item_label": "已通过",
+    "item_value": "1",
+    "sort_order": 1,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Approved",
+      "zh-CN": "已通过"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 3,
+    "dict_code": "audit_status",
+    "item_label": "已拒绝",
+    "item_value": "2",
+    "sort_order": 2,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Rejected",
+      "zh-CN": "已拒绝"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 4,
+    "dict_code": "dev_status",
+    "item_label": "创意构思",
+    "item_value": "ideation",
+    "sort_order": 0,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Ideation",
+      "zh-CN": "创意构思"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 16,
+    "dict_code": "city",
+    "item_label": "北京",
+    "item_value": "110100",
+    "sort_order": 0,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Beijing",
+      "zh-CN": "北京"
+    },
+    "parent_value": "BJ"
+  },
+  {
+    "id": 6,
+    "dict_code": "dev_status",
+    "item_label": "功能完成",
+    "item_value": "completed",
+    "sort_order": 2,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Completed",
+      "zh-CN": "功能完成"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 28,
+    "dict_code": "city",
+    "item_label": "重庆",
+    "item_value": "500100",
+    "sort_order": 5,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Chongqing",
+      "zh-CN": "重庆"
+    },
+    "parent_value": "CQ"
+  },
+  {
+    "id": 32,
+    "dict_code": "city",
+    "item_label": "福州",
+    "item_value": "350100",
+    "sort_order": 9,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Fuzhou",
+      "zh-CN": "福州"
+    },
+    "parent_value": "FJ"
+  },
+  {
+    "id": 54,
+    "dict_code": "city",
+    "item_label": "泉州",
+    "item_value": "350500",
+    "sort_order": 31,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Quanzhou",
+      "zh-CN": "泉州"
+    },
+    "parent_value": "FJ"
+  },
+  {
+    "id": 24,
+    "dict_code": "city",
+    "item_label": "百色",
+    "item_value": "451000",
+    "sort_order": 1,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Baise",
+      "zh-CN": "百色"
+    },
+    "parent_value": "GX"
+  },
+  {
+    "id": 21,
+    "dict_code": "honor_type",
+    "item_label": "城市人气",
+    "item_value": "city_star",
+    "sort_order": 1,
+    "status": true,
+    "label_i18n": {
+      "en-US": "City Star",
+      "zh-CN": "城市人气"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 34,
+    "dict_code": "city",
+    "item_label": "桂林",
+    "item_value": "450300",
+    "sort_order": 11,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Guilin",
+      "zh-CN": "桂林"
+    },
+    "parent_value": "GX"
+  },
+  {
+    "id": 20,
+    "dict_code": "honor_type",
+    "item_label": "社区精选",
+    "item_value": "community_choice",
+    "sort_order": 0,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Community Choice",
+      "zh-CN": "社区精选"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 7,
+    "dict_code": "dev_status",
+    "item_label": "已可体验",
+    "item_value": "released",
+    "sort_order": 3,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Released",
+      "zh-CN": "已上线"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 44,
+    "dict_code": "city",
+    "item_label": "兰州",
+    "item_value": "620100",
+    "sort_order": 21,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Lanzhou",
+      "zh-CN": "兰州"
+    },
+    "parent_value": "GS"
+  },
+  {
+    "id": 36,
+    "dict_code": "city",
+    "item_label": "合肥",
+    "item_value": "340100",
+    "sort_order": 13,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Hefei",
+      "zh-CN": "合肥"
+    },
+    "parent_value": "AH"
+  },
+  {
+    "id": 18,
+    "dict_code": "city",
+    "item_label": "深圳",
+    "item_value": "440300",
+    "sort_order": 2,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Shenzhen",
+      "zh-CN": "深圳"
+    },
+    "parent_value": "GD"
+  },
+  {
+    "id": 5,
+    "dict_code": "dev_status",
+    "item_label": "初步原型",
+    "item_value": "prototype",
+    "sort_order": 1,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Prototype",
+      "zh-CN": "初步原型"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 30,
+    "dict_code": "city",
+    "item_label": "东莞",
+    "item_value": "441900",
+    "sort_order": 7,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Dongguan",
+      "zh-CN": "东莞"
+    },
+    "parent_value": "GD"
+  },
+  {
+    "id": 31,
+    "dict_code": "city",
+    "item_label": "佛山",
+    "item_value": "440600",
+    "sort_order": 8,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Foshan",
+      "zh-CN": "佛山"
+    },
+    "parent_value": "GD"
+  },
+  {
+    "id": 33,
+    "dict_code": "city",
+    "item_label": "广州",
+    "item_value": "440100",
+    "sort_order": 10,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Guangzhou",
+      "zh-CN": "广州"
+    },
+    "parent_value": "GD"
+  },
+  {
+    "id": 38,
+    "dict_code": "city",
+    "item_label": "惠州",
+    "item_value": "441300",
+    "sort_order": 15,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Huizhou",
+      "zh-CN": "惠州"
+    },
+    "parent_value": "GD"
+  },
+  {
+    "id": 39,
+    "dict_code": "city",
+    "item_label": "江门",
+    "item_value": "440700",
+    "sort_order": 16,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Jiangmen",
+      "zh-CN": "江门"
+    },
+    "parent_value": "GD"
+  },
+  {
+    "id": 53,
+    "dict_code": "city",
+    "item_label": "清远",
+    "item_value": "441800",
+    "sort_order": 30,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Qingyuan",
+      "zh-CN": "清远"
+    },
+    "parent_value": "GD"
+  },
+  {
+    "id": 48,
+    "dict_code": "city",
+    "item_label": "南宁",
+    "item_value": "450100",
+    "sort_order": 25,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Nanning",
+      "zh-CN": "南宁"
+    },
+    "parent_value": "GX"
+  },
+  {
+    "id": 35,
+    "dict_code": "city",
+    "item_label": "邯郸",
+    "item_value": "130400",
+    "sort_order": 12,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Handan",
+      "zh-CN": "邯郸"
+    },
+    "parent_value": "HE"
+  },
+  {
+    "id": 45,
+    "dict_code": "city",
+    "item_label": "廊坊",
+    "item_value": "131000",
+    "sort_order": 22,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Langfang",
+      "zh-CN": "廊坊"
+    },
+    "parent_value": "HE"
+  },
+  {
+    "id": 23,
+    "dict_code": "city",
+    "item_label": "安阳",
+    "item_value": "410500",
+    "sort_order": 0,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Anyang",
+      "zh-CN": "安阳"
+    },
+    "parent_value": "HA"
+  },
+  {
+    "id": 47,
+    "dict_code": "city",
+    "item_label": "洛阳",
+    "item_value": "410300",
+    "sort_order": 24,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Luoyang",
+      "zh-CN": "洛阳"
+    },
+    "parent_value": "HA"
+  },
+  {
+    "id": 26,
+    "dict_code": "city",
+    "item_label": "常州",
+    "item_value": "320400",
+    "sort_order": 3,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Changzhou",
+      "zh-CN": "常州"
+    },
+    "parent_value": "JS"
+  },
+  {
+    "id": 49,
+    "dict_code": "city",
+    "item_label": "南通",
+    "item_value": "320600",
+    "sort_order": 26,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Nantong",
+      "zh-CN": "南通"
+    },
+    "parent_value": "JS"
+  },
+  {
+    "id": 50,
+    "dict_code": "city",
+    "item_label": "南京",
+    "item_value": "320100",
+    "sort_order": 27,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Nanjing",
+      "zh-CN": "南京"
+    },
+    "parent_value": "JS"
+  },
+  {
+    "id": 56,
+    "dict_code": "city",
+    "item_label": "苏州",
+    "item_value": "320500",
+    "sort_order": 33,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Suzhou",
+      "zh-CN": "苏州"
+    },
+    "parent_value": "JS"
+  },
+  {
+    "id": 25,
+    "dict_code": "city",
+    "item_label": "长春",
+    "item_value": "220100",
+    "sort_order": 2,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Changchun",
+      "zh-CN": "长春"
+    },
+    "parent_value": "JL"
+  },
+  {
+    "id": 29,
+    "dict_code": "city",
+    "item_label": "大连",
+    "item_value": "210200",
+    "sort_order": 6,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Dalian",
+      "zh-CN": "大连"
+    },
+    "parent_value": "LN"
+  },
+  {
+    "id": 55,
+    "dict_code": "city",
+    "item_label": "沈阳",
+    "item_value": "210100",
+    "sort_order": 32,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Shenyang",
+      "zh-CN": "沈阳"
+    },
+    "parent_value": "LN"
+  },
+  {
+    "id": 40,
+    "dict_code": "city",
+    "item_label": "济南",
+    "item_value": "370100",
+    "sort_order": 17,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Jinan",
+      "zh-CN": "济南"
+    },
+    "parent_value": "SD"
+  },
+  {
+    "id": 41,
+    "dict_code": "city",
+    "item_label": "济宁",
+    "item_value": "370800",
+    "sort_order": 18,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Jining",
+      "zh-CN": "济宁"
+    },
+    "parent_value": "SD"
+  },
+  {
+    "id": 46,
+    "dict_code": "city",
+    "item_label": "临沂",
+    "item_value": "371300",
+    "sort_order": 23,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Linyi",
+      "zh-CN": "临沂"
+    },
+    "parent_value": "SD"
+  },
+  {
+    "id": 52,
+    "dict_code": "city",
+    "item_label": "青岛",
+    "item_value": "370200",
+    "sort_order": 29,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Qingdao",
+      "zh-CN": "青岛"
+    },
+    "parent_value": "SD"
+  },
+  {
+    "id": 17,
+    "dict_code": "city",
+    "item_label": "上海",
+    "item_value": "310100",
+    "sort_order": 1,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Shanghai",
+      "zh-CN": "上海"
+    },
+    "parent_value": "SH"
+  },
+  {
+    "id": 27,
+    "dict_code": "city",
+    "item_label": "成都",
+    "item_value": "510100",
+    "sort_order": 4,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Chengdu",
+      "zh-CN": "成都"
+    },
+    "parent_value": "SC"
+  },
+  {
+    "id": 43,
+    "dict_code": "city",
+    "item_label": "昆明",
+    "item_value": "530100",
+    "sort_order": 20,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Kunming",
+      "zh-CN": "昆明"
+    },
+    "parent_value": "YN"
+  },
+  {
+    "id": 19,
+    "dict_code": "city",
+    "item_label": "杭州",
+    "item_value": "330100",
+    "sort_order": 3,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Hangzhou",
+      "zh-CN": "杭州"
+    },
+    "parent_value": "ZJ"
+  },
+  {
+    "id": 37,
+    "dict_code": "city",
+    "item_label": "湖州",
+    "item_value": "330500",
+    "sort_order": 14,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Huzhou",
+      "zh-CN": "湖州"
+    },
+    "parent_value": "ZJ"
+  },
+  {
+    "id": 42,
+    "dict_code": "city",
+    "item_label": "金华",
+    "item_value": "330700",
+    "sort_order": 19,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Jinhua",
+      "zh-CN": "金华"
+    },
+    "parent_value": "ZJ"
+  },
+  {
+    "id": 51,
+    "dict_code": "city",
+    "item_label": "宁波",
+    "item_value": "330200",
+    "sort_order": 28,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Ningbo",
+      "zh-CN": "宁波"
+    },
+    "parent_value": "ZJ"
+  },
+  {
+    "id": 22,
+    "dict_code": "honor_type",
+    "item_label": "城市推荐",
+    "item_value": "best_of_year",
+    "sort_order": 2,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Best of Year",
+      "zh-CN": "城市推荐"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 73,
+    "dict_code": "category_code",
+    "item_label": "实用工具",
+    "item_value": "utility",
+    "sort_order": 5,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Utility Tool",
+      "zh-CN": "实用工具"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 74,
+    "dict_code": "category_code",
+    "item_label": "场景应用",
+    "item_value": "scenario",
+    "sort_order": 6,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Scenario App",
+      "zh-CN": "场景应用"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 75,
+    "dict_code": "category_code",
+    "item_label": "智能助手",
+    "item_value": "assistant",
+    "sort_order": 7,
+    "status": true,
+    "label_i18n": {
+      "en-US": "AI Assistant",
+      "zh-CN": "智能助手"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 76,
+    "dict_code": "category_code",
+    "item_label": "内容创作",
+    "item_value": "content",
+    "sort_order": 8,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Content Creation",
+      "zh-CN": "内容创作"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 77,
+    "dict_code": "category_code",
+    "item_label": "创意实验",
+    "item_value": "creative",
+    "sort_order": 9,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Creative Experiment",
+      "zh-CN": "创意实验"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 78,
+    "dict_code": "category_code",
+    "item_label": "其他类型",
+    "item_value": "other",
+    "sort_order": 10,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Other",
+      "zh-CN": "其他类型"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 79,
+    "dict_code": "country",
+    "item_label": "安徽",
+    "item_value": "AH",
+    "sort_order": 0,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Anhui",
+      "zh-CN": "安徽"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 80,
+    "dict_code": "country",
+    "item_label": "北京",
+    "item_value": "BJ",
+    "sort_order": 1,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Beijing",
+      "zh-CN": "北京"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 81,
+    "dict_code": "country",
+    "item_label": "重庆",
+    "item_value": "CQ",
+    "sort_order": 2,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Chongqing",
+      "zh-CN": "重庆"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 82,
+    "dict_code": "country",
+    "item_label": "福建",
+    "item_value": "FJ",
+    "sort_order": 3,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Fujian",
+      "zh-CN": "福建"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 83,
+    "dict_code": "country",
+    "item_label": "甘肃",
+    "item_value": "GS",
+    "sort_order": 4,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Gansu",
+      "zh-CN": "甘肃"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 84,
+    "dict_code": "country",
+    "item_label": "广东",
+    "item_value": "GD",
+    "sort_order": 5,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Guangdong",
+      "zh-CN": "广东"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 85,
+    "dict_code": "country",
+    "item_label": "广西",
+    "item_value": "GX",
+    "sort_order": 6,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Guangxi",
+      "zh-CN": "广西"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 86,
+    "dict_code": "country",
+    "item_label": "贵州",
+    "item_value": "GZ",
+    "sort_order": 7,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Guizhou",
+      "zh-CN": "贵州"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 87,
+    "dict_code": "country",
+    "item_label": "河北",
+    "item_value": "HE",
+    "sort_order": 8,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Hebei",
+      "zh-CN": "河北"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 88,
+    "dict_code": "country",
+    "item_label": "河南",
+    "item_value": "HA",
+    "sort_order": 9,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Henan",
+      "zh-CN": "河南"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 89,
+    "dict_code": "country",
+    "item_label": "湖北",
+    "item_value": "HB",
+    "sort_order": 10,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Hubei",
+      "zh-CN": "湖北"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 90,
+    "dict_code": "country",
+    "item_label": "江苏",
+    "item_value": "JS",
+    "sort_order": 11,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Jiangsu",
+      "zh-CN": "江苏"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 91,
+    "dict_code": "country",
+    "item_label": "吉林",
+    "item_value": "JL",
+    "sort_order": 12,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Jilin",
+      "zh-CN": "吉林"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 92,
+    "dict_code": "country",
+    "item_label": "辽宁",
+    "item_value": "LN",
+    "sort_order": 13,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Liaoning",
+      "zh-CN": "辽宁"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 93,
+    "dict_code": "country",
+    "item_label": "山东",
+    "item_value": "SD",
+    "sort_order": 14,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Shandong",
+      "zh-CN": "山东"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 94,
+    "dict_code": "country",
+    "item_label": "山西",
+    "item_value": "SX",
+    "sort_order": 15,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Shanxi",
+      "zh-CN": "山西"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 95,
+    "dict_code": "country",
+    "item_label": "陕西",
+    "item_value": "SN",
+    "sort_order": 16,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Shaanxi",
+      "zh-CN": "陕西"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 96,
+    "dict_code": "country",
+    "item_label": "上海",
+    "item_value": "SH",
+    "sort_order": 17,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Shanghai",
+      "zh-CN": "上海"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 97,
+    "dict_code": "country",
+    "item_label": "四川",
+    "item_value": "SC",
+    "sort_order": 18,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Sichuan",
+      "zh-CN": "四川"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 98,
+    "dict_code": "country",
+    "item_label": "天津",
+    "item_value": "TJ",
+    "sort_order": 19,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Tianjin",
+      "zh-CN": "天津"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 99,
+    "dict_code": "country",
+    "item_label": "新疆",
+    "item_value": "XJ",
+    "sort_order": 20,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Xinjiang",
+      "zh-CN": "新疆"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 100,
+    "dict_code": "country",
+    "item_label": "云南",
+    "item_value": "YN",
+    "sort_order": 21,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Yunnan",
+      "zh-CN": "云南"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 101,
+    "dict_code": "country",
+    "item_label": "浙江",
+    "item_value": "ZJ",
+    "sort_order": 22,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Zhejiang",
+      "zh-CN": "浙江"
+    },
+    "parent_value": null
+  },
+  {
+    "id": 66,
+    "dict_code": "city",
+    "item_label": "厦门",
+    "item_value": "350200",
+    "sort_order": 43,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Xiamen",
+      "zh-CN": "厦门"
+    },
+    "parent_value": "FJ"
+  },
+  {
+    "id": 65,
+    "dict_code": "city",
+    "item_label": "珠海",
+    "item_value": "440400",
+    "sort_order": 42,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Zhuhai",
+      "zh-CN": "珠海"
+    },
+    "parent_value": "GD"
+  },
+  {
+    "id": 71,
+    "dict_code": "city",
+    "item_label": "中山",
+    "item_value": "442000",
+    "sort_order": 48,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Zhongshan",
+      "zh-CN": "中山"
+    },
+    "parent_value": "GD"
+  },
+  {
+    "id": 67,
+    "dict_code": "city",
+    "item_label": "兴义",
+    "item_value": "522301",
+    "sort_order": 44,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Xingyi",
+      "zh-CN": "兴义"
+    },
+    "parent_value": "GZ"
+  },
+  {
+    "id": 72,
+    "dict_code": "city",
+    "item_label": "遵义",
+    "item_value": "520300",
+    "sort_order": 49,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Zunyi",
+      "zh-CN": "遵义"
+    },
+    "parent_value": "GZ"
+  },
+  {
+    "id": 60,
+    "dict_code": "city",
+    "item_label": "唐山",
+    "item_value": "130200",
+    "sort_order": 37,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Tangshan",
+      "zh-CN": "唐山"
+    },
+    "parent_value": "HE"
+  },
+  {
+    "id": 70,
+    "dict_code": "city",
+    "item_label": "郑州",
+    "item_value": "410100",
+    "sort_order": 47,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Zhengzhou",
+      "zh-CN": "郑州"
+    },
+    "parent_value": "HA"
+  },
+  {
+    "id": 63,
+    "dict_code": "city",
+    "item_label": "武汉",
+    "item_value": "420100",
+    "sort_order": 40,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Wuhan",
+      "zh-CN": "武汉"
+    },
+    "parent_value": "HB"
+  },
+  {
+    "id": 57,
+    "dict_code": "city",
+    "item_label": "泰安",
+    "item_value": "370900",
+    "sort_order": 34,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Tai'an",
+      "zh-CN": "泰安"
+    },
+    "parent_value": "SD"
+  },
+  {
+    "id": 61,
+    "dict_code": "city",
+    "item_label": "淄博",
+    "item_value": "370300",
+    "sort_order": 38,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Zibo",
+      "zh-CN": "淄博"
+    },
+    "parent_value": "SD"
+  },
+  {
+    "id": 69,
+    "dict_code": "city",
+    "item_label": "烟台",
+    "item_value": "370600",
+    "sort_order": 46,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Yantai",
+      "zh-CN": "烟台"
+    },
+    "parent_value": "SD"
+  },
+  {
+    "id": 58,
+    "dict_code": "city",
+    "item_label": "太原",
+    "item_value": "140100",
+    "sort_order": 35,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Taiyuan",
+      "zh-CN": "太原"
+    },
+    "parent_value": "SX"
+  },
+  {
+    "id": 68,
+    "dict_code": "city",
+    "item_label": "西安",
+    "item_value": "610100",
+    "sort_order": 45,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Xi'an",
+      "zh-CN": "西安"
+    },
+    "parent_value": "SN"
+  },
+  {
+    "id": 59,
+    "dict_code": "city",
+    "item_label": "天津",
+    "item_value": "120100",
+    "sort_order": 36,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Tianjin",
+      "zh-CN": "天津"
+    },
+    "parent_value": "TJ"
+  },
+  {
+    "id": 62,
+    "dict_code": "city",
+    "item_label": "乌鲁木齐",
+    "item_value": "650100",
+    "sort_order": 39,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Urumqi",
+      "zh-CN": "乌鲁木齐"
+    },
+    "parent_value": "XJ"
+  },
+  {
+    "id": 64,
+    "dict_code": "city",
+    "item_label": "温州",
+    "item_value": "330300",
+    "sort_order": 41,
+    "status": true,
+    "label_i18n": {
+      "en-US": "Wenzhou",
+      "zh-CN": "温州"
+    },
+    "parent_value": "ZJ"
+  }
+]

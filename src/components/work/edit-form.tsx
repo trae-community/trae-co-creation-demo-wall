@@ -3,13 +3,13 @@
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { toast } from 'sonner';
 import { Tag as WorkTag, DictionaryItem } from "@/lib/types";
 import { Button } from "@/components/common/action-button";
 import { Select } from "@/components/common/form-select";
 import { AlertCircle, CheckCircle, UploadCloud, Link as LinkIcon, Users, MapPin, FileText, Image as ImageIcon, Globe, Plus, Trash2, LayoutGrid } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { useLocale, useTranslations } from 'next-intl';
-import { useUser } from "@clerk/nextjs";
 import { RichTextEditor } from "@/app/[language]/submit/editor/RichTextEditor";
 
 export interface BackendWorkData {
@@ -42,7 +42,6 @@ export interface BackendWorkData {
 }
 
 export function EditForm({ initialData, onSuccess, onCancel }: { initialData: BackendWorkData; onSuccess?: () => void; onCancel?: () => void }) {
-  const { user } = useUser();
   const t = useTranslations('Submit');
   const locale = useLocale();
   const [uploadingCover, setUploadingCover] = useState(false);
@@ -93,7 +92,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
 
   // Ensure minimum items
   if (defaultValues.team.length === 0) defaultValues.team.push({ value: "" });
-  if (defaultValues.highlights.length === 0) defaultValues.highlights.push({ value: "" }, { value: "" }, { value: "" });
+  if (defaultValues.highlights.length === 0) defaultValues.highlights.push({ value: "" });
   if (defaultValues.scenarios.length === 0) defaultValues.scenarios.push({ value: "" });
 
   // Initialize preview URLs from transformed data
@@ -121,9 +120,9 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
     contactEmail: z.string().email(t('validationEmail')).optional().or(z.literal("")),
     coverUrl: z.string().min(1, t('validationCover')),
     story: z.string().min(20, t('validationStoryMin')),
-    highlights: z.array(z.object({ value: z.string().min(1, t('validationHighlightRequired')).max(10, t('validationHighlightMax')) }))
-      .min(3, t('validationHighlightsMin'))
-      .max(5, t('validationHighlightsMax')),
+    highlights: z.array(z.object({ value: z.string().min(1, t('validationHighlightRequired')).max(30, t('validationHighlightMax')) }))
+      .min(1, t('validationHighlightsMin'))
+      .max(3, t('validationHighlightsMax')),
     scenarios: z.array(z.object({ value: z.string().min(1, t('validationScenarioRequired')) }))
       .min(1, t('validationScenariosMin')),
     screenshots: z.array(z.string()).min(1, t('validationScreenshotsMin')).max(5, t('validationScreenshotsMax')),
@@ -183,7 +182,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        alert(t('uploadSizeError'));
+        toast.error(t('uploadSizeError'));
         return;
       }
       
@@ -194,7 +193,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
         setValue("coverUrl", url, { shouldValidate: true });
       } catch (error) {
         console.error("Cover upload failed:", error);
-        alert(t('uploadError') || "Upload failed");
+        toast.error(t('uploadError') || "Upload failed");
       } finally {
         setUploadingCover(false);
       }
@@ -205,7 +204,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
     const files = e.target.files;
     if (files) {
       if (files.length + screenshots.length > 5) {
-        alert(t('uploadLimitError'));
+        toast.error(t('uploadLimitError'));
         return;
       }
 
@@ -224,7 +223,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
         setValue("screenshots", newScreenshots, { shouldValidate: true });
       } catch (error) {
         console.error("Screenshot upload failed:", error);
-        alert(t('uploadError') || "Upload failed");
+        toast.error(t('uploadError') || "Upload failed");
       } finally {
         setUploadingScreenshots(false);
       }
@@ -306,7 +305,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
       setValue("tags", currentTags.filter(t => t !== tagId));
     } else {
       if (currentTags.length >= 5) {
-        alert(t('tagsLimitError'));
+        toast.error(t('tagsLimitError'));
         return;
       }
       setValue("tags", [...currentTags, tagId]);
@@ -340,11 +339,11 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
         }
       } else {
         console.error("Submission error:", result.error, result.details);
-        alert(t('submitError') || result.error || "Submission failed");
+        toast.error(t('submitError') || result.error || "Submission failed");
       }
     } catch (error) {
       console.error("Submission failed:", error);
-      alert(t('submitError') || "An unexpected error occurred");
+      toast.error(t('submitError') || "An unexpected error occurred");
     }
   };
 

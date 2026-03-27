@@ -1,6 +1,6 @@
 'use client'
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp, Mail, Award, ChevronLeft, ChevronRight, Download, Link2, Check } from "lucide-react";
 import { Button } from "@/components/common/action-button";
 import { useEffect, useState, useRef } from "react";
@@ -36,6 +36,7 @@ export function WorkDetailView() {
   const locale = useLocale();
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const id = params?.id as string;
   const [work, setWork] = useState<Work | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -141,6 +142,13 @@ export function WorkDetailView() {
   const currentPageUrl = typeof window !== 'undefined' ? window.location.href : '';
   const normalizeLabel = (label: string) => label.replace(/[:：]\s*$/, '');
   const withColon = (label: string) => `${normalizeLabel(label)}：`;
+  const returnToListHref = (() => {
+    const from = searchParams.get('from');
+    if (!from || !from.startsWith('/')) {
+      return '/';
+    }
+    return from;
+  })();
 
   const handleLike = async () => {
     try {
@@ -335,7 +343,7 @@ export function WorkDetailView() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <Link
-        href="/"
+        href={returnToListHref}
         className="inline-flex items-center text-gray-400 hover:text-primary transition-colors mb-4"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />

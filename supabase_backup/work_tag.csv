@@ -1,0 +1,5 @@
+id,name,is_auto_audit,audit_start_time,audit_end_time
+1,线上社区,False,,
+2,站内投稿,False,,
+6,TRAE on Campus（校园活动）,False,,
+7,TRAE Friends（城市活动）,True,2026-03-28 04:00:00+00:00,2026-03-29 16:00:00+00:00
