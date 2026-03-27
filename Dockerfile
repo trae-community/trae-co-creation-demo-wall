@@ -1,10 +1,25 @@
-# Build stage
-FROM docker.cnb.cool/jaguarliu.cool/wenyuan-ai/docker-sync/node:20-slim_amd64 AS builder
+# Shared base stage for Debian mirror configuration and Prisma runtime deps
+FROM docker.cnb.cool/jaguarliu.cool/wenyuan-ai/docker-sync/node:20-slim_amd64 AS base
 
-# Install build dependencies and OpenSSL for Prisma
-RUN apt-get update && apt-get install -y \
-    openssl \
-    ca-certificates \
+ARG DEBIAN_MIRROR=mirrors.tuna.tsinghua.edu.cn
+
+RUN set -eux; \
+    if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
+      sed -i "s|http://deb.debian.org/debian|https://${DEBIAN_MIRROR}/debian|g; s|http://deb.debian.org/debian-security|https://${DEBIAN_MIRROR}/debian-security|g" /etc/apt/sources.list.d/debian.sources; \
+    fi; \
+    if [ -f /etc/apt/sources.list ]; then \
+      sed -i "s|http://deb.debian.org/debian|https://${DEBIAN_MIRROR}/debian|g; s|http://deb.debian.org/debian-security|https://${DEBIAN_MIRROR}/debian-security|g" /etc/apt/sources.list; \
+    fi; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      openssl \
+      ca-certificates; \
+    rm -rf /var/lib/apt/lists/*
+
+# Build stage
+FROM base AS builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
     g++ \
@@ -48,10 +63,7 @@ RUN npx prisma generate
 RUN npm run build
 
 # Production stage
-FROM docker.cnb.cool/jaguarliu.cool/wenyuan-ai/docker-sync/node:20-slim_amd64 AS runner
-
-# Install OpenSSL for Prisma
-RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+FROM base AS runner
 
 WORKDIR /app
 

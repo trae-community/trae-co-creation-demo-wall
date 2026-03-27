@@ -7,6 +7,14 @@ const rootDir = process.cwd()
 const entrypoint = fs.readFileSync(path.join(rootDir, 'entrypoint.sh'), 'utf8')
 const dockerfile = fs.readFileSync(path.join(rootDir, 'Dockerfile'), 'utf8')
 
+test('dockerfile uses a shared base stage and a configurable Debian mirror for apt', () => {
+  assert.match(dockerfile, /^FROM .+ AS base$/m)
+  assert.match(dockerfile, /^ARG DEBIAN_MIRROR=/m)
+  assert.match(dockerfile, /sed -i .*debian\.sources/)
+  assert.match(dockerfile, /^FROM base AS builder$/m)
+  assert.match(dockerfile, /^FROM base AS runner$/m)
+})
+
 test('startup uses checked-in local Prisma and tsx CLIs instead of npx downloads', () => {
   assert.doesNotMatch(entrypoint, /npx\s+prisma/)
   assert.doesNotMatch(entrypoint, /npx\s+tsx/)
