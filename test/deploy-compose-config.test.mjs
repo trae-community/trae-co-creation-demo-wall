@@ -12,6 +12,10 @@ const composeProd = fs.readFileSync(
   path.join(rootDir, 'docker-compose.prod.yml'),
   'utf8',
 )
+const composeDefault = fs.readFileSync(
+  path.join(rootDir, 'docker-compose.yml'),
+  'utf8',
+)
 
 for (const [name, source, appNames] of [
   ['2c8g', compose2c8g, ['app-1', 'app-2']],
@@ -30,3 +34,11 @@ for (const [name, source, appNames] of [
     }
   })
 }
+
+test('default compose forwards NEXTAUTH_URL from environment instead of hardcoding localhost', () => {
+  assert.match(
+    composeDefault,
+    /NEXTAUTH_URL=\$\{NEXTAUTH_URL\}|NEXTAUTH_URL:\s*\$\{NEXTAUTH_URL\}/,
+  )
+  assert.doesNotMatch(composeDefault, /NEXTAUTH_URL=http:\/\/localhost/)
+})

@@ -21,7 +21,7 @@ services:
       - COS_BUCKET=${COS_BUCKET}
       - COS_REGION=${COS_REGION}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
       - AUTH_TRUST_HOST=true
     depends_on:
       - db

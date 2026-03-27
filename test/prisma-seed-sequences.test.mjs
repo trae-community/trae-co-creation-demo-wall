@@ -18,3 +18,10 @@ test('seed realigns imported table sequences before creating admin records', () 
   assert.notEqual(adminIndex, -1)
   assert.ok(resetIndex < adminIndex, 'sequence reset must happen before admin upsert')
 })
+
+test('seed discovers sequence-backed columns dynamically instead of assuming every table has an id column', () => {
+  assert.match(seedSource, /information_schema\.columns/)
+  assert.match(seedSource, /column_default LIKE 'nextval\(%'/)
+  assert.doesNotMatch(seedSource, /pg_get_serial_sequence\('"\\\$\{tableName\\\}"', 'id'\)/)
+  assert.doesNotMatch(seedSource, /SELECT MAX\(id\) AS max_id/)
+})

@@ -5,9 +5,36 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+function escapeLiteral(value: string) {
+  return value.replace(/'/g, "''");
+}
+
+function quoteIdentifier(identifier: string) {
+  return `"${identifier.replace(/"/g, '""')}"`;
+}
+
 async function resetTableSequence(tableName: string) {
+  const escapedTableName = escapeLiteral(tableName);
+  const sequenceColumnRows = await prisma.$queryRawUnsafe<Array<{ column_name: string | null }>>(
+    `
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_schema = current_schema()
+        AND table_name = '${escapedTableName}'
+        AND column_default LIKE 'nextval(%'
+      LIMIT 1
+    `,
+  );
+
+  const sequenceColumn = sequenceColumnRows[0]?.column_name;
+
+  if (!sequenceColumn) {
+    return;
+  }
+
+  const escapedSequenceColumn = escapeLiteral(sequenceColumn);
   const sequenceRows = await prisma.$queryRawUnsafe<Array<{ sequence_name: string | null }>>(
-    `SELECT pg_get_serial_sequence('"${tableName}"', 'id') AS sequence_name`,
+    `SELECT pg_get_serial_sequence('"${tableName}"', '${escapedSequenceColumn}') AS sequence_name`,
   );
 
   const sequenceName = sequenceRows[0]?.sequence_name;
@@ -17,7 +44,7 @@ async function resetTableSequence(tableName: string) {
   }
 
   const maxIdRows = await prisma.$queryRawUnsafe<Array<{ max_id: bigint | number | null }>>(
-    `SELECT MAX(id) AS max_id FROM "${tableName}"`,
+    `SELECT MAX(${quoteIdentifier(sequenceColumn)}) AS max_id FROM ${quoteIdentifier(tableName)}`,
   );
 
   const maxId = maxIdRows[0]?.max_id;
