@@ -45,7 +45,7 @@ function buildSchema(t: (k: string) => string) {
         })
       )
       .min(1, t('validationHighlightsMin'))
-      .max(3, t('validationHighlightsMax')),
+      .max(5, t('validationHighlightsMax')),
     scenarios: z
       .array(z.object({ value: z.string().min(1, t('validationScenarioRequired')) }))
       .min(1, t('validationScenariosMin')),
@@ -104,14 +104,14 @@ export function SubmissionForm() {
       city: '',
       category: '',
       devStatus: '',
-      tags: 0,
+      tags: [],
       team: [{ value: session?.user?.name || '' }],
       teamIntro: '',
       contactPhone: '',
       contactEmail: '',
       coverUrl: '',
       story: '',
-      highlights: [{ value: '' }],
+      highlights: [{ value: '' }, { value: '' }, { value: '' }],
       scenarios: [{ value: '' }],
       screenshots: [],
       demoUrl: '',

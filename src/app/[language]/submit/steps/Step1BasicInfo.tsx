@@ -13,7 +13,7 @@ export type SubmissionFormValues = {
   city: string
   category: string
   devStatus: string
-  tags: number
+  tags: number[]
   team: { value: string }[]
   teamIntro?: string
   contactPhone?: string
@@ -50,10 +50,13 @@ export function Step1BasicInfo({
   const { register, watch, setValue, formState: { errors } } = form
 
   const selectedCountry = watch('country')
-  const selectedTag = watch('tags') || 0
+  const selectedTags = watch('tags') || []
 
-  const selectTag = (tagId: number) => {
-    setValue('tags', tagId, { shouldValidate: true })
+  const toggleTag = (tagId: number) => {
+    const current = selectedTags
+    const exists = current.includes(tagId)
+    const next = exists ? current.filter(id => id !== tagId) : [...current, tagId]
+    setValue('tags', next, { shouldValidate: true })
   }
 
   const inputClass =
@@ -194,12 +197,12 @@ export function Step1BasicInfo({
         </label>
         <div className="flex flex-wrap gap-2">
           {availableTags.map(tag => {
-            const isSelected = selectedTag === tag.id
+            const isSelected = selectedTags.includes(tag.id)
             return (
               <button
                 key={tag.id}
                 type="button"
-                onClick={() => selectTag(tag.id)}
+                onClick={() => toggleTag(tag.id)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
                   isSelected
                     ? 'bg-primary text-black border-primary'
