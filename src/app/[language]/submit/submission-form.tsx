@@ -1,12 +1,12 @@
 'use client'
 
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useState, useEffect, useMemo } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSession } from 'next-auth/react'
-import { CheckCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { Tag as WorkTag, DictionaryItem } from '@/lib/types'
 import { Button } from '@/components/common/action-button'
@@ -26,7 +26,10 @@ function buildSchema(t: (k: string) => string) {
     city: z.string().min(1, t('validationCity')),
     category: z.string().min(1, t('validationCategory')),
     devStatus: z.string().min(1, t('validationDevStatus')),
-    tags: z.number().min(1, t('validationTagsRequired')),
+    tags: z
+      .array(z.number())
+      .min(1, t('validationTagsMin') || t('validationTagsRequired'))
+      .max(5, t('validationTagsMax')),
     team: z
       .array(z.object({ value: z.string().min(1, t('validationTeamMemberRequired')) }))
       .min(1, t('validationTeamMin')),
@@ -34,17 +37,17 @@ function buildSchema(t: (k: string) => string) {
     contactPhone: z.string().optional(),
     contactEmail: z.union([z.string().email(t('validationEmail')), z.literal('')]).optional(),
     coverUrl: z.string().min(1, t('validationCover')),
-    story: z.string().min(10, t('validationStoryMin')),
+    story: z.string().min(20, t('validationStoryMin')),
     highlights: z
       .array(
         z.object({
           value: z
             .string()
             .min(1, t('validationHighlightRequired'))
-            .max(30, t('validationHighlightMax')),
+            .max(10, t('validationHighlightMax')),
         })
       )
-      .min(1, t('validationHighlightsMin'))
+      .min(3, t('validationHighlightsMin'))
       .max(5, t('validationHighlightsMax')),
     scenarios: z
       .array(z.object({ value: z.string().min(1, t('validationScenarioRequired')) }))

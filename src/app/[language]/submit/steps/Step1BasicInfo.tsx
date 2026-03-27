@@ -55,6 +55,9 @@ export function Step1BasicInfo({
   const toggleTag = (tagId: number) => {
     const current = selectedTags
     const exists = current.includes(tagId)
+    if (!exists && current.length >= 5) {
+      return
+    }
     const next = exists ? current.filter(id => id !== tagId) : [...current, tagId]
     setValue('tags', next, { shouldValidate: true })
   }
