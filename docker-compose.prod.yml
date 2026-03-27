@@ -42,7 +42,7 @@ x-app-service: &app-service
 
 services:
   nginx-lb:
-    image: nginx:alpine
+    image: docker.cnb.cool/jaguarliu.cool/wenyuan-ai/docker-sync/nginx:alpine_amd64
     ports:
       - "80:80"
     volumes:
@@ -86,7 +86,7 @@ services:
     <<: *app-service
 
   db:
-    image: postgres:16-alpine
+    image: docker.cnb.cool/jaguarliu.cool/wenyuan-ai/docker-sync/postgres:16-alpine_amd64
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -123,7 +123,7 @@ services:
           memory: 2G
 
   redis:
-    image: redis:7-alpine
+    image: docker.cnb.cool/jaguarliu.cool/wenyuan-ai/docker-sync/redis:7-alpine_amd64
     command: redis-server --maxmemory 1gb --maxmemory-policy allkeys-lru --save 60 1000 --appendonly yes
     volumes:
       - redis-data:/data
