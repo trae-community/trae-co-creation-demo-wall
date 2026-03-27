@@ -25,3 +25,9 @@ test('seed discovers sequence-backed columns dynamically instead of assuming eve
   assert.doesNotMatch(seedSource, /pg_get_serial_sequence\('"\\\$\{tableName\\\}"', 'id'\)/)
   assert.doesNotMatch(seedSource, /SELECT MAX\(id\) AS max_id/)
 })
+
+test('seed aligns default role setup with backed-up role codes', () => {
+  assert.match(seedSource, /where:\s*\{\s*roleCode:\s*'root'\s*\}/)
+  assert.doesNotMatch(seedSource, /roleCode:\s*'ROOT_ADMIN'/)
+  assert.doesNotMatch(seedSource, /roleName:\s*'根管理员'/)
+})

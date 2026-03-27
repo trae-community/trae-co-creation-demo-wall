@@ -156,14 +156,14 @@ async function main() {
 
   console.log(`✓ Admin user created: ${adminUser.email}`);
 
-  // 分配根管理员角色
+  // 分配根用户角色，需与备份数据和前端权限判断保持一致
   const adminRole = await prisma.sysRole.upsert({
-    where: { roleCode: 'ROOT_ADMIN' },
+    where: { roleCode: 'root' },
     update: {},
     create: {
-      roleCode: 'ROOT_ADMIN',
-      roleName: '根管理员',
-      description: '系统最高权限管理员',
+      roleCode: 'root',
+      roleName: '根用户',
+      description: '系统最高权限用户',
     },
   });
 
