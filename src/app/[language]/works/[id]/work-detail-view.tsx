@@ -342,13 +342,14 @@ export function WorkDetailView() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <Link
-        href={returnToListHref}
+      <button
+        type="button"
+        onClick={() => router.push(returnToListHref)}
         className="inline-flex items-center text-gray-400 hover:text-primary transition-colors mb-4"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
         {t('backList')}
-      </Link>
+      </button>
 
       <div className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border">
         <div className="aspect-video w-full bg-zinc-900 relative">

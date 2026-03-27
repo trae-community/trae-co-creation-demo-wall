@@ -1,10 +1,10 @@
 'use client'
 
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Work } from "@/lib/types";
 import { MapPin, Users, Award, Eye, ThumbsUp } from "lucide-react";
 import { useTranslations } from 'next-intl';
-import { Link, usePathname } from '@/lib/language/navigation';
+import { Link } from '@/lib/language/navigation';
 
 interface WorkCardProps {
   work: Work;
