@@ -1,0 +1,15 @@
+$:
+  vscode:
+    - services:
+        - vscode
+        - docker
+      docker:
+        image: docker.cnb.cool/arsrna/dev-env/node22
+        volumes:
+          # 使用缓存，同时更新
+          - /root/.pnpm:cow
+          - /root/.pnpm-store:cow
+          - /workspace/.next:cow
+      stages:
+        - name: 启动
+          script: echo hello
