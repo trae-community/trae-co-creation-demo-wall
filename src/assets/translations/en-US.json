@@ -267,6 +267,11 @@
     "confirmPasswordPlaceholder": "Re-enter new password",
     "passwordChangeSuccess": "Password changed successfully",
     "passwordChangeError": "Failed to change password",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "validationOldPasswordRequired": "Please enter current password",
+    "validationNewPasswordRequired": "Please enter new password",
+    "validationPasswordMinLength": "Password must be at least 6 characters",
+    "validationConfirmPasswordRequired": "Please confirm new password",
+    "validationPasswordMismatch": "Passwords do not match"
   }
 }

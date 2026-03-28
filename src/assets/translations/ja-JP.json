@@ -273,6 +273,11 @@
     "confirmPasswordPlaceholder": "新しいパスワードを再入力",
     "passwordChangeSuccess": "パスワードが正常に変更されました",
     "passwordChangeError": "パスワードの変更に失敗しました",
-    "cancel": "キャンセル"
+    "cancel": "キャンセル",
+    "validationOldPasswordRequired": "現在のパスワードを入力してください",
+    "validationNewPasswordRequired": "新しいパスワードを入力してください",
+    "validationPasswordMinLength": "新しいパスワードは 6 文字以上である必要があります",
+    "validationConfirmPasswordRequired": "新しいパスワードを確認してください",
+    "validationPasswordMismatch": "新しいパスワードが一致しません"
   }
 }
