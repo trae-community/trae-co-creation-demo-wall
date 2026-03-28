@@ -401,10 +401,10 @@ export default function UsersPage() {
           </DialogHeader>
           
           <div className="space-y-4 py-4">
-            {availableRoles.length === 0 ? (
+            {availableRoles.filter(role => role.roleCode !== 'root').length === 0 ? (
               <p className="text-sm text-muted-foreground text-center">暂无可用角色</p>
             ) : (
-              availableRoles.map(role => (
+              availableRoles.filter(role => role.roleCode !== 'root').map(role => (
                 <div key={role.id} className="flex items-center space-x-2">
                   <Checkbox 
                     id={`role-${role.id}`} 
