@@ -254,9 +254,19 @@
     "noSummary": "No summary",
     "worksMeta": "Views {views} | Likes {likes}",
     "securityTitle": "Account & Security",
-    "securityDesc": "Keep using Clerk account features for password, security and account management.",
+    "securityDesc": "Manage your password and account security settings.",
     "openSettings": "Open account settings",
     "settingsModalTitle": "Account settings",
-    "settingsModalDesc": "Manage password, authentication methods and account details via Clerk."
+    "settingsModalDesc": "Manage password, authentication methods and account details via Clerk.",
+    "changePassword": "Change Password",
+    "oldPassword": "Current Password",
+    "oldPasswordPlaceholder": "Enter your current password",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter new password (at least 6 characters)",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Re-enter new password",
+    "passwordChangeSuccess": "Password changed successfully",
+    "passwordChangeError": "Failed to change password",
+    "cancel": "Cancel"
   }
 }
