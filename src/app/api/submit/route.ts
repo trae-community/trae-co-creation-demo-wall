@@ -13,6 +13,17 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
 };
 
 const stripHtmlTags = (html: string) => html.replace(/<[^>]*>/g, '').trim();
+const hasValidTeamMembers = (value: string) => {
+  try {
+    const parsed = JSON.parse(value);
+    return (
+      Array.isArray(parsed) &&
+      parsed.some((member) => typeof member === "string" && member.trim().length > 0)
+    );
+  } catch {
+    return false;
+  }
+};
 
 // Schema matching the frontend form
 const submissionSchema = z.object({
@@ -20,8 +31,8 @@ const submissionSchema = z.object({
   intro: z.string().min(10).max(100),
   country: z.string().min(1),
   city: z.string().min(1),
-  team: z.string().min(2),
-  teamIntro: z.string().optional(),
+  team: z.string().refine(hasValidTeamMembers, '请至少填写1名团队成员'),
+  teamIntro: z.string().min(1),
   contactPhone: z.string().optional(),
   contactEmail: z.string().email().optional().or(z.literal("")),
   coverUrl: z.string().min(1),

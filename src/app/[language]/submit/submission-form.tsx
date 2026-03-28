@@ -34,7 +34,7 @@ function buildSchema(t: (k: string) => string) {
     team: z
       .array(z.object({ value: z.string().min(1, t('validationTeamMemberRequired')) }))
       .min(1, t('validationTeamMin')),
-    teamIntro: z.string().optional(),
+    teamIntro: z.string().min(1, t('validationTeamIntro')),
     contactPhone: z.string().optional(),
     contactEmail: z.union([z.string().email(t('validationEmail')), z.literal('')]).optional(),
     coverUrl: z.string().min(1, t('validationCover')),
@@ -48,7 +48,7 @@ function buildSchema(t: (k: string) => string) {
             .max(10, t('validationHighlightMax')),
         })
       )
-      .min(3, t('validationHighlightsMin'))
+      .min(1, t('validationHighlightsMin'))
       .max(5, t('validationHighlightsMax')),
     scenarios: z
       .array(z.object({ value: z.string().min(1, t('validationScenarioRequired')) }))
@@ -117,7 +117,7 @@ export function SubmissionForm() {
       contactEmail: '',
       coverUrl: '',
       story: '',
-      highlights: [{ value: '' }, { value: '' }, { value: '' }],
+      highlights: [{ value: '' }],
       scenarios: [{ value: '' }],
       screenshots: [],
       demoUrl: '',

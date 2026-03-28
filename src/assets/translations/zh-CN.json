@@ -126,6 +126,7 @@
     "validationRepoUrl": "请输入有效的仓库链接",
     "validationTeamMemberRequired": "请填写团队成员姓名",
     "validationTeamMin": "至少需要1名团队成员",
+    "validationTeamIntro": "请填写团队介绍",
     "validationEmail": "请输入有效的邮箱地址",
     "nextStep": "下一步",
     "prevStep": "上一步",

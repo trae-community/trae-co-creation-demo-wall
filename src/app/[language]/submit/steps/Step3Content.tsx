@@ -85,7 +85,7 @@ export function Step3Content({ form }: Step3Props) {
                   </p>
                 )}
               </div>
-              {highlightFields.length > 3 && (
+              {highlightFields.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeHighlight(index)}

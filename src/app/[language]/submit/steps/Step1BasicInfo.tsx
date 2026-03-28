@@ -15,7 +15,7 @@ export type SubmissionFormValues = {
   devStatus: string
   tags: number[]
   team: { value: string }[]
-  teamIntro?: string
+  teamIntro: string
   contactPhone?: string
   contactEmail?: string
   coverUrl: string
