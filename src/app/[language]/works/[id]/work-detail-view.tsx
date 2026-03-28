@@ -134,6 +134,8 @@ export function WorkDetailView() {
 
   const teamMembers = toStringList(work?.team);
   const screenshotList = work?.screenshots || [];
+  const demoUrl = work?.demoUrl?.trim() || '';
+  const repoUrl = work?.repoUrl?.trim() || '';
   const featureLines = (work?.features || '')
     .split('\n')
     .map(line => line.replace(/^\d+\.\s*/, '').trim())
@@ -561,15 +563,17 @@ export function WorkDetailView() {
 
         <div className="space-y-6">
           <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 flex flex-col gap-3">
-            <a href={work.demoUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
-              <Button className="w-full gap-2 font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40">
-                <ExternalLink className="w-4 h-4" />
-                {t('tryDemo')}
-              </Button>
-            </a>
+            {demoUrl && (
+              <a href={demoUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
+                <Button className="w-full gap-2 font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40">
+                  <ExternalLink className="w-4 h-4" />
+                  {t('tryDemo')}
+                </Button>
+              </a>
+            )}
 
-            {work.repoUrl && (
-              <a href={work.repoUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
+            {repoUrl && (
+              <a href={repoUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
                 <Button variant="secondary" className="w-full gap-2 bg-white/10 hover:bg-white/20 border-white/5 text-white">
                   <Github className="w-4 h-4" />
                   {t('codeRepo')}
