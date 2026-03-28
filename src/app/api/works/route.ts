@@ -19,7 +19,7 @@ const updateSchema = z.object({
   category: z.string().min(1),
   devStatus: z.string().min(1),
   tags: z.array(z.number()).min(1).max(5),
-  highlights: z.array(z.string().max(10)).min(3).max(5),
+  highlights: z.array(z.string().max(30)).min(1).max(5),
   scenarios: z.array(z.string()).min(1),
   screenshots: z.array(z.string()).min(1).max(5),
   demoUrl: z.string().url().optional().or(z.literal('')),

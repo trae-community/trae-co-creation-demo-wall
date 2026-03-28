@@ -3,10 +3,10 @@
 import { UseFormReturn } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
 import { AlertCircle, UploadCloud, Plus, Trash2, Image as ImageIcon } from 'lucide-react'
-import { SubmissionFormValues } from './Step1BasicInfo'
+import { WorkFormValues } from '@/lib/work-form'
 
 interface Step2Props {
-  form: UseFormReturn<SubmissionFormValues>
+  form: UseFormReturn<WorkFormValues>
   previewCoverUrl: string
   setPreviewCoverUrl: (url: string) => void
   previewScreenshots: string[]

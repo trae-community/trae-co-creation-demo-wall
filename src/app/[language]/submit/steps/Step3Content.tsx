@@ -5,10 +5,10 @@ import { useTranslations } from 'next-intl'
 import { AlertCircle, Plus, Trash2, Link as LinkIcon, FileText } from 'lucide-react'
 import { Button } from '@/components/common/action-button'
 import { RichTextEditor } from '@/app/[language]/submit/editor/RichTextEditor'
-import { SubmissionFormValues } from './Step1BasicInfo'
+import { WorkFormValues } from '@/lib/work-form'
 
 interface Step3Props {
-  form: UseFormReturn<SubmissionFormValues>
+  form: UseFormReturn<WorkFormValues>
 }
 
 export function Step3Content({ form }: Step3Props) {
@@ -76,7 +76,7 @@ export function Step3Content({ form }: Step3Props) {
                   {...register(`highlights.${index}.value` as const)}
                   className={inputClass}
                   placeholder={t('highlightPlaceholder', { index: index + 1 })}
-                  maxLength={10}
+                  maxLength={30}
                 />
                 {errors.highlights?.[index]?.value && (
                   <p className="text-red-500 text-xs flex items-center gap-1">

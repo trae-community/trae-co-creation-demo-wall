@@ -5,30 +5,10 @@ import { useTranslations } from 'next-intl'
 import { AlertCircle, Globe, MapPin, LayoutGrid, CheckCircle, Tag } from 'lucide-react'
 import { Select } from '@/components/common/form-select'
 import { DictionaryItem, Tag as WorkTag } from '@/lib/types'
-
-export type SubmissionFormValues = {
-  name: string
-  intro: string
-  country: string
-  city: string
-  category: string
-  devStatus: string
-  tags: number[]
-  team: { value: string }[]
-  teamIntro: string
-  contactPhone?: string
-  contactEmail?: string
-  coverUrl: string
-  story: string
-  highlights: { value: string }[]
-  scenarios: { value: string }[]
-  screenshots: string[]
-  demoUrl?: string
-  repoUrl?: string
-}
+import { WorkFormValues } from '@/lib/work-form'
 
 interface Step1Props {
-  form: UseFormReturn<SubmissionFormValues>
+  form: UseFormReturn<WorkFormValues>
   availableCountries: DictionaryItem[]
   availableCities: DictionaryItem[]
   availableCategories: DictionaryItem[]
