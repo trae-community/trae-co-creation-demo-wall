@@ -3,16 +3,19 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { writeOperationLog } from "@/lib/audit-log";
+import { sanitizeRichText, stripHtmlTags } from "@/lib/rich-text";
 import { z } from "zod";
-import sanitizeHtml from "sanitize-html";
-
-const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
-  allowedTags: ['p','br','strong','em','u','s','h2','h3','ul','ol','li','a','blockquote','code'],
-  allowedAttributes: { a: ['href', 'target', 'rel'] },
-  allowedSchemes: ['http', 'https', 'mailto'],
+const hasValidTeamMembers = (value: string) => {
+  try {
+    const parsed = JSON.parse(value);
+    return (
+      Array.isArray(parsed) &&
+      parsed.some((member) => typeof member === "string" && member.trim().length > 0)
+    );
+  } catch {
+    return false;
+  }
 };
-
-const stripHtmlTags = (html: string) => html.replace(/<[^>]*>/g, '').trim();
 
 // Schema matching the frontend form
 const submissionSchema = z.object({
@@ -20,8 +23,8 @@ const submissionSchema = z.object({
   intro: z.string().min(10).max(100),
   country: z.string().min(1),
   city: z.string().min(1),
-  team: z.string().min(2),
-  teamIntro: z.string().optional(),
+  team: z.string().refine(hasValidTeamMembers, '请至少填写1名团队成员'),
+  teamIntro: z.string().min(1),
   contactPhone: z.string().optional(),
   contactEmail: z.string().email().optional().or(z.literal("")),
   coverUrl: z.string().min(1),
@@ -59,7 +62,7 @@ export async function POST(request: Request) {
 
     const data = validationResult.data;
     // Sanitize HTML story before persisting — prevents stored XSS
-    const cleanStory = sanitizeHtml(data.story, SANITIZE_OPTIONS);
+    const cleanStory = sanitizeRichText(data.story);
     const now = new Date();
 
     const result = await prisma.$transaction(async (tx) => {

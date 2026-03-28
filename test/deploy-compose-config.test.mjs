@@ -42,3 +42,11 @@ test('default compose forwards NEXTAUTH_URL from environment instead of hardcodi
   )
   assert.doesNotMatch(composeDefault, /NEXTAUTH_URL=http:\/\/localhost/)
 })
+
+test('default compose uses one-shot app-init so normal app restarts do not rerun db init', () => {
+  assert.match(composeDefault, /\n\s{2}app-init:\n/)
+  assert.match(composeDefault, /\n\s{2}app:\n/)
+  assert.match(composeDefault, /RUN_DB_INIT:\s*"true"|RUN_DB_INIT=true/)
+  assert.match(composeDefault, /\n\s{2}app:\n[\s\S]*RUN_DB_INIT:\s*"false"|RUN_DB_INIT=false/)
+  assert.match(composeDefault, /\n\s{2}app:\n[\s\S]*service_completed_successfully/)
+})

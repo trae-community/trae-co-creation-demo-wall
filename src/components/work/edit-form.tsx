@@ -2,9 +2,9 @@
 
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { toast } from 'sonner';
 import { Tag as WorkTag, DictionaryItem } from "@/lib/types";
+import { buildWorkFormSchema, WorkFormValues } from "@/lib/work-form";
 import { Button } from "@/components/common/action-button";
 import { Select } from "@/components/common/form-select";
 import { AlertCircle, CheckCircle, UploadCloud, Link as LinkIcon, Users, MapPin, FileText, Image as ImageIcon, Globe, Plus, Trash2, LayoutGrid } from "lucide-react";
@@ -63,7 +63,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
   };
 
   // Transform backend data to form values
-  const defaultValues = {
+  const defaultValues: WorkFormValues = {
     name: initialData.title,
     intro: initialData.summary || "",
     country: initialData.countryCode || "",
@@ -81,7 +81,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
     story: initialData.detail?.story || "",
     highlights: initialData.detail?.highlights 
       ? normalizeStringList(initialData.detail.highlights).map(h => ({ value: h })) 
-      : [{ value: "" }, { value: "" }, { value: "" }],
+      : [{ value: "" }],
     scenarios: initialData.detail?.scenarios 
       ? normalizeStringList(initialData.detail.scenarios).map(s => ({ value: s })) 
       : [{ value: "" }],
@@ -106,31 +106,10 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
   const [availableCities, setAvailableCities] = useState<DictionaryItem[]>([]);
   const [availableDevStatuses, setAvailableDevStatuses] = useState<DictionaryItem[]>([]);
 
-  const submissionSchema = z.object({
-    name: z.string().min(2, t('validationNameMin')).max(50, t('validationNameMax')),
-    intro: z.string().min(10, t('validationIntroMin')).max(100, t('validationIntroMax')),
-    country: z.string().min(1, t('validationCountry')),
-    city: z.string().min(1, t('validationCity')),
-    category: z.string().min(1, t('validationCategory')),
-    devStatus: z.string().min(1, t('validationDevStatus')),
-    tags: z.array(z.number()).min(1, t('validationTagsMin')).max(5, t('validationTagsMax')),
-    team: z.array(z.object({ value: z.string().min(1, t('validationTeamMemberRequired')) })).min(1, t('validationTeamMin')),
-    teamIntro: z.string().optional(),
-    contactPhone: z.string().optional(),
-    contactEmail: z.string().email(t('validationEmail')).optional().or(z.literal("")),
-    coverUrl: z.string().min(1, t('validationCover')),
-    story: z.string().min(20, t('validationStoryMin')),
-    highlights: z.array(z.object({ value: z.string().min(1, t('validationHighlightRequired')).max(30, t('validationHighlightMax')) }))
-      .min(1, t('validationHighlightsMin'))
-      .max(3, t('validationHighlightsMax')),
-    scenarios: z.array(z.object({ value: z.string().min(1, t('validationScenarioRequired')) }))
-      .min(1, t('validationScenariosMin')),
-    screenshots: z.array(z.string()).min(1, t('validationScreenshotsMin')).max(5, t('validationScreenshotsMax')),
-    demoUrl: z.string().url(t('validationDemoUrl')),
-    repoUrl: z.string().url(t('validationRepoUrl')).optional().or(z.literal("")),
-  });
-  
-  type SubmissionFormValues = z.infer<typeof submissionSchema>;
+  const submissionSchema = useMemo(
+    () => buildWorkFormSchema(t, { requireTeamIntro: false }),
+    [t]
+  );
 
   const {
     register,
@@ -139,7 +118,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
     setValue,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<SubmissionFormValues>({
+  } = useForm<WorkFormValues>({
     resolver: zodResolver(submissionSchema),
     defaultValues: defaultValues,
   });
@@ -312,7 +291,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
     }
   };
 
-  const onSubmit = async (data: SubmissionFormValues) => {
+  const onSubmit = async (data: WorkFormValues) => {
     try {
       // 2. Prepare payload with real URLs
       const payload = {
@@ -573,10 +552,11 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
                     {...register(`highlights.${index}.value` as const)}
                     className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
                     placeholder={t('highlightPlaceholder', { index: index + 1 })}
+                    maxLength={30}
                   />
                   {errors.highlights?.[index]?.value && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.highlights[index]?.value?.message}</p>}
                 </div>
-                {highlightFields.length > 3 && (
+                {highlightFields.length > 1 && (
                   <button type="button" onClick={() => removeHighlight(index)} className="p-3 text-zinc-500 hover:text-red-500 transition-colors">
                     <Trash2 className="w-5 h-5" />
                   </button>
@@ -669,7 +649,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">{t('demoUrl')} <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium text-gray-300">{t('demoUrl')}</label>
               <input
                 {...register("demoUrl")}
                 className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"

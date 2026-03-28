@@ -119,6 +119,7 @@
     "validationTeam": "チームメンバーを入力してください",
     "validationTeamMemberRequired": "チームメンバー名を入力してください",
     "validationTeamMin": "最低1人のチームメンバーが必要です",
+    "validationTeamIntro": "チーム紹介を入力してください",
     "validationCover": "カバー画像をアップロードしてください",
     "validationProblemMin": "問題の説明は20文字以上必要です",
     "validationSolutionMin": "解決方法は20文字以上必要です",
@@ -173,6 +174,7 @@
     "copyLink": "リンクをコピー",
     "copied": "コピー完了",
     "systemShare": "システム共有",
+    "clickToPreview": "クリックして拡大表示",
     "phone": "電話",
     "email": "メール"
   },

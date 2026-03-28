@@ -1,66 +1,25 @@
 'use client'
 
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
 import { useState, useEffect, useMemo } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useSession } from 'next-auth/react'
-import { CheckCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 import { Tag as WorkTag, DictionaryItem } from '@/lib/types'
+import { buildWorkFormSchema, WorkFormValues } from '@/lib/work-form'
 import { Button } from '@/components/common/action-button'
 import { StepIndicator, StepNumber } from './steps/StepIndicator'
-import { Step1BasicInfo, SubmissionFormValues } from './steps/Step1BasicInfo'
+import { Step1BasicInfo } from './steps/Step1BasicInfo'
 import { Step2VisualAssets } from './steps/Step2VisualAssets'
 import { Step3Content } from './steps/Step3Content'
 import { Step4Team } from './steps/Step4Team'
 
-// ─── Zod schema ───────────────────────────────────────────────────────────────
-
-function buildSchema(t: (k: string) => string) {
-  return z.object({
-    name: z.string().min(2, t('validationNameMin')).max(50, t('validationNameMax')),
-    intro: z.string().min(10, t('validationIntroMin')).max(100, t('validationIntroMax')),
-    country: z.string().min(1, t('validationCountry')),
-    city: z.string().min(1, t('validationCity')),
-    category: z.string().min(1, t('validationCategory')),
-    devStatus: z.string().min(1, t('validationDevStatus')),
-    tags: z.number().min(1, t('validationTagsRequired')),
-    team: z
-      .array(z.object({ value: z.string().min(1, t('validationTeamMemberRequired')) }))
-      .min(1, t('validationTeamMin')),
-    teamIntro: z.string().optional(),
-    contactPhone: z.string().optional(),
-    contactEmail: z.union([z.string().email(t('validationEmail')), z.literal('')]).optional(),
-    coverUrl: z.string().min(1, t('validationCover')),
-    story: z.string().min(10, t('validationStoryMin')),
-    highlights: z
-      .array(
-        z.object({
-          value: z
-            .string()
-            .min(1, t('validationHighlightRequired'))
-            .max(30, t('validationHighlightMax')),
-        })
-      )
-      .min(1, t('validationHighlightsMin'))
-      .max(5, t('validationHighlightsMax')),
-    scenarios: z
-      .array(z.object({ value: z.string().min(1, t('validationScenarioRequired')) }))
-      .min(1, t('validationScenariosMin')),
-    screenshots: z
-      .array(z.string())
-      .min(1, t('validationScreenshotsMin'))
-      .max(5, t('validationScreenshotsMax')),
-    demoUrl: z.union([z.string().url(t('validationDemoUrl')), z.literal('')]).optional(),
-    repoUrl: z.union([z.string().url(t('validationRepoUrl')), z.literal('')]).optional(),
-  })
-}
-
 // ─── Step → field mapping for partial validation ──────────────────────────────
 
-const STEP_FIELDS: Record<StepNumber, (keyof SubmissionFormValues)[]> = {
+const STEP_FIELDS: Record<StepNumber, (keyof WorkFormValues)[]> = {
   1: ['name', 'intro', 'country', 'city', 'category', 'devStatus', 'tags'],
   2: ['coverUrl', 'screenshots'],
   3: ['story', 'highlights', 'scenarios', 'demoUrl', 'repoUrl'],
@@ -73,11 +32,13 @@ export function SubmissionForm() {
   const { data: session } = useSession()
   const t = useTranslations('Submit')
   const locale = useLocale()
+  const router = useRouter()
 
   // ── Wizard state ──
   const [currentStep, setCurrentStep] = useState<StepNumber>(1)
   const [isNavigating, setIsNavigating] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [submittedWorkId, setSubmittedWorkId] = useState<string | null>(null)
 
   // ── Upload / preview state (lives here, passed to Step2) ──
   const [previewCoverUrl, setPreviewCoverUrl] = useState('')
@@ -93,9 +54,9 @@ export function SubmissionForm() {
   const [availableDevStatuses, setAvailableDevStatuses] = useState<DictionaryItem[]>([])
 
   // ── Form ──
-  const submissionSchema = useMemo(() => buildSchema(t), [t])
+  const submissionSchema = useMemo(() => buildWorkFormSchema(t), [t])
 
-  const form = useForm<SubmissionFormValues>({
+  const form = useForm<WorkFormValues>({
     resolver: zodResolver(submissionSchema),
     defaultValues: {
       name: '',
@@ -111,7 +72,7 @@ export function SubmissionForm() {
       contactEmail: '',
       coverUrl: '',
       story: '',
-      highlights: [{ value: '' }, { value: '' }, { value: '' }],
+      highlights: [{ value: '' }],
       scenarios: [{ value: '' }],
       screenshots: [],
       demoUrl: '',
@@ -279,7 +240,7 @@ export function SubmissionForm() {
   }
 
   // ── Submit ──
-  const onSubmit = async (data: SubmissionFormValues) => {
+  const onSubmit = async (data: WorkFormValues) => {
     try {
       const payload = {
         ...data,
@@ -296,6 +257,7 @@ export function SubmissionForm() {
       const result = await res.json()
 
       if (res.ok && result.success) {
+        setSubmittedWorkId(result.id)
         setIsSubmitted(true)
       } else {
         console.error('Submission error:', result.error, result.details)
@@ -317,10 +279,12 @@ export function SubmissionForm() {
         <h2 className="text-3xl font-bold text-white mb-4">{t('successTitle')}</h2>
         <p className="text-gray-400 mb-8 max-w-md mx-auto">{t('successMessage')}</p>
         <div className="flex justify-center gap-4">
-          <Button onClick={() => window.location.reload()} variant="outline">
-            {t('continueSubmit')}
-          </Button>
-          <Button onClick={() => setIsSubmitted(false)}>{t('viewSubmission')}</Button>
+          {submittedWorkId && (
+            <Button onClick={() => router.push(`/${locale}/works/${submittedWorkId}`)} variant="outline">
+              {t('viewProject')}
+            </Button>
+          )}
+          <Button onClick={() => router.push(`/${locale}`)}>{t('backHome')}</Button>
         </div>
       </div>
     )

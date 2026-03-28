@@ -127,6 +127,7 @@
     "validationRepoUrl": "Please enter a valid repository link",
     "validationTeamMemberRequired": "Team member name required",
     "validationTeamMin": "At least 1 team member required",
+    "validationTeamIntro": "Please fill in the team introduction",
     "validationEmail": "Please enter a valid email",
     "nextStep": "Next",
     "prevStep": "Back",
@@ -167,6 +168,7 @@
     "copyLink": "Copy Link",
     "copied": "Copied",
     "systemShare": "System Share",
+    "clickToPreview": "Click to preview",
     "phone": "Phone",
     "email": "Email"
   },

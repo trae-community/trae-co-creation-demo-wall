@@ -172,6 +172,10 @@ export function WorksManagement({
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [viewingWork, setViewingWork] = useState<WorkItem | null>(null)
   const [viewImageIndex, setViewImageIndex] = useState(0)
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false)
+  const [previewImages, setPreviewImages] = useState<string[]>([])
+  const [previewImageIndex, setPreviewImageIndex] = useState(0)
+  const [previewTitle, setPreviewTitle] = useState('')
 
   const { feedback, showFeedback } = useFeedback()
 
@@ -285,6 +289,14 @@ export function WorksManagement({
     setViewingWork(work)
     setViewImageIndex(0)
     setIsViewDialogOpen(true)
+  }
+
+  const openImagePreview = (images: string[], index: number, title: string) => {
+    if (images.length === 0) return
+    setPreviewImages(images)
+    setPreviewImageIndex(index)
+    setPreviewTitle(title)
+    setIsImagePreviewOpen(true)
   }
 
   const handleDelete = async (id: string) => {
@@ -678,12 +690,23 @@ export function WorksManagement({
 
           <div className="space-y-6 py-2">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-1 rounded-md overflow-hidden border border-border bg-secondary/20">
+              <div className="md:col-span-1 rounded-md overflow-hidden border border-border bg-secondary/20 relative group">
                 {viewingWork?.coverUrl ? (
-                  <img src={viewingWork.coverUrl} alt={viewingWork.title} className="w-full h-48 object-cover" />
+                  <img
+                    src={viewingWork.coverUrl}
+                    alt={viewingWork.title}
+                    className="w-full h-48 object-cover cursor-zoom-in"
+                    onClick={() => openImagePreview([viewingWork.coverUrl!], 0, `${viewingWork.title} - 封面`)}
+                    title="点击查看大图"
+                  />
                 ) : (
                   <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">无封面图</div>
                 )}
+                {viewingWork?.coverUrl ? (
+                  <div className="absolute top-3 right-3 rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs text-white/90 backdrop-blur-sm transition-opacity group-hover:opacity-100 opacity-90">
+                    点击查看大图
+                  </div>
+                ) : null}
               </div>
               <div className="md:col-span-2 space-y-3">
                 <div>
@@ -721,12 +744,17 @@ export function WorksManagement({
               <div className="rounded-md border border-border p-3 bg-secondary/20">
                 {viewingImages.length > 0 ? (
                   <div className="space-y-3">
-                    <div className="relative overflow-hidden rounded-md bg-black/20">
+                    <div className="relative overflow-hidden rounded-md bg-black/20 group">
                       <img
                         src={viewingImages[currentViewImageIndex].imageUrl}
                         alt={`${viewingWork?.title || '作品'}-轮播图-${currentViewImageIndex + 1}`}
-                        className="w-full h-56 sm:h-72 object-cover"
+                        className="w-full h-56 sm:h-72 object-cover cursor-zoom-in"
+                        onClick={() => openImagePreview(viewingImages.map(image => image.imageUrl), currentViewImageIndex, `${viewingWork?.title || '作品'} - 项目截图`)}
+                        title="点击查看大图"
                       />
+                      <div className="absolute top-3 right-3 rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs text-white/90 backdrop-blur-sm transition-opacity group-hover:opacity-100 opacity-90">
+                        点击查看大图
+                      </div>
                       {viewingImages.length > 1 && (
                         <>
                           <Button
@@ -941,6 +969,66 @@ export function WorksManagement({
               {isSavingHonors ? '保存中...' : '保存'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isImagePreviewOpen} onOpenChange={setIsImagePreviewOpen}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[1100px]">
+          <DialogHeader>
+            <DialogTitle>{previewTitle}</DialogTitle>
+            <DialogDescription>
+              {previewImages.length > 1 ? `${previewImageIndex + 1} / ${previewImages.length}` : '图片预览'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="relative rounded-md overflow-hidden border border-border bg-black/50">
+              {previewImages[previewImageIndex] ? (
+                <img
+                  src={previewImages[previewImageIndex]}
+                  alt={`${previewTitle}-${previewImageIndex + 1}`}
+                  className="w-full max-h-[75vh] object-contain bg-black"
+                />
+              ) : null}
+              {previewImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewImageIndex(prev => (prev - 1 + previewImages.length) % previewImages.length)}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2"
+                    aria-label="上一张"
+                    title="上一张"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewImageIndex(prev => (prev + 1) % previewImages.length)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2"
+                    aria-label="下一张"
+                    title="下一张"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </>
+              )}
+            </div>
+            {previewImages.length > 1 && (
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                {previewImages.map((image, index) => (
+                  <button
+                    key={`${image}-${index}`}
+                    type="button"
+                    onClick={() => setPreviewImageIndex(index)}
+                    className={`rounded-md overflow-hidden border ${index === previewImageIndex ? 'border-primary' : 'border-border'}`}
+                    aria-label={`预览第 ${index + 1} 张图片`}
+                    title={`预览第 ${index + 1} 张图片`}
+                  >
+                    <img src={image} alt={`${previewTitle}-${index + 1}`} className="w-full h-16 object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 

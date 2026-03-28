@@ -1,10 +1,10 @@
 'use client'
 
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Work } from "@/lib/types";
-import { MapPin, Users, Award, Eye, ThumbsUp } from "lucide-react";
+import { MapPin, Award, Eye, ThumbsUp } from "lucide-react";
 import { useTranslations } from 'next-intl';
-import { Link, usePathname } from '@/lib/language/navigation';
+import { Link } from '@/lib/language/navigation';
 
 interface WorkCardProps {
   work: Work;
@@ -62,7 +62,7 @@ export function WorkCard({ work }: WorkCardProps) {
   return (
     <Link
       href={detailHref}
-      className="group block rounded-2xl overflow-hidden border border-white/8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(34,197,94,0.2)] hover:border-green-500/35"
+      className="group flex h-full flex-col rounded-2xl overflow-hidden border border-white/8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(34,197,94,0.2)] hover:border-green-500/35"
       style={{ background: '#111318' }}
     >
       {/* Cover — 4:3 ratio */}
@@ -115,13 +115,15 @@ export function WorkCard({ work }: WorkCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-5 flex flex-col h-[180px]">
-        <h3 className="font-bold text-white text-base mb-1.5 line-clamp-1 group-hover:text-green-400 transition-colors">
-          {work.name}
-        </h3>
-        <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2 mb-4">
-          {work.intro}
-        </p>
+      <div className="flex min-w-0 flex-1 flex-col p-5">
+        <div className="min-w-0">
+          <h3 className="font-bold text-white text-base mb-1.5 line-clamp-1 group-hover:text-green-400 transition-colors [overflow-wrap:anywhere]">
+            {work.name}
+          </h3>
+          <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2 mb-4 [overflow-wrap:anywhere]">
+            {work.intro}
+          </p>
+        </div>
 
         {/* Tags */}
         {displayTags.length > 0 && (
@@ -145,12 +147,12 @@ export function WorkCard({ work }: WorkCardProps) {
         )}
 
         {/* Footer: author + stats */}
-        <div className="flex items-center justify-between pt-3.5 border-t border-white/6 mt-auto">
+        <div className="flex min-w-0 items-center justify-between gap-3 pt-3.5 border-t border-white/6 mt-auto">
           {/* Author / team */}
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
             {isTeam ? (
               <>
-                <div className="flex -space-x-1.5">
+                <div className="flex shrink-0 -space-x-1.5">
                   {teamMembers.slice(0, 3).map((member, i) => (
                     <div
                       key={i}
@@ -160,14 +162,14 @@ export function WorkCard({ work }: WorkCardProps) {
                     </div>
                   ))}
                 </div>
-                <div>
-                  <div className="text-xs text-zinc-300 font-medium leading-none">
+                <div className="min-w-0">
+                  <div className="text-xs text-zinc-300 font-medium leading-none truncate">
                     {teamMembers.length}{t('people') || '人团队'}
                   </div>
                   {work.city && (
-                    <div className="text-[10px] text-zinc-600 mt-0.5 flex items-center gap-0.5">
-                      <MapPin className="w-2.5 h-2.5" />
-                      {work.city}
+                    <div className="text-[10px] text-zinc-600 mt-0.5 flex min-w-0 items-center gap-0.5">
+                      <MapPin className="w-2.5 h-2.5 shrink-0" />
+                      <span className="truncate">{work.city}</span>
                     </div>
                   )}
                 </div>
@@ -177,14 +179,14 @@ export function WorkCard({ work }: WorkCardProps) {
                 <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-zinc-600">
                   {work.author?.name?.charAt(0) || '?'}
                 </div>
-                <div>
-                  <div className="text-xs text-zinc-300 font-medium leading-none line-clamp-1 max-w-[80px]">
+                <div className="min-w-0">
+                  <div className="max-w-[80px] text-xs text-zinc-300 font-medium leading-none line-clamp-1 [overflow-wrap:anywhere]">
                     {work.author?.name || teamMembers[0] || '-'}
                   </div>
                   {work.city && (
-                    <div className="text-[10px] text-zinc-600 mt-0.5 flex items-center gap-0.5">
-                      <MapPin className="w-2.5 h-2.5" />
-                      {work.city}
+                    <div className="text-[10px] text-zinc-600 mt-0.5 flex min-w-0 items-center gap-0.5">
+                      <MapPin className="w-2.5 h-2.5 shrink-0" />
+                      <span className="truncate">{work.city}</span>
                     </div>
                   )}
                 </div>
@@ -193,7 +195,7 @@ export function WorkCard({ work }: WorkCardProps) {
           </div>
 
           {/* Stats */}
-          <div className="flex items-center gap-3 text-zinc-600 text-[11px]">
+          <div className="flex shrink-0 items-center gap-3 text-zinc-600 text-[11px]">
             <span className="flex items-center gap-1">
               <Eye className="w-3 h-3" />
               {work.views >= 1000 ? `${(work.views / 1000).toFixed(1)}k` : work.views}

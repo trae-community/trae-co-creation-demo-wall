@@ -4,10 +4,10 @@ import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
 import { AlertCircle, Plus, Trash2, Users } from 'lucide-react'
 import { Button } from '@/components/common/action-button'
-import { SubmissionFormValues } from './Step1BasicInfo'
+import { WorkFormValues } from '@/lib/work-form'
 
 interface Step4Props {
-  form: UseFormReturn<SubmissionFormValues>
+  form: UseFormReturn<WorkFormValues>
 }
 
 export function Step4Team({ form }: Step4Props) {
@@ -82,13 +82,21 @@ export function Step4Team({ form }: Step4Props) {
 
       {/* Team Intro */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-300">{t('teamIntro')}</label>
+        <label className="text-sm font-medium text-gray-300">
+          {t('teamIntro')} <span className="text-red-500">*</span>
+        </label>
         <textarea
           {...register('teamIntro')}
           rows={4}
           className={inputClass}
           placeholder={t('teamIntroPlaceholder')}
         />
+        {errors.teamIntro && (
+          <p className="text-red-500 text-xs flex items-center gap-1">
+            <AlertCircle className="w-3 h-3" />
+            {errors.teamIntro.message}
+          </p>
+        )}
       </div>
 
       {/* Contact Info */}
