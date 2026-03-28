@@ -62,7 +62,7 @@ export function WorkCard({ work }: WorkCardProps) {
   return (
     <Link
       href={detailHref}
-      className="group block rounded-2xl overflow-hidden border border-white/8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(34,197,94,0.2)] hover:border-green-500/35"
+      className="group flex h-full flex-col rounded-2xl overflow-hidden border border-white/8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(34,197,94,0.2)] hover:border-green-500/35"
       style={{ background: '#111318' }}
     >
       {/* Cover — 4:3 ratio */}
@@ -115,7 +115,7 @@ export function WorkCard({ work }: WorkCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-5 flex min-w-0 flex-col h-[180px] overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col p-5">
         <div className="min-w-0">
           <h3 className="font-bold text-white text-base mb-1.5 line-clamp-1 group-hover:text-green-400 transition-colors [overflow-wrap:anywhere]">
             {work.name}
