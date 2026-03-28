@@ -267,6 +267,11 @@
     "confirmPasswordPlaceholder": "请再次输入新密码",
     "passwordChangeSuccess": "密码修改成功",
     "passwordChangeError": "密码修改失败",
-    "cancel": "取消"
+    "cancel": "取消",
+    "validationOldPasswordRequired": "请输入原密码",
+    "validationNewPasswordRequired": "请输入新密码",
+    "validationPasswordMinLength": "新密码长度不能少于 6 个字符",
+    "validationConfirmPasswordRequired": "请确认新密码",
+    "validationPasswordMismatch": "两次输入的新密码不一致"
   }
 }

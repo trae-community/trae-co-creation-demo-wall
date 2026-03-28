@@ -160,37 +160,27 @@ export default function ProfilePage() {
 
     // 前端验证
     if (!passwordForm.oldPassword) {
-      setPasswordError(locale === "zh-CN" ? "请输入原密码" :
-              locale === "ja-JP" ? "現在のパスワードを入力してください" :
-              "Please enter current password");
+      setPasswordError(t("validationOldPasswordRequired"));
       return;
     }
 
     if (!passwordForm.newPassword) {
-      setPasswordError(locale === "zh-CN" ? "请输入新密码" :
-              locale === "ja-JP" ? "新しいパスワードを入力してください" :
-              "Please enter new password");
+      setPasswordError(t("validationNewPasswordRequired"));
       return;
     }
 
     if (passwordForm.newPassword.length < 6) {
-      setPasswordError(locale === "zh-CN" ? "新密码长度不能少于 6 个字符" : 
-                      locale === "ja-JP" ? "新しいパスワードは 6 文字以上である必要があります" : 
-                      "Password must be at least 6 characters");
+      setPasswordError(t("validationPasswordMinLength"));
       return;
     }
 
     if (!passwordForm.confirmPassword) {
-      setPasswordError(locale === "zh-CN" ? "请确认新密码" :
-              locale === "ja-JP" ? "新しいパスワードを確認してください" :
-              "Please confirm new password");
+      setPasswordError(t("validationConfirmPasswordRequired"));
       return;
     }
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordError(locale === "zh-CN" ? "两次输入的新密码不一致" :
-                      locale === "ja-JP" ? "新しいパスワードが一致しません" :
-                      "Passwords do not match");
+      setPasswordError(t("validationPasswordMismatch"));
       return;
     }
 
