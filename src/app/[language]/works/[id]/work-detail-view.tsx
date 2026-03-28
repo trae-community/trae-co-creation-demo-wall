@@ -45,6 +45,10 @@ export function WorkDetailView() {
   const [viewsCount, setViewsCount] = useState(0);
   const [activeScreenshotIndex, setActiveScreenshotIndex] = useState(0);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [previewImageIndex, setPreviewImageIndex] = useState(0);
+  const [previewTitle, setPreviewTitle] = useState('');
   const [shareImageUrl, setShareImageUrl] = useState('');
   const [isShareGenerating, setIsShareGenerating] = useState(false);
   const [shareActionDone, setShareActionDone] = useState<'copied' | ''>('');
@@ -340,6 +344,24 @@ export function WorkDetailView() {
     setActiveScreenshotIndex((prev) => (prev + 1) % screenshotList.length);
   };
 
+  const openImagePreview = (images: string[], index: number, title: string) => {
+    if (images.length === 0) return;
+    setPreviewImages(images);
+    setPreviewImageIndex(index);
+    setPreviewTitle(title);
+    setIsImagePreviewOpen(true);
+  };
+
+  const showPrevPreviewImage = () => {
+    if (previewImages.length <= 1) return;
+    setPreviewImageIndex((prev) => (prev - 1 + previewImages.length) % previewImages.length);
+  };
+
+  const showNextPreviewImage = () => {
+    if (previewImages.length <= 1) return;
+    setPreviewImageIndex((prev) => (prev + 1) % previewImages.length);
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <button
@@ -352,12 +374,17 @@ export function WorkDetailView() {
       </button>
 
       <div className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border">
-        <div className="aspect-video w-full bg-zinc-900 relative">
+        <div className="aspect-video w-full bg-zinc-900 relative group">
           <img
             src={work.coverUrl}
             alt={work.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover cursor-zoom-in"
+            onClick={() => openImagePreview([work.coverUrl], 0, work.name)}
+            title={t('clickToPreview')}
           />
+          <div className="absolute top-4 right-4 rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs text-white/90 backdrop-blur-sm transition-opacity group-hover:opacity-100 opacity-90">
+            {t('clickToPreview')}
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
             <div className="p-8 text-white w-full">
               <div className="flex items-center gap-3 mb-3">
@@ -476,18 +503,25 @@ export function WorkDetailView() {
             </h2>
             {screenshotList.length > 0 ? (
               <div className="space-y-4">
-                <div className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/60">
+                <div className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/60 group">
                   <img
                     src={screenshotList[activeScreenshotIndex]}
                     alt={`Screenshot ${activeScreenshotIndex + 1}`}
-                    className="w-full h-[320px] object-cover"
+                    className="w-full h-[320px] object-cover cursor-zoom-in"
+                    onClick={() => openImagePreview(screenshotList, activeScreenshotIndex, t('screenshots'))}
+                    title={t('clickToPreview')}
                   />
+                  <div className="absolute top-4 right-4 rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs text-white/90 backdrop-blur-sm transition-opacity group-hover:opacity-100 opacity-90">
+                    {t('clickToPreview')}
+                  </div>
                   {screenshotList.length > 1 && (
                     <>
                       <button
                         type="button"
                         onClick={showPrevScreenshot}
                         className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2"
+                        aria-label="上一张"
+                        title="上一张"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
@@ -495,6 +529,8 @@ export function WorkDetailView() {
                         type="button"
                         onClick={showNextScreenshot}
                         className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2"
+                        aria-label="下一张"
+                        title="下一张"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
@@ -647,6 +683,65 @@ export function WorkDetailView() {
               {t('systemShare')}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isImagePreviewOpen} onOpenChange={setIsImagePreviewOpen}>
+        <DialogContent className="bg-zinc-950 border border-zinc-800 text-white sm:max-w-5xl">
+          <DialogHeader>
+            <DialogTitle>{previewTitle}</DialogTitle>
+            <DialogDescription className="text-zinc-400">
+              {previewImages.length > 1 ? `${previewImageIndex + 1} / ${previewImages.length}` : previewTitle}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="relative rounded-xl overflow-hidden border border-zinc-800 bg-black/40">
+              {previewImages[previewImageIndex] ? (
+                <img
+                  src={previewImages[previewImageIndex]}
+                  alt={`${previewTitle}-${previewImageIndex + 1}`}
+                  className="w-full max-h-[75vh] object-contain bg-black"
+                />
+              ) : null}
+              {previewImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={showPrevPreviewImage}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2"
+                    aria-label="上一张"
+                    title="上一张"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={showNextPreviewImage}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2"
+                    aria-label="下一张"
+                    title="下一张"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+            </div>
+            {previewImages.length > 1 && (
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                {previewImages.map((image, index) => (
+                  <button
+                    key={`${image}-${index}`}
+                    type="button"
+                    onClick={() => setPreviewImageIndex(index)}
+                    className={`rounded-lg overflow-hidden border ${index === previewImageIndex ? 'border-primary' : 'border-zinc-800'}`}
+                    aria-label={`预览第 ${index + 1} 张图片`}
+                    title={`预览第 ${index + 1} 张图片`}
+                  >
+                    <img src={image} alt={`${previewTitle}-thumbnail-${index + 1}`} className="w-full h-16 object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
