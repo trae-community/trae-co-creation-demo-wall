@@ -127,19 +127,22 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               <Link
                 href="/profile"
                 className={cn(
-                  "flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 overflow-hidden",
+                  "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                   pathname === "/profile"
-                    ? "ring-2 ring-green-500 ring-offset-2 ring-offset-background"
-                    : "hover:ring-2 hover:ring-white/20"
+                    ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
                 )}
               >
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
-                    <UserRound className="w-5 h-5 text-zinc-500" />
-                  </div>
-                )}
+                <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0">
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
+                      <UserRound className="w-3.5 h-3.5 text-zinc-500" />
+                    </div>
+                  )}
+                </div>
+                {tProfile('menu')}
               </Link>
             )}
 

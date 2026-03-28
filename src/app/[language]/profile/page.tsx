@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "@/lib/language/navigation";
 import { signOut } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2, MapPin, Save, ShieldCheck, Sparkles, User, LogOut, Camera } from "lucide-react";
+import { Loader2, MapPin, Save, ShieldCheck, Sparkles, User, LogOut, Camera, Key } from "lucide-react";
 import { toast } from 'sonner';
 import { WorksManagement } from "@/components/work/works-management";
 import { LikedWorks } from "@/components/work/liked-works";
@@ -46,6 +46,12 @@ interface ProfileFormState {
   locationCity: string;
 }
 
+interface ChangePasswordFormState {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 export default function ProfilePage() {
   const locale = useLocale();
   const t = useTranslations("Profile");
@@ -60,8 +66,17 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [passwordForm, setPasswordForm] = useState<ChangePasswordFormState>({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
   const fetchProfile = async () => {
     try {
@@ -136,6 +151,84 @@ export default function ProfilePage() {
       setError(err instanceof Error ? err.message : t("saveError"));
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    // 清空之前的提示
+    setPasswordError("");
+
+    // 前端验证
+    if (!passwordForm.oldPassword) {
+      setPasswordError(locale === "zh-CN" ? "请输入原密码" :
+              locale === "ja-JP" ? "現在のパスワードを入力してください" :
+              "Please enter current password");
+      return;
+    }
+
+    if (!passwordForm.newPassword) {
+      setPasswordError(locale === "zh-CN" ? "请输入新密码" :
+              locale === "ja-JP" ? "新しいパスワードを入力してください" :
+              "Please enter new password");
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      setPasswordError(locale === "zh-CN" ? "新密码长度不能少于 6 个字符" : 
+                      locale === "ja-JP" ? "新しいパスワードは 6 文字以上である必要があります" : 
+                      "Password must be at least 6 characters");
+      return;
+    }
+
+    if (!passwordForm.confirmPassword) {
+      setPasswordError(locale === "zh-CN" ? "请确认新密码" :
+              locale === "ja-JP" ? "新しいパスワードを確認してください" :
+              "Please confirm new password");
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError(locale === "zh-CN" ? "两次输入的新密码不一致" :
+                      locale === "ja-JP" ? "新しいパスワードが一致しません" :
+                      "Passwords do not match");
+      return;
+    }
+
+    try {
+      setIsChangingPassword(true);
+
+      const response = await fetch("/api/profile/change-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(passwordForm),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setPasswordError(result.error || t("passwordChangeError"));
+        return;
+      }
+
+      // 成功：清空表单，显示成功提示
+      setPasswordForm({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setPasswordSuccess(result.message || t("passwordChangeSuccess"));
+      // 2秒后关闭弹窗
+      setTimeout(() => {
+        setShowPasswordModal(false);
+        setPasswordSuccess("");
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      setPasswordError(err instanceof Error ? err.message : t("passwordChangeError"));
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -330,7 +423,110 @@ export default function ProfilePage() {
             <LikedWorks userId={data.profile.id} />
           </div>
         </div>
+
+        {/* 右侧栏 */}
+        <div className="space-y-8">
+          <div className="rounded-2xl border border-white/10 bg-card p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <ShieldCheck className="w-4 h-4 text-primary" />
+              <h2 className="text-lg font-semibold text-white">{t("securityTitle")}</h2>
+            </div>
+            <p className="text-sm text-gray-400 mb-4">{t("securityDesc")}</p>
+            <button
+              onClick={() => setShowPasswordModal(true)}
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+            >
+              <Key className="w-4 h-4" />
+              {t("changePassword")}
+            </button>
+          </div>
+        </div>
       </section>
+
+      {/* 修改密码弹窗 */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowPasswordModal(false)}
+          />
+          <div className="relative w-full max-w-md bg-[#0A0A0C] border border-white/10 rounded-2xl p-6 shadow-2xl">
+            <h3 className="text-lg font-semibold text-white mb-4">{t("changePassword")}</h3>
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm text-gray-300">{t("oldPassword")}</label>
+                <input
+                  type="password"
+                  value={passwordForm.oldPassword}
+                  onChange={(event) => setPasswordForm((prev) => ({ ...prev, oldPassword: event.target.value }))}
+                  className="w-full rounded-xl border border-white/10 bg-zinc-900/60 text-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  placeholder={t("oldPasswordPlaceholder")}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm text-gray-300">{t("newPassword")}</label>
+                <input
+                  type="password"
+                  value={passwordForm.newPassword}
+                  onChange={(event) => setPasswordForm((prev) => ({ ...prev, newPassword: event.target.value }))}
+                  className="w-full rounded-xl border border-white/10 bg-zinc-900/60 text-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  placeholder={t("newPasswordPlaceholder")}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm text-gray-300">{t("confirmPassword")}</label>
+                <input
+                  type="password"
+                  value={passwordForm.confirmPassword}
+                  onChange={(event) => setPasswordForm((prev) => ({ ...prev, confirmPassword: event.target.value }))}
+                  className="w-full rounded-xl border border-white/10 bg-zinc-900/60 text-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  placeholder={t("confirmPasswordPlaceholder")}
+                />
+              </div>
+
+              {/* 弹窗内的成功提示 */}
+              {passwordSuccess && (
+                <div className="p-3 rounded-xl border border-green-500/30 bg-green-500/10 text-sm text-green-300">
+                  {passwordSuccess}
+                </div>
+              )}
+
+              {/* 弹窗内的错误提示 */}
+              {passwordError && (
+                <div className="p-3 rounded-xl border border-red-500/30 bg-red-500/10 text-sm text-red-300">
+                  {passwordError}
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+                    setPasswordError("");
+                    setPasswordSuccess("");
+                  }}
+                  disabled={isChangingPassword}
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 transition-colors disabled:opacity-50"
+                >
+                  {t("cancel")}
+                </button>
+                <button
+                  onClick={handleChangePassword}
+                  disabled={isChangingPassword}
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-black font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  {isChangingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  {t("changePassword")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

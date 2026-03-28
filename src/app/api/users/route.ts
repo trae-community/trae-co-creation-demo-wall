@@ -154,6 +154,16 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
+    // 如果提供了 roleIds，检查是否包含 root 角色
+    if (roleIds && roleIds.length > 0) {
+      const rootRole = await prisma.sysRole.findUnique({
+        where: { roleCode: 'root' }
+      });
+      if (rootRole && roleIds.includes(rootRole.id)) {
+        return NextResponse.json({ error: '不能给用户分配根用户角色' }, { status: 400 });
+      }
+    }
+
     // If roleIds is provided, update roles
     const roleUpdate = roleIds ? {
       roles: {

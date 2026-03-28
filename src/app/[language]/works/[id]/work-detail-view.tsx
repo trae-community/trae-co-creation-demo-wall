@@ -291,10 +291,37 @@ export function WorkDetailView() {
   const handleCopyLink = async () => {
     if (!currentPageUrl) return;
     try {
-      await navigator.clipboard.writeText(currentPageUrl);
-      setShareActionDone('copied');
-      setTimeout(() => setShareActionDone(''), 1500);
-    } catch {
+      // 尝试使用 Clipboard API
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(currentPageUrl);
+        setShareActionDone('copied');
+        setTimeout(() => setShareActionDone(''), 1500);
+        return;
+      }
+    } catch (err) {
+      console.error('Clipboard API failed:', err);
+    }
+    
+    // Fallback: 使用传统的 execCommand 方法（移动端兼容性更好）
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = currentPageUrl;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      if (successful) {
+        setShareActionDone('copied');
+        setTimeout(() => setShareActionDone(''), 1500);
+      }
+    } catch (err) {
+      console.error('Fallback copy failed:', err);
       setShareActionDone('');
     }
   };
