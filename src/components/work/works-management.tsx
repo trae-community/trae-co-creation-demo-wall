@@ -723,7 +723,7 @@ export function WorksManagement({
                     <div>{getLabel(viewingWork?.devStatusCode || null, devStatuses) || '暂无'}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground">国家/城市</div>
+                    <div className="text-xs text-muted-foreground">省份/城市</div>
                     <div>
                       {viewingWork?.countryCode ? getLabel(viewingWork.countryCode, countries) : ''}
                       {viewingWork?.countryCode && viewingWork?.cityCode ? ' · ' : ''}
