@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { WorkCard } from "@/components/work/work-card";
 import { CityFilter, FilterState } from "@/components/work/city-filter";
@@ -27,6 +27,7 @@ export default function Page() {
   const [sortBy, setSortBy] = useState<'time' | 'likes' | 'views'>((searchParams.get('sort') as any) || 'time');
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const pageSize = 12;
+  const hasMountedRef = useRef(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
@@ -34,6 +35,10 @@ export default function Page() {
   }, [searchQuery]);
 
   useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
     setPage(1);
   }, [filters, debouncedSearch, sortBy]);
 
@@ -192,6 +197,8 @@ export default function Page() {
                 disabled={page <= 1}
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-600 border border-white/10 hover:border-white/20 hover:text-white transition-all disabled:opacity-30"
                 style={{ background: 'rgba(255,255,255,0.04)' }}
+                aria-label={t('prevPage')}
+                title={t('prevPage')}
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -253,6 +260,8 @@ export default function Page() {
                 disabled={page >= totalPages}
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-600 border border-white/10 hover:border-white/20 hover:text-white transition-all disabled:opacity-30"
                 style={{ background: 'rgba(255,255,255,0.04)' }}
+                aria-label={t('nextPage')}
+                title={t('nextPage')}
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
