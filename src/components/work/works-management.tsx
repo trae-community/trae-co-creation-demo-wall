@@ -153,6 +153,11 @@ export function WorksManagement({
   const [editingWork, setEditingWork] = useState<WorkItem | null>(null)
   const [deletingWorkId, setDeletingWorkId] = useState<string | null>(null)
   
+  // Delete Dialog states
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [workToDelete, setWorkToDelete] = useState<WorkItem | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  
   // Tag Dialog states
   const [isTagDialogOpen, setIsTagDialogOpen] = useState(false)
   const [selectedWork, setSelectedWork] = useState<WorkItem | null>(null)
@@ -299,14 +304,21 @@ export function WorksManagement({
     setIsImagePreviewOpen(true)
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('确定要删除该作品吗？此操作不可恢复。')) return
+  const handleOpenDeleteDialog = (work: WorkItem) => {
+    setWorkToDelete(work)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!workToDelete) return
     
     try {
-      setDeletingWorkId(id)
-      const res = await fetch(`/api/console/works?id=${id}`, { method: 'DELETE' })
+      setIsDeleting(true)
+      setDeletingWorkId(workToDelete.id)
+      const res = await fetch(`/api/console/works?id=${workToDelete.id}`, { method: 'DELETE' })
       
       if (res.ok) {
+        setIsDeleteDialogOpen(false)
         fetchWorks()
         showFeedback('success', '作品已删除')
       } else {
@@ -317,6 +329,7 @@ export function WorksManagement({
       console.error('Failed to delete work:', error)
       showFeedback('error', '删除失败')
     } finally {
+      setIsDeleting(false)
       setDeletingWorkId(null)
     }
   }
@@ -582,7 +595,7 @@ export function WorksManagement({
                           variant="ghost" 
                           size="icon"
                           className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={() => handleDelete(work.id)}
+                          onClick={() => handleOpenDeleteDialog(work)}
                           disabled={deletingWorkId === work.id}
                           title="删除作品"
                         >
@@ -1072,6 +1085,25 @@ export function WorksManagement({
             <Button variant="outline" onClick={() => setIsAuditDialogOpen(false)}>取消</Button>
             <Button onClick={onSaveAudit} disabled={isSavingAudit}>
               {isSavingAudit ? '保存中...' : '保存'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>删除作品</DialogTitle>
+            <DialogDescription>
+              确定要删除作品「{workToDelete?.title}」吗？此操作不可恢复。
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={isDeleting}>取消</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? '删除中...' : '确认删除'}
             </Button>
           </DialogFooter>
         </DialogContent>

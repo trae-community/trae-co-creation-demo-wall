@@ -499,6 +499,24 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Work ID is required' }, { status: 400 });
     }
 
+    // 检查作品是否存在，并获取作品的所有者信息
+    const work = await prisma.workBase.findUnique({
+      where: { id: BigInt(id) },
+      select: { userId: true }
+    });
+
+    if (!work) {
+      return NextResponse.json({ error: 'Work not found' }, { status: 404 });
+    }
+
+    // 权限验证：只有作品所有者或管理员/root可以删除
+    const isOwner = operator && work.userId === operator.userId;
+    const isAdmin = operator && operator.roles.some(r => r === 'admin' || r === 'root');
+
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json({ error: '您没有权限删除此作品' }, { status: 403 });
+    }
+
     await prisma.workBase.delete({
       where: { id: BigInt(id) },
     });
