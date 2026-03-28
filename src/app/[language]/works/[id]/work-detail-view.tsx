@@ -459,9 +459,9 @@ export function WorkDetailView() {
               {t('story')}
             </h2>
             <div
-                className="prose prose-invert max-w-none text-gray-300 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: work.story || '<p>-</p>' }}
-              />
+              className="prose prose-invert max-w-none leading-relaxed prose-headings:text-white prose-p:text-gray-300 prose-strong:text-white prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-li:text-gray-300 prose-blockquote:text-gray-400 prose-code:text-primary"
+              dangerouslySetInnerHTML={{ __html: work.story || '<p>-</p>' }}
+            />
           </section>
 
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">

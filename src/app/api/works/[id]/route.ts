@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { sanitizeRichText } from '@/lib/rich-text'
 
 
 const toStringArray = (value: unknown): string[] => {
@@ -128,7 +129,7 @@ export async function GET(
       teamIntro: work.team?.teamIntro || '',
       contactEmail: work.team?.contactEmail || '',
       coverUrl: work.coverUrl || '',
-      story: work.detail?.story || '',
+      story: work.detail?.story ? sanitizeRichText(work.detail.story) : '',
       features: features.map((line, index) => `${index + 1}. ${line}`).join('\n'),
       scenarios: scenarios.join('\n'),
       screenshots: work.images.map(image => image.imageUrl),
@@ -170,7 +171,6 @@ export async function GET(
     return NextResponse.json({ error: 'Failed to fetch work detail' }, { status: 500 })
   }
 }
-
 
 
 

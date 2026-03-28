@@ -3,16 +3,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { writeOperationLog } from "@/lib/audit-log";
+import { sanitizeRichText, stripHtmlTags } from "@/lib/rich-text";
 import { z } from "zod";
-import sanitizeHtml from "sanitize-html";
-
-const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
-  allowedTags: ['p','br','strong','em','u','s','h2','h3','ul','ol','li','a','blockquote','code'],
-  allowedAttributes: { a: ['href', 'target', 'rel'] },
-  allowedSchemes: ['http', 'https', 'mailto'],
-};
-
-const stripHtmlTags = (html: string) => html.replace(/<[^>]*>/g, '').trim();
 const hasValidTeamMembers = (value: string) => {
   try {
     const parsed = JSON.parse(value);
@@ -70,7 +62,7 @@ export async function POST(request: Request) {
 
     const data = validationResult.data;
     // Sanitize HTML story before persisting — prevents stored XSS
-    const cleanStory = sanitizeHtml(data.story, SANITIZE_OPTIONS);
+    const cleanStory = sanitizeRichText(data.story);
     const now = new Date();
 
     const result = await prisma.$transaction(async (tx) => {

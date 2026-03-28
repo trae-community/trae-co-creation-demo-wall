@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { getDictionaries } from '@/lib/edge-config';
 import { getAuthUser } from '@/lib/auth'
+import { sanitizeRichText, stripHtmlTags } from '@/lib/rich-text'
 import { z } from 'zod'
 
 const updateSchema = z.object({
@@ -15,7 +16,7 @@ const updateSchema = z.object({
   contactPhone: z.string().optional(),
   contactEmail: z.string().email().optional().or(z.literal('')),
   coverUrl: z.string().min(1),
-  story: z.string().min(20),
+  story: z.string().refine(value => stripHtmlTags(value).length >= 20),
   category: z.string().min(1),
   devStatus: z.string().min(1),
   tags: z.array(z.number()).min(1).max(5),
@@ -280,6 +281,7 @@ export async function PUT(req: Request) {
 
     const data = validationResult.data
     const workId = BigInt(id)
+    const cleanStory = sanitizeRichText(data.story)
 
     // Verify ownership
     const existingWork = await prisma.workBase.findUnique({
@@ -328,14 +330,14 @@ export async function PUT(req: Request) {
         where: { workId },
         create: {
           workId,
-          story: data.story,
+          story: cleanStory,
           highlights: data.highlights,
           scenarios: data.scenarios,
           demoUrl: data.demoUrl,
           repoUrl: data.repoUrl || null,
         },
         update: {
-          story: data.story,
+          story: cleanStory,
           highlights: data.highlights,
           scenarios: data.scenarios,
           demoUrl: data.demoUrl,
