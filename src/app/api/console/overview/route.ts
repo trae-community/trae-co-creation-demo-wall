@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getAuthUser, isAdmin } from '@/lib/auth';
 
 type WindowDays = 7 | 30;
 
@@ -23,10 +24,23 @@ const getWindowDays = (value: string | null): WindowDays => {
 
 export async function GET(req: NextRequest) {
   try {
+    // 鉴权检查：只有管理员可以访问
+    const user = await getAuthUser();
+    if (!isAdmin(user)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
+
     const { searchParams } = new URL(req.url);
     const windowDays = getWindowDays(searchParams.get('window'));
 
-    const now = new Date();
+    // 获取数据库中最新的记录时间作为基准
+    const latestAuthLog = await prisma.sysAuthLog.findFirst({
+      orderBy: { createdAt: 'desc' },
+      select: { createdAt: true }
+    });
+    
+    // 使用数据库最新时间或当前时间作为基准
+    const now = latestAuthLog?.createdAt ? new Date(latestAuthLog.createdAt) : new Date();
     const currentStart = new Date(now.getTime() - windowDays * 24 * 60 * 60 * 1000);
     const previousStart = new Date(now.getTime() - windowDays * 2 * 24 * 60 * 60 * 1000);
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
-import { getAuthUser } from '@/lib/auth';
+import { getAuthUser, isAdmin } from '@/lib/auth';
 import { writeOperationLog } from '@/lib/audit-log';
 
 // Helper to sanitize object
@@ -15,6 +15,12 @@ const sanitize = (data: any) => {
 // GET: 获取角色列表
 export async function GET(req: NextRequest) {
   try {
+    // 鉴权检查：只有管理员可以访问
+    const user = await getAuthUser();
+    if (!isAdmin(user)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
+
     const { searchParams } = new URL(req.url);
     const page = Number(searchParams.get(CRUD_QUERY_PARAMS.page) || '1');
     const pageSize = Number(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10');
@@ -62,6 +68,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const operator = await getAuthUser();
+    if (!isAdmin(operator)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
     const body = await req.json();
     const { roleCode, roleName, description } = body;
 
@@ -109,6 +118,9 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const operator = await getAuthUser();
+    if (!isAdmin(operator)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
     const body = await req.json();
     const { id, roleCode, roleName, description } = body;
 
@@ -157,6 +169,9 @@ export async function PUT(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const operator = await getAuthUser();
+    if (!isAdmin(operator)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 

@@ -29,7 +29,7 @@ const submissionSchema = z.object({
   contactEmail: z.string().email().optional().or(z.literal("")),
   coverUrl: z.string().min(1),
   // story may be HTML from Tiptap — validate on stripped plain text
-  story: z.string().refine(s => stripHtmlTags(s).length >= 10, '创作故事至少10个字符'),
+  story: z.string().refine(s => stripHtmlTags(s).length >= 20, '创作故事至少20个字符'),
   category: z.string().min(1),
   devStatus: z.string().optional(),
   tags: z.array(z.number()).min(1).max(5),

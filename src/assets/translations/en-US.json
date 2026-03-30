@@ -103,6 +103,7 @@
     "cancel": "Cancel",
     "close": "Close",
     "submitError": "Submission failed. Please try again.",
+    "validationFailed": "Validation failed",
     "validationNameMin": "Project name must be at least 2 characters",
     "validationNameMax": "Project name cannot exceed 50 characters",
     "validationIntroMin": "Introduction must be at least 10 characters",
