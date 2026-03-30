@@ -261,11 +261,15 @@ export function SubmissionForm() {
         setIsSubmitted(true)
       } else {
         console.error('Submission error:', result.error, result.details)
-        toast.error(t('submitError') || result.error || 'Submission failed')
+        // 显示具体的错误信息
+        const errorMsg = result.details?.length > 0
+          ? result.details.map((d: {path?: string[], message?: string}) => d.message).filter(Boolean).join('、')
+          : result.error || t('submitError')
+        toast.error(errorMsg)
       }
     } catch (err) {
       console.error('Submission failed:', err)
-      toast.error(t('submitError') || 'An unexpected error occurred')
+      toast.error(t('submitError'))
     }
   }
 

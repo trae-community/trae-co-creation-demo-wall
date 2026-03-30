@@ -107,6 +107,7 @@
     "cancel": "キャンセル",
     "close": "閉じる",
     "submitError": "送信に失敗しました。再試行してください。",
+    "validationFailed": "検証に失敗しました",
     "validationNameMin": "プロジェクト名は2文字以上必要です",
     "validationNameMax": "プロジェクト名は50文字以内にしてください",
     "validationIntroMin": "紹介文は10文字以上必要です",

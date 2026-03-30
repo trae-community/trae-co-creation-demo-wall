@@ -318,11 +318,15 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
         }
       } else {
         console.error("Submission error:", result.error, result.details);
-        toast.error(t('submitError') || result.error || "Submission failed");
+        // 显示具体的错误信息
+        const errorMsg = result.details?.length > 0
+          ? result.details.map((d: {path?: string[], message?: string}) => d.message).filter(Boolean).join('、')
+          : result.error || t('submitError')
+        toast.error(errorMsg)
       }
     } catch (error) {
       console.error("Submission failed:", error);
-      toast.error(t('submitError') || "An unexpected error occurred");
+      toast.error(t('submitError'));
     }
   };
 
@@ -740,7 +744,17 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
             <div className="text-red-500 text-sm flex items-center gap-2">
               <AlertCircle className="w-4 h-4" />
               <span>
-                {t('submitError')}: {Object.keys(errors).length} fields invalid
+                {t('validationFailed')}：{Object.keys(errors).map(k => {
+                  const fieldNames: Record<string, string> = {
+                    name: t('projectName'), intro: t('intro'), country: t('country'), city: t('city'),
+                    category: t('category'), devStatus: t('devStatus'), tags: t('tags'),
+                    team: t('team'), teamIntro: t('teamIntro'), coverUrl: t('coverImageLabel'),
+                    story: t('story'), highlights: t('highlights'), scenarios: t('scenarios'),
+                    screenshots: t('screenshotsLabel'), demoUrl: t('demoUrl'), repoUrl: t('repoUrl'),
+                    contactEmail: t('contactEmail'), contactPhone: t('contactPhone')
+                  }
+                  return fieldNames[k] || k
+                }).join('、')}
               </span>
             </div>
           )}

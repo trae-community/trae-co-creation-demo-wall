@@ -101,6 +101,8 @@
     "cancel": "取消",
     "close": "关闭",
     "submitError": "提交失败，请重试。",
+    "validationFailed": "验证失败",
+    "fieldsInvalid": "以下字段需要修正：{fields}",
     "validationNameMin": "项目名称至少2个字符",
     "validationNameMax": "项目名称不能超过50个字符",
     "validationIntroMin": "简介至少10个字符",

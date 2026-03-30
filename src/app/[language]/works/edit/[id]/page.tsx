@@ -59,16 +59,19 @@ export default async function EditPage({ params }: { params: Promise<{ id: strin
     return <div>Unauthorized</div>;
   }
 
-  // Helper to safely parse JSON
-  const safeParseJSON = (json: any, fallback: any) => {
+  // Helper to safely parse JSON or return as array
+  const normalizeStringList = (input: unknown): string[] => {
+    if (!input) return [];
+    if (Array.isArray(input)) return input.map(String);
     try {
-      if (typeof json === 'string') {
-        return JSON.parse(json);
+      if (typeof input === 'string') {
+        const parsed = JSON.parse(input);
+        if (Array.isArray(parsed)) return parsed.map(String);
       }
-      return json || fallback;
     } catch {
-      return fallback;
+      // fallback to empty array
     }
+    return [];
   };
 
   // Transform to InitialData
@@ -81,14 +84,14 @@ export default async function EditPage({ params }: { params: Promise<{ id: strin
     category: work.categoryCode || "",
     devStatus: work.devStatusCode || "",
     tags: work.tags.map(t => t.tagId),
-    team: work.team?.members ? safeParseJSON(work.team.members, []).map((m: string) => ({ value: m })) : [{ value: "" }],
+    team: work.team?.members ? normalizeStringList(work.team.members).map((m: string) => ({ value: m })) : [{ value: "" }],
     teamIntro: work.team?.teamIntro || "",
     contactPhone: work.team?.contactPhone || "",
     contactEmail: work.team?.contactEmail || "",
     coverUrl: work.coverUrl || "",
     story: work.detail?.story || "",
-    highlights: work.detail?.highlights ? (work.detail.highlights as string[]).map(h => ({ value: h })) : [{ value: "" }],
-    scenarios: work.detail?.scenarios ? (work.detail.scenarios as string[]).map(s => ({ value: s })) : [{ value: "" }],
+    highlights: work.detail?.highlights ? normalizeStringList(work.detail.highlights).map(h => ({ value: h })) : [{ value: "" }],
+    scenarios: work.detail?.scenarios ? normalizeStringList(work.detail.scenarios).map(s => ({ value: s })) : [{ value: "" }],
     screenshots: work.images.map(img => img.imageUrl),
     demoUrl: work.detail?.demoUrl || "",
     repoUrl: work.detail?.repoUrl || "",

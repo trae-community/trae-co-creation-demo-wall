@@ -5,7 +5,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
@@ -45,6 +45,10 @@ const ToolbarButton = ({
 )
 
 export function RichTextEditor({ value, onChange, placeholder, hasError }: RichTextEditorProps) {
+  // Track if this is the initial mount to properly sync external value
+  const isInitialMount = useRef(true)
+  const previousValueRef = useRef<string>(value)
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -79,13 +83,27 @@ export function RichTextEditor({ value, onChange, placeholder, hasError }: RichT
   })
 
   // Sync external value changes (e.g. form reset or initialData load)
+  // Only update when the value has actually changed from outside the editor
   useEffect(() => {
     if (!editor) return
-    const currentHtml = editor.getHTML()
-    if (value !== undefined && value !== currentHtml) {
-      // Only update if content actually differs, to avoid cursor reset
-      // Use false to keep cursor position; the overloaded signature only takes 2 args in this version
-      editor.commands.setContent(value || '')
+
+    // Skip if this is the first render - content is already set via useEditor's content prop
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      previousValueRef.current = value
+      return
+    }
+
+    // Only update if the external value differs from what we last recorded
+    // This prevents unnecessary resets when the value change came from the editor itself
+    if (value !== previousValueRef.current) {
+      const currentHtml = editor.getHTML()
+      // Compare the actual content, ignoring minor formatting differences
+      // Only update if the content is genuinely different
+      if (value !== currentHtml) {
+        editor.commands.setContent(value || '')
+      }
+      previousValueRef.current = value
     }
   }, [editor, value])
 
