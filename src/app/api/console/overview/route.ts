@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getAuthUser, isAdmin } from '@/lib/auth';
 
 type WindowDays = 7 | 30;
 
@@ -23,6 +24,12 @@ const getWindowDays = (value: string | null): WindowDays => {
 
 export async function GET(req: NextRequest) {
   try {
+    // 鉴权检查：只有管理员可以访问
+    const user = await getAuthUser();
+    if (!isAdmin(user)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
+
     const { searchParams } = new URL(req.url);
     const windowDays = getWindowDays(searchParams.get('window'));
 

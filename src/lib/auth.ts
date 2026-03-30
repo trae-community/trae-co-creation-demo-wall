@@ -51,3 +51,18 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     return null;
   }
 }
+
+/**
+ * Check if user has any of the required roles
+ */
+export function hasAnyRole(user: AuthUser | null, requiredRoles: string[]): boolean {
+  if (!user) return false;
+  return requiredRoles.some(role => user.roles.includes(role));
+}
+
+/**
+ * Check if user is admin (has 'admin' or 'root' role)
+ */
+export function isAdmin(user: AuthUser | null): boolean {
+  return hasAnyRole(user, ['admin', 'root']);
+}

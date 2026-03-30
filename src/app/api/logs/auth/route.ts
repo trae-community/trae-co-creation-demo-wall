@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
+import { getAuthUser, isAdmin } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
   try {
+    // 鉴权检查：只有管理员可以访问
+    const user = await getAuthUser()
+    if (!isAdmin(user)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 })
+    }
+
     const { searchParams } = new URL(req.url)
     const page = parseInt(searchParams.get(CRUD_QUERY_PARAMS.page) || '1')
     const pageSize = parseInt(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10')

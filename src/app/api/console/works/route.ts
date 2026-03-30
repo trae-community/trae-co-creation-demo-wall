@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
-import { getAuthUser } from '@/lib/auth';
+import { getAuthUser, isAdmin } from '@/lib/auth';
 import { writeOperationLog } from '@/lib/audit-log';
 
 // Helper to sanitize object
@@ -15,6 +15,12 @@ const sanitize = (data: any) => {
 // GET: 获取作品列表或单个作品
 export async function GET(req: NextRequest) {
   try {
+    // 鉴权检查：只有管理员可以访问
+    const user = await getAuthUser();
+    if (!isAdmin(user)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
@@ -167,6 +173,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const operator = await getAuthUser();
+    if (!isAdmin(operator)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
     const body = await req.json();
     const { 
       userId, 
@@ -247,6 +256,9 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const operator = await getAuthUser();
+    if (!isAdmin(operator)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
     const body = await req.json();
     const { 
       id, 
@@ -492,6 +504,9 @@ export async function PUT(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const operator = await getAuthUser();
+    if (!isAdmin(operator)) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
@@ -511,9 +526,9 @@ export async function DELETE(req: NextRequest) {
 
     // 权限验证：只有作品所有者或管理员/root可以删除
     const isOwner = operator && work.userId === operator.userId;
-    const isAdmin = operator && operator.roles.some(r => r === 'admin' || r === 'root');
+    const isAdminRole = operator && operator.roles.some(r => r === 'admin' || r === 'root');
 
-    if (!isOwner && !isAdmin) {
+    if (!isOwner && !isAdminRole) {
       return NextResponse.json({ error: '您没有权限删除此作品' }, { status: 403 });
     }
 
