@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sanitizeRichText } from '@/lib/rich-text'
+import { getAuthUser, isAdmin } from '@/lib/auth'
 
 
 const toStringArray = (value: unknown): string[] => {
@@ -57,11 +58,15 @@ export async function GET(
       return NextResponse.json({ error: 'Work ID is required' }, { status: 400 })
     }
 
+    // 获取当前用户（可能未登录）
+    const currentUser = await getAuthUser()
+
     const work = await prisma.workBase.findUnique({
       where: { id: BigInt(id) },
       include: {
         user: {
           select: {
+            id: true,
             username: true,
             avatarUrl: true,
             email: true,
@@ -70,6 +75,8 @@ export async function GET(
         },
         statistic: {
           select: {
+            auditStatus: true,
+            displayStatus: true,
             viewCount: true,
             likeCount: true
           }
@@ -93,6 +100,17 @@ export async function GET(
     })
 
     if (!work) {
+      return NextResponse.json({ error: 'Work not found' }, { status: 404 })
+    }
+
+    // 权限检查：未登录用户只能查看已审核且可见的作品
+    // 作者或管理员可以查看自己的作品
+    const isOwner = currentUser && work.userId === currentUser.userId
+    const isAdminUser = isAdmin(currentUser)
+    const isApproved = work.statistic?.auditStatus === 1
+    const isVisible = work.statistic?.displayStatus === 1
+
+    if (!isOwner && !isAdminUser && (!isApproved || !isVisible)) {
       return NextResponse.json({ error: 'Work not found' }, { status: 404 })
     }
 
