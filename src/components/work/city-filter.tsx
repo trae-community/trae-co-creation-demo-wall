@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from 'next-intl';
-import { DictionaryItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronUp, Filter } from "lucide-react";
 
@@ -58,19 +57,16 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
     const loadFilterOptions = async () => {
       const apiLang = locale === 'zh' ? 'zh-CN' : locale === 'en' ? 'en-US' : locale === 'ja' ? 'ja-JP' : locale;
       try {
-        const [categoryRes, countryRes, cityRes] = await Promise.all([
-          fetch(`/api/dictionaries?code=category_code&lang=${apiLang}`),
-          fetch(`/api/dictionaries?code=country&lang=${apiLang}`),
-          fetch(`/api/dictionaries?code=city&lang=${apiLang}`)
-        ]);
-        const [categoryData, countryData, cityData] = await Promise.all([
-          categoryRes.ok ? categoryRes.json() : null,
-          countryRes.ok ? countryRes.json() : null,
-          cityRes.ok ? cityRes.json() : null
-        ]);
-        setCategories(((categoryData?.items as DictionaryItem[] | undefined) || []).map(item => ({ label: item.itemLabel, value: item.itemValue })));
-        setCountries(((countryData?.items as DictionaryItem[] | undefined) || []).map(item => ({ label: item.itemLabel, value: item.itemValue })));
-        setCities(((cityData?.items as DictionaryItem[] | undefined) || []).map(item => ({ label: item.itemLabel, value: item.itemValue, parentValue: item.parentValue })));
+        // 使用新 API 获取有作品的筛选选项
+        const res = await fetch(`/api/works/filter-options?lang=${apiLang}`);
+        if (res.ok) {
+          const data = await res.json();
+          setCategories(data.categories || []);
+          setCountries(data.countries || []);
+          setCities(data.cities || []);
+        } else {
+          console.error('Failed to load filter options');
+        }
       } catch (error) {
         console.error('Failed to load filter options:', error);
       }
