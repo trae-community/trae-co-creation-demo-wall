@@ -156,6 +156,44 @@ interface CrudPaginationProps {
 
 ---
 
+## 编辑器组件
+
+### RichTextEditor
+
+富文本编辑器组件，基于 Tiptap 实现。
+
+**位置**: `src/app/[language]/submit/editor/RichTextEditor.tsx`
+
+**Props**:
+```typescript
+interface RichTextEditorProps {
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+  minHeight?: string
+  error?: boolean
+  readOnly?: boolean
+}
+```
+
+**使用示例**:
+```tsx
+<RichTextEditor
+  value={story}
+  onChange={setStory}
+  placeholder="请输入创作故事..."
+  minHeight="200px"
+/>
+```
+
+**特性**:
+- 支持加粗、斜体、下划线
+- 支持标题、列表、引用
+- 支持图片插入
+- 编辑模式下内容同步修复
+
+---
+
 ## 作品相关组件
 
 ### WorkCard
