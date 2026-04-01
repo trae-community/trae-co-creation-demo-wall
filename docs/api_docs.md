@@ -8,6 +8,8 @@
 - [标签相关](#标签相关)
 - [文件上传](#文件上传)
 - [提交作品](#提交作品)
+- [后台管理](#后台管理)
+- [控制台概览](#控制台概览)
 
 ---
 
@@ -516,3 +518,246 @@ POST /api/submit
   "id": "1"
 }
 ```
+
+---
+
+## 后台管理
+
+### 鉴权说明
+
+所有后台管理接口需要 `admin` 或 `root` 角色，否则返回 403。
+
+### 获取作品列表（后台）
+
+```
+GET /api/console/works
+```
+
+**查询参数**:
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| page | number | 页码 |
+| pageSize | number | 每页数量 |
+| query | string | 搜索关键词 |
+| userId | string | 按用户筛选 |
+
+**权限**: admin/root
+
+---
+
+### 更新作品审核状态
+
+```
+PUT /api/console/works
+```
+
+**请求体**:
+```json
+{
+  "id": "1",
+  "auditStatus": 1,
+  "auditReason": "审核通过"
+}
+```
+
+**权限**: admin/root
+
+---
+
+### 删除作品（后台）
+
+```
+DELETE /api/console/works?id=1
+```
+
+**权限**: admin/root
+
+---
+
+### 获取用户列表
+
+```
+GET /api/users
+```
+
+**查询参数**:
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| page | number | 页码 |
+| pageSize | number | 每页数量 |
+| query | string | 搜索关键词 |
+
+**权限**: admin/root
+
+---
+
+### 创建用户
+
+```
+POST /api/users
+```
+
+**请求体**:
+```json
+{
+  "username": "用户名",
+  "email": "user@example.com",
+  "phone": "13800138000",
+  "bio": "简介",
+  "avatarUrl": "https://..."
+}
+```
+
+**权限**: admin/root
+
+---
+
+### 更新用户
+
+```
+PUT /api/users
+```
+
+**请求体**:
+```json
+{
+  "id": "1",
+  "username": "用户名",
+  "email": "user@example.com",
+  "roleIds": [1, 2]
+}
+```
+
+**权限**: admin/root
+
+**说明**: 不能给用户分配 root 角色
+
+---
+
+### 删除用户
+
+```
+DELETE /api/users?id=1
+```
+
+**权限**: admin/root
+
+---
+
+### 获取角色列表
+
+```
+GET /api/roles
+```
+
+**权限**: admin/root
+
+---
+
+### 创建角色
+
+```
+POST /api/roles
+```
+
+**请求体**:
+```json
+{
+  "roleCode": "editor",
+  "roleName": "编辑",
+  "description": "内容编辑"
+}
+```
+
+**权限**: admin/root
+
+---
+
+### 获取认证日志
+
+```
+GET /api/logs/auth
+```
+
+**查询参数**:
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| page | number | 页码 |
+| pageSize | number | 每页数量 |
+| filter | string | all/sign_in/sign_up |
+
+**权限**: admin/root
+
+---
+
+### 获取操作日志
+
+```
+GET /api/logs/operations
+```
+
+**查询参数**:
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| page | number | 页码 |
+| pageSize | number | 每页数量 |
+| filter | string | all/success/failed |
+
+**权限**: admin/root
+
+---
+
+## 控制台概览
+
+### 获取概览数据
+
+```
+GET /api/console/overview?window=7
+```
+
+**查询参数**:
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| window | number | 时间窗口，7 或 30 |
+
+**权限**: admin/root
+
+**响应**:
+```json
+{
+  "stats": {
+    "totalWorks": { "label": "总作品数", "value": 100, "change": 10.5 },
+    "activeUsers": { "label": "活跃用户", "value": 50, "change": 5.2 },
+    "registeredUsers": { "label": "注册用户", "value": 200, "change": 15.3 },
+    "systemVisits": { "label": "系统访问", "value": 1000, "change": 20.1 }
+  },
+  "trend": [
+    {
+      "date": "2024-01-01",
+      "label": "01-01",
+      "visits": 100,
+      "registrations": 10,
+      "uploads": 5
+    }
+  ],
+  "distribution": [
+    { "label": "登录", "value": 500 },
+    { "label": "注册", "value": 100 },
+    { "label": "上传作品", "value": 50 },
+    { "label": "其他操作", "value": 350 }
+  ],
+  "latestActivities": [
+    {
+      "id": "register-1",
+      "type": "register",
+      "title": "用户注册",
+      "description": "xxx 完成注册",
+      "status": "success",
+      "user": "xxx",
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}
+```
+
+**说明**: 统计数据基于数据库最新记录时间计算

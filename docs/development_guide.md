@@ -128,3 +128,47 @@ npx prisma db push
 | v0.3 | 多语言支持、字典表结构升级 |
 | v0.4 | 登录日志、操作日志表 |
 | v0.5 | 字典项层级关系支持（parent_value） |
+| v0.6 | 安全加固、城市字典扩展、控制台统计修复 |
+
+## 6. 安全开发规范
+
+### 6.1 后台 API 鉴权
+
+所有后台管理接口必须添加角色鉴权：
+
+```typescript
+import { isAdmin } from '@/lib/auth';
+
+export async function GET(req: NextRequest) {
+  const user = await getAuthUser();
+  if (!isAdmin(user)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  // 业务逻辑
+}
+```
+
+### 6.2 作品可见性控制
+
+前台作品详情接口必须检查作品状态：
+
+```typescript
+const isOwner = currentUser && work.userId === currentUser.userId;
+const isAdminUser = isAdmin(currentUser);
+const isApproved = work.statistic?.auditStatus === 1;
+const isVisible = work.statistic?.displayStatus === 1;
+
+if (!isOwner && !isAdminUser && (!isApproved || !isVisible)) {
+  return NextResponse.json({ error: 'Work not found' }, { status: 404 });
+}
+```
+
+### 6.3 角色分配安全
+
+禁止给用户分配 `root` 角色：
+
+```typescript
+if (roleIds.includes(ROOT_ROLE_ID)) {
+  return NextResponse.json({ error: 'Cannot assign root role' }, { status: 403 });
+}
+```
