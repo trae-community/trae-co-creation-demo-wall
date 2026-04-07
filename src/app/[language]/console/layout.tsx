@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Link, usePathname, useRouter } from '@/lib/language/navigation'
 import { useSession } from 'next-auth/react'
+import { useLocale } from 'next-intl'
 import {
   LayoutDashboard,
   FolderKanban,
@@ -33,6 +34,7 @@ export default function ConsoleLayout({
 }) {
   const pathname = usePathname()
   const router = useRouter()
+  const locale = useLocale()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [expandedGroups, setExpandedGroups] = useState<string[]>([])
 
@@ -62,6 +64,7 @@ export default function ConsoleLayout({
   const isRoot = roles.includes('root')
   const isAdmin = roles.includes('admin')
   const hasAccess = isRoot || isAdmin
+  const isAuthenticated = status === 'authenticated'
   const rolesResolved = status !== 'loading' && rolesLoaded
 
   const navItems = useMemo(() => {
@@ -169,8 +172,15 @@ export default function ConsoleLayout({
   useEffect(() => {
     if (!rolesResolved) return
 
+    // 未登录时重定向到登录页
+    if (!isAuthenticated) {
+      router.push(`/${locale}/sign-in`)
+      return
+    }
+
+    // 已登录但无权限时重定向到首页
     if (!hasAccess) {
-      router.push('/')
+      router.push(`/${locale}`)
       return
     }
 
@@ -182,10 +192,10 @@ export default function ConsoleLayout({
       if (allowedHrefs.length > 0) {
         router.push(allowedHrefs[0])
       } else {
-        router.push('/')
+        router.push(`/${locale}`)
       }
     }
-  }, [pathname, hasAccess, allowedHrefs, router, rolesResolved])
+  }, [pathname, hasAccess, allowedHrefs, router, rolesResolved, isAuthenticated, locale])
 
   const renderNavItem = (item: NavItem, depth = 0) => {
     if (item.children) {

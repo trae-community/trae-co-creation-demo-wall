@@ -47,8 +47,18 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       .catch(() => {});
   }, [status]);
 
-  const showConsole = roles.some(r => r === 'root' || r === 'admin');
   const isAuthenticated = status === 'authenticated';
+  // 控制台菜单需要登录且有权限
+  const showConsole = isAuthenticated && roles.some(r => r === 'root' || r === 'admin');
+
+  // 点击提交作品按钮时判断登录状态
+  const handleSubmitClick = () => {
+    if (isAuthenticated) {
+      router.push('/submit');
+    } else {
+      router.push('/sign-in');
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -93,9 +103,9 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               <Home className="w-3.5 h-3.5" />
               {t('home')}
             </Link>
-            <Link
-              href="/submit"
-              prefetch={false}
+            <button
+              type="button"
+              onClick={handleSubmitClick}
               className={cn(
                 "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                 pathname === "/submit"
@@ -105,7 +115,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             >
               <PlusCircle className="w-3.5 h-3.5" />
               {t('submit')}
-            </Link>
+            </button>
 
             {showConsole && (
               <Link
@@ -222,9 +232,9 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 <Home className="w-4 h-4" />
                 {t('home')}
               </Link>
-              <Link
-                href="/submit"
-                onClick={() => setMobileMenuOpen(false)}
+              <button
+                type="button"
+                onClick={() => { setMobileMenuOpen(false); handleSubmitClick(); }}
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                   pathname === "/submit"
@@ -234,7 +244,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               >
                 <PlusCircle className="w-4 h-4" />
                 {t('submit')}
-              </Link>
+              </button>
 
               {showConsole && (
                 <Link
