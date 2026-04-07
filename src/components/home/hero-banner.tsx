@@ -2,13 +2,25 @@
 
 import React, { useRef, useState } from "react";
 import { DottedGlowBackground } from "@/components/ui/dotted-glow-background";
-import { Link } from '@/lib/language/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export function HeroBanner() {
   const [isHovering, setIsHovering] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const t = useTranslations('Home');
+  const locale = useLocale();
+  const router = useRouter();
+  const { data: session } = useSession();
+
+  const handleSubmitClick = () => {
+    if (session) {
+      router.push(`/${locale}/submit`);
+    } else {
+      router.push(`/${locale}/sign-in`);
+    }
+  };
 
   return (
     <section
@@ -45,14 +57,14 @@ export function HeroBanner() {
         </p>
 
         <div className="flex flex-col sm:flex-row flex-wrap gap-3">
-          <Link
-            href="/submit"
+          <button
+            onClick={handleSubmitClick}
             className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-bold text-sm text-black flex items-center justify-center gap-2 transition-all hover:opacity-90"
             style={{ background: '#32F08C', boxShadow: '0 0 20px rgba(50, 240, 140, 0.3)' }}
           >
             {t('submitWork')}
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-          </Link>
+          </button>
           <a
             href="#projects"
             className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-semibold text-sm text-zinc-300 border border-white/10 bg-white/5 hover:bg-white/10 transition-all backdrop-blur-md text-center"
