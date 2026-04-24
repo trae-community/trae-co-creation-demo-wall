@@ -30,7 +30,6 @@ export async function GET(req: NextRequest) {
     // Handle search query
     if (query) {
       where.OR = [
-        { clerkId: { contains: query, mode: 'insensitive' } },
         { ipAddress: { contains: query, mode: 'insensitive' } },
         {
           user: {

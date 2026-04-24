@@ -2,6 +2,7 @@ import type { NextAuthConfig } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import { compare } from 'bcryptjs'
 import { prisma } from './prisma'
+import { writeAuthLog } from './audit-log'
 
 export const authConfig = {
   providers: [
@@ -56,6 +57,24 @@ export const authConfig = {
         session.user.id = token.id as string
       }
       return session
+    },
+  },
+  events: {
+    async signIn({ user }) {
+      if (user?.id) {
+        await writeAuthLog({
+          userId: user.id,
+          authType: 'sign_in',
+          authChannel: 'credentials',
+          authStatus: 'success',
+          metadata: { email: user.email },
+        })
+        // Update lastSignInAt
+        await prisma.sysUser.update({
+          where: { id: BigInt(user.id) },
+          data: { lastSignInAt: new Date() },
+        }).catch(() => {})
+      }
     },
   },
 } satisfies NextAuthConfig

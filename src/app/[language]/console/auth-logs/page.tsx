@@ -88,12 +88,12 @@ export default function AuthLogsPage() {
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">登录注册日志</h2>
-          <p className="text-muted-foreground mt-1">只读查看用户登录与注册行为</p>
+          <p className="text-muted-foreground mt-1">只读查看用户登录与注册记录</p>
         </div>
       </div>
 
       <CrudFilterBar
-        searchPlaceholder="搜索用户、邮箱、Clerk ID、IP..."
+        searchPlaceholder="搜索用户名、邮箱、IP..."
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
         filterValue={filterMode}
@@ -122,13 +122,13 @@ export default function AuthLogsPage() {
                     <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">
                       {item.authType === 'sign_up' ? '注册' : '登录'}
                     </Badge>
-                    <Badge variant="outline">{item.authChannel || 'clerk'}</Badge>
+                    <Badge variant="outline">{item.authChannel || 'credentials'}</Badge>
                     <Badge variant={item.authStatus === 'success' ? 'default' : 'destructive'}>
                       {item.authStatus}
                     </Badge>
                   </div>
                   <div className="text-sm text-muted-foreground mt-1 break-all">
-                    {item.user?.email || '无邮箱'} · Clerk: {item.clerkId || '-'}
+                    {item.user?.email || '无邮箱'}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1 break-all">
                     IP: {item.ipAddress || '-'} · UA: {item.userAgent || '-'}

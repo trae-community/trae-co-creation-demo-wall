@@ -243,36 +243,40 @@ export async function GET(req: NextRequest) {
         const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return timeB - timeA;
       })
-      .slice(0, 12);
+      .slice(0, 10);
 
     const distribution = [
-      { label: '登录', value: signInCount },
-      { label: '注册', value: signUpCount },
-      { label: '上传作品', value: uploadCount },
-      { label: '其他操作', value: Math.max(operationCount - uploadCount, 0) }
+      { label: '登录次数', value: signInCount, tip: `近${windowDays}天登录操作的总次数` },
+      { label: '注册次数', value: signUpCount, tip: `近${windowDays}天注册操作的总次数` },
+      { label: '上传作品次数', value: uploadCount, tip: `近${windowDays}天通过提交页或后台创建作品的总次数` },
+      { label: '其他操作次数', value: Math.max(operationCount - uploadCount, 0), tip: `近${windowDays}天除上传作品外的其他后台操作次数` }
     ];
 
     return NextResponse.json({
       stats: {
         totalWorks: {
-          label: '总作品数',
-          value: totalWorks,
-          change: calcChange(currentNewWorks, previousNewWorks)
+          label: '本周新增作品',
+          value: currentNewWorks,
+          change: calcChange(currentNewWorks, previousNewWorks),
+          tip: `近${windowDays}天新增的作品数量，环比为对比前${windowDays}天的变化率。数据库作品总数：${totalWorks}`
         },
         activeUsers: {
-          label: '活跃用户',
+          label: '本周登录用户',
           value: currentActiveUsers,
-          change: calcChange(currentActiveUsers, previousActiveUsers)
+          change: calcChange(currentActiveUsers, previousActiveUsers),
+          tip: `近${windowDays}天有登录记录的不重复用户数（基于认证日志去重）`
         },
         registeredUsers: {
-          label: '注册用户',
-          value: totalUsers,
-          change: calcChange(currentNewUsers, previousNewUsers)
+          label: '本周新注册用户',
+          value: currentNewUsers,
+          change: calcChange(currentNewUsers, previousNewUsers),
+          tip: `近${windowDays}天新注册的用户数，环比为对比前${windowDays}天的变化率。数据库用户总数：${totalUsers}`
         },
         systemVisits: {
-          label: '系统访问',
+          label: '本周认证事件',
           value: currentVisits,
-          change: calcChange(currentVisits, previousVisits)
+          change: calcChange(currentVisits, previousVisits),
+          tip: `近${windowDays}天认证日志的总条数（含登录、注册、失败等所有认证事件），环比为对比前${windowDays}天的变化率`
         }
       },
       trend: daySeries,
