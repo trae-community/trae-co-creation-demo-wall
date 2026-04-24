@@ -1,14 +1,15 @@
 'use client'
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { WorkCard } from "@/components/work/work-card";
-import { CityFilter, FilterState } from "@/components/work/city-filter";
-import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight, Calendar, X } from "lucide-react";
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/lib/language/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { cn } from "@/lib/utils";
-import { HeroBanner } from "@/components/home/hero-banner";
-import { useWorks } from "@/hooks/use-works";
+import { WorkCard } from '@/components/work/work-card';
+import { CityFilter, FilterState } from '@/components/work/city-filter';
+import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight, Calendar, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { HeroBanner } from '@/components/home/hero-banner';
+import { useWorks } from '@/hooks/use-works';
 
 export default function Page() {
   const t = useTranslations('Home');
@@ -56,8 +57,8 @@ export default function Page() {
     if (page > 1) params.set('page', page.toString());
 
     const newUrl = params.toString() ? `?${params.toString()}` : '';
-    router.replace(`/${locale}${newUrl}`, { scroll: false });
-  }, [filters, debouncedSearch, sortBy, selectedDate, page, router, locale]);
+    router.replace(`/${newUrl}`, { scroll: false });
+  }, [filters, debouncedSearch, sortBy, selectedDate, page, router]);
 
   const { data, isLoading } = useWorks({
     page,

@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Users, FileText, UserPlus, TrendingUp, Activity, PieChart, BarChart, Upload } from 'lucide-react'
+import { Users, FileText, UserPlus, TrendingUp, Activity, PieChart, BarChart, Upload, Info } from 'lucide-react'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
 import { CrudFeedback } from '@/components/crud/crud-feedback'
 import { useFeedback } from '@/hooks/use-feedback'
@@ -14,6 +14,7 @@ interface StatItem {
   label: string
   value: number
   change: number
+  tip?: string
 }
 
 interface TrendItem {
@@ -27,6 +28,7 @@ interface TrendItem {
 interface DistributionItem {
   label: string
   value: number
+  tip?: string
 }
 
 interface ActivityItem {
@@ -53,10 +55,10 @@ interface OverviewData {
 
 const defaultData: OverviewData = {
   stats: {
-    totalWorks: { label: '总作品数', value: 0, change: 0 },
-    activeUsers: { label: '活跃用户', value: 0, change: 0 },
-    registeredUsers: { label: '注册用户', value: 0, change: 0 },
-    systemVisits: { label: '系统访问', value: 0, change: 0 }
+    totalWorks: { label: '本周新增作品', value: 0, change: 0, tip: '' },
+    activeUsers: { label: '本周登录用户', value: 0, change: 0, tip: '' },
+    registeredUsers: { label: '本周新注册用户', value: 0, change: 0, tip: '' },
+    systemVisits: { label: '本周认证事件', value: 0, change: 0, tip: '' }
   },
   trend: [],
   distribution: [],
@@ -136,12 +138,23 @@ export default function ConsolePage() {
                 <stat.icon size={24} />
               </div>
               <span className={`text-sm font-medium ${stat.change >= 0 ? 'text-green-500' : 'text-red-500'} flex items-center gap-1`}>
-                {formatChange(stat.change)}
+                环比{formatChange(stat.change)}
                 <Activity size={12} />
               </span>
             </div>
             <h3 className="text-3xl font-bold text-foreground mb-1">{formatNumber(stat.value)}</h3>
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm text-muted-foreground">{stat.label}</p>
+              {stat.tip && (
+                <span className="relative group/tip cursor-help">
+                  <Info size={14} className="text-muted-foreground/60 hover:text-muted-foreground transition-colors" />
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs text-white bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl whitespace-normal w-56 text-left opacity-0 invisible group-hover/tip:opacity-100 group-hover/tip:visible transition-all duration-200 pointer-events-none z-50">
+                    {stat.tip}
+                    <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-zinc-800" />
+                  </span>
+                </span>
+              )}
+            </div>
           </div>
         ))}
       </div>
@@ -151,7 +164,8 @@ export default function ConsolePage() {
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <BarChart size={20} className="text-primary" />
-              访问趋势
+              每日趋势
+              <span className="text-xs font-normal text-muted-foreground ml-1">近{windowDays}天每日认证事件 / 注册 / 上传作品数量</span>
             </h3>
             <select
               value={String(windowDays)}
@@ -173,7 +187,7 @@ export default function ConsolePage() {
                   <div key={item.date} className="space-y-1">
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>{item.label}</span>
-                      <span>访问 {item.visits} / 注册 {item.registrations} / 上传 {item.uploads}</span>
+                      <span>认证 {item.visits} / 注册 {item.registrations} / 上传 {item.uploads}</span>
                     </div>
                     <div className="h-2 rounded bg-secondary/70 overflow-hidden flex">
                       <div
@@ -200,7 +214,8 @@ export default function ConsolePage() {
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <PieChart size={20} className="text-purple-500" />
-              数据分布
+              操作分布
+              <span className="text-xs font-normal text-muted-foreground ml-1">近{windowDays}天各类型操作次数占比</span>
             </h3>
             <span className="text-xs text-muted-foreground">当前窗口</span>
           </div>
@@ -214,7 +229,18 @@ export default function ConsolePage() {
                 {data.distribution.map((item, index) => (
                   <div key={`${item.label}-${index}`} className="space-y-1">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-foreground">{item.label}</span>
+                      <span className="text-foreground flex items-center gap-1.5">
+                        {item.label}
+                        {item.tip && (
+                          <span className="relative group/dist cursor-help">
+                            <Info size={12} className="text-muted-foreground/60 hover:text-muted-foreground transition-colors" />
+                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs text-white bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl whitespace-normal w-52 text-left opacity-0 invisible group-hover/dist:opacity-100 group-hover/dist:visible transition-all duration-200 pointer-events-none z-50">
+                              {item.tip}
+                              <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-zinc-800" />
+                            </span>
+                          </span>
+                        )}
+                      </span>
                       <span className="text-muted-foreground">{formatNumber(item.value)}</span>
                     </div>
                     <div className="h-2 rounded bg-secondary/70 overflow-hidden">
@@ -232,8 +258,11 @@ export default function ConsolePage() {
       </div>
 
       <Card className="rounded-xl border border-border bg-card overflow-hidden">
-        <div className="p-6 border-b border-border">
-          <h3 className="text-lg font-semibold">最新动态</h3>
+        <div className="p-6 border-b border-border flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold">最新动态</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">最近10条用户注册与作品上传记录</p>
+          </div>
         </div>
         <div className="p-6">
           {data.latestActivities.length === 0 ? (
