@@ -11,11 +11,13 @@ export interface FilterState {
   tags: string[];
   countries: string[];
   honors: string[];
+  auditStatuses: string[];
 }
 
 interface CityFilterProps {
   filters: FilterState;
   onFilterChange: (filters: FilterState) => void;
+  auditStatusOptions?: FilterOption[];
 }
 
 type FilterOption = {
@@ -46,7 +48,7 @@ const Pill = ({
   </button>
 );
 
-export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
+export function CityFilter({ filters, onFilterChange, auditStatusOptions }: CityFilterProps) {
   const t = useTranslations('Filter');
   const locale = useLocale();
   const [categories, setCategories] = useState<FilterOption[]>([]);
@@ -126,7 +128,7 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
     </div>
   );
 
-  const activeFilterCount = filters.categories.length + filters.countries.length + filters.cities.length + filters.honors.length;
+  const activeFilterCount = filters.categories.length + filters.countries.length + filters.cities.length + filters.honors.length + filters.auditStatuses.length;
 
   return (
     <div className="space-y-2.5">
@@ -149,6 +151,9 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
 
       {/* Desktop: Always visible / Mobile: Collapsible */}
       <div className={cn("space-y-2.5", !isExpanded && "hidden lg:block")}>
+        {auditStatusOptions && auditStatusOptions.length > 0 && (
+          <FilterRow label={t('auditStatus')} items={auditStatusOptions} type="auditStatuses" selected={filters.auditStatuses} />
+        )}
         <FilterRow label={t('type')} items={categories} type="categories" selected={filters.categories} />
         {honors.length > 0 && (
           <FilterRow label={t('honor')} items={honors} type="honors" selected={filters.honors} />

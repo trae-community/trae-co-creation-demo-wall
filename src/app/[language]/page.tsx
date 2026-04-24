@@ -22,6 +22,7 @@ export default function Page() {
     tags: searchParams.get('tags')?.split(',').filter(Boolean) || [],
     countries: searchParams.get('countries')?.split(',').filter(Boolean) || [],
     honors: searchParams.get('honors')?.split(',').filter(Boolean) || [],
+    auditStatuses: [],
   });
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || "");
   const [debouncedSearch, setDebouncedSearch] = useState(searchParams.get('search') || "");
@@ -215,7 +216,7 @@ export default function Page() {
           <p className="text-zinc-400 text-sm mb-3">{t('noResults')}</p>
           <button
             onClick={() => {
-              setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [] });
+              setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [] });
               setSearchQuery("");
               setSelectedDate("");
             }}

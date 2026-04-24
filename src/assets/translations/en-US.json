@@ -180,6 +180,7 @@
     "all": "All",
     "type": "Type",
     "honor": "Honor",
+    "auditStatus": "Audit",
     "country": "Province",
     "city": "City"
   },

@@ -50,6 +50,10 @@ export async function GET(req: NextRequest) {
     const pageSize = Number(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10');
     const query = searchParams.get(CRUD_QUERY_PARAMS.query) || '';
     const userId = searchParams.get('userId');
+    const categoryCode = searchParams.get('category');
+    const countryCode = searchParams.get('country');
+    const honorCode = searchParams.get('honor');
+    const auditStatus = searchParams.get('auditStatus');
 
     // 构建过滤条件
     const whereFilters: Prisma.WorkBaseWhereInput[] = [];
@@ -65,7 +69,26 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Additional filters can be added here (e.g., country, city, category) if passed in searchParams
+    if (categoryCode) {
+      whereFilters.push({ categoryCode });
+    }
+    if (countryCode) {
+      whereFilters.push({ countryCode });
+    }
+    if (honorCode) {
+      whereFilters.push({
+        honors: {
+          some: {
+            dictItem: { itemValue: honorCode }
+          }
+        }
+      });
+    }
+    if (auditStatus !== null && auditStatus !== '') {
+      whereFilters.push({
+        statistic: { auditStatus: Number(auditStatus) }
+      });
+    }
 
     const whereClause = whereFilters.length ? { AND: whereFilters } : undefined;
     const skip = (Math.max(page, 1) - 1) * Math.max(pageSize, 1);

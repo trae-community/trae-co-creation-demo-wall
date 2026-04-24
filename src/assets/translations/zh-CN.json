@@ -180,6 +180,7 @@
     "all": "全部",
     "type": "类型",
     "honor": "荣誉",
+    "auditStatus": "审核",
     "country": "省份",
     "city": "城市",
     "filters": "筛选"

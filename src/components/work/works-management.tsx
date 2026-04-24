@@ -3,14 +3,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
-import { Edit, Trash2, Eye, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Edit, Trash2, Eye, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 
 import { CrudFeedback } from '@/components/crud/crud-feedback'
-import { CrudFilterBar } from '@/components/crud/crud-filter-bar'
 import { CrudPagination } from '@/components/crud/crud-pagination'
+import { CityFilter, FilterState } from '@/components/work/city-filter'
 import { useFeedback } from '@/hooks/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
 import { useParams } from 'next/navigation'
@@ -140,6 +140,9 @@ export function WorksManagement({
   const [works, setWorks] = useState<WorkItem[]>([])
   const [totalItems, setTotalItems] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
+  const [filters, setFilters] = useState<FilterState>({
+    cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [],
+  })
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 10
   
@@ -241,6 +244,10 @@ export function WorksManagement({
       if (userId) {
         params.append('userId', userId)
       }
+      if (filters.categories.length) params.append('category', filters.categories[0])
+      if (filters.countries.length) params.append('country', filters.countries[0])
+      if (filters.honors.length) params.append('honor', filters.honors[0])
+      if (filters.auditStatuses.length) params.append('auditStatus', filters.auditStatuses[0])
 
       const res = await fetch(`/api/console/works?${params.toString()}`)
       if (res.ok) {
@@ -256,7 +263,7 @@ export function WorksManagement({
     } finally {
       setIsLoading(false)
     }
-  }, [currentPage, pageSize, searchTerm, showFeedback, userId])
+  }, [currentPage, pageSize, searchTerm, showFeedback, userId, filters])
 
   // Initial fetch
   useEffect(() => {
@@ -264,10 +271,10 @@ export function WorksManagement({
     fetchDicts()
   }, [fetchWorks, fetchDicts])
 
-  // Reset page when search changes
+  // Reset page when search or filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm])
+  }, [searchTerm, filters])
 
   // Handlers
   const handleEdit = async (work: WorkItem) => {
@@ -503,15 +510,37 @@ export function WorksManagement({
         </div>
       )}
 
-      <CrudFilterBar
-        searchPlaceholder="搜索作品名称、简介..."
-        searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
-        filterValue="all"
-        filterOptions={[]} 
-        onFilterChange={() => {}}
-        filterPlaceholder="筛选作品"
-      />
+      {/* Search + Filter */}
+      <div className="p-4 rounded-xl border border-border bg-card space-y-3">
+        {/* Search */}
+        <div className="flex flex-col sm:flex-row gap-3 items-center">
+          <div className="relative flex-1 max-w-md w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <input
+              type="text"
+              placeholder="搜索作品名称、简介..."
+              className="w-full pl-10 pr-4 py-2 rounded-lg text-sm bg-secondary border border-border focus:outline-none focus:ring-1 focus:ring-primary/40"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [] })}
+            className="shrink-0"
+          >
+            重置筛选
+          </Button>
+        </div>
+
+        {/* CityFilter — same as home page */}
+        <CityFilter
+          filters={filters}
+          onFilterChange={setFilters}
+          auditStatusOptions={auditStatuses.map(s => ({ label: s.itemLabel, value: s.itemValue }))}
+        />
+      </div>
 
       <div className="space-y-4">
         {works.map(work => (
