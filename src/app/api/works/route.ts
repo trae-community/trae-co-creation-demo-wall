@@ -93,10 +93,12 @@ export async function GET(req: Request) {
     const lang = searchParams.get('lang') || 'zh-CN';
     const sort = searchParams.get('sort') || 'newest'; // newest, likes, views
     const date = searchParams.get('date'); // YYYY-MM-DD 格式，按提交日期筛选
+    const honor = searchParams.get('honor');
 
     const cityCodes = city?.split(',').filter(Boolean) || [];
     const countryCodes = country?.split(',').filter(Boolean) || [];
     const categoryCodes = category?.split(',').filter(Boolean) || [];
+    const honorCodes = honor?.split(',').filter(Boolean) || [];
 
     // 构建过滤条件
     const whereFilters: Prisma.WorkBaseWhereInput[] = [
@@ -125,6 +127,18 @@ export async function GET(req: Request) {
     }
     if (categoryCodes.length > 0) {
       whereFilters.push({ categoryCode: { in: categoryCodes } });
+    }
+
+    if (honorCodes.length > 0) {
+      whereFilters.push({
+        honors: {
+          some: {
+            dictItem: {
+              itemValue: { in: honorCodes }
+            }
+          }
+        }
+      });
     }
 
     if (tags && tags.length > 0) {

@@ -17,10 +17,11 @@ async function getRawDictionaries() {
   const cached = await getDictionaries();
   if (cached) return cached as any;
 
-  const [countryDict, cityDict, categoryDict] = await Promise.all([
+  const [countryDict, cityDict, categoryDict, honorDict] = await Promise.all([
     prisma.sysDict.findUnique({ where: { dictCode: 'country' }, include: { items: true } }),
     prisma.sysDict.findUnique({ where: { dictCode: 'city' }, include: { items: true } }),
     prisma.sysDict.findUnique({ where: { dictCode: 'category_code' }, include: { items: true } }),
+    prisma.sysDict.findUnique({ where: { dictCode: 'honor_type' }, include: { items: true } }),
   ]);
 
   const serialize = (obj: unknown) =>
@@ -30,6 +31,7 @@ async function getRawDictionaries() {
     countryDict: serialize(countryDict),
     cityDict: serialize(cityDict),
     categoryDict: serialize(categoryDict),
+    honorDict: serialize(honorDict),
   };
 }
 
@@ -62,7 +64,7 @@ export async function GET(req: Request) {
     });
 
     // 获取字典数据
-    const { countryDict, cityDict, categoryDict } = await getRawDictionaries();
+    const { countryDict, cityDict, categoryDict, honorDict } = await getRawDictionaries();
 
     // 解析标签
     const resolveLabel = (item: DictItem) => {
@@ -75,6 +77,14 @@ export async function GET(req: Request) {
       }
       return label;
     };
+
+    // 获取有作品荣誉的honor_item_id集合
+    const honorItemIds = await prisma.workHonor.findMany({
+      where: { work: { statistic: { auditStatus: 1, displayStatus: 1 } } },
+      select: { honorItemId: true },
+      distinct: ['honorItemId'],
+    });
+    const honorsWithWorks = new Set(honorItemIds.map(h => h.honorItemId.toString()));
 
     // 过滤出有作品的省份
     const countries = (countryDict?.items || [])
@@ -103,10 +113,20 @@ export async function GET(req: Request) {
       }))
       .sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label, lang));
 
+    // 荣誉标签
+    const honors = (honorDict?.items || [])
+      .filter((item: DictItem) => honorsWithWorks.has(item.id))
+      .map((item: DictItem) => ({
+        label: resolveLabel(item),
+        value: item.itemValue,
+      }))
+      .sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label, lang));
+
     return NextResponse.json({
       countries,
       cities,
       categories,
+      honors,
     });
 
   } catch (error) {

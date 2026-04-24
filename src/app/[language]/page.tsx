@@ -21,6 +21,7 @@ export default function Page() {
     categories: searchParams.get('categories')?.split(',').filter(Boolean) || [],
     tags: searchParams.get('tags')?.split(',').filter(Boolean) || [],
     countries: searchParams.get('countries')?.split(',').filter(Boolean) || [],
+    honors: searchParams.get('honors')?.split(',').filter(Boolean) || [],
   });
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || "");
   const [debouncedSearch, setDebouncedSearch] = useState(searchParams.get('search') || "");
@@ -50,6 +51,7 @@ export default function Page() {
     if (filters.categories.length) params.set('categories', filters.categories.join(','));
     if (filters.tags.length) params.set('tags', filters.tags.join(','));
     if (filters.countries.length) params.set('countries', filters.countries.join(','));
+    if (filters.honors.length) params.set('honors', filters.honors.join(','));
     if (debouncedSearch) params.set('search', debouncedSearch);
     if (sortBy !== 'time') params.set('sort', sortBy);
     if (selectedDate) params.set('date', selectedDate);
@@ -70,6 +72,7 @@ export default function Page() {
     category: filters.categories.join(','),
     tags: filters.tags.join(','),
     date: selectedDate || undefined,
+    honor: filters.honors.join(','),
   });
 
   const works = data?.items || [];
@@ -212,7 +215,7 @@ export default function Page() {
           <p className="text-zinc-400 text-sm mb-3">{t('noResults')}</p>
           <button
             onClick={() => {
-              setFilters({ cities: [], categories: [], tags: [], countries: [] });
+              setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [] });
               setSearchQuery("");
               setSelectedDate("");
             }}

@@ -217,7 +217,7 @@ export function WorkCard({ work }: WorkCardProps) {
               <Eye className="w-3.5 h-3.5" />
               {work.views >= 1000 ? `${(work.views / 1000).toFixed(1)}k` : work.views}
             </span>
-            <span className="flex items-center gap-1 text-[11px] font-semibold text-rose-400/80">
+            <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-400/80">
               <ThumbsUp className="w-3.5 h-3.5" />
               {work.likes}
             </span>
