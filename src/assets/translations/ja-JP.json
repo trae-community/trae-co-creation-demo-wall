@@ -188,7 +188,8 @@
     "honor": "栄誉",
     "auditStatus": "審査",
     "country": "都道府県",
-    "city": "都市"
+    "city": "都市",
+    "dateLabel": "日付"
   },
   "Card": {
     "viewDetails": "詳細を見る",

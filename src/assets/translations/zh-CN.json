@@ -183,7 +183,8 @@
     "auditStatus": "审核",
     "country": "省份",
     "city": "城市",
-    "filters": "筛选"
+    "filters": "筛选",
+    "dateLabel": "日期"
   },
   "Card": {
     "viewDetails": "查看详情",

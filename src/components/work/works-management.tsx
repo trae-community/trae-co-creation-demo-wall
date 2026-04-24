@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
-import { Edit, Trash2, Eye, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { Edit, Trash2, Eye, ThumbsUp, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -143,6 +143,7 @@ export function WorksManagement({
   const [filters, setFilters] = useState<FilterState>({
     cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [],
   })
+  const [selectedDate, setSelectedDate] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 10
   
@@ -248,6 +249,7 @@ export function WorksManagement({
       if (filters.countries.length) params.append('country', filters.countries[0])
       if (filters.honors.length) params.append('honor', filters.honors[0])
       if (filters.auditStatuses.length) params.append('auditStatus', filters.auditStatuses[0])
+      if (selectedDate) params.append('date', selectedDate)
 
       const res = await fetch(`/api/console/works?${params.toString()}`)
       if (res.ok) {
@@ -263,7 +265,7 @@ export function WorksManagement({
     } finally {
       setIsLoading(false)
     }
-  }, [currentPage, pageSize, searchTerm, showFeedback, userId, filters])
+  }, [currentPage, pageSize, searchTerm, showFeedback, userId, filters, selectedDate])
 
   // Initial fetch
   useEffect(() => {
@@ -274,7 +276,7 @@ export function WorksManagement({
   // Reset page when search or filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm, filters])
+  }, [searchTerm, filters, selectedDate])
 
   // Handlers
   const handleEdit = async (work: WorkItem) => {
@@ -527,7 +529,7 @@ export function WorksManagement({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [] })}
+            onClick={() => { setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [] }); setSelectedDate('') }}
             className="shrink-0"
           >
             重置筛选
@@ -539,6 +541,8 @@ export function WorksManagement({
           filters={filters}
           onFilterChange={setFilters}
           auditStatusOptions={auditStatuses.map(s => ({ label: s.itemLabel, value: s.itemValue }))}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
         />
       </div>
 
@@ -593,6 +597,20 @@ export function WorksManagement({
                           <Calendar size={14} />
                           <span>{new Date(work.createdAt).toLocaleDateString('zh-CN')}</span>
                         </div>
+                        {work.statistic && (
+                          <>
+                            <span className="text-border">|</span>
+                            <div className="flex items-center gap-1" title="浏览量">
+                              <Eye size={14} />
+                              <span>{Number(work.statistic.viewCount) >= 1000 ? `${(Number(work.statistic.viewCount) / 1000).toFixed(1)}k` : work.statistic.viewCount}</span>
+                            </div>
+                            <span className="text-border">|</span>
+                            <div className="flex items-center gap-1" title="点赞数">
+                              <ThumbsUp size={14} />
+                              <span>{work.statistic.likeCount}</span>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                     
