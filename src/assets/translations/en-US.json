@@ -180,8 +180,10 @@
     "all": "All",
     "type": "Type",
     "honor": "Honor",
+    "auditStatus": "Audit",
     "country": "Province",
-    "city": "City"
+    "city": "City",
+    "dateLabel": "Date"
   },
   "Card": {
     "viewDetails": "View Details",

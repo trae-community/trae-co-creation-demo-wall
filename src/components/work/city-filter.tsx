@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils";
-import { ChevronDown, ChevronUp, Filter } from "lucide-react";
+import { ChevronDown, ChevronUp, Filter, Calendar, X } from "lucide-react";
 
 export interface FilterState {
   cities: string[];
@@ -11,11 +11,15 @@ export interface FilterState {
   tags: string[];
   countries: string[];
   honors: string[];
+  auditStatuses: string[];
 }
 
 interface CityFilterProps {
   filters: FilterState;
   onFilterChange: (filters: FilterState) => void;
+  auditStatusOptions?: FilterOption[];
+  selectedDate?: string;
+  onDateChange?: (date: string) => void;
 }
 
 type FilterOption = {
@@ -46,7 +50,7 @@ const Pill = ({
   </button>
 );
 
-export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
+export function CityFilter({ filters, onFilterChange, auditStatusOptions, selectedDate, onDateChange }: CityFilterProps) {
   const t = useTranslations('Filter');
   const locale = useLocale();
   const [categories, setCategories] = useState<FilterOption[]>([]);
@@ -126,7 +130,8 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
     </div>
   );
 
-  const activeFilterCount = filters.categories.length + filters.countries.length + filters.cities.length + filters.honors.length;
+  const dateActive = !!(selectedDate && onDateChange);
+  const activeFilterCount = filters.categories.length + filters.countries.length + filters.cities.length + filters.honors.length + filters.auditStatuses.length + (dateActive ? 1 : 0);
 
   return (
     <div className="space-y-2.5">
@@ -149,6 +154,9 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
 
       {/* Desktop: Always visible / Mobile: Collapsible */}
       <div className={cn("space-y-2.5", !isExpanded && "hidden lg:block")}>
+        {auditStatusOptions && auditStatusOptions.length > 0 && (
+          <FilterRow label={t('auditStatus')} items={auditStatusOptions} type="auditStatuses" selected={filters.auditStatuses} />
+        )}
         <FilterRow label={t('type')} items={categories} type="categories" selected={filters.categories} />
         {honors.length > 0 && (
           <FilterRow label={t('honor')} items={honors} type="honors" selected={filters.honors} />
@@ -156,6 +164,49 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
         <FilterRow label={t('country')} items={countries} type="countries" selected={filters.countries} />
         {filters.countries.length > 0 && (
           <FilterRow label={t('city')} items={availableCities} type="cities" selected={filters.cities} />
+        )}
+        {/* Date filter — only when controlled */}
+        {onDateChange && (
+          <div className="flex items-start gap-3 pb-0.5">
+            <span className="text-xs text-zinc-500 font-medium w-10 shrink-0 select-none mt-2">{t('dateLabel')}</span>
+            <div className="flex flex-wrap gap-2">
+              <Pill active={!selectedDate} onClick={() => onDateChange('')}>
+                {t('all')}
+              </Pill>
+              <button
+                onClick={() => {
+                  const input = document.getElementById('city-filter-date-input') as HTMLInputElement | null;
+                  if (input) input.showPicker?.();
+                }}
+                className={cn(
+                  "px-3.5 py-1.5 rounded-full text-sm whitespace-nowrap border transition-all duration-200 shrink-0",
+                  selectedDate
+                    ? "bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-black font-bold border-transparent shadow-[0_0_12px_rgba(34,197,94,0.25)]"
+                    : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
+                )}
+              >
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {selectedDate || t('dateLabel')}
+                  {selectedDate && (
+                    <span
+                      onClick={(e) => { e.stopPropagation(); onDateChange(''); }}
+                      className="ml-0.5 w-4 h-4 flex items-center justify-center rounded-full hover:bg-black/20 transition-all"
+                    >
+                      <X className="w-3 h-3" />
+                    </span>
+                  )}
+                </span>
+              </button>
+              <input
+                id="city-filter-date-input"
+                type="date"
+                value={selectedDate || ''}
+                onChange={(e) => onDateChange(e.target.value)}
+                className="sr-only"
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>
