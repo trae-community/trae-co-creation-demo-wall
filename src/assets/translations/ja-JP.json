@@ -267,7 +267,7 @@
     "securityDesc": "パスワードとアカウントのセキュリティ設定を管理します。",
     "openSettings": "アカウント設定を開く",
     "settingsModalTitle": "アカウント設定",
-    "settingsModalDesc": "Clerk でパスワード、認証方法、アカウント情報を管理します。",
+    "settingsModalDesc": "ここでパスワードとアカウント情報を管理します。",
     "changePassword": "パスワードを変更",
     "oldPassword": "現在のパスワード",
     "oldPasswordPlaceholder": "現在のパスワードを入力してください",

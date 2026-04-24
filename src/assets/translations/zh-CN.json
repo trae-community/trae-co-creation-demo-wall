@@ -262,7 +262,7 @@
     "securityDesc": "管理您的密码和账户安全设置。",
     "openSettings": "打开账户设置",
     "settingsModalTitle": "账户设置",
-    "settingsModalDesc": "在 Clerk 中管理密码、认证方式和账户详情。",
+    "settingsModalDesc": "在此管理密码和账户详情。",
     "changePassword": "修改密码",
     "oldPassword": "原密码",
     "oldPasswordPlaceholder": "请输入当前使用的密码",

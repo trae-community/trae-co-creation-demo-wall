@@ -44,7 +44,6 @@ interface UserItem {
   bio: string | null
   createdAt: string
   updatedAt: string
-  clerkId: string | null
   roles: { role: Role }[]
 }
 
@@ -280,9 +279,6 @@ export default function UsersPage() {
                 <div className="space-y-1 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-lg">{user.username}</span>
-                    {user.clerkId && (
-                      <Badge variant="outline" className="text-xs font-normal">Clerk User</Badge>
-                    )}
                     {user.roles && user.roles.map(r => (
                       <Badge key={r.role.id} variant="secondary" className="text-xs">
                         {r.role.roleName}
