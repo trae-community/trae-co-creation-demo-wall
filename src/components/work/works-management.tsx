@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useLocale } from 'next-intl'
 import { Edit, Trash2, Eye, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -131,6 +133,8 @@ export function WorksManagement({
 }: WorksManagementProps) {
   const params = useParams()
   const lang = (params?.lang as string) || 'zh-CN'
+  const router = useRouter()
+  const locale = useLocale()
   
   const [isLoading, setIsLoading] = useState(false)
   const [works, setWorks] = useState<WorkItem[]>([])
@@ -565,6 +569,10 @@ export function WorksManagement({
                     
                     {/* Action Buttons */}
                     <div className="flex items-center gap-1 shrink-0">
+                      {/* Jump to detail page */}
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-emerald-500 hover:bg-emerald-500/10" onClick={() => router.push(`/${locale}/works/${work.id}`)} title="查看详情页">
+                        <ExternalLink size={16} />
+                      </Button>
                       {allowedActions.includes('view') && (
                         <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-indigo-500 hover:bg-indigo-500/10" onClick={() => handleView(work)} title="查看作品">
                           <Eye size={16} />

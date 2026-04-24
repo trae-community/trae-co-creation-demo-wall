@@ -239,7 +239,7 @@ export function SubmissionForm() {
     setCurrentStep(n)
   }
 
-  // ── Submit ──
+  // ── Submit (only allowed from Step 4) ──
   const onSubmit = async (data: WorkFormValues) => {
     try {
       const payload = {
@@ -304,7 +304,11 @@ export function SubmissionForm() {
       </div>
 
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (currentStep !== 4) return
+          handleSubmit(onSubmit)()
+        }}
         className="bg-card p-8 md:p-10 rounded-2xl shadow-lg border border-border"
       >
         {/* Step indicator */}
