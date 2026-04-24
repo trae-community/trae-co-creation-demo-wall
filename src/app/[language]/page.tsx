@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { WorkCard } from "@/components/work/work-card";
 import { CityFilter, FilterState } from "@/components/work/city-filter";
-import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight, Calendar, X } from "lucide-react";
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils";
 import { HeroBanner } from "@/components/home/hero-banner";
@@ -25,6 +25,7 @@ export default function Page() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || "");
   const [debouncedSearch, setDebouncedSearch] = useState(searchParams.get('search') || "");
   const [sortBy, setSortBy] = useState<'time' | 'likes' | 'views'>((searchParams.get('sort') as any) || 'time');
+  const [selectedDate, setSelectedDate] = useState(searchParams.get('date') || '');
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const pageSize = 12;
   const hasMountedRef = useRef(false);
@@ -40,7 +41,7 @@ export default function Page() {
       return;
     }
     setPage(1);
-  }, [filters, debouncedSearch, sortBy]);
+  }, [filters, debouncedSearch, sortBy, selectedDate]);
 
   // 同步状态到 URL
   useEffect(() => {
@@ -51,11 +52,12 @@ export default function Page() {
     if (filters.countries.length) params.set('countries', filters.countries.join(','));
     if (debouncedSearch) params.set('search', debouncedSearch);
     if (sortBy !== 'time') params.set('sort', sortBy);
+    if (selectedDate) params.set('date', selectedDate);
     if (page > 1) params.set('page', page.toString());
 
     const newUrl = params.toString() ? `?${params.toString()}` : '';
     router.replace(`/${locale}${newUrl}`, { scroll: false });
-  }, [filters, debouncedSearch, sortBy, page, router, locale]);
+  }, [filters, debouncedSearch, sortBy, selectedDate, page, router, locale]);
 
   const { data, isLoading } = useWorks({
     page,
@@ -67,6 +69,7 @@ export default function Page() {
     country: filters.countries.join(','),
     category: filters.categories.join(','),
     tags: filters.tags.join(','),
+    date: selectedDate || undefined,
   });
 
   const works = data?.items || [];
@@ -118,7 +121,7 @@ export default function Page() {
             />
           </div>
 
-          {/* Sort tabs — fixed right */}
+          {/* Sort tabs + Date picker — fixed right */}
           <div
             className="flex items-center rounded-xl border border-white/10 p-1 gap-0.5 shrink-0"
             style={{ background: 'rgba(255,255,255,0.03)' }}
@@ -138,6 +141,43 @@ export default function Page() {
                 <span className="hidden sm:inline">{label}</span>
               </button>
             ))}
+
+            {/* Divider */}
+            <div className="w-px h-5 bg-white/10 mx-1" />
+
+            {/* Date picker — styled like sort buttons */}
+            <button
+              type="button"
+              onClick={() => {
+                const input = document.getElementById('date-filter-input') as HTMLInputElement | null;
+                if (input) input.showPicker?.();
+              }}
+              className={cn(
+                "flex items-center gap-1.5 px-2 sm:px-3.5 py-2 rounded-lg text-sm font-medium transition-all border",
+                selectedDate
+                  ? "bg-green-500/15 text-green-400 border-green-500/25"
+                  : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Calendar className="w-3 h-3" />
+              <span className="hidden sm:inline">{selectedDate || t('dateLabel')}</span>
+              <span className="sm:hidden">{selectedDate ? selectedDate.slice(5) : t('dateLabel')}</span>
+              {selectedDate && (
+                <span
+                  onClick={(e) => { e.stopPropagation(); setSelectedDate(''); }}
+                  className="ml-0.5 w-4 h-4 flex items-center justify-center rounded-full hover:bg-white/10 transition-all"
+                >
+                  <X className="w-3 h-3" />
+                </span>
+              )}
+            </button>
+            <input
+              id="date-filter-input"
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="sr-only"
+            />
           </div>
         </div>
 
@@ -174,6 +214,7 @@ export default function Page() {
             onClick={() => {
               setFilters({ cities: [], categories: [], tags: [], countries: [] });
               setSearchQuery("");
+              setSelectedDate("");
             }}
             className="text-green-500 text-sm font-medium hover:underline"
           >

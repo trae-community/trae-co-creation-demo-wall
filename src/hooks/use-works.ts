@@ -11,6 +11,7 @@ interface WorksParams {
   country?: string
   category?: string
   tags?: string
+  date?: string
 }
 
 interface WorksResponse {

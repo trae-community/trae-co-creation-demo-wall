@@ -29,7 +29,10 @@
     "heroBadge": "Showcasing real TRAE creations worldwide",
     "resultCount": "",
     "resultCountUnit": "works found",
-    "showing": "Showing"
+    "showing": "Showing",
+    "clearDate": "Clear date",
+    "dateFilterHint": "Filter by submission date",
+    "dateLabel": "Date"
   },
   "Submit": {
     "title": "Welcome to submit your TRAE Demo!",

@@ -30,7 +30,10 @@
     "heroBadge": "世界中の TRAE 作品を展示中",
     "resultCount": "計",
     "resultCountUnit": "件",
-    "showing": "表示"
+    "showing": "表示",
+    "clearDate": "日付をクリア",
+    "dateFilterHint": "投稿日で絞り込み",
+    "dateLabel": "日付"
   },
   "Submit": {
     "title": "TRAE Demoの送信へようこそ！",

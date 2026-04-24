@@ -29,7 +29,10 @@
     "heroBadge": "在这里，看见 TRAE 创作者的灵感落地",
     "resultCount": "共",
     "resultCountUnit": "个作品",
-    "showing": "显示"
+    "showing": "显示",
+    "clearDate": "清除日期",
+    "dateFilterHint": "按提交日期筛选",
+    "dateLabel": "日期"
   },
   "Submit": {
     "title": "欢迎提交你的 TRAE Demo！",

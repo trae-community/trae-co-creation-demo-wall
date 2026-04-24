@@ -92,6 +92,7 @@ export async function GET(req: Request) {
     const tags = searchParams.get('tags')?.split(',').filter(Boolean);
     const lang = searchParams.get('lang') || 'zh-CN';
     const sort = searchParams.get('sort') || 'newest'; // newest, likes, views
+    const date = searchParams.get('date'); // YYYY-MM-DD 格式，按提交日期筛选
 
     const cityCodes = city?.split(',').filter(Boolean) || [];
     const countryCodes = country?.split(',').filter(Boolean) || [];
@@ -136,6 +137,17 @@ export async function GET(req: Request) {
           }
         }
       });
+    }
+
+    // 按日期筛选（当天 00:00:00 ~ 23:59:59）
+    if (date) {
+      const start = new Date(`${date}T00:00:00.000Z`);
+      const end = new Date(`${date}T23:59:59.999Z`);
+      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+        whereFilters.push({
+          createdAt: { gte: start, lte: end }
+        });
+      }
     }
 
     const where: Prisma.WorkBaseWhereInput = { AND: whereFilters };
