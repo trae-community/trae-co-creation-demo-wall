@@ -10,6 +10,7 @@ export interface FilterState {
   categories: string[];
   tags: string[];
   countries: string[];
+  honors: string[];
 }
 
 interface CityFilterProps {
@@ -51,6 +52,7 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
   const [categories, setCategories] = useState<FilterOption[]>([]);
   const [countries, setCountries] = useState<FilterOption[]>([]);
   const [cities, setCities] = useState<FilterOption[]>([]);
+  const [honors, setHonors] = useState<FilterOption[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
@@ -64,6 +66,7 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
           setCategories(data.categories || []);
           setCountries(data.countries || []);
           setCities(data.cities || []);
+          setHonors(data.honors || []);
         } else {
           console.error('Failed to load filter options');
         }
@@ -123,7 +126,7 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
     </div>
   );
 
-  const activeFilterCount = filters.categories.length + filters.countries.length + filters.cities.length;
+  const activeFilterCount = filters.categories.length + filters.countries.length + filters.cities.length + filters.honors.length;
 
   return (
     <div className="space-y-2.5">
@@ -147,6 +150,9 @@ export function CityFilter({ filters, onFilterChange }: CityFilterProps) {
       {/* Desktop: Always visible / Mobile: Collapsible */}
       <div className={cn("space-y-2.5", !isExpanded && "hidden lg:block")}>
         <FilterRow label={t('type')} items={categories} type="categories" selected={filters.categories} />
+        {honors.length > 0 && (
+          <FilterRow label={t('honor')} items={honors} type="honors" selected={filters.honors} />
+        )}
         <FilterRow label={t('country')} items={countries} type="countries" selected={filters.countries} />
         {filters.countries.length > 0 && (
           <FilterRow label={t('city')} items={availableCities} type="cities" selected={filters.cities} />

@@ -185,6 +185,7 @@
   "Filter": {
     "all": "すべて",
     "type": "タイプ",
+    "honor": "栄誉",
     "country": "都道府県",
     "city": "都市"
   },

@@ -12,6 +12,7 @@ interface WorksParams {
   category?: string
   tags?: string
   date?: string
+  honor?: string
 }
 
 interface WorksResponse {

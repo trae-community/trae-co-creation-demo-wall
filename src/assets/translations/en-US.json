@@ -179,6 +179,7 @@
   "Filter": {
     "all": "All",
     "type": "Type",
+    "honor": "Honor",
     "country": "Province",
     "city": "City"
   },
