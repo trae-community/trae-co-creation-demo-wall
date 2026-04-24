@@ -54,6 +54,11 @@ export async function GET(req: Request) {
                   members: true,
                 },
               },
+              honors: {
+                include: {
+                  dictItem: true,
+                },
+              },
             },
           },
         },
@@ -79,6 +84,9 @@ export async function GET(req: Request) {
         views: Number(work.statistic?.viewCount || 0),
         likes: Number(work.statistic?.likeCount || 0),
         tags: work.tags.map((r) => r.tag.name),
+        honors: work.honors
+          .map((honor) => honor.dictItem?.itemLabel || '')
+          .filter(Boolean),
         createdAt: work.createdAt,
         likedAt: like.createdAt,
       };
