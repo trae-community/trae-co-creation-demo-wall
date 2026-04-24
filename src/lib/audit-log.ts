@@ -85,7 +85,7 @@ export async function writeAuthLog(input: AuthLogInput) {
         userId: normalizeId(input.userId),
         clerkId: input.clerkId || null,
         authType: input.authType,
-        authChannel: input.authChannel || 'clerk',
+        authChannel: input.authChannel || 'credentials',
         authStatus: input.authStatus || 'success',
         ipAddress: meta.ipAddress,
         userAgent: meta.userAgent,

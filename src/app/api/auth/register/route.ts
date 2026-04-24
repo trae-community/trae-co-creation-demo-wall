@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
+import { writeAuthLog } from '@/lib/audit-log'
 
 export async function POST(req: Request) {
   try {
@@ -47,6 +48,15 @@ export async function POST(req: Request) {
         },
       })
     }
+
+    // Write auth log for registration
+    await writeAuthLog({
+      userId: user.id,
+      authType: 'sign_up',
+      authChannel: 'credentials',
+      authStatus: 'success',
+      metadata: { email: user.email, username: user.username },
+    })
 
     return NextResponse.json({
       success: true,
