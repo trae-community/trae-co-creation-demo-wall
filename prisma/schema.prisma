@@ -53,6 +53,7 @@ model SysDictItem {
   dict SysDict @relation(fields: [dictCode], references: [dictCode], onDelete: Cascade)
   workHonors WorkHonor[]
 
+  @@unique([dictCode, itemValue])
   @@map("sys_dict_item")
 }
 

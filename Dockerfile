@@ -85,7 +85,6 @@ COPY --from=builder /app/node_modules/get-tsconfig ./node_modules/get-tsconfig
 COPY --from=builder /app/node_modules/resolve-pkg-maps ./node_modules/resolve-pkg-maps
 COPY --from=builder /app/node_modules/bcryptjs ./node_modules/bcryptjs
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/supabase_backup ./supabase_backup
 COPY entrypoint.sh ./entrypoint.sh
 
 EXPOSE 3000
