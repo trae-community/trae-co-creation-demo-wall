@@ -254,9 +254,11 @@
     "cityPlaceholder": "例如：杭州",
     "save": "保存",
     "worksTitle": "我的作品",
+    "worksTab": "我的作品",
     "noWorks": "还没有作品。",
     "submitFirstWork": "提交第一份作品",
     "likedWorksTitle": "我的点赞",
+    "likedTab": "我的点赞",
     "noLikedWorks": "还没有点赞的作品。",
     "noCover": "暂无封面",
     "noSummary": "暂无简介",
@@ -280,6 +282,8 @@
     "validationNewPasswordRequired": "请输入新密码",
     "validationPasswordMinLength": "新密码长度不能少于 6 个字符",
     "validationConfirmPasswordRequired": "请确认新密码",
-    "validationPasswordMismatch": "两次输入的新密码不一致"
+    "validationPasswordMismatch": "两次输入的新密码不一致",
+    "editProfile": "编辑资料",
+    "cancelEdit": "取消编辑"
   }
 }

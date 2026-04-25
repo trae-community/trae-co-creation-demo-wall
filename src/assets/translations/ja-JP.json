@@ -259,9 +259,11 @@
     "cityPlaceholder": "例：Tokyo",
     "save": "保存",
     "worksTitle": "自分の作品",
+    "worksTab": "自分の作品",
     "noWorks": "まだ作品がありません。",
     "submitFirstWork": "最初の作品を投稿",
     "likedWorksTitle": "いいねした作品",
+    "likedTab": "いいねした作品",
     "noLikedWorks": "いいねした作品がありません。",
     "noCover": "カバーなし",
     "noSummary": "概要なし",
@@ -285,6 +287,8 @@
     "validationNewPasswordRequired": "新しいパスワードを入力してください",
     "validationPasswordMinLength": "新しいパスワードは 6 文字以上である必要があります",
     "validationConfirmPasswordRequired": "新しいパスワードを確認してください",
-    "validationPasswordMismatch": "新しいパスワードが一致しません"
+    "validationPasswordMismatch": "新しいパスワードが一致しません",
+    "editProfile": "プロフィール編集",
+    "cancelEdit": "キャンセル"
   }
 }
