@@ -1,6 +1,7 @@
 {
   "Nav": {
     "home": "首页",
+    "rankings": "排行榜",
     "submit": "提交",
     "login": "登录 / 注册",
     "langSwitch": "EN",
@@ -285,5 +286,23 @@
     "validationPasswordMismatch": "两次输入的新密码不一致",
     "editProfile": "编辑资料",
     "cancelEdit": "取消编辑"
+  },
+  "Rankings": {
+    "title": "排行榜",
+    "subtitle": "查看城市、作品、创作者排行数据",
+    "cityRanking": "城市排行",
+    "workRanking": "作品排行",
+    "creatorRanking": "创作者排行",
+    "byWorks": "按作品数",
+    "byViews": "按浏览量",
+    "byLikes": "按点赞量",
+    "works": "作品",
+    "views": "浏览",
+    "likes": "点赞",
+    "totalViews": "总浏览",
+    "totalLikes": "总点赞",
+    "author": "作者",
+    "loadError": "排行数据加载失败，请刷新重试",
+    "noData": "暂无排行数据"
   }
 }

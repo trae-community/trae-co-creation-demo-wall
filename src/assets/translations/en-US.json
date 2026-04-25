@@ -1,6 +1,7 @@
 {
   "Nav": {
     "home": "Home",
+    "rankings": "Rankings",
     "submit": "Submit",
     "login": "Login / Register",
     "langSwitch": "EN",
@@ -284,5 +285,23 @@
     "validationPasswordMismatch": "Passwords do not match",
     "editProfile": "Edit Profile",
     "cancelEdit": "Cancel"
+  },
+  "Rankings": {
+    "title": "Rankings",
+    "subtitle": "Explore rankings by city, work, and creator",
+    "cityRanking": "Cities",
+    "workRanking": "Works",
+    "creatorRanking": "Creators",
+    "byWorks": "By Works",
+    "byViews": "By Views",
+    "byLikes": "By Likes",
+    "works": "Works",
+    "views": "Views",
+    "likes": "Likes",
+    "totalViews": "Total Views",
+    "totalLikes": "Total Likes",
+    "author": "Author",
+    "loadError": "Failed to load rankings. Please refresh.",
+    "noData": "No ranking data available yet."
   }
 }
