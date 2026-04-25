@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X } from "lucide-react";
+import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X, Trophy } from "lucide-react";
 import { ParticlesBackground } from "./particles-background";
 import { useSession } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
@@ -102,6 +102,18 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             >
               <Home className="w-3.5 h-3.5" />
               {t('home')}
+            </Link>
+            <Link
+              href="/rankings"
+              className={cn(
+                "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
+                pathname === "/rankings"
+                  ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
+                  : "text-gray-400 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Trophy className="w-3.5 h-3.5" />
+              {t('rankings')}
             </Link>
             <button
               type="button"
@@ -231,6 +243,19 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               >
                 <Home className="w-4 h-4" />
                 {t('home')}
+              </Link>
+              <Link
+                href="/rankings"
+                onClick={() => setMobileMenuOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                  pathname === "/rankings"
+                    ? "bg-green-500/10 text-green-500 border border-green-500/20"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <Trophy className="w-4 h-4" />
+                {t('rankings')}
               </Link>
               <button
                 type="button"

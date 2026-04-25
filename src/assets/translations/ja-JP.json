@@ -1,6 +1,7 @@
 {
   "Nav": {
     "home": "ホーム",
+    "rankings": "ランキング",
     "submit": "投稿",
     "login": "ログイン / 登録",
     "langSwitch": "EN",
@@ -259,9 +260,11 @@
     "cityPlaceholder": "例：Tokyo",
     "save": "保存",
     "worksTitle": "自分の作品",
+    "worksTab": "自分の作品",
     "noWorks": "まだ作品がありません。",
     "submitFirstWork": "最初の作品を投稿",
     "likedWorksTitle": "いいねした作品",
+    "likedTab": "いいねした作品",
     "noLikedWorks": "いいねした作品がありません。",
     "noCover": "カバーなし",
     "noSummary": "概要なし",
@@ -285,6 +288,26 @@
     "validationNewPasswordRequired": "新しいパスワードを入力してください",
     "validationPasswordMinLength": "新しいパスワードは 6 文字以上である必要があります",
     "validationConfirmPasswordRequired": "新しいパスワードを確認してください",
-    "validationPasswordMismatch": "新しいパスワードが一致しません"
+    "validationPasswordMismatch": "新しいパスワードが一致しません",
+    "editProfile": "プロフィール編集",
+    "cancelEdit": "キャンセル"
+  },
+  "Rankings": {
+    "title": "ランキング",
+    "subtitle": "都市・作品・クリエイターのランキングデータを見る",
+    "cityRanking": "都市",
+    "workRanking": "作品",
+    "creatorRanking": "クリエイター",
+    "byWorks": "作品数順",
+    "byViews": "閲覧数順",
+    "byLikes": "いいね数順",
+    "works": "作品",
+    "views": "閲覧",
+    "likes": "いいね",
+    "totalViews": "合計閲覧",
+    "totalLikes": "合計いいね",
+    "author": "作者",
+    "loadError": "ランキングデータの読み込みに失敗しました",
+    "noData": "まだランキングデータがありません"
   }
 }

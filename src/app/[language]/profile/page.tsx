@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "@/lib/language/navigation";
+import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2, MapPin, Save, ShieldCheck, Sparkles, User, LogOut, Camera, Key } from "lucide-react";
+import { Loader2, MapPin, Save, Sparkles, User, LogOut, Camera, Key, Pencil, X } from "lucide-react";
 import { toast } from 'sonner';
 import { WorksManagement } from "@/components/work/works-management";
 import { LikedWorks } from "@/components/work/liked-works";
@@ -68,6 +68,8 @@ export default function ProfilePage() {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState<'works' | 'liked'>('works');
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -276,10 +278,12 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* ── Profile Hero Card (头像 + 信息 + 统计 一体) ── */}
       <section className="rounded-3xl border border-white/10 bg-card/80 backdrop-blur-md p-6 md:p-8">
-        <div className="flex flex-col md:flex-row md:items-center gap-6">
-          <div className="relative group">
+        {/* 上半：头像 + 用户名/邮箱 + 操作按钮 */}
+        <div className="flex flex-col md:flex-row md:items-center gap-5">
+          <div className="relative group shrink-0">
             <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 bg-zinc-900">
               {data.profile.avatarUrl ? (
                 <img src={data.profile.avatarUrl} alt={data.profile.username} className="w-full h-full object-cover" />
@@ -305,132 +309,157 @@ export default function ProfilePage() {
             </label>
           </div>
 
-          <div className="flex-1">
-            <h1 className="text-2xl md:text-3xl font-bold text-white">{data.profile.username}</h1>
-            <p className="text-gray-400 mt-1">{data.profile.email}</p>
-            <p className="text-xs text-gray-500 mt-2">
-              {t("lastSignIn")}: {data.profile.lastSignInAt ? new Date(data.profile.lastSignInAt).toLocaleString(locale) : t("na")}
-            </p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl md:text-3xl font-bold text-white truncate">{data.profile.username}</h1>
+            <p className="text-gray-400 mt-1 text-sm truncate">{data.profile.email}</p>
           </div>
 
-          <button
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            {t("signOut")}
-          </button>
-        </div>
-      </section>
-
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-2xl border border-white/10 bg-card p-5">
-          <p className="text-xs text-gray-400">{t("statsWorks")}</p>
-          <p className="text-2xl font-bold text-white mt-1">{data.profile.workCount}</p>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-card p-5">
-          <p className="text-xs text-gray-400">{t("statsViews")}</p>
-          <p className="text-2xl font-bold text-white mt-1">{data.profile.totalViews}</p>
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-card p-5">
-          <p className="text-xs text-gray-400">{t("statsLikes")}</p>
-          <p className="text-2xl font-bold text-white mt-1">{data.profile.totalLikes}</p>
-        </div>
-      </section>
-
-      <section className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <div className="xl:col-span-2 space-y-8">
-          <div className="rounded-2xl border border-white/10 bg-card p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <h2 className="text-lg font-semibold text-white">{t("basicsTitle")}</h2>
-            </div>
-
-            {error ? (
-              <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{error}</div>
-            ) : null}
-            {success ? (
-              <div className="mb-4 rounded-xl border border-green-500/30 bg-green-500/10 p-3 text-sm text-green-300">{success}</div>
-            ) : null}
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm text-gray-300">{t("usernameLabel")}</label>
-                <input
-                  value={form.username}
-                  onChange={(event) => setForm((prev) => ({ ...prev, username: event.target.value }))}
-                  className="w-full rounded-xl border border-white/10 bg-zinc-900/60 text-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                  placeholder={t("usernamePlaceholder")}
-                  maxLength={20}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm text-gray-300">{t("introLabel")}</label>
-                <textarea
-                  rows={4}
-                  value={form.bio}
-                  onChange={(event) => setForm((prev) => ({ ...prev, bio: event.target.value }))}
-                  className="w-full rounded-xl border border-white/10 bg-zinc-900/60 text-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                  placeholder={t("introPlaceholder")}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm text-gray-300">{t("phoneLabel")}</label>
-                <input
-                  value={form.phone}
-                  onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}
-                  className="w-full rounded-xl border border-white/10 bg-zinc-900/60 text-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                  placeholder={t("phonePlaceholder")}
-                />
-              </div>
-
-              <div className="flex justify-end">
-                <button
-                  onClick={handleSave}
-                  disabled={!hasChanges || isSaving}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-black font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-                >
-                  {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  {t("save")}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-card p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">{t("worksTitle")}</h2>
-            <WorksManagement 
-              scope="user" 
-              userId={data.profile.id}
-              allowedActions={['view', 'edit', 'tag', 'delete']} 
-            />
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-card p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">{t("likedWorksTitle")}</h2>
-            <LikedWorks userId={data.profile.id} />
-          </div>
-        </div>
-
-        {/* 右侧栏 */}
-        <div className="space-y-8">
-          <div className="rounded-2xl border border-white/10 bg-card p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <ShieldCheck className="w-4 h-4 text-primary" />
-              <h2 className="text-lg font-semibold text-white">{t("securityTitle")}</h2>
-            </div>
-            <p className="text-sm text-gray-400 mb-4">{t("securityDesc")}</p>
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+            <button
+              onClick={() => { setIsEditing(!isEditing); if (isEditing) { setSuccess(""); setError(""); } }}
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium border transition-all",
+                isEditing
+                  ? "text-zinc-400 border-white/10 hover:text-white hover:bg-white/5"
+                  : "text-primary border-primary/25 bg-primary/10 hover:bg-primary/20"
+              )}
+            >
+              {isEditing ? <><X className="w-3.5 h-3.5" />{t("cancelEdit")}</> : <><Pencil className="w-3.5 h-3.5" />{t("editProfile")}</>}
+            </button>
             <button
               onClick={() => setShowPasswordModal(true)}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-colors text-sm"
             >
-              <Key className="w-4 h-4" />
-              {t("changePassword")}
+              <Key className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{t("changePassword")}</span>
+            </button>
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-colors text-sm"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              {t("signOut")}
             </button>
           </div>
         </div>
+
+        {/* 统计数据 inline */}
+        <div className="mt-5 flex items-center gap-6 text-sm">
+          <div className="flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <span className="text-gray-400">{t("statsWorks")}</span>
+            <span className="text-white font-semibold">{data.profile.workCount}</span>
+          </div>
+          <div className="w-px h-4 bg-white/10" />
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-400">{t("statsViews")}</span>
+            <span className="text-white font-semibold">{data.profile.totalViews}</span>
+          </div>
+          <div className="w-px h-4 bg-white/10" />
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-400">{t("statsLikes")}</span>
+            <span className="text-white font-semibold">{data.profile.totalLikes}</span>
+          </div>
+          <div className="w-px h-4 bg-white/10" />
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            {t("lastSignIn")}: {data.profile.lastSignInAt ? new Date(data.profile.lastSignInAt).toLocaleString(locale) : t("na")}
+          </div>
+        </div>
+
+        {/* 基础信息（可折叠，编辑模式展开） */}
+        {isEditing && (
+          <>
+            <div className="mt-5 border-t border-white/5 pt-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <h2 className="text-sm font-semibold text-white">{t("basicsTitle")}</h2>
+              </div>
+
+              {error && <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{error}</div>}
+              {success && <div className="mb-4 rounded-xl border border-green-500/30 bg-green-500/10 p-3 text-sm text-green-300">{success}</div>}
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm text-gray-300">{t("usernameLabel")}</label>
+                  <input
+                    value={form.username}
+                    onChange={(event) => setForm((prev) => ({ ...prev, username: event.target.value }))}
+                    className="w-full rounded-xl border border-white/10 bg-zinc-900/60 text-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    placeholder={t("usernamePlaceholder")}
+                    maxLength={20}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-gray-300">{t("introLabel")}</label>
+                  <textarea
+                    rows={3}
+                    value={form.bio}
+                    onChange={(event) => setForm((prev) => ({ ...prev, bio: event.target.value }))}
+                    className="w-full rounded-xl border border-white/10 bg-zinc-900/60 text-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    placeholder={t("introPlaceholder")}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-gray-300">{t("phoneLabel")}</label>
+                  <input
+                    value={form.phone}
+                    onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}
+                    className="w-full rounded-xl border border-white/10 bg-zinc-900/60 text-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    placeholder={t("phonePlaceholder")}
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleSave}
+                    disabled={!hasChanges || isSaving}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-black font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                  >
+                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    {t("save")}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </section>
+
+      {/* ── Works / Liked — Tab（延展占满） ── */}
+      <section className="rounded-2xl border border-white/10 bg-card p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab('works')}
+            className={cn(
+              "px-4 py-2 rounded-full text-sm font-medium border transition-all",
+              activeTab === 'works'
+                ? "bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-black font-bold border-transparent shadow-[0_0_12px_rgba(34,197,94,0.25)]"
+                : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
+            )}
+          >
+            {t("worksTab")}
+          </button>
+          <button
+            onClick={() => setActiveTab('liked')}
+            className={cn(
+              "px-4 py-2 rounded-full text-sm font-medium border transition-all",
+              activeTab === 'liked'
+                ? "bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-black font-bold border-transparent shadow-[0_0_12px_rgba(34,197,94,0.25)]"
+                : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
+            )}
+          >
+            {t("likedTab")}
+          </button>
+        </div>
+
+        {activeTab === 'works' ? (
+          <WorksManagement
+            scope="user"
+            userId={data.profile.id}
+            allowedActions={['view', 'edit', 'tag', 'delete']}
+          />
+        ) : (
+          <LikedWorks userId={data.profile.id} />
+        )}
       </section>
 
       {/* 修改密码弹窗 */}
