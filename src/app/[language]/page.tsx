@@ -7,8 +7,8 @@ import { CityFilter, FilterState } from "@/components/work/city-filter";
 import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight, Calendar, X } from "lucide-react";
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils";
-import { HeroBanner } from "@/components/home/hero-banner";
-import { useWorks } from "@/hooks/use-works";
+import { HeroBanner } from "@/components/common/hero-banner";
+import { useWorks } from "@/lib/use-works";
 
 export default function Page() {
   const t = useTranslations('Home');
