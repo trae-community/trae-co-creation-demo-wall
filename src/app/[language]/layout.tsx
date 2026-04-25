@@ -4,7 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { SessionProvider } from 'next-auth/react';
 import { SiteLayout } from '@/components/layout/site-layout';
-import { QueryProvider } from '@/components/providers/query-provider';
+import { QueryProvider } from '@/components/common/query-provider';
 import { Toaster } from 'sonner';
 
 const fontSans = Inter({

@@ -9,7 +9,7 @@ import { CrudPagination } from '@/components/crud/crud-pagination'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
-import { useFeedback } from '@/hooks/use-feedback'
+import { useFeedback } from '@/lib/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
 
 interface OperationLogItem {

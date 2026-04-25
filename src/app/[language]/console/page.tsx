@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Users, FileText, UserPlus, TrendingUp, Activity, PieChart, BarChart, Upload, Info } from 'lucide-react'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
 import { CrudFeedback } from '@/components/crud/crud-feedback'
-import { useFeedback } from '@/hooks/use-feedback'
+import { useFeedback } from '@/lib/use-feedback'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 

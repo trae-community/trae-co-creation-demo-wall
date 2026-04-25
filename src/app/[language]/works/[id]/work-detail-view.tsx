@@ -8,7 +8,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/lib/language/navigation';
 import { Work } from "@/lib/types";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useWorksStore } from '@/store/works-store';
+import { useWorksStore } from '@/lib/works-store';
 
 const toStringList = (value: unknown): string[] => {
   if (Array.isArray(value)) {

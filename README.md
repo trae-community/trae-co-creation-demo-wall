@@ -1,68 +1,74 @@
-# TRAE DEMO WALL (Competition Showcase Platform)
+# TRAE DEMO WALL
 
-这是一个用于收集和展示参赛项目的平台。
-
-## 功能
-
-### 1. 提交端 (Submission)
-- 访问 `/submit` 页面。
-- 填写项目信息：名称、简介、城市、团队、封面图、详细内容、外部链接。
-- 自动生成 JSON 数据文件并下载。
-- 将生成的 JSON 文件提交给管理员。
-
-### 2. 展示端 (Showcase)
-- **首页**: 展示所有项目，支持按城市筛选和关键词搜索。
-- **项目详情页**: 展示项目的详细信息、团队、Demo 链接和代码仓库。
+参赛作品提交与展示平台。
 
 ## 技术栈
 
-- **前端框架**: Next.js + React
-- **样式**: Tailwind CSS
-- **数据库**: Supabase (PostgreSQL)
-- **ORM**: Prisma
-- **表单**: React Hook Form + Zod
-- **图标**: Lucide React
+- **框架**: Next.js 15 (App Router) + React 18
+- **样式**: Tailwind CSS + Radix UI
+- **数据库**: PostgreSQL (Prisma ORM)
+- **认证**: NextAuth.js (Credentials)
+- **国际化**: next-intl
+- **对象存储**: 腾讯云 COS
 
-## 协作开发指南
+## 本地开发
 
-### 1. 环境准备
+### 1. 安装依赖
 
-1.  克隆仓库并安装依赖:
-    ```bash
-    npm install
-    ```
+```bash
+npm install
+```
 
-2.  配置环境变量:
-    *   复制 `.env.example` 文件为 `.env.local`。
-    *   填入您的 Supabase 项目凭证。
-    *   **注意**: `.env.local` 包含敏感信息，请勿提交到代码仓库。
+### 2. 配置环境变量
 
-### 2. 数据库配置
+```bash
+cp .env.example .env
+```
 
-本项目使用 Prisma 进行数据库管理。
+编辑 `.env`，填入数据库地址、NextAuth 密钥、COS 凭证。
 
-1.  **同步数据库结构**:
-    如果您是第一次拉取代码，或数据库结构有更新，请运行以下命令将 Schema 同步到您的 Supabase 数据库：
-    ```bash
-    npx prisma db push
-    ```
-
-2.  **生成客户端**:
-    每次修改 `prisma/schema.prisma` 后，都需要重新生成客户端代码：
-    ```bash
-    npx prisma generate
-    ```
-
-### 3. 启动开发服务器
+### 3. 启动
 
 ```bash
 npm run dev
 ```
 
-## 部署指南
+访问 http://localhost:3000
 
-### Vercel (推荐)
-本项目已预配置，可以直接部署到 Vercel：
-1.  在 Vercel控制台导入项目。
-2.  在 Settings -> Environment Variables 中配置 `.env.example` 中列出的所有环境变量。
-3.  Vercel 会自动识别 Next.js 项目并进行构建部署。
+> Schema 变更后需执行 `npx prisma generate` 重新生成客户端。
+
+## 生产部署
+
+### Docker Compose（推荐）
+
+```bash
+cp .env.docker.example .env
+# 编辑 .env 配置 NEXTAUTH_SECRET、NEXTAUTH_URL、COS 凭证
+
+docker compose up -d
+```
+
+详细指南见 [docs/guides/docker-deployment.md](docs/guides/docker-deployment.md)。
+
+### 手动部署
+
+```bash
+npm run build
+npm run start
+```
+
+需自行配置 PostgreSQL、环境变量及反向代理。
+
+## 项目结构
+
+```
+src/
+├── app/          # 路由层（页面 + API）
+├── assets/       # 翻译/CSS/Logo
+├── components/   # UI 组件（auth/common/crud/layout/ui/work）
+└── lib/          # 工具层（auth/prisma/cos/hooks/store）
+```
+
+## 文档
+
+所有文档位于 `docs/` 目录，索引见 [docs/README.md](docs/README.md)。
