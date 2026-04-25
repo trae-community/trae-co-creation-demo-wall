@@ -100,8 +100,8 @@ export function WorkCard({ work }: WorkCardProps) {
             {(work.honors || []).map((honor) => (
               <span
                 key={honor}
-                className="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold text-amber-300 border border-amber-500/30 backdrop-blur-sm"
-                style={{ background: 'rgba(245,158,11,0.15)' }}
+                className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold text-amber-950 border border-amber-300/60 shadow-[0_0_10px_rgba(245,158,11,0.35)]"
+                style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
               >
                 <Award className="w-3 h-3" />
                 {honor}
