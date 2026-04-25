@@ -111,6 +111,49 @@ services:
       - "random_page_cost=1.1"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - trae-network
+    cpus: 2
+    mem_limit: 2g
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+
+  db-dev:
+    image: docker.cnb.cool/jaguarliu.cool/wenyuan-ai/docker-sync/postgres:16-alpine_amd64
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: trae_demo_wall_dev
+    command:
+      - "postgres"
+      - "-p"
+      - "5433"
+      - "-c"
+      - "max_connections=300"
+      - "-c"
+      - "shared_buffers=512MB"
+      - "-c"
+      - "effective_cache_size=2GB"
+      - "-c"
+      - "work_mem=32MB"
+      - "-c"
+      - "maintenance_work_mem=128MB"
+      - "-c"
+      - "checkpoint_completion_target=0.9"
+      - "-c"
+      - "wal_buffers=16MB"
+      - "-c"
+      - "random_page_cost=1.1"
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5433"
     restart: unless-stopped
     networks:
       - trae-network
@@ -140,6 +183,7 @@ services:
 
 volumes:
   postgres-data:
+  postgres-dev-data:
   redis-data:
 
 networks:

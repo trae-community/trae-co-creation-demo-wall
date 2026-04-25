@@ -88,6 +88,34 @@ services:
     networks:
       - trae-network
 
+  db-dev:
+    image: docker.cnb.cool/jaguarliu.cool/wenyuan-ai/docker-sync/postgres:16-alpine_amd64
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=trae_demo_wall_dev
+    command:
+      - "postgres"
+      - "-p"
+      - "5433"
+      - "-c"
+      - "max_connections=100"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "effective_cache_size=1GB"
+      - "-c"
+      - "work_mem=16MB"
+      - "-c"
+      - "maintenance_work_mem=64MB"
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5433"
+    restart: unless-stopped
+    networks:
+      - trae-network
+
   redis:
     image: docker.cnb.cool/jaguarliu.cool/wenyuan-ai/docker-sync/redis:7-alpine_amd64
     command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save 60 1000
@@ -113,6 +141,7 @@ services:
 
 volumes:
   postgres-data:
+  postgres-dev-data:
   redis-data:
 
 networks:
