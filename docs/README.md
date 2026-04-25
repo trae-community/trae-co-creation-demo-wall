@@ -11,6 +11,7 @@
 | [component-reference.md](guides/component-reference.md) | 前端组件文档（通用/CRUD/作品/UI组件） |
 | [crud-guide.md](guides/crud-guide.md) | CRUD 组件与分页接口使用说明 |
 | [development-guide.md](guides/development-guide.md) | 开发规范（命名/路由/文件组织） |
+| [docker-deployment.md](guides/docker-deployment.md) | Docker 部署指南（生产环境） |
 
 ## 设计文档
 
