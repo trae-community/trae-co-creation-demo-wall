@@ -26,6 +26,7 @@ export interface Work {
   tags: string[];
   honors?: string[];
   author: {
+    id?: string;
     name: string;
     avatar: string | null;
     email?: string | null;

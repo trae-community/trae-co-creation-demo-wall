@@ -292,6 +292,16 @@
     "editProfile": "プロフィール編集",
     "cancelEdit": "キャンセル"
   },
+  "UserProfile": {
+    "title": "ユーザープロフィール",
+    "works": "作品",
+    "views": "閲覧",
+    "likes": "いいね",
+    "noWorks": "公開作品はまだありません。",
+    "joinedAt": "参加日",
+    "notFound": "ユーザーが見つかりません",
+    "loadError": "ユーザー情報の読み込みに失敗しました"
+  },
   "Rankings": {
     "title": "ランキング",
     "subtitle": "都市・作品・クリエイターのランキングデータを見る",

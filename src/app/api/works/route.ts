@@ -205,6 +205,7 @@ export async function GET(req: Request) {
         include: {
           user: {
             select: {
+              id: true,
               username: true,
               avatarUrl: true,
             }
@@ -244,6 +245,7 @@ export async function GET(req: Request) {
       category: categoryLabelMap[work.categoryCode || ''] || work.categoryCode || '',
       coverUrl: work.coverUrl,
       author: {
+        id: work.user.id.toString(),
         name: work.user.username,
         avatar: work.user.avatarUrl,
       },

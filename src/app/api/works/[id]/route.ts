@@ -176,6 +176,7 @@ export async function GET(
         })
         .filter(Boolean),
       author: {
+        id: work.user?.id?.toString() || '',
         name: work.user?.username || '',
         avatar: work.user?.avatarUrl || null,
         email: work.user?.email || null,

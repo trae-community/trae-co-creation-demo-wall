@@ -286,6 +286,16 @@
     "editProfile": "Edit Profile",
     "cancelEdit": "Cancel"
   },
+  "UserProfile": {
+    "title": "User Profile",
+    "works": "Works",
+    "views": "Views",
+    "likes": "Likes",
+    "noWorks": "No public works yet.",
+    "joinedAt": "Joined",
+    "notFound": "User not found",
+    "loadError": "Failed to load user profile"
+  },
   "Rankings": {
     "title": "Rankings",
     "subtitle": "Explore rankings by city, work, and creator",
