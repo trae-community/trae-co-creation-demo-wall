@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getDictionaries } from '@/lib/edge-config';
+import { sortFilterOptions } from './sort-filter-options';
 
 interface DictItem {
   id: string;
@@ -92,8 +93,8 @@ export async function GET(req: Request) {
       .map((item: DictItem) => ({
         label: resolveLabel(item),
         value: item.itemValue,
-      }))
-      .sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label, lang));
+        sortOrder: item.sortOrder,
+      }));
 
     // 过滤出有作品的城市
     const cities = (cityDict?.items || [])
@@ -102,16 +103,16 @@ export async function GET(req: Request) {
         label: resolveLabel(item),
         value: item.itemValue,
         parentValue: item.parentValue,
-      }))
-      .sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label, lang));
+        sortOrder: item.sortOrder,
+      }));
 
     // 分类不需要过滤
     const categories = (categoryDict?.items || [])
       .map((item: DictItem) => ({
         label: resolveLabel(item),
         value: item.itemValue,
-      }))
-      .sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label, lang));
+        sortOrder: item.sortOrder,
+      }));
 
     // 荣誉标签
     const honors = (honorDict?.items || [])
@@ -119,14 +120,14 @@ export async function GET(req: Request) {
       .map((item: DictItem) => ({
         label: resolveLabel(item),
         value: item.itemValue,
-      }))
-      .sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label, lang));
+        sortOrder: item.sortOrder,
+      }));
 
     return NextResponse.json({
-      countries,
-      cities,
-      categories,
-      honors,
+      countries: sortFilterOptions(countries, lang).map(({ sortOrder: _sortOrder, ...item }) => item),
+      cities: sortFilterOptions(cities, lang).map(({ sortOrder: _sortOrder, ...item }) => item),
+      categories: sortFilterOptions(categories, lang).map(({ sortOrder: _sortOrder, ...item }) => item),
+      honors: sortFilterOptions(honors, lang).map(({ sortOrder: _sortOrder, ...item }) => item),
     });
 
   } catch (error) {
