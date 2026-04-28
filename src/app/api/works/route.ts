@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
-import { getDictionaries } from '@/lib/edge-config';
 import { getAuthUser } from '@/lib/auth'
 import { sanitizeRichText, stripHtmlTags } from '@/lib/rich-text'
 import { z } from 'zod'
@@ -28,55 +27,33 @@ const updateSchema = z.object({
 })
 
 async function getRawDictionaries() {
-  // 尝试从 Edge Config 读取
-  const cached = await getDictionaries()
-  if (cached) return cached as any
-  // 回退到数据库查询
   const [countryDict, cityDict, categoryDict, honorDict] = await Promise.all([
-    prisma.sysDict.findUnique({ where: { dictCode: 'country' }, include: { items: true } }),
-    prisma.sysDict.findUnique({ where: { dictCode: 'city' }, include: { items: true } }),
-    prisma.sysDict.findUnique({ where: { dictCode: 'category_code' }, include: { items: true } }),
-    prisma.sysDict.findUnique({ where: { dictCode: 'honor_type' }, include: { items: true } }),
+    prisma.sysDict.findUnique({
+      where: { dictCode: 'country' },
+      include: { items: { orderBy: { sortOrder: 'asc' } } },
+    }),
+    prisma.sysDict.findUnique({
+      where: { dictCode: 'city' },
+      include: { items: { orderBy: { sortOrder: 'asc' } } },
+    }),
+    prisma.sysDict.findUnique({
+      where: { dictCode: 'category_code' },
+      include: { items: { orderBy: { sortOrder: 'asc' } } },
+    }),
+    prisma.sysDict.findUnique({
+      where: { dictCode: 'honor_type' },
+      include: { items: { orderBy: { sortOrder: 'asc' } } },
+    }),
   ])
 
   const serialize = (obj: unknown) =>
     JSON.parse(JSON.stringify(obj, (_, v) => (typeof v === 'bigint' ? v.toString() : v)))
 
-  const result = {
+  return {
     countryDict: serialize(countryDict),
     cityDict: serialize(cityDict),
     categoryDict: serialize(categoryDict),
     honorDict: serialize(honorDict),
-  }
-
-  // 后台异步更新 Edge Config（不阻塞响应）
-  if (process.env.EDGE_CONFIG) {
-    updateEdgeConfig(result).catch(console.error)
-  }
-
-  return result
-}
-
-async function updateEdgeConfig(data: any) {
-  try {
-    const edgeConfigId = process.env.EDGE_CONFIG?.match(/ecfg_[a-z0-9]+/)?.[0]
-    if (!edgeConfigId || !process.env.VERCEL_API_TOKEN) return
-
-    await fetch(
-      `https://api.vercel.com/v1/edge-config/${edgeConfigId}/items`,
-      {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${process.env.VERCEL_API_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          items: [{ operation: 'upsert', key: 'dictionaries', value: data }],
-        }),
-      }
-    )
-  } catch (error) {
-    console.error('Failed to update Edge Config:', error)
   }
 }
 

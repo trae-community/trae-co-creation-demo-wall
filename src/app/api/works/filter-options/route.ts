@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getDictionaries } from '@/lib/edge-config';
 import { sortFilterOptions } from './sort-filter-options';
 
 interface DictItem {
@@ -15,14 +14,23 @@ interface DictItem {
 }
 
 async function getRawDictionaries() {
-  const cached = await getDictionaries();
-  if (cached) return cached as any;
-
   const [countryDict, cityDict, categoryDict, honorDict] = await Promise.all([
-    prisma.sysDict.findUnique({ where: { dictCode: 'country' }, include: { items: true } }),
-    prisma.sysDict.findUnique({ where: { dictCode: 'city' }, include: { items: true } }),
-    prisma.sysDict.findUnique({ where: { dictCode: 'category_code' }, include: { items: true } }),
-    prisma.sysDict.findUnique({ where: { dictCode: 'honor_type' }, include: { items: true } }),
+    prisma.sysDict.findUnique({
+      where: { dictCode: 'country' },
+      include: { items: { orderBy: { sortOrder: 'asc' } } },
+    }),
+    prisma.sysDict.findUnique({
+      where: { dictCode: 'city' },
+      include: { items: { orderBy: { sortOrder: 'asc' } } },
+    }),
+    prisma.sysDict.findUnique({
+      where: { dictCode: 'category_code' },
+      include: { items: { orderBy: { sortOrder: 'asc' } } },
+    }),
+    prisma.sysDict.findUnique({
+      where: { dictCode: 'honor_type' },
+      include: { items: { orderBy: { sortOrder: 'asc' } } },
+    }),
   ]);
 
   const serialize = (obj: unknown) =>
@@ -124,10 +132,10 @@ export async function GET(req: Request) {
       }));
 
     return NextResponse.json({
-      countries: sortFilterOptions(countries, lang).map(({ sortOrder: _sortOrder, ...item }) => item),
-      cities: sortFilterOptions(cities, lang).map(({ sortOrder: _sortOrder, ...item }) => item),
-      categories: sortFilterOptions(categories, lang).map(({ sortOrder: _sortOrder, ...item }) => item),
-      honors: sortFilterOptions(honors, lang).map(({ sortOrder: _sortOrder, ...item }) => item),
+      countries: sortFilterOptions(countries, lang),
+      cities: sortFilterOptions(cities, lang),
+      categories: sortFilterOptions(categories, lang),
+      honors: sortFilterOptions(honors, lang),
     });
 
   } catch (error) {
