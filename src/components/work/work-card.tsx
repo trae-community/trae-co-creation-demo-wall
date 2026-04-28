@@ -188,13 +188,21 @@ export function WorkCard({ work }: WorkCardProps) {
               </>
             ) : (
               <>
-                <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-zinc-600">
+                <Link
+                  href={`/user/${work.author.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-zinc-600 hover:border-primary transition-colors shrink-0"
+                >
                   {work.author?.name?.charAt(0) || '?'}
-                </div>
+                </Link>
                 <div className="min-w-0">
-                  <div className="max-w-[80px] text-xs text-zinc-300 font-medium leading-none line-clamp-1 [overflow-wrap:anywhere]">
+                  <Link
+                    href={`/user/${work.author.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="max-w-[80px] text-xs text-zinc-300 font-medium leading-none line-clamp-1 [overflow-wrap:anywhere] hover:text-primary transition-colors"
+                  >
                     {work.author?.name || teamMembers[0] || '-'}
-                  </div>
+                  </Link>
                   <div className="text-[10px] text-zinc-600 mt-0.5 flex min-w-0 items-center gap-1">
                     {work.city && (
                       <>

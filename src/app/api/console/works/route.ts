@@ -15,11 +15,12 @@ const sanitize = (data: any) => {
 // GET: 获取作品列表或单个作品
 export async function GET(req: NextRequest) {
   try {
-    // 鉴权检查：只有管理员可以访问
     const user = await getAuthUser();
-    if (!isAdmin(user)) {
-      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const adminMode = isAdmin(user);
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
@@ -43,6 +44,11 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'Work not found' }, { status: 404 });
       }
 
+      // 普通用户只能查看自己的作品
+      if (!adminMode && work.userId !== user.userId) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+
       return NextResponse.json(sanitize(work));
     }
 
@@ -57,8 +63,14 @@ export async function GET(req: NextRequest) {
 
     // 构建过滤条件
     const whereFilters: Prisma.WorkBaseWhereInput[] = [];
-    if (userId) {
-      whereFilters.push({ userId: BigInt(userId) });
+
+    // 普通用户强制只能查自己的作品
+    if (adminMode) {
+      if (userId) {
+        whereFilters.push({ userId: BigInt(userId) });
+      }
+    } else {
+      whereFilters.push({ userId: user.userId });
     }
     if (query.trim()) {
       whereFilters.push({
@@ -279,19 +291,22 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const operator = await getAuthUser();
-    if (!isAdmin(operator)) {
-      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    if (!operator) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const adminMode = isAdmin(operator);
+
     const body = await req.json();
-    const { 
-      id, 
+    const {
+      id,
       userId,
-      title, 
-      summary, 
-      coverUrl, 
-      countryCode, 
-      cityCode, 
-      categoryCode, 
+      title,
+      summary,
+      coverUrl,
+      countryCode,
+      cityCode,
+      categoryCode,
       devStatusCode,
       tagIds,
       honorIds,
@@ -304,6 +319,27 @@ export async function PUT(req: NextRequest) {
 
     if (!id) {
       return NextResponse.json({ error: 'Work ID is required' }, { status: 400 });
+    }
+
+    // 普通用户只能操作自己的作品
+    if (!adminMode) {
+      const work = await prisma.workBase.findUnique({
+        where: { id: BigInt(id) },
+        select: { userId: true }
+      });
+      if (!work) {
+        return NextResponse.json({ error: 'Work not found' }, { status: 404 });
+      }
+      if (work.userId !== operator.userId) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+      // 普通用户不能操作审核状态和荣誉
+      if (auditStatus !== undefined) {
+        return NextResponse.json({ error: 'Forbidden: Admin access required for audit' }, { status: 403 });
+      }
+      if (honorIds !== undefined) {
+        return NextResponse.json({ error: 'Forbidden: Admin access required for honors' }, { status: 403 });
+      }
     }
 
     // If auditStatus is provided, update statistic and create log
@@ -527,9 +563,11 @@ export async function PUT(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const operator = await getAuthUser();
-    if (!isAdmin(operator)) {
-      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    if (!operator) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const adminMode = isAdmin(operator);
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
@@ -548,10 +586,9 @@ export async function DELETE(req: NextRequest) {
     }
 
     // 权限验证：只有作品所有者或管理员/root可以删除
-    const isOwner = operator && work.userId === operator.userId;
-    const isAdminRole = operator && operator.roles.some(r => r === 'admin' || r === 'root');
+    const isOwner = work.userId === operator.userId;
 
-    if (!isOwner && !isAdminRole) {
+    if (!isOwner && !adminMode) {
       return NextResponse.json({ error: '您没有权限删除此作品' }, { status: 403 });
     }
 

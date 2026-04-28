@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { Loader2, Trophy, MapPin, FileText, Users, Eye, ThumbsUp, Crown, Medal, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Link } from '@/lib/language/navigation'
 
 // ── Data Types ──
 interface CityRankingItem {
@@ -22,7 +23,10 @@ interface WorkRankingItem {
   title: string
   coverUrl: string | null
   summary: string | null
-  author: string
+  author: {
+    id: string
+    name: string
+  }
   views: number
   likes: number
 }
@@ -138,11 +142,16 @@ export default function RankingsPage() {
     { key: 'creators', icon: Users, label: t('creatorRanking') },
   ]
 
-  const sortOptions: { key: SortKey; label: string }[] = [
-    { key: 'works', label: t('byWorks') },
-    { key: 'views', label: t('byViews') },
-    { key: 'likes', label: t('byLikes') },
-  ]
+  const sortOptions: { key: SortKey; label: string }[] = mainTab === 'works'
+    ? [
+        { key: 'views', label: t('byViews') },
+        { key: 'likes', label: t('byLikes') },
+      ]
+    : [
+        { key: 'works', label: t('byWorks') },
+        { key: 'views', label: t('byViews') },
+        { key: 'likes', label: t('byLikes') },
+      ]
 
   // Max value for progress bar
   const cityMax = useMemo(() => {
@@ -307,7 +316,7 @@ export default function RankingsPage() {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-white truncate group-hover:text-primary transition-colors">{work.title}</p>
-                  <p className="text-xs text-zinc-500 mt-0.5">{t('author')}: {work.author}</p>
+                  <p className="text-xs text-zinc-500 mt-0.5">{t('author')}: <Link href={`/user/${work.author.id}`} onClick={(e) => e.stopPropagation()} className="hover:text-primary transition-colors">{work.author.name}</Link></p>
                 </div>
 
                 {/* Stats */}
@@ -332,10 +341,11 @@ export default function RankingsPage() {
             <div className="text-center py-16 text-zinc-500">{t('noData')}</div>
           ) : (
             sortedCreators.map((creator, idx) => (
-              <div
+              <Link
                 key={creator.userId}
+                href={`/user/${creator.userId}`}
                 className={cn(
-                  "rounded-xl border p-4 flex items-center gap-4 transition-all hover:border-white/10",
+                  "rounded-xl border p-4 flex items-center gap-4 transition-all hover:border-white/10 cursor-pointer group",
                   rankRowBg(idx)
                 )}
               >
@@ -345,7 +355,7 @@ export default function RankingsPage() {
                 {/* Avatar */}
                 <div className="shrink-0 w-12 h-12 rounded-full overflow-hidden border border-white/10 bg-zinc-900">
                   {creator.avatarUrl ? (
-                    <img src={creator.avatarUrl} alt={creator.username} className="w-full h-full object-cover" />
+                    <img src={creator.avatarUrl} alt={creator.username} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <User className="w-5 h-5 text-zinc-600" />
@@ -355,7 +365,7 @@ export default function RankingsPage() {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white truncate">{creator.username}</p>
+                  <p className="font-semibold text-white truncate group-hover:text-primary transition-colors">{creator.username}</p>
                 </div>
 
                 {/* Stats */}
@@ -373,7 +383,7 @@ export default function RankingsPage() {
                     <p className="text-white font-semibold">{formatNumber(creator.totalLikes)}</p>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))
           )
         )}

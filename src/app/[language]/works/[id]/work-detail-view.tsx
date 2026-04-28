@@ -634,15 +634,29 @@ export function WorkDetailView() {
             </h3>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                {work.author.avatar ? (
-                  <img
-                    src={work.author.avatar}
-                    alt={work.author.name}
-                    className="w-10 h-10 rounded-full object-cover border border-zinc-700"
-                  />
-                ) : null}
+                <Link
+                  href={`/user/${work.author.id}`}
+                  className="shrink-0"
+                >
+                  {work.author.avatar ? (
+                    <img
+                      src={work.author.avatar}
+                      alt={work.author.name}
+                      className="w-10 h-10 rounded-full object-cover border border-zinc-700 hover:border-primary transition-colors"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-bold text-zinc-300 border border-zinc-600 hover:border-primary transition-colors">
+                      {work.author.name?.charAt(0) || '?'}
+                    </div>
+                  )}
+                </Link>
                 <div>
-                  <p className="text-sm text-gray-200 font-medium">{work.author.name || '-'}</p>
+                  <Link
+                    href={`/user/${work.author.id}`}
+                    className="text-sm text-gray-200 font-medium hover:text-primary transition-colors"
+                  >
+                    {work.author.name || '-'}
+                  </Link>
                   <p className="text-xs text-gray-500 mt-1">{work.author.bio || '-'}</p>
                 </div>
               </div>

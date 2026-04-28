@@ -26,6 +26,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { Link } from '@/lib/language/navigation'
 
 // Types
 interface Role {
@@ -268,17 +269,17 @@ export default function UsersPage() {
           <Card key={user.id} className="overflow-hidden border-border bg-card/50">
             <div className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-start gap-4 flex-1">
-                <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <Link href={`/user/${user.id}`} className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:ring-2 hover:ring-primary/40 transition-all">
                   {user.avatarUrl ? (
                     <img src={user.avatarUrl} alt={user.username} className="h-full w-full rounded-full object-cover" />
                   ) : (
                     <User size={20} />
                   )}
-                </div>
+                </Link>
                 
                 <div className="space-y-1 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-lg">{user.username}</span>
+                    <Link href={`/user/${user.id}`} className="font-semibold text-lg hover:text-primary transition-colors">{user.username}</Link>
                     {user.roles && user.roles.map(r => (
                       <Badge key={r.role.id} variant="secondary" className="text-xs">
                         {r.role.roleName}

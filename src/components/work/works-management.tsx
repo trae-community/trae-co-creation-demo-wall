@@ -14,6 +14,7 @@ import { CityFilter, FilterState } from '@/components/work/city-filter'
 import { useFeedback } from '@/lib/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
 import { useParams } from 'next/navigation'
+import { Link } from '@/lib/language/navigation'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -590,7 +591,7 @@ export function WorksManagement({
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                         <div className="flex items-center gap-1" title="作者">
                           <User size={14} />
-                          <span>{work.user.username}</span>
+                          <Link href={`/user/${work.userId}`} onClick={(e) => e.stopPropagation()} className="hover:text-primary transition-colors">{work.user.username}</Link>
                         </div>
                         <span className="text-border">|</span>
                         <div className="flex items-center gap-1" title="创建时间">

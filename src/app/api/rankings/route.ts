@@ -81,7 +81,10 @@ export async function GET() {
       title: w.title,
       coverUrl: w.coverUrl,
       summary: w.summary,
-      author: w.user.username,
+      author: {
+        id: w.user.id.toString(),
+        name: w.user.username,
+      },
       views: Number(w.statistic?.viewCount || 0),
       likes: Number(w.statistic?.likeCount || 0),
     });

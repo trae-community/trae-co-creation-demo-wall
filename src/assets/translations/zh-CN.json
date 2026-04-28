@@ -287,6 +287,16 @@
     "editProfile": "编辑资料",
     "cancelEdit": "取消编辑"
   },
+  "UserProfile": {
+    "title": "用户主页",
+    "works": "作品",
+    "views": "浏览",
+    "likes": "点赞",
+    "noWorks": "暂无公开展示的作品。",
+    "joinedAt": "加入于",
+    "notFound": "用户不存在",
+    "loadError": "加载用户信息失败"
+  },
   "Rankings": {
     "title": "排行榜",
     "subtitle": "查看城市、作品、创作者排行数据",
