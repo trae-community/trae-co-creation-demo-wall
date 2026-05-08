@@ -362,6 +362,16 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto px-4">
           <p>{tFooter('rights')}</p>
           <p className="mt-2">{tFooter('slogan')}</p>
+          <p className="mt-2">
+            <a
+              href="https://beian.miit.gov.cn/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gray-300 transition-colors"
+            >
+              {tFooter('icp')}
+            </a>
+          </p>
         </div>
       </footer>
     </div>
