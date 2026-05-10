@@ -300,6 +300,7 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const {
       id,
+      ids,
       userId,
       title,
       summary,
@@ -317,8 +318,124 @@ export async function PUT(req: NextRequest) {
       contactEmail
     } = body;
 
-    if (!id) {
+    const batchIds = Array.isArray(ids)
+      ? [...new Set(ids.map((value: unknown) => String(value)).filter(Boolean))]
+      : [];
+
+    if (!id && batchIds.length === 0) {
       return NextResponse.json({ error: 'Work ID is required' }, { status: 400 });
+    }
+
+    if (batchIds.length > 0) {
+      if (!adminMode) {
+        return NextResponse.json({ error: 'Forbidden: Admin access required for batch audit' }, { status: 403 });
+      }
+      if (auditStatus === undefined) {
+        return NextResponse.json({ error: 'Batch audit status is required' }, { status: 400 });
+      }
+      if (
+        userId !== undefined ||
+        title !== undefined ||
+        summary !== undefined ||
+        coverUrl !== undefined ||
+        countryCode !== undefined ||
+        cityCode !== undefined ||
+        categoryCode !== undefined ||
+        devStatusCode !== undefined ||
+        tagIds !== undefined ||
+        honorIds !== undefined ||
+        teamMembers !== undefined ||
+        teamIntro !== undefined ||
+        contactPhone !== undefined ||
+        contactEmail !== undefined
+      ) {
+        return NextResponse.json({ error: 'Batch mode only supports audit updates' }, { status: 400 });
+      }
+
+      const auditorId = operator.userId;
+      const newStatus = Number(auditStatus);
+      const auditReason = body.auditReason || 'Batch audit via console';
+      const workIds = batchIds.map((value: string) => BigInt(value));
+      const now = new Date();
+
+      const existingWorks = await prisma.workBase.findMany({
+        where: {
+          id: { in: workIds }
+        },
+        select: { id: true }
+      });
+
+      if (existingWorks.length !== workIds.length) {
+        return NextResponse.json({ error: 'Some works were not found' }, { status: 404 });
+      }
+
+      const currentStats = await prisma.workStatistic.findMany({
+        where: {
+          workId: { in: workIds }
+        },
+        select: {
+          workId: true,
+          auditStatus: true
+        }
+      });
+
+      const statMap = new Map(currentStats.map(stat => [stat.workId.toString(), stat]));
+
+      await prisma.$transaction(async tx => {
+        for (const workId of workIds) {
+          const key = workId.toString();
+          const currentStat = statMap.get(key);
+
+          if (currentStat) {
+            await tx.workStatistic.update({
+              where: { workId },
+              data: {
+                auditStatus: newStatus,
+                lastAuditAt: now,
+                displayStatus: newStatus === 1 ? 1 : 0
+              }
+            });
+          } else {
+            await tx.workStatistic.create({
+              data: {
+                workId,
+                auditStatus: newStatus,
+                displayStatus: newStatus === 1 ? 1 : 0,
+                lastAuditAt: now
+              }
+            });
+          }
+
+          await tx.$executeRaw`
+            INSERT INTO "work_audit_log"
+            ("work_id", "auditor_id", "prev_status", "new_status", "reason", "created_at")
+            VALUES (${workId}, ${auditorId}, ${currentStat?.auditStatus ?? null}, ${newStatus}, ${auditReason}, ${now})
+          `;
+        }
+      });
+
+      await Promise.all(
+        batchIds.map(targetId =>
+          writeOperationLog({
+            operatorId: auditorId,
+            module: 'works',
+            action: 'audit',
+            targetType: 'work_base',
+            targetId,
+            payload: {
+              auditStatus: newStatus,
+              auditReason,
+              batch: true
+            },
+            request: req
+          })
+        )
+      );
+
+      return NextResponse.json({
+        success: true,
+        updatedCount: batchIds.length
+      });
     }
 
     // 普通用户只能操作自己的作品
