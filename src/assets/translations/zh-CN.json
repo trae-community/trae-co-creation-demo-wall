@@ -197,7 +197,8 @@
   },
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
-    "slogan": "展示每一个真实完成的作品"
+    "slogan": "展示每一个真实完成的作品",
+    "icp": "浙ICP备2026026485号-1"
   },
   "Admin": {
     "title": "后台管理",

@@ -1,10 +1,10 @@
 'use client'
 
-import { usePathname, useSearchParams } from "next/navigation";
 import { Work } from "@/lib/types";
 import { MapPin, Award, Eye, ThumbsUp, Clock } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from 'next-intl';
-import { Link } from '@/lib/language/navigation';
+import { Link, usePathname, useRouter } from '@/lib/language/navigation';
 
 interface WorkCardProps {
   work: Work;
@@ -44,6 +44,7 @@ const normalizeTeamMembers = (team: unknown): string[] => {
 export function WorkCard({ work }: WorkCardProps) {
   const t = useTranslations('Card');
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const teamMembers = normalizeTeamMembers(work.team);
   const isTeam = teamMembers.length > 1;
@@ -65,6 +66,13 @@ export function WorkCard({ work }: WorkCardProps) {
   const specialTags = work.tags.filter(tag => ["已上线", "开源", "持续更新"].includes(tag));
   const otherTags = work.tags.filter(tag => !["已上线", "开源", "持续更新"].includes(tag));
   const displayTags = [...specialTags, ...otherTags].slice(0, 3);
+  const authorHref = `/user/${work.author.id}`;
+
+  const handleAuthorClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    router.push(authorHref);
+  };
 
   return (
     <Link
@@ -188,21 +196,22 @@ export function WorkCard({ work }: WorkCardProps) {
               </>
             ) : (
               <>
-                <Link
-                  href={`/user/${work.author.id}`}
-                  onClick={(e) => e.stopPropagation()}
+                <button
+                  type="button"
+                  onClick={handleAuthorClick}
                   className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-zinc-600 hover:border-primary transition-colors shrink-0"
+                  aria-label={`查看作者 ${work.author?.name || ''}`}
                 >
                   {work.author?.name?.charAt(0) || '?'}
-                </Link>
+                </button>
                 <div className="min-w-0">
-                  <Link
-                    href={`/user/${work.author.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="max-w-[80px] text-xs text-zinc-300 font-medium leading-none line-clamp-1 [overflow-wrap:anywhere] hover:text-primary transition-colors"
+                  <button
+                    type="button"
+                    onClick={handleAuthorClick}
+                    className="max-w-[80px] text-left text-xs text-zinc-300 font-medium leading-none line-clamp-1 [overflow-wrap:anywhere] hover:text-primary transition-colors"
                   >
                     {work.author?.name || teamMembers[0] || '-'}
-                  </Link>
+                  </button>
                   <div className="text-[10px] text-zinc-600 mt-0.5 flex min-w-0 items-center gap-1">
                     {work.city && (
                       <>

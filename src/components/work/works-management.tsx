@@ -183,6 +183,8 @@ export function WorksManagement({
   const [selectedAuditStatus, setSelectedAuditStatus] = useState<string>('0')
   const [auditReason, setAuditReason] = useState('')
   const [isSavingAudit, setIsSavingAudit] = useState(false)
+  const [selectedWorkIds, setSelectedWorkIds] = useState<string[]>([])
+  const [auditTargetIds, setAuditTargetIds] = useState<string[]>([])
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [viewingWork, setViewingWork] = useState<WorkItem | null>(null)
   const [viewImageIndex, setViewImageIndex] = useState(0)
@@ -255,7 +257,9 @@ export function WorksManagement({
       const res = await fetch(`/api/console/works?${params.toString()}`)
       if (res.ok) {
         const data = await res.json()
-        setWorks(data.items || [])
+        const nextItems = data.items || []
+        setWorks(nextItems)
+        setSelectedWorkIds(prev => prev.filter(id => nextItems.some((item: WorkItem) => item.id === id)))
         setTotalItems(data.total || 0)
       } else {
         showFeedback('error', '作品列表加载失败')
@@ -444,22 +448,50 @@ export function WorksManagement({
     const status = work.statistic?.auditStatus !== undefined 
       ? String(work.statistic.auditStatus) 
       : '0'
+    setAuditTargetIds([work.id])
     setSelectedAuditStatus(status)
     setAuditReason('') // Reset reason
     setIsAuditDialogOpen(true)
   }
 
+  const handleToggleWorkSelection = (workId: string, checked: boolean) => {
+    setSelectedWorkIds(prev =>
+      checked ? [...prev, workId] : prev.filter(id => id !== workId)
+    )
+  }
+
+  const handleToggleSelectAllWorks = (checked: boolean) => {
+    if (checked) {
+      setSelectedWorkIds(works.map(work => work.id))
+      return
+    }
+    setSelectedWorkIds([])
+  }
+
+  const handleOpenBulkAuditDialog = () => {
+    if (selectedWorkIds.length === 0) {
+      showFeedback('error', '请先选择要审核的作品')
+      return
+    }
+
+    setSelectedWork(null)
+    setAuditTargetIds(selectedWorkIds)
+    setSelectedAuditStatus('0')
+    setAuditReason('')
+    setIsAuditDialogOpen(true)
+  }
+
   const onSaveAudit = async () => {
-    if (!selectedWork) return
+    if (auditTargetIds.length === 0) return
     try {
       setIsSavingAudit(true)
-      console.log('Saving audit status:', selectedAuditStatus, 'reason:', auditReason, 'for work:', selectedWork.id)
+      const isBatchAudit = auditTargetIds.length > 1
       
       const res = await fetch('/api/console/works', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: selectedWork.id,
+          ...(isBatchAudit ? { ids: auditTargetIds } : { id: auditTargetIds[0] }),
           auditStatus: Number(selectedAuditStatus), // Ensure it's a number
           auditReason: auditReason // Send reason
         })
@@ -467,8 +499,10 @@ export function WorksManagement({
 
       if (res.ok) {
         setIsAuditDialogOpen(false)
+        setAuditTargetIds([])
+        setSelectedWorkIds([])
         await fetchWorks() // Wait for refresh
-        showFeedback('success', '作品审核状态已更新')
+        showFeedback('success', isBatchAudit ? `已批量更新 ${auditTargetIds.length} 个作品的审核状态` : '作品审核状态已更新')
       } else {
         const errorData = await res.json().catch(() => ({}))
         console.error('Audit update failed:', errorData)
@@ -493,6 +527,9 @@ export function WorksManagement({
   const current = Math.min(currentPage, totalPages)
   const startIndex = (current - 1) * pageSize
   const endIndex = Math.min(startIndex + pageSize, totalItems)
+  const showBulkAuditControls = scope === 'admin' && allowedActions.includes('audit')
+  const isAllCurrentPageSelected = works.length > 0 && works.every(work => selectedWorkIds.includes(work.id))
+  const isPartiallySelected = works.some(work => selectedWorkIds.includes(work.id)) && !isAllCurrentPageSelected
   const viewingTeamMembers = normalizeStringList(viewingWork?.team?.members)
   const viewingHighlights = normalizeStringList(viewingWork?.detail?.highlights)
   const viewingScenarios = normalizeStringList(viewingWork?.detail?.scenarios)
@@ -548,9 +585,57 @@ export function WorksManagement({
       </div>
 
       <div className="space-y-4">
+        {showBulkAuditControls && works.length > 0 && (
+          <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="select-all-works"
+                checked={isAllCurrentPageSelected ? true : isPartiallySelected ? 'indeterminate' : false}
+                onCheckedChange={(checked) => handleToggleSelectAllWorks(checked === true)}
+              />
+              <Label htmlFor="select-all-works" className="cursor-pointer">
+                本页全选
+              </Label>
+              <span className="text-sm text-muted-foreground">
+                已选择 {selectedWorkIds.length} 个作品
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedWorkIds([])}
+                disabled={selectedWorkIds.length === 0}
+              >
+                清空选择
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleOpenBulkAuditDialog}
+                disabled={selectedWorkIds.length === 0}
+              >
+                批量审核
+              </Button>
+            </div>
+          </div>
+        )}
+
         {works.map(work => (
           <Card key={work.id} className="overflow-hidden border border-border bg-card hover:bg-card/80 transition-colors">
-            <div className="flex flex-col sm:flex-row">
+            <div className="flex">
+              {showBulkAuditControls && (
+                <div className="flex items-start border-r border-border/50 p-4">
+                  <Checkbox
+                    id={`work-select-${work.id}`}
+                    checked={selectedWorkIds.includes(work.id)}
+                    onCheckedChange={(checked) => handleToggleWorkSelection(work.id, checked === true)}
+                    aria-label={`选择作品 ${work.title}`}
+                  />
+                </div>
+              )}
+
+              <div className="flex flex-1 flex-col sm:flex-row">
               {/* Cover Image */}
               <div className="w-full sm:w-48 h-32 sm:h-auto bg-muted shrink-0 relative group">
                 {work.coverUrl ? (
@@ -711,6 +796,7 @@ export function WorksManagement({
                     </Badge>
                   ))}
                 </div>
+              </div>
               </div>
             </div>
           </Card>
@@ -1106,7 +1192,11 @@ export function WorksManagement({
           <DialogHeader>
             <DialogTitle>审核作品</DialogTitle>
             <DialogDescription>
-              更改作品的审核状态。审核通过后作品将自动上架。
+              {auditTargetIds.length > 1
+                ? `批量更新 ${auditTargetIds.length} 个作品的审核状态。审核通过后作品将自动上架。`
+                : selectedWork
+                  ? `更改作品「${selectedWork.title}」的审核状态。审核通过后作品将自动上架。`
+                  : '更改已选作品的审核状态。审核通过后作品将自动上架。'}
             </DialogDescription>
           </DialogHeader>
           

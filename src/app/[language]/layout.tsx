@@ -5,6 +5,7 @@ import { getMessages } from 'next-intl/server';
 import { SessionProvider } from 'next-auth/react';
 import { SiteLayout } from '@/components/layout/site-layout';
 import { QueryProvider } from '@/components/common/query-provider';
+import { auth } from '@/lib/auth-nextauth';
 import { Toaster } from 'sonner';
 
 const fontSans = Inter({
@@ -40,19 +41,20 @@ export default async function LocaleLayout({
 }) {
   const { language } = await params;
   const messages = await getMessages();
+  const session = await auth();
 
   return (
-    <SessionProvider>
-      <html lang={language}>
-        <body className={`${fontSans.variable} ${fontChinese.variable} ${fontMono.variable} antialiased`}>
+    <html lang={language}>
+      <body className={`${fontSans.variable} ${fontChinese.variable} ${fontMono.variable} antialiased`}>
+        <SessionProvider session={session} refetchOnWindowFocus={false} refetchInterval={0}>
           <QueryProvider>
             <NextIntlClientProvider messages={messages}>
               <SiteLayout>{children}</SiteLayout>
             </NextIntlClientProvider>
           </QueryProvider>
-          <Toaster position="top-center" theme="dark" richColors />
-        </body>
-      </html>
-    </SessionProvider>
+        </SessionProvider>
+        <Toaster position="top-center" theme="dark" richColors />
+      </body>
+    </html>
   )
 }
