@@ -198,8 +198,11 @@
   },
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
-    "slogan": "展示每一个真实完成的作品",
-    "icp": "浙ICP备2026026485号-1"
+    "icp": "浙ICP备2026026485号-1",
+    "githubCommunity": "GitHub 社区",
+    "repo": "仓库",
+    "traeOfficial": "Trae 官网",
+    "traeCommunity": "Trae 社区"
   },
   "Admin": {
     "title": "后台管理",

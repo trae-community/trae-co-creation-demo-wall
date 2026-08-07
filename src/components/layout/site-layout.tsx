@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X, Trophy } from "lucide-react";
+import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X, Trophy, Github, Code2, Globe, MessagesSquare } from "lucide-react";
 import { ParticlesBackground } from "./particles-background";
 import { useSession } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
@@ -358,20 +358,45 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      <footer className="bg-card border-t border-border py-8 text-center text-gray-400 text-sm">
-        <div className="container mx-auto px-4">
-          <p>{tFooter('rights')}</p>
-          <p className="mt-2">{tFooter('slogan')}</p>
-          <p className="mt-2">
+      <footer className="relative border-t border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
+        {/* 顶部渐变装饰线 — 科技感点缀 */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-40 bg-gradient-to-r from-transparent via-green-500/50 to-transparent" />
+        <div className="container mx-auto px-4 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          {/* 版权 + 备案 */}
+          <div className="flex items-center gap-2.5 text-xs text-zinc-500">
+            <span>{tFooter('rights')}</span>
+            <span className="w-1 h-1 rounded-full bg-zinc-700 hidden sm:block" />
             <a
               href="https://beian.miit.gov.cn/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-gray-300 transition-colors"
+              className="hover:text-green-400 transition-colors"
             >
               {tFooter('icp')}
             </a>
-          </p>
+          </div>
+
+          {/* 外链 — 胶囊风格，与导航/筛选 UI 一致 */}
+          <div className="flex items-center gap-2">
+            {[
+              { label: tFooter('githubCommunity'), href: 'https://github.com/trae-community', icon: Github },
+              { label: tFooter('repo'), href: 'https://github.com/trae-community/trae-co-creation-demo-wall', icon: Code2 },
+              { label: tFooter('traeOfficial'), href: 'https://www.trae.cn', icon: Globe },
+              { label: tFooter('traeCommunity'), href: 'https://forum.trae.cn', icon: MessagesSquare },
+            ].map(({ label, href, icon: Icon }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={label}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-zinc-400 border border-white/10 bg-white/5 hover:text-green-400 hover:border-green-500/30 hover:bg-green-500/10 transition-all"
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {label}
+              </a>
+            ))}
+          </div>
         </div>
       </footer>
     </div>

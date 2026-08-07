@@ -204,8 +204,11 @@
   },
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
-    "slogan": "すべてのリアルな完成作品を展示する",
-    "icp": "浙ICP备2026026485号-1"
+    "icp": "浙ICP备2026026485号-1",
+    "githubCommunity": "GitHub コミュニティ",
+    "repo": "リポジトリ",
+    "traeOfficial": "Trae 公式サイト",
+    "traeCommunity": "Trae コミュニティ"
   },
   "Admin": {
     "title": "管理画面",
