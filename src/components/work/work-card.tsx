@@ -1,7 +1,7 @@
 'use client'
 
 import { Work } from "@/lib/types";
-import { MapPin, Award, Eye, ThumbsUp, Clock } from "lucide-react";
+import { MapPin, Award, Eye, ThumbsUp, Clock, ArrowRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/language/navigation';
@@ -85,6 +85,8 @@ export function WorkCard({ work }: WorkCardProps) {
         <img
           src={work.coverUrl}
           alt={work.name}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           onError={(e) => {
             const img = e.target as HTMLImageElement;
@@ -99,9 +101,7 @@ export function WorkCard({ work }: WorkCardProps) {
           style={{ background: 'rgba(0,0,0,0.5)' }}>
           <span className="text-white text-sm font-medium flex items-center gap-1.5">
             {t('viewDetails')}
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-            </svg>
+            <ArrowRight className="w-4 h-4" />
           </span>
         </div>
 
@@ -218,6 +218,7 @@ export function WorkCard({ work }: WorkCardProps) {
                     type="button"
                     onClick={handleAuthorClick}
                     className="max-w-[80px] text-left text-xs text-zinc-300 font-medium leading-none line-clamp-1 [overflow-wrap:anywhere] hover:text-primary transition-colors"
+                    title={work.author?.name || teamMembers[0] || '-'}
                   >
                     {work.author?.name || teamMembers[0] || '-'}
                   </button>

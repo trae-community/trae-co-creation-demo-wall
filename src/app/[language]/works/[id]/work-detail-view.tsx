@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp, Mail, Award, ChevronLeft, ChevronRight, Download, Link2, Check } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp, Mail, Award, ChevronLeft, ChevronRight, Download, Link2, Check, MapPin } from "lucide-react";
 import { Button } from "@/components/common/action-button";
 import { useEffect, useState, useRef } from "react";
 import { useLocale, useTranslations } from 'next-intl';
@@ -9,6 +9,7 @@ import { Link } from '@/lib/language/navigation';
 import { Work } from "@/lib/types";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useWorksStore } from '@/lib/works-store';
+import { cn } from '@/lib/utils';
 
 const toStringList = (value: unknown): string[] => {
   if (Array.isArray(value)) {
@@ -52,7 +53,10 @@ export function WorkDetailView() {
   const [shareImageUrl, setShareImageUrl] = useState('');
   const [isShareGenerating, setIsShareGenerating] = useState(false);
   const [shareActionDone, setShareActionDone] = useState<'copied' | ''>('');
+  const [likeAnimating, setLikeAnimating] = useState(false);
   const viewRecorded = useRef(false);
+  const touchStartX = useRef(0);
+  const screenshotCarouselRef = useRef<HTMLDivElement>(null);
 
   const { detailCache, setDetailCache } = useWorksStore();
 
@@ -157,29 +161,91 @@ export function WorkDetailView() {
   })();
 
   const handleLike = async () => {
+    // 乐观更新：立即切换 UI
+    const prevLiked = liked;
+    const prevCount = likesCount;
+    setLiked(!prevLiked);
+    setLikesCount(prevLiked ? prevCount - 1 : prevCount + 1);
+    setLikeAnimating(true);
+    setTimeout(() => setLikeAnimating(false), 600);
+
     try {
       const res = await fetch(`/api/works/${id}/like`, { method: 'POST' });
       
       if (res.status === 401) {
-        // 未登录，跳转到登录页
+        // 未登录，回滚并跳转
+        setLiked(prevLiked);
+        setLikesCount(prevCount);
         router.push(`/${locale}/sign-in`);
         return;
       }
       
-      if (!res.ok) return;
+      if (!res.ok) {
+        setLiked(prevLiked);
+        setLikesCount(prevCount);
+        return;
+      }
       
       const data = await res.json();
       setLiked(data.liked);
-      setLikesCount((prev) => data.liked ? prev + 1 : Math.max(0, prev - 1));
+      setLikesCount(data.liked ? prevCount + (prevLiked ? 0 : 1) : prevCount - (prevLiked ? 1 : 0));
     } catch {
-      // 忽略错误
+      setLiked(prevLiked);
+      setLikesCount(prevCount);
     }
   };
 
+  // 截图轮播键盘导航（必须在 early return 之前）
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (screenshotList.length <= 1) return;
+      if (e.key === 'ArrowLeft') {
+        setActiveScreenshotIndex((prev) => (prev - 1 + screenshotList.length) % screenshotList.length);
+      }
+      if (e.key === 'ArrowRight') {
+        setActiveScreenshotIndex((prev) => (prev + 1) % screenshotList.length);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [screenshotList.length]);
+
   if (isLoading) {
     return (
-      <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-white">Loading...</h2>
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* 返回按钮骨架 */}
+        <div className="h-5 w-20 rounded bg-white/5 animate-pulse" />
+        {/* 封面区骨架 */}
+        <div className="bg-card rounded-2xl overflow-hidden border border-border">
+          <div className="aspect-video w-full bg-zinc-900 animate-pulse" />
+          <div className="p-8 space-y-4">
+            <div className="h-8 w-3/4 bg-white/5 rounded animate-pulse" />
+            <div className="h-4 w-full bg-white/5 rounded animate-pulse" />
+            <div className="h-4 w-2/3 bg-white/5 rounded animate-pulse" />
+            <div className="flex gap-3 pt-4">
+              <div className="h-10 w-32 rounded-full bg-white/5 animate-pulse" />
+              <div className="h-10 w-24 rounded-full bg-white/5 animate-pulse" />
+            </div>
+          </div>
+        </div>
+        {/* 内容区骨架 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2 space-y-6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="bg-card p-8 rounded-2xl border border-border space-y-3">
+                <div className="h-6 w-24 bg-white/5 rounded animate-pulse" />
+                <div className="h-4 w-full bg-white/5 rounded animate-pulse" />
+                <div className="h-4 w-5/6 bg-white/5 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+          <div className="space-y-6">
+            <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-3">
+              <div className="h-10 w-full rounded bg-white/5 animate-pulse" />
+              <div className="h-10 w-full rounded bg-white/5 animate-pulse" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -456,6 +522,12 @@ export function WorkDetailView() {
                   <span className="font-medium">{withColon(t('submitTime'))}</span>
                   <span className="text-gray-200">{new Date(work.createdAt).toLocaleDateString()}</span>
                 </div>
+                {(work.country || work.city) && (
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <MapPin className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-200">{[work.country, work.city].filter(Boolean).join(' / ')}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -468,7 +540,7 @@ export function WorkDetailView() {
                     : "bg-zinc-800/80 text-gray-300 hover:text-white hover:bg-zinc-800 border border-white/10 backdrop-blur-md hover:border-green-500/50 hover:shadow-[0_0_15px_rgba(50,240,140,0.1)]"
                 }`}
               >
-                <ThumbsUp className={`w-4 h-4 ${liked ? "fill-current animate-bounce" : "group-hover:scale-110 transition-transform"}`} />
+                <ThumbsUp className={`w-4 h-4 transition-transform ${liked ? "fill-current" : ""} ${likeAnimating ? "scale-125" : "scale-100"}`} />
                 {liked ? t('liked') : t('likeProject')}
                 <span className={`ml-1.5 px-2 py-0.5 rounded-full text-xs font-mono ${liked ? "bg-white/20" : "bg-white/5 text-gray-400 group-hover:text-white"}`}>
                   {likesCount}
@@ -532,7 +604,19 @@ export function WorkDetailView() {
             </h2>
             {screenshotList.length > 0 ? (
               <div className="space-y-4">
-                <div className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/60 group">
+                <div
+                  ref={screenshotCarouselRef}
+                  tabIndex={0}
+                  className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/60 group outline-none focus-visible:ring-2 focus-visible:ring-green-500/50"
+                  onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                  onTouchEnd={(e) => {
+                    const diff = e.changedTouches[0].clientX - touchStartX.current;
+                    if (Math.abs(diff) > 50) {
+                      if (diff > 0) showPrevScreenshot();
+                      else showNextScreenshot();
+                    }
+                  }}
+                >
                   <img
                     src={screenshotList[activeScreenshotIndex]}
                     alt={`Screenshot ${activeScreenshotIndex + 1}`}
@@ -563,6 +647,27 @@ export function WorkDetailView() {
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
+                      {/* 圆点指示器 */}
+                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+                        {screenshotList.map((_, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => setActiveScreenshotIndex(index)}
+                            className={cn(
+                              "w-2 h-2 rounded-full transition-all",
+                              index === activeScreenshotIndex
+                                ? "bg-green-400 w-4"
+                                : "bg-white/40 hover:bg-white/60"
+                            )}
+                            aria-label={`第 ${index + 1} 张`}
+                          />
+                        ))}
+                      </div>
+                      {/* 计数器 */}
+                      <div className="absolute top-3 left-3 rounded-full bg-black/60 px-2 py-0.5 text-xs text-white/80 backdrop-blur-sm">
+                        {activeScreenshotIndex + 1} / {screenshotList.length}
+                      </div>
                     </>
                   )}
                 </div>
@@ -616,15 +721,6 @@ export function WorkDetailView() {
               <Share2 className="w-4 h-4" />
               {t('shareCard')}
             </Button>
-          </div>
-
-          <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
-            <h3 className="font-bold text-primary mb-2">{t('aboutProject')}</h3>
-            <p className="text-gray-400 text-sm mb-4">{t('aboutProjectDesc')}</p>
-            <div className="text-sm text-gray-300 space-y-2">
-              <p><span className="text-gray-500">{withColon(t('country'))}</span>{work.country || '-'}</p>
-              <p><span className="text-gray-500">{withColon(t('city'))}</span>{work.city || '-'}</p>
-            </div>
           </div>
 
           <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
@@ -691,6 +787,12 @@ export function WorkDetailView() {
           </div>
         </div>
       </div>
+
+      {/* 底部提示 */}
+      <div className="mt-8 pt-6 border-t border-zinc-800/50">
+        <p className="text-center text-xs text-gray-500">{t('aboutProjectDesc')}</p>
+      </div>
+
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="bg-zinc-950 border border-zinc-800 text-white sm:max-w-3xl">
           <DialogHeader>
@@ -704,8 +806,15 @@ export function WorkDetailView() {
               {shareImageUrl ? (
                 <img src={shareImageUrl} alt={t('sharePreviewAlt')} className="w-full aspect-[1200/630] object-cover" />
               ) : (
-                <div className="h-56 flex items-center justify-center text-zinc-500 text-sm">
-                  {isShareGenerating ? t('shareGenerating') : '-'}
+                <div className="h-56 flex flex-col items-center justify-center gap-3 text-zinc-500">
+                  {isShareGenerating ? (
+                    <>
+                      <div className="w-48 h-1.5 rounded-full bg-zinc-800 overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-green-500 to-green-400 rounded-full animate-[shareProgress_2s_ease-in-out_infinite]" style={{ width: '60%' }} />
+                      </div>
+                      <span className="text-xs">{t('shareGenerating')}</span>
+                    </>
+                  ) : '-'}
                 </div>
               )}
             </div>

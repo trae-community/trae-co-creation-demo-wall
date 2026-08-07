@@ -25,6 +25,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
 
   // Fetch user roles from API
@@ -70,6 +71,15 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // 导航栏滚动反馈：滚动后加深背景 + 加阴影
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleLanguageSwitch = (newLocale: (typeof LOCALE_OPTIONS)[number]['code']) => {
     if (newLocale !== locale) {
       router.replace(pathname, { locale: newLocale });
@@ -82,7 +92,12 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans text-foreground relative z-0">
       <ParticlesBackground />
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-background/50 backdrop-blur-xl supports-[backdrop-filter]:bg-background/20">
+      <header className={cn(
+        "sticky top-0 z-50 border-b transition-all duration-300",
+        scrolled
+          ? "border-white/10 bg-background/80 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+          : "border-white/5 bg-background/50 backdrop-blur-xl supports-[backdrop-filter]:bg-background/20"
+      )}>
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-lg font-bold text-white tracking-tight group">
             <Image src={logo} alt="logo" className="w-8 h-8" />

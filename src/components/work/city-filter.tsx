@@ -44,7 +44,7 @@ const Pill = ({
   <button
     onClick={onClick}
     className={cn(
-      "px-3.5 py-1.5 rounded-full text-sm whitespace-nowrap border transition-all duration-200 shrink-0",
+      "px-3.5 py-1.5 rounded-full text-sm whitespace-nowrap border transition-all duration-200 shrink-0 active:scale-95",
       active
         ? "bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold border-transparent shadow-[0_0_12px_rgba(50,240,140,0.25)]"
         : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
