@@ -202,10 +202,16 @@ export function WorkCard({ work }: WorkCardProps) {
                 <button
                   type="button"
                   onClick={handleAuthorClick}
-                  className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-zinc-600 hover:border-primary transition-colors shrink-0"
+                  className="w-6 h-6 rounded-full overflow-hidden border border-zinc-600 hover:border-primary transition-colors shrink-0 bg-zinc-700"
                   aria-label={`查看作者 ${work.author?.name || ''}`}
                 >
-                  {work.author?.name?.charAt(0) || '?'}
+                  {work.author?.avatar ? (
+                    <img src={work.author.avatar} alt={work.author.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="flex items-center justify-center w-full h-full text-[10px] font-bold text-zinc-300">
+                      {work.author?.name?.charAt(0) || '?'}
+                    </span>
+                  )}
                 </button>
                 <div className="min-w-0">
                   <button
