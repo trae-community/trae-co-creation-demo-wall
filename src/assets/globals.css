@@ -170,3 +170,9 @@
   50% { transform: translateX(60%); }
   100% { transform: translateX(-100%); }
 }
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

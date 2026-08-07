@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp, Mail, Award, ChevronLeft, ChevronRight, Download, Link2, Check, MapPin } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp, Mail, Award, ChevronLeft, ChevronRight, Download, Link2, Check, MapPin, X } from "lucide-react";
 import { Button } from "@/components/common/action-button";
 import { useEffect, useState, useRef } from "react";
 import { useLocale, useTranslations } from 'next-intl';
@@ -477,10 +477,10 @@ export function WorkDetailView() {
             onClick={() => openImagePreview([work.coverUrl], 0, work.name)}
             title={t('clickToPreview')}
           />
-          <div className="absolute top-4 right-4 rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs text-white/90 backdrop-blur-sm transition-opacity group-hover:opacity-100 opacity-90">
+          <div className="absolute top-4 right-4 rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs text-white/90 backdrop-blur-sm transition-opacity group-hover:opacity-100 opacity-90 pointer-events-none">
             {t('clickToPreview')}
           </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end pointer-events-none">
             <div className="p-8 text-white w-full">
               <div className="flex items-center gap-3 mb-3">
                 <span className="bg-primary text-black text-xs font-bold px-2 py-1 rounded">
@@ -839,65 +839,56 @@ export function WorkDetailView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Dialog open={isImagePreviewOpen} onOpenChange={setIsImagePreviewOpen}>
-        <DialogContent className="bg-zinc-950 border border-zinc-800 text-white sm:max-w-5xl">
-          <DialogHeader>
-            <DialogTitle>{previewTitle}</DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              {previewImages.length > 1 ? `${previewImageIndex + 1} / ${previewImages.length}` : previewTitle}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="relative rounded-xl overflow-hidden border border-zinc-800 bg-black/40">
-              {previewImages[previewImageIndex] ? (
-                <img
-                  src={previewImages[previewImageIndex]}
-                  alt={`${previewTitle}-${previewImageIndex + 1}`}
-                  className="w-full max-h-[75vh] object-contain bg-black"
-                />
-              ) : null}
-              {previewImages.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={showPrevPreviewImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2"
-                    aria-label="上一张"
-                    title="上一张"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={showNextPreviewImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2"
-                    aria-label="下一张"
-                    title="下一张"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </>
-              )}
+      {/* 轻量级图片预览 */}
+      {isImagePreviewOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center animate-fadeIn"
+          onClick={() => setIsImagePreviewOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setIsImagePreviewOpen(false)}
+            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
+            aria-label="关闭"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          
+          {previewImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); showPrevPreviewImage(); }}
+                className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
+                aria-label="上一张"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); showNextPreviewImage(); }}
+                className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
+                aria-label="下一张"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </>
+          )}
+          
+          <img
+            src={previewImages[previewImageIndex]}
+            alt={`${previewTitle}-${previewImageIndex + 1}`}
+            className="max-w-[90vw] max-h-[90vh] object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+          
+          {previewImages.length > 1 && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/60 backdrop-blur-md rounded-full px-4 py-2">
+              <span className="text-white text-sm">{previewImageIndex + 1} / {previewImages.length}</span>
             </div>
-            {previewImages.length > 1 && (
-              <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
-                {previewImages.map((image, index) => (
-                  <button
-                    key={`${image}-${index}`}
-                    type="button"
-                    onClick={() => setPreviewImageIndex(index)}
-                    className={`rounded-lg overflow-hidden border ${index === previewImageIndex ? 'border-primary' : 'border-zinc-800'}`}
-                    aria-label={`预览第 ${index + 1} 张图片`}
-                    title={`预览第 ${index + 1} 张图片`}
-                  >
-                    <img src={image} alt={`${previewTitle}-thumbnail-${index + 1}`} className="w-full h-16 object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+          )}
+        </div>
+      )}
     </div>
   );
 }
