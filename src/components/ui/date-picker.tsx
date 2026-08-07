@@ -11,6 +11,8 @@ interface DatePickerProps {
   /** 未选中日期时的占位文案 */
   placeholder?: string
   className?: string
+  /** 触发按钮风格：ghost 融入排序栏（默认）/ outline 独立使用带边框 */
+  variant?: 'ghost' | 'outline'
 }
 
 const WEEKDAYS_ZH = ['一', '二', '三', '四', '五', '六', '日']
@@ -46,7 +48,7 @@ function buildCalendarDays(year: number, month: number) {
   return days
 }
 
-export function DatePicker({ value, onChange, placeholder = '日期', className }: DatePickerProps) {
+export function DatePicker({ value, onChange, placeholder = '日期', className, variant = 'ghost' }: DatePickerProps) {
   const locale = useLocale()
   const [isOpen, setIsOpen] = useState(false)
   // 弹窗内当前展示的年月
@@ -144,7 +146,7 @@ export function DatePicker({ value, onChange, placeholder = '日期', className 
 
   return (
     <div ref={containerRef} className={cn('relative', className)}>
-      {/* 触发按钮 — 与排序 tabs 风格一致 */}
+      {/* 触发按钮 — ghost 与排序 tabs 风格一致，outline 适合独立放置 */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -152,7 +154,9 @@ export function DatePicker({ value, onChange, placeholder = '日期', className 
           'flex items-center gap-1.5 px-2 sm:px-3.5 py-2 rounded-lg text-sm font-medium transition-all border',
           value
             ? 'bg-green-500/15 text-green-400 border-green-500/25'
-            : 'text-zinc-500 border-transparent hover:text-white hover:bg-white/5'
+            : variant === 'outline'
+              ? 'text-muted-foreground border-border bg-secondary hover:text-foreground hover:bg-accent'
+              : 'text-zinc-500 border-transparent hover:text-white hover:bg-white/5'
         )}
       >
         <Calendar className="w-3 h-3" />

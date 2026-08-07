@@ -567,11 +567,12 @@ export function WorksManagement({
             />
           </div>
 
-          {/* Date picker — 自定义日历弹窗，与首页一致 */}
+          {/* Date picker — 自定义日历弹窗，与首页一致；独立放置用 outline 风格 */}
           <DatePicker
             value={selectedDate}
             onChange={setSelectedDate}
             placeholder="日期"
+            variant="outline"
             className="shrink-0"
           />
         </div>
