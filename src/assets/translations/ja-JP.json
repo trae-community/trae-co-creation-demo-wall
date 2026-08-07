@@ -190,7 +190,9 @@
     "auditStatus": "審査",
     "country": "都道府県",
     "city": "都市",
-    "dateLabel": "日付"
+    "filters": "フィルター",
+    "dateLabel": "日付",
+    "reset": "フィルターをリセット"
   },
   "Card": {
     "viewDetails": "詳細を見る",

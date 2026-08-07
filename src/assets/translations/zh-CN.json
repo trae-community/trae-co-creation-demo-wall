@@ -185,7 +185,8 @@
     "country": "省份",
     "city": "城市",
     "filters": "筛选",
-    "dateLabel": "日期"
+    "dateLabel": "日期",
+    "reset": "重置筛选"
   },
   "Card": {
     "viewDetails": "查看详情",

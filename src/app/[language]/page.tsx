@@ -4,11 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { WorkCard } from "@/components/work/work-card";
 import { CityFilter, FilterState } from "@/components/work/city-filter";
-import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight, Calendar, X } from "lucide-react";
+import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils";
 import { HeroBanner } from "@/components/common/hero-banner";
 import { useWorks } from "@/lib/use-works";
+import { DatePicker } from "@/components/ui/date-picker";
 
 export default function Page() {
   const t = useTranslations('Home');
@@ -149,44 +150,23 @@ export default function Page() {
             {/* Divider */}
             <div className="w-px h-5 bg-white/10 mx-1" />
 
-            {/* Date picker — styled like sort buttons */}
-            <button
-              type="button"
-              onClick={() => {
-                const input = document.getElementById('date-filter-input') as HTMLInputElement | null;
-                if (input) input.showPicker?.();
-              }}
-              className={cn(
-                "flex items-center gap-1.5 px-2 sm:px-3.5 py-2 rounded-lg text-sm font-medium transition-all border",
-                selectedDate
-                  ? "bg-green-500/15 text-green-400 border-green-500/25"
-                  : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
-              )}
-            >
-              <Calendar className="w-3 h-3" />
-              <span className="hidden sm:inline">{selectedDate || t('dateLabel')}</span>
-              <span className="sm:hidden">{selectedDate ? selectedDate.slice(5) : t('dateLabel')}</span>
-              {selectedDate && (
-                <span
-                  onClick={(e) => { e.stopPropagation(); setSelectedDate(''); }}
-                  className="ml-0.5 w-4 h-4 flex items-center justify-center rounded-full hover:bg-white/10 transition-all"
-                >
-                  <X className="w-3 h-3" />
-                </span>
-              )}
-            </button>
-            <input
-              id="date-filter-input"
-              type="date"
+            {/* Date picker — 自定义日历弹窗，与 UI 风格一致 */}
+            <DatePicker
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="sr-only"
+              onChange={setSelectedDate}
+              placeholder={t('dateLabel')}
             />
           </div>
         </div>
 
-        {/* Row 2: Filter pills */}
-        <CityFilter filters={filters} onFilterChange={setFilters} />
+        {/* Row 2: Filter pills — 与作品管理页/个人主页统一交互 */}
+        <CityFilter
+          filters={filters}
+          onFilterChange={setFilters}
+          showReset
+          searchTerm={searchQuery}
+          onReset={() => setSearchQuery('')}
+        />
       </div>
 
       {/* ── WORK GRID ── */}

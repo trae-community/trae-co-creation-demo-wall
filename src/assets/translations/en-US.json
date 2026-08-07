@@ -184,7 +184,9 @@
     "auditStatus": "Audit",
     "country": "Province",
     "city": "City",
-    "dateLabel": "Date"
+    "filters": "Filters",
+    "dateLabel": "Date",
+    "reset": "Reset Filters"
   },
   "Card": {
     "viewDetails": "View Details",

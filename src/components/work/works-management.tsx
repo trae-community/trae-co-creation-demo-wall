@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/select"
 import { EditForm } from '@/components/work/edit-form'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { DatePicker } from '@/components/ui/date-picker'
+import { cn } from '@/lib/utils'
 
 // Types
 interface TagItem {
@@ -552,7 +554,7 @@ export function WorksManagement({
 
       {/* Search + Filter */}
       <div className="p-4 rounded-xl border border-border bg-card space-y-3">
-        {/* Search */}
+        {/* Search + Date picker */}
         <div className="flex flex-col sm:flex-row gap-3 items-center">
           <div className="relative flex-1 max-w-md w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -564,23 +566,24 @@ export function WorksManagement({
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => { setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [] }); setSelectedDate('') }}
+
+          {/* Date picker — 自定义日历弹窗，与首页一致 */}
+          <DatePicker
+            value={selectedDate}
+            onChange={setSelectedDate}
+            placeholder="日期"
             className="shrink-0"
-          >
-            重置筛选
-          </Button>
+          />
         </div>
 
-        {/* CityFilter — same as home page */}
+        {/* CityFilter — 与首页统一交互，内置重置按钮 */}
         <CityFilter
           filters={filters}
           onFilterChange={setFilters}
           auditStatusOptions={auditStatuses.map(s => ({ label: s.itemLabel, value: s.itemValue }))}
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
+          showReset
+          searchTerm={searchTerm}
+          onReset={() => { setSearchTerm(''); setSelectedDate('') }}
         />
       </div>
 
