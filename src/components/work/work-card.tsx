@@ -77,7 +77,7 @@ export function WorkCard({ work }: WorkCardProps) {
   return (
     <Link
       href={detailHref}
-      className="group flex h-full flex-col rounded-2xl overflow-hidden border border-white/8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(34,197,94,0.2)] hover:border-green-500/35"
+      className="group flex h-full flex-col rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(50,240,140,0.2)] hover:border-green-500/35"
       style={{ background: '#111318' }}
     >
       {/* Cover — 4:3 ratio */}
@@ -87,7 +87,10 @@ export function WorkCard({ work }: WorkCardProps) {
           alt={work.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = "https://placehold.co/600x450?text=No+Image";
+            const img = e.target as HTMLImageElement;
+            if (img.dataset.fallback) return; // 防止兑底图也失败时死循环
+            img.dataset.fallback = '1';
+            img.src = '/images/work-placeholder.svg';
           }}
         />
 
@@ -151,7 +154,7 @@ export function WorkCard({ work }: WorkCardProps) {
                   className={`text-[10px] px-2 py-0.5 rounded-full border ${
                     isSpecial
                       ? "bg-green-500/10 text-green-500 border-green-500/20"
-                      : "bg-white/5 text-zinc-600 border-white/8"
+                      : "bg-white/5 text-zinc-600 border-white/10"
                   }`}
                 >
                   {tag}
@@ -162,7 +165,7 @@ export function WorkCard({ work }: WorkCardProps) {
         )}
 
         {/* Footer: author + time + stats */}
-        <div className="flex min-w-0 items-center justify-between gap-3 pt-3.5 border-t border-white/6 mt-auto">
+        <div className="flex min-w-0 items-center justify-between gap-3 pt-3.5 border-t border-white/5 mt-auto">
           {/* Author / team */}
           <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
             {isTeam ? (
@@ -230,11 +233,11 @@ export function WorkCard({ work }: WorkCardProps) {
 
           {/* Stats — eye-catching */}
           <div className="flex shrink-0 items-center gap-2.5">
-            <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-400/80">
+            <span className="flex items-center gap-1 text-[11px] font-semibold text-green-400/80">
               <Eye className="w-3.5 h-3.5" />
               {work.views >= 1000 ? `${(work.views / 1000).toFixed(1)}k` : work.views}
             </span>
-            <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-400/80">
+            <span className="flex items-center gap-1 text-[11px] font-semibold text-green-400/80">
               <ThumbsUp className="w-3.5 h-3.5" />
               {work.likes}
             </span>

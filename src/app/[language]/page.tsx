@@ -174,7 +174,7 @@ export default function Page() {
         /* Skeleton */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-2xl overflow-hidden border border-white/6" style={{ background: '#111318' }}>
+            <div key={i} className="rounded-2xl overflow-hidden border border-white/5" style={{ background: '#111318' }}>
               <div className="animate-pulse bg-white/5" style={{ aspectRatio: '4/3' }} />
               <div className="p-5 space-y-3">
                 <div className="animate-pulse h-4 bg-white/5 rounded-md w-3/4" />
@@ -191,7 +191,7 @@ export default function Page() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 rounded-2xl border border-dashed border-white/8" style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <div className="text-center py-20 rounded-2xl border border-dashed border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
           <div className="text-3xl mb-3">🔍</div>
           <p className="text-zinc-400 text-sm mb-3">{t('noResults')}</p>
           <button

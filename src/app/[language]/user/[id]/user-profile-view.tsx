@@ -137,7 +137,7 @@ export function UserProfileView() {
               <Link
                 key={work.id}
                 href={`/works/${work.id}`}
-                className="group flex flex-col rounded-2xl overflow-hidden border border-white/8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(34,197,94,0.2)] hover:border-green-500/35"
+                className="group flex flex-col rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(50,240,140,0.2)] hover:border-green-500/35"
                 style={{ background: '#111318' }}
               >
                 <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
@@ -147,7 +147,10 @@ export function UserProfileView() {
                       alt={work.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x450?text=No+Image'
+                        const img = e.target as HTMLImageElement;
+                        if (img.dataset.fallback) return; // 防止兑底图也失败时死循环
+                        img.dataset.fallback = '1';
+                        img.src = '/images/work-placeholder.svg';
                       }}
                     />
                   ) : (
@@ -178,7 +181,7 @@ export function UserProfileView() {
                     <p className="text-zinc-500 text-xs line-clamp-2 mb-3">{work.summary}</p>
                   )}
 
-                  <div className="flex items-center gap-3 mt-auto pt-3 border-t border-white/6 text-xs text-zinc-500">
+                  <div className="flex items-center gap-3 mt-auto pt-3 border-t border-white/5 text-xs text-zinc-500">
                     <span className="flex items-center gap-1">
                       <Eye className="w-3 h-3" />
                       {work.views >= 1000 ? `${(work.views / 1000).toFixed(1)}k` : work.views}
@@ -196,7 +199,7 @@ export function UserProfileView() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 rounded-2xl border border-dashed border-white/8" style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <div className="text-center py-16 rounded-2xl border border-dashed border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
             <p className="text-zinc-400 text-sm">{t('noWorks')}</p>
           </div>
         )}
