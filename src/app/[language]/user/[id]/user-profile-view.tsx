@@ -199,8 +199,17 @@ export function UserProfileView() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 rounded-2xl border border-dashed border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <p className="text-zinc-400 text-sm">{t('noWorks')}</p>
+          <div className="text-center py-16 rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+              <Sparkles className="w-8 h-8 text-zinc-500" />
+            </div>
+            <p className="text-zinc-400 text-sm mb-4">{t('noWorks')}</p>
+            <Link
+              href="/submit"
+              className="px-4 py-2 rounded-full text-sm font-medium text-green-400 border border-green-500/30 bg-green-500/10 hover:bg-green-500/20 transition-colors"
+            >
+              {t('submitFirstWork')}
+            </Link>
           </div>
         )}
       </section>

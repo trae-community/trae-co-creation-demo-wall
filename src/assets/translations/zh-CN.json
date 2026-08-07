@@ -298,6 +298,7 @@
     "views": "浏览",
     "likes": "点赞",
     "noWorks": "暂无公开展示的作品。",
+    "submitFirstWork": "提交第一份作品",
     "joinedAt": "加入于",
     "notFound": "用户不存在",
     "loadError": "加载用户信息失败"

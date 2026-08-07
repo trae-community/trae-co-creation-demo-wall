@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
-import { Edit, Trash2, Eye, ThumbsUp, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { Edit, Trash2, Eye, ThumbsUp, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search, Inbox } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -807,8 +807,9 @@ export function WorksManagement({
         ))}
         
         {works.length === 0 && (
-          <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg bg-card/30">
-            暂无作品
+          <div className="col-span-full flex flex-col items-center justify-center py-16 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg bg-card/30">
+            <Inbox className="w-12 h-12 text-zinc-600 mb-3" />
+            <span>暂无作品</span>
           </div>
         )}
       </div>

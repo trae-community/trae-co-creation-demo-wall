@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { WorkCard } from "@/components/work/work-card";
 import { CityFilter, FilterState } from "@/components/work/city-filter";
-import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight, SearchX } from "lucide-react";
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils";
 import { HeroBanner } from "@/components/common/hero-banner";
@@ -191,16 +191,18 @@ export default function Page() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 rounded-2xl border border-dashed border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
-          <div className="text-3xl mb-3">🔍</div>
-          <p className="text-zinc-400 text-sm mb-3">{t('noResults')}</p>
+        <div className="text-center py-20 rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+            <SearchX className="w-8 h-8 text-zinc-500" />
+          </div>
+          <p className="text-zinc-400 text-sm mb-4">{t('noResults')}</p>
           <button
             onClick={() => {
               setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [] });
               setSearchQuery("");
               setSelectedDate("");
             }}
-            className="text-green-500 text-sm font-medium hover:underline"
+            className="px-4 py-2 rounded-full text-sm font-medium text-green-400 border border-green-500/30 bg-green-500/10 hover:bg-green-500/20 transition-colors"
           >
             {t('clearFilters')}
           </button>

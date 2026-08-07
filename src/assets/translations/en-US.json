@@ -298,6 +298,7 @@
     "views": "Views",
     "likes": "Likes",
     "noWorks": "No public works yet.",
+    "submitFirstWork": "Submit your first work",
     "joinedAt": "Joined",
     "notFound": "User not found",
     "loadError": "Failed to load user profile"

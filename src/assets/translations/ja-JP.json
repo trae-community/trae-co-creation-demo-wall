@@ -304,6 +304,7 @@
     "views": "閲覧",
     "likes": "いいね",
     "noWorks": "公開作品はまだありません。",
+    "submitFirstWork": "最初の作品を投稿",
     "joinedAt": "参加日",
     "notFound": "ユーザーが見つかりません",
     "loadError": "ユーザー情報の読み込みに失敗しました"
