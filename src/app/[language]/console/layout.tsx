@@ -106,7 +106,7 @@ export default function ConsoleLayout({
 
     const isRoot = roles.includes('root')
     const isAdmin = roles.includes('admin')
-    const allowedItems = ['用户管理', '作品管理', '标签管理']
+    const allowedItems = ['用户管理', '作品管理', '标签管理', '城市数据']
 
     const filterNavItems = (items: NavItem[]): NavItem[] => {
       if (isRoot) return items;

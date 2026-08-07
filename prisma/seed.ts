@@ -157,31 +157,40 @@ async function main() {
   console.log(`✓ Admin user created: ${adminUser.email}`);
 
   // 分配根用户角色，需与备份数据和前端权限判断保持一致
-  const adminRole = await prisma.sysRole.upsert({
-    where: { roleCode: 'root' },
-    update: {},
-    create: {
-      roleCode: 'root',
-      roleName: '根用户',
-      description: '系统最高权限用户',
-    },
-  });
+  // 系统内置角色固定为 root/admin/common，不可新增、修改或删除
+  const builtinRoles = [
+    { roleCode: 'root', roleName: '根用户', description: '系统最高权限用户，可访问全部控制台模块' },
+    { roleCode: 'admin', roleName: '管理员', description: '日常运营管理，可访问用户管理、作品管理、城市数据等模块' },
+    { roleCode: 'common', roleName: '普通用户', description: '注册用户，仅可使用前台功能' },
+  ];
+
+  let adminRole = null as Awaited<ReturnType<typeof prisma.sysRole.upsert>> | null;
+  for (const roleData of builtinRoles) {
+    const role = await prisma.sysRole.upsert({
+      where: { roleCode: roleData.roleCode },
+      update: {},
+      create: roleData,
+    });
+    if (roleData.roleCode === 'root') {
+      adminRole = role;
+    }
+  }
 
   await prisma.sysUserRole.upsert({
     where: {
       userId_roleId: {
         userId: adminUser.id,
-        roleId: adminRole.id,
+        roleId: adminRole!.id,
       },
     },
     update: {},
     create: {
       userId: adminUser.id,
-      roleId: adminRole.id,
+      roleId: adminRole!.id,
     },
   });
 
-  console.log(`✓ Admin role assigned: ${adminRole.roleName}`);
+  console.log(`✓ Admin role assigned: ${adminRole!.roleName}`);
 
   console.log('Database seed completed!');
 }
