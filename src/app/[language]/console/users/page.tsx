@@ -293,7 +293,7 @@ export default function UsersPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">全部角色</SelectItem>
-                {availableRoles.filter(role => role.roleCode !== 'root').map(role => (
+                {availableRoles.map(role => (
                   <SelectItem key={role.id} value={role.roleCode}>
                     {role.roleName}
                   </SelectItem>
