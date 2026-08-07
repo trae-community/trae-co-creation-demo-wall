@@ -268,7 +268,7 @@ export function WorkDetailView() {
   <text x="104" y="282" fill="#ffffff" font-size="56" font-family="Arial, sans-serif" font-weight="700">${safe(title)}</text>
   <text x="104" y="326" fill="#e4e4e7" font-size="25" font-family="Arial, sans-serif">${safe(intro)}</text>
   <rect x="76" y="398" width="1048" height="132" rx="18" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)"/>
-  <rect x="104" y="430" width="128" height="30" rx="15" fill="rgba(34,197,94,0.14)" stroke="rgba(34,197,94,0.36)"/>
+  <rect x="104" y="430" width="128" height="30" rx="15" fill="rgba(50,240,140,0.14)" stroke="rgba(50,240,140,0.36)"/>
   <text x="168" y="450" text-anchor="middle" fill="#86efac" font-size="14" font-family="Arial, sans-serif">${safe(categoryLine)}</text>
   ${tagSvg}
   <text x="104" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">${safe(teamLabel)} ${safe(String(teamMembers.length || 0))}</text>
@@ -464,8 +464,8 @@ export function WorkDetailView() {
                 onClick={handleLike}
                 className={`gap-2 transition-all duration-300 px-6 py-2.5 rounded-full font-medium ${
                   liked
-                    ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)] border-transparent scale-105"
-                    : "bg-zinc-800/80 text-gray-300 hover:text-white hover:bg-zinc-800 border border-white/10 backdrop-blur-md hover:border-green-500/50 hover:shadow-[0_0_15px_rgba(34,197,94,0.1)]"
+                    ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-[0_0_20px_rgba(50,240,140,0.4)] border-transparent scale-105"
+                    : "bg-zinc-800/80 text-gray-300 hover:text-white hover:bg-zinc-800 border border-white/10 backdrop-blur-md hover:border-green-500/50 hover:shadow-[0_0_15px_rgba(50,240,140,0.1)]"
                 }`}
               >
                 <ThumbsUp className={`w-4 h-4 ${liked ? "fill-current animate-bounce" : "group-hover:scale-110 transition-transform"}`} />

@@ -232,7 +232,7 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
                         'h-8 rounded-lg text-sm transition-all',
                         inMonth ? 'text-zinc-200' : 'text-zinc-600',
                         isSelected
-                          ? 'bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-black font-bold shadow-[0_0_12px_rgba(34,197,94,0.25)]'
+                          ? 'bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold shadow-[0_0_12px_rgba(50,240,140,0.25)]'
                           : 'hover:bg-white/10',
                         isToday && !isSelected && 'border border-green-500/40'
                       )}
@@ -259,7 +259,7 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
                     className={cn(
                       'h-12 rounded-lg text-sm transition-all',
                       isSelected
-                        ? 'bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-black font-bold shadow-[0_0_12px_rgba(34,197,94,0.25)]'
+                        ? 'bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold shadow-[0_0_12px_rgba(50,240,140,0.25)]'
                         : 'text-zinc-200 hover:bg-white/10',
                       isCurrent && !isSelected && 'border border-green-500/40'
                     )}
@@ -285,7 +285,7 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
                     className={cn(
                       'h-12 rounded-lg text-sm transition-all',
                       isSelected
-                        ? 'bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-black font-bold shadow-[0_0_12px_rgba(34,197,94,0.25)]'
+                        ? 'bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold shadow-[0_0_12px_rgba(50,240,140,0.25)]'
                         : 'text-zinc-200 hover:bg-white/10',
                       isCurrent && !isSelected && 'border border-green-500/40'
                     )}

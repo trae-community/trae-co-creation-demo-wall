@@ -707,7 +707,7 @@ export function WorksManagement({
                     {/* Action Buttons */}
                     <div className="flex items-center gap-1 shrink-0">
                       {/* Jump to detail page */}
-                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-emerald-500 hover:bg-emerald-500/10" onClick={() => router.push(`/${locale}/works/${work.id}`)} title="查看详情页">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-green-400 hover:bg-green-500/10" onClick={() => router.push(`/${locale}/works/${work.id}`)} title="查看详情页">
                         <ExternalLink size={16} />
                       </Button>
                       {allowedActions.includes('view') && (

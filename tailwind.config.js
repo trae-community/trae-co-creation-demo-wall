@@ -10,6 +10,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        // 品牌绿统一：以 logo 绿 #32F08C 为基准覆写 Tailwind green 色板
+        green: {
+          300: "#9DF7C6",
+          400: "#32F08C",
+          500: "#1FDB79",
+          600: "#14B368",
+        },
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",

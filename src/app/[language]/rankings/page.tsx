@@ -196,7 +196,7 @@ export default function RankingsPage() {
             className={cn(
               "flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border transition-all",
               mainTab === key
-                ? "bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-black font-bold border-transparent shadow-[0_0_12px_rgba(34,197,94,0.25)]"
+                ? "bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold border-transparent shadow-[0_0_12px_rgba(50,240,140,0.25)]"
                 : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
             )}
           >
@@ -258,7 +258,7 @@ export default function RankingsPage() {
                     {/* Progress bar */}
                     <div className="mt-2 h-1.5 rounded-full bg-white/5 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-gradient-to-r from-[#22C55E] to-[#16A34A] transition-all duration-500"
+                        className="h-full rounded-full bg-gradient-to-r from-[#32F08C] to-[#17D479] transition-all duration-500"
                         style={{ width: `${barPercent}%` }}
                       />
                     </div>
