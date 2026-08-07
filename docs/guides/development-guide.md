@@ -18,37 +18,33 @@ src/
 │   ├── [language]/                 # 国际化路由段（Next.js 动态段）
 │   │   ├── page.tsx
 │   │   ├── layout.tsx
-│   │   ├── console/
+│   │   ├── console/                # 控制台（用户/角色/作品/标签/日志等）
 │   │   ├── sign-in/
 │   │   ├── sign-up/
+│   │   ├── profile/                # 个人主页
 │   │   ├── submit/
 │   │   │   ├── page.tsx
 │   │   │   └── submission-form.tsx
 │   │   └── works/[id]/
 │   │       ├── page.tsx
 │   │       └── work-detail-view.tsx
-│   ├── api/
-│   ├── test/
+│   ├── api/                        # API 路由
 │   └── layout.tsx
 ├── assets/
 │   ├── globals.css
-│   └── translations/
+│   └── translations/               # zh-CN / en-US / ja-JP
 ├── components/
-│   ├── ui/                         # shadcn 基础组件
+│   ├── ui/                         # shadcn 基础组件（含 date-picker）
 │   ├── common/                     # 通用业务组件
 │   ├── layout/                     # 布局组件
-│   ├── work/                       # 作品域组件
+│   ├── work/                       # 作品域组件（city-filter/works-management 等）
 │   └── crud/                       # CRUD 相关组件
-├── hooks/
-│   └── use-feedback.ts
 ├── lib/
 │   ├── language/                   # i18n 路由与请求配置
-│   ├── crud.ts
-│   ├── types.ts
-│   ├── utils.ts
-│   ├── auth.ts
-│   ├── prisma.ts
-│   └── supabase.ts
+│   ├── auth.ts / auth-nextauth.ts  # 鉴权与角色判断
+│   ├── prisma.ts / crud.ts / types.ts / utils.ts
+│   ├── use-feedback.ts / use-works.ts  # Hook
+│   └── works-store.ts              # Zustand store
 └── middleware.ts
 ```
 
@@ -68,8 +64,8 @@ src/
 
 ### 3) Hook 命名
 
-- Hook 文件统一 `use-*.ts`：如 `use-feedback.ts`。
-- Hook 放 `src/hooks/`，避免与 UI 组件混放，职责更清晰。
+- Hook 文件统一 `use-*.ts`：如 `use-feedback.ts`、`use-works.ts`。
+- Hook 放 `src/lib/`，避免与 UI 组件混放，职责更清晰。
 
 ### 4) 国际化命名
 
@@ -88,7 +84,7 @@ src/
    - 文件名使用 kebab-case，导出名使用 PascalCase。
 
 3. 新建 Hook  
-   - 放在 `src/hooks/`，命名 `use-*.ts`。  
+   - 放在 `src/lib/`，命名 `use-*.ts`。  
    - 避免把 hook 放在 `components/` 内，除非该 hook 仅服务某个组件且不复用。
 
 4. 类型与工具  
@@ -96,43 +92,38 @@ src/
    - 公共常量与过滤参数放 `src/lib/crud.ts`。  
    - 公共函数放 `src/lib/utils.ts`。
 
-## 5. 国际化
+## 国际化
    - 所有用户可见文案走 `next-intl`。
-   - 文案文件放在 `src/assets/translations/*.json`。
+   - 文案文件放在 `src/assets/translations/*.json`，三语（zh-CN / en-US / ja-JP）同步维护。
 
-## 5. 数据库迁移
+## 数据库迁移
 
-项目使用 **Prisma** 作为 ORM，迁移脚本位于 `docs/db/` 目录。
+项目使用 **Prisma** 作为 ORM，迁移记录位于 `prisma/migrations/`，种子数据见 `prisma/seed.ts`。
 
-### 运行迁移
+### 常用命令
 
 ```bash
 # 生成 Prisma 客户端（schema 变更后需要）
 npx prisma generate
 
-# 推送 schema 变更到数据库
-npx prisma db push
+# 开发环境：创建并应用迁移
+npx prisma migrate dev --name <描述>
+
+# 部署/本地初始化：应用已有迁移
+npx prisma migrate deploy
+
+# 初始化种子数据（内置角色、字典等）
+npm run seed
 ```
 
-### 迁移脚本命名规范
+### 迁移提交规范
 
-- 格式：`migration_v{版本号}_{描述}.sql`
-- 示例：`migration_v0.5_add_parent_value_to_city.sql`
+- 迁移目录与产生它的 schema 改动一起提交。
+- 历史手写 SQL 迁移已归档至 `docs/archive/db/`，仅作参考。
 
-### 重要迁移记录
+## 安全开发规范
 
-| 版本 | 描述 |
-|------|------|
-| v0.1 | 初始数据库 schema |
-| v0.2 | 作品相关表扩展 |
-| v0.3 | 多语言支持、字典表结构升级 |
-| v0.4 | 登录日志、操作日志表 |
-| v0.5 | 字典项层级关系支持（parent_value） |
-| v0.6 | 安全加固、城市字典扩展、控制台统计修复 |
-
-## 6. 安全开发规范
-
-### 6.1 后台 API 鉴权
+### 后台 API 鉴权
 
 所有后台管理接口必须添加角色鉴权：
 
@@ -148,7 +139,7 @@ export async function GET(req: NextRequest) {
 }
 ```
 
-### 6.2 作品可见性控制
+### 作品可见性控制
 
 前台作品详情接口必须检查作品状态：
 
@@ -163,9 +154,9 @@ if (!isOwner && !isAdminUser && (!isApproved || !isVisible)) {
 }
 ```
 
-### 6.3 角色分配安全
+### 角色体系约束
 
-禁止给用户分配 `root` 角色：
+系统固定三个内置角色（`root` / `admin` / `common`），API 层禁止新增/修改/删除（见 `src/app/api/roles/route.ts`）；同时禁止给用户分配 `root` 角色：
 
 ```typescript
 if (roleIds.includes(ROOT_ROLE_ID)) {

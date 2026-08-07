@@ -1,5 +1,12 @@
 # TRAE DEMO WALL - 文档目录
 
+## 项目入口文档
+
+| 文件 | 说明 |
+|------|------|
+| [README.md](../README.md) | 项目介绍、技术栈、本地开发/部署指南 |
+| [CONTRIBUTING.md](../CONTRIBUTING.md) | 贡献指南（分支流程、Conventional Commits 提交规范、自检清单） |
+
 ## 指南文档
 
 `guides/` 目录存放开发参考文档：
@@ -10,7 +17,7 @@
 | [code-wiki.md](guides/code-wiki.md) | 项目架构、技术栈、目录结构总览 |
 | [component-reference.md](guides/component-reference.md) | 前端组件文档（通用/CRUD/作品/UI组件） |
 | [crud-guide.md](guides/crud-guide.md) | CRUD 组件与分页接口使用说明 |
-| [development-guide.md](guides/development-guide.md) | 开发规范（命名/路由/文件组织） |
+| [development-guide.md](guides/development-guide.md) | 开发规范（命名/路由/文件组织/安全） |
 | [docker-deployment.md](guides/docker-deployment.md) | Docker 部署指南（生产环境） |
 
 ## 设计文档
