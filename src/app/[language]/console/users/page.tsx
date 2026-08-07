@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Plus, User, Mail, Phone, Calendar, Shield } from 'lucide-react'
+import { Plus, User, Mail, Phone, Calendar, Shield, Filter } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -27,6 +27,13 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
 import { Link } from '@/lib/language/navigation'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 // Types
 interface Role {
@@ -78,6 +85,9 @@ export default function UsersPage() {
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([])
   const [isSavingRoles, setIsSavingRoles] = useState(false)
 
+  // Filter states
+  const [filterRoleCode, setFilterRoleCode] = useState('all')
+
   const { feedback, showFeedback } = useFeedback()
 
   // Form
@@ -102,6 +112,11 @@ export default function UsersPage() {
         [CRUD_QUERY_PARAMS.query]: searchTerm,
       })
 
+      // 添加角色筛选参数
+      if (filterRoleCode && filterRoleCode !== 'all') {
+        params.set('roleCode', filterRoleCode)
+      }
+
       const res = await fetch(`/api/users?${params.toString()}`)
       if (res.ok) {
         const data = await res.json()
@@ -116,7 +131,7 @@ export default function UsersPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [currentPage, pageSize, searchTerm, showFeedback])
+  }, [currentPage, pageSize, searchTerm, filterRoleCode, showFeedback])
 
   // Fetch Roles
   const fetchRoles = useCallback(async () => {
@@ -137,10 +152,10 @@ export default function UsersPage() {
     fetchRoles()
   }, [fetchUsers, fetchRoles])
 
-  // Reset page when search changes
+  // Reset page when search or filter changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm])
+  }, [searchTerm, filterRoleCode])
 
   // Handlers
   const handleCreate = () => {
@@ -253,16 +268,55 @@ export default function UsersPage() {
         </Button>
       </div>
 
-      <CrudFilterBar
-        searchPlaceholder="搜索用户名、邮箱或手机号..."
-        searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
-        // No complex filters for now, but keeping prop consistent
-        filterValue="all"
-        filterOptions={[]} 
-        onFilterChange={() => {}}
-        filterPlaceholder="筛选用户"
-      />
+      <div className="p-4 rounded-xl border border-border bg-card space-y-3">
+        {/* Search */}
+        <div className="flex flex-col sm:flex-row gap-3 items-center">
+          <div className="relative flex-1 max-w-md w-full">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="搜索用户名、邮箱或手机号..."
+              className="w-full pl-10 pr-4 py-2 rounded-lg text-sm bg-secondary border border-border focus:outline-none focus:ring-1 focus:ring-primary/40"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          {/* Role Filter Dropdown */}
+          <div className="flex items-center gap-2">
+            <Filter size={16} className="text-muted-foreground" />
+            <Select value={filterRoleCode} onValueChange={(value) => setFilterRoleCode(value)}>
+              <SelectTrigger className="w-[200px] bg-secondary border-border">
+                <SelectValue placeholder="全部角色" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部角色</SelectItem>
+                {availableRoles.filter(role => role.roleCode !== 'root').map(role => (
+                  <SelectItem key={role.id} value={role.roleCode}>
+                    {role.roleName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {(searchTerm || filterRoleCode !== 'all') && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSearchTerm('')
+                setFilterRoleCode('all')
+              }}
+              className="shrink-0"
+            >
+              重置筛选
+            </Button>
+          )}
+        </div>
+      </div>
 
       <div className="space-y-4">
         {users.map(user => (

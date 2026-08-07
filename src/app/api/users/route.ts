@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
     const page = Number(searchParams.get(CRUD_QUERY_PARAMS.page) || '1');
     const pageSize = Number(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10');
     const query = searchParams.get(CRUD_QUERY_PARAMS.query) || '';
+    const roleCode = searchParams.get('roleCode') || ''; // 按角色编码筛选
     
     // 构建过滤条件
     const whereFilters: Prisma.SysUserWhereInput[] = [];
@@ -40,6 +41,19 @@ export async function GET(req: NextRequest) {
           { email: { contains: query, mode: 'insensitive' } },
           { phone: { contains: query, mode: 'insensitive' } },
         ],
+      });
+    }
+
+    // 如果指定了角色编码，添加角色筛选条件
+    if (roleCode) {
+      whereFilters.push({
+        roles: {
+          some: {
+            role: {
+              roleCode: roleCode
+            }
+          }
+        }
       });
     }
 
