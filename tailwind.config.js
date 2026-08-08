@@ -75,7 +75,7 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["var(--font-sans)"],
+        sans: ["var(--font-sans)", "var(--font-chinese)", "ui-sans-serif", "system-ui"],
         serif: ["var(--font-serif)"],
         mono: ["var(--font-mono)"],
       },

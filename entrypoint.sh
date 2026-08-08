@@ -10,7 +10,7 @@ if [ "${RUN_DB_INIT:-true}" = "true" ]; then
   echo "Database is ready!"
 
   echo "Running database migrations..."
-  node node_modules/prisma/build/index.js db push
+  node node_modules/prisma/build/index.js db push --accept-data-loss
 
   echo "Seeding database..."
   node node_modules/tsx/dist/cli.mjs prisma/seed.ts || echo "Seed failed or already completed"

@@ -30,6 +30,7 @@ export default function Page() {
   const [sortBy, setSortBy] = useState<'time' | 'likes' | 'views'>((searchParams.get('sort') as any) || 'time');
   const [selectedDate, setSelectedDate] = useState(searchParams.get('date') || '');
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const [sortTransitioning, setSortTransitioning] = useState(false);
   const pageSize = 12;
   const hasMountedRef = useRef(false);
 
@@ -64,6 +65,13 @@ export default function Page() {
     }
     setPage(1);
   }, [filters, debouncedSearch, sortBy, selectedDate]);
+
+  // Sort change transition
+  useEffect(() => {
+    setSortTransitioning(true);
+    const timer = setTimeout(() => setSortTransitioning(false), 200);
+    return () => clearTimeout(timer);
+  }, [sortBy]);
 
   // 同步状态到 URL
   useEffect(() => {
@@ -213,9 +221,18 @@ export default function Page() {
           ))}
         </div>
       ) : works.length > 0 ? (
-        <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 transition-opacity duration-300", isLoading && "opacity-60")}>
-          {works.map((work) => (
-            <WorkCard key={work.id} work={work} />
+        <div className={cn(
+          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 transition-all duration-200",
+          isLoading && "opacity-60",
+          sortTransitioning && "opacity-40 scale-[0.98]"
+        )}>
+          {works.map((work, index) => (
+            <div
+              key={work.id}
+              style={{ animation: `cardFadeUp 0.4s ease-out ${index * 50}ms both` }}
+            >
+              <WorkCard key={work.id} work={work} />
+            </div>
           ))}
         </div>
       ) : (
