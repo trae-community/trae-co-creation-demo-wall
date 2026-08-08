@@ -820,6 +820,7 @@ export function WorksManagement({
         endIndex={endIndex}
         current={current}
         totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
         onPrev={() => setCurrentPage(current - 1)}
         onNext={() => setCurrentPage(current + 1)}
       />

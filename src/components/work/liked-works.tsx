@@ -77,6 +77,7 @@ export function LikedWorks({ userId }: LikedWorksProps) {
           endIndex={endIndex}
           current={current}
           totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
           onPrev={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
           onNext={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
         />
