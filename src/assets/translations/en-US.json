@@ -33,7 +33,11 @@
     "showing": "Showing",
     "clearDate": "Clear date",
     "dateFilterHint": "Filter by submission date",
-    "dateLabel": "Date"
+    "dateLabel": "Date",
+    "statWorks": "Works",
+    "statCreators": "Creators",
+    "statViews": "Total Views",
+    "statLikes": "Total Likes"
   },
   "Submit": {
     "title": "Welcome to submit your TRAE Demo!",
@@ -140,9 +144,11 @@
     "uploading": "Uploading…"
   },
   "Work": {
-    "notFound": "Project Not Found",
+    "notFound": "Project not found",
     "backHome": "Back to Home",
     "backList": "Back to List",
+    "backToProfile": "Back to Profile",
+    "backRankings": "Back to Rankings",
     "cityFeatured": "City Featured",
     "teamMembers": "Team Members:",
     "submitTime": "Submitted:",
@@ -200,7 +206,6 @@
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
     "icp": "浙ICP备2026026485号-1",
     "githubCommunity": "GitHub Community",
-    "repo": "Repository",
     "traeOfficial": "Trae Official",
     "traeCommunity": "Trae Community"
   },
@@ -319,6 +324,8 @@
     "totalLikes": "Total Likes",
     "author": "Author",
     "loadError": "Failed to load rankings. Please refresh.",
-    "noData": "No ranking data available yet."
+    "noData": "No ranking data available yet.",
+    "trending": "Trending",
+    "noTrendingData": "No new works in the past 7 days. Submit yours now!"
   }
 }

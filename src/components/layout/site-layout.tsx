@@ -395,7 +395,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             {[
               { label: tFooter('githubCommunity'), href: 'https://github.com/trae-community', icon: Github },
-              { label: tFooter('repo'), href: 'https://github.com/trae-community/trae-co-creation-demo-wall', icon: Code2 },
               { label: tFooter('traeOfficial'), href: 'https://www.trae.cn', icon: Globe },
               { label: tFooter('traeCommunity'), href: 'https://forum.trae.cn', icon: MessagesSquare },
             ].map(({ label, href, icon: Icon }) => (
