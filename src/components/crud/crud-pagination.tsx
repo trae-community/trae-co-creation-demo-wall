@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useCallback, useRef } from 'react'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 
 interface CrudPaginationProps {
   totalItems: number
@@ -29,31 +30,14 @@ export function CrudPagination({
   onPageSizeChange,
   pageSizes = [5, 10, 20, 50],
 }: CrudPaginationProps) {
-  const [inputValue, setInputValue] = useState(String(current))
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value)
-  }, [])
-
-  const handleInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleJumpPage()
-    }
-  }, [])
-
-  const handleJumpClick = useCallback(() => {
-    handleJumpPage()
-  }, [])
-
-  const handleJumpPage = useCallback(() => {
-    const num = parseInt(inputValue, 10)
-    if (num >= 1 && num <= totalPages && num !== current) {
+  const jumpPage = () => {
+    const num = parseInt(inputRef.current?.value || '1', 10)
+    if (num >= 1 && num <= totalPages) {
       onPageChange?.(num)
-      setInputValue(String(num))
-    } else {
-      setInputValue(String(current))
     }
-  }, [inputValue, totalPages, current, onPageChange])
+  }
 
   const handlePageSizeChange = useCallback((size: number) => {
     onPageSizeChange?.(size)
@@ -62,7 +46,6 @@ export function CrudPagination({
   // Generate page buttons: first pages ..., current pages ..., last pages
   const getPageButtons = useCallback((): Array<{ page: number; label: string }> => {
     if (totalPages <= 7) {
-      // Show all pages if ≤ 7
       return Array.from({ length: totalPages }, (_, i) => ({
         page: i + 1,
         label: String(i + 1),
@@ -71,14 +54,12 @@ export function CrudPagination({
 
     const buttons: Array<{ page: number; label: string }> = []
 
-    // Always show page 1
     buttons.push({ page: 1, label: '1' })
 
     if (current > 3) {
       buttons.push({ page: -1, label: '...' })
     }
 
-    // Show pages around current
     const start = Math.max(2, current - 1)
     const end = Math.min(totalPages - 1, current + 1)
 
@@ -90,7 +71,6 @@ export function CrudPagination({
       buttons.push({ page: -2, label: '...' })
     }
 
-    // Always show last page
     buttons.push({ page: totalPages, label: String(totalPages) })
 
     return buttons
@@ -99,19 +79,21 @@ export function CrudPagination({
   const pageButtons = getPageButtons()
 
   return (
-    <div className="p-4 border border-border rounded-xl bg-card flex items-center justify-between text-sm text-muted-foreground flex-wrap gap-3">
+    <div className="p-4 border border-input rounded-lg bg-card flex flex-col sm:flex-row items-center justify-between text-sm text-muted-foreground gap-3">
       {/* Info */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span>显示 {totalItems === 0 ? 0 : startIndex + 1}-{endIndex} 共 {totalItems} 条记录</span>
+        <span className="whitespace-nowrap">
+          显示 {totalItems === 0 ? 0 : startIndex + 1}-{endIndex} 共 {totalItems} 条记录
+        </span>
         
         {/* Page size selector */}
         {onPageSizeChange && (
           <div className="flex items-center gap-1">
-            <span>每页:</span>
+            <span>每页</span>
             <select
               value={pageSize}
               onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-              className="px-2 py-1 rounded border border-border bg-background cursor-pointer"
+              className="h-8 px-2 rounded-md border border-input bg-background text-sm cursor-pointer focus:outline-none focus:ring-1 focus:ring-ring"
             >
               {pageSizes.map((size) => (
                 <option key={size} value={size}>
@@ -119,72 +101,100 @@ export function CrudPagination({
                 </option>
               ))}
             </select>
+            <span>条</span>
           </div>
         )}
       </div>
 
       {/* Controls */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {/* First page */}
+        {onPageChange && totalPages > 1 && current > 1 && (
+          <button
+            className="h-8 w-8 inline-flex items-center justify-center rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50 disabled:pointer-events-none"
+            onClick={() => onPageChange(1)}
+            disabled={current <= 1}
+            aria-label="第一页"
+          >
+            <ChevronsLeft className="h-3.5 w-3.5" />
+          </button>
+        )}
+
         {/* Previous button */}
         <button
-          className="px-3 py-1 rounded border border-border hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-          disabled={current <= 1}
+          className="h-8 w-8 inline-flex items-center justify-center rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50 disabled:pointer-events-none"
           onClick={onPrev}
+          disabled={current <= 1}
+          aria-label="上一页"
         >
-          上一页
+          <ChevronLeft className="h-3.5 w-3.5" />
         </button>
 
         {/* Page buttons */}
-        <div className="flex items-center gap-1">
-          {pageButtons.map(({ page, label }) => (
-            page < 0 ? (
-              <span key={`ellipsis-${page}`} className="px-2">
-                {label}
-              </span>
-            ) : (
-              <button
-                key={page}
-                className={`px-3 py-1 rounded border transition-colors ${
-                  page === current
-                    ? 'bg-primary text-primary-foreground border-primary font-semibold'
-                    : 'border-border hover:bg-secondary'
-                }`}
-                onClick={() => onPageChange?.(page)}
-                disabled={page === current}
-              >
-                {label}
-              </button>
-            )
-          ))}
-        </div>
+        {onPageChange && (
+          <div className="flex items-center gap-1">
+            {pageButtons.map(({ page, label }) => (
+              page < 0 ? (
+                <span key={`ellipsis-${page}`} className="px-1 text-muted-foreground">
+                  {label}
+                </span>
+              ) : (
+                <button
+                  key={page}
+                  className={`h-8 min-w-[2rem] px-2 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors ${
+                    page === current
+                      ? 'bg-primary text-primary-foreground shadow'
+                      : 'hover:bg-accent hover:text-accent-foreground'
+                  }`}
+                  onClick={() => onPageChange(page)}
+                  disabled={page === current}
+                >
+                  {label}
+                </button>
+              )
+            ))}
+          </div>
+        )}
 
         {/* Next button */}
         <button
-          className="px-3 py-1 rounded border border-border hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-          disabled={current >= totalPages}
+          className="h-8 w-8 inline-flex items-center justify-center rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50 disabled:pointer-events-none"
           onClick={onNext}
+          disabled={current >= totalPages}
+          aria-label="下一页"
         >
-          下一页
+          <ChevronRight className="h-3.5 w-3.5" />
         </button>
 
+        {/* Last page */}
+        {onPageChange && totalPages > 1 && current < totalPages && (
+          <button
+            className="h-8 w-8 inline-flex items-center justify-center rounded-md border border-input bg-transparent hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50 disabled:pointer-events-none"
+            onClick={() => onPageChange(totalPages)}
+            disabled={current >= totalPages}
+            aria-label="最后一页"
+          >
+            <ChevronsRight className="h-3.5 w-3.5" />
+          </button>
+        )}
+
         {/* Go to page */}
-        {totalPages > 1 && (
-          <div className="flex items-center gap-1">
+        {totalPages > 1 && onPageChange && (
+          <div className="flex items-center gap-1 ml-2">
             <span>跳至</span>
             <input
               type="number"
               min={1}
               max={totalPages}
-              value={inputValue}
-              onChange={handleInputChange}
-              onKeyDown={handleInputKeyDown}
-              onBlur={() => setInputValue(String(current))}
-              className="w-16 px-2 py-1 rounded border border-border bg-background text-center"
+              ref={inputRef}
+              defaultValue=""
+              onKeyDown={(e) => e.key === 'Enter' && jumpPage()}
+              className="h-8 w-16 rounded-md border border-input bg-input px-2 text-sm text-center focus:outline-none focus:ring-1 focus:ring-ring appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
             <span>页</span>
             <button
-              className="px-3 py-1 rounded bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              onClick={handleJumpClick}
+              className="h-8 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:pointer-events-none shadow"
+              onClick={jumpPage}
             >
               跳转
             </button>
