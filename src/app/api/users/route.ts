@@ -75,7 +75,6 @@ export async function GET(req: NextRequest) {
           bio: true,
           createdAt: true,
           updatedAt: true,
-          clerkId: true,
           // Explicitly excluding passwordHash by not selecting it
           roles: {
             include: {
@@ -133,7 +132,6 @@ export async function POST(req: NextRequest) {
         bio: true,
         createdAt: true,
         updatedAt: true,
-        clerkId: true,
       }
     });
 
@@ -219,7 +217,6 @@ export async function PUT(req: NextRequest) {
         bio: true,
         createdAt: true,
         updatedAt: true,
-        clerkId: true,
         roles: {
           include: {
             role: true

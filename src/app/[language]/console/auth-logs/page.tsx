@@ -15,7 +15,6 @@ import { CRUD_QUERY_PARAMS } from '@/lib/crud'
 interface AuthLogItem {
   id: string
   userId: string | null
-  clerkId: string | null
   authType: 'sign_in' | 'sign_up' | string
   authChannel: string | null
   authStatus: string

@@ -69,7 +69,6 @@ const getRequestMeta = (request?: RequestLike) => {
 
 type AuthLogInput = {
   userId?: IdLike
-  clerkId?: string | null
   authType: string
   authChannel?: string | null
   authStatus?: string
@@ -83,7 +82,6 @@ export async function writeAuthLog(input: AuthLogInput) {
     await prisma.sysAuthLog.create({
       data: {
         userId: normalizeId(input.userId),
-        clerkId: input.clerkId || null,
         authType: input.authType,
         authChannel: input.authChannel || 'credentials',
         authStatus: input.authStatus || 'success',

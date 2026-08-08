@@ -70,8 +70,6 @@ model SysUser {
   emailVerified DateTime? @map("email_verified") @db.Timestamptz
   /// 手机号 (选填)
   phone        String?  @db.VarChar(50)
-  /// Clerk 用户ID (兼容旧数据)
-  clerkId      String?  @unique @map("clerk_id") @db.VarChar(255)
   /// 密码哈希
   passwordHash String?  @map("password_hash") @db.VarChar(255)
   /// 头像链接
