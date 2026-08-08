@@ -1,203 +1,223 @@
 import { PrismaClient } from '@prisma/client';
-import fs from 'fs';
-import path from 'path';
 import bcrypt from 'bcryptjs';
+import { roles, dicts, dictItems } from '../docs/seed-data';
 
 const prisma = new PrismaClient();
 
-function escapeLiteral(value: string) {
-  return value.replace(/'/g, "''");
-}
-
-function quoteIdentifier(identifier: string) {
-  return `"${identifier.replace(/"/g, '""')}"`;
-}
-
-async function resetTableSequence(tableName: string) {
-  const escapedTableName = escapeLiteral(tableName);
-  const sequenceColumnRows = await prisma.$queryRawUnsafe<Array<{ column_name: string | null }>>(
-    `
-      SELECT column_name
-      FROM information_schema.columns
-      WHERE table_schema = current_schema()
-        AND table_name = '${escapedTableName}'
-        AND column_default LIKE 'nextval(%'
-      LIMIT 1
-    `,
-  );
-
-  const sequenceColumn = sequenceColumnRows[0]?.column_name;
-
-  if (!sequenceColumn) {
-    return;
-  }
-
-  const escapedSequenceColumn = escapeLiteral(sequenceColumn);
-  const sequenceRows = await prisma.$queryRawUnsafe<Array<{ sequence_name: string | null }>>(
-    `SELECT pg_get_serial_sequence('"${tableName}"', '${escapedSequenceColumn}') AS sequence_name`,
-  );
-
-  const sequenceName = sequenceRows[0]?.sequence_name;
-
-  if (!sequenceName) {
-    return;
-  }
-
-  const maxIdRows = await prisma.$queryRawUnsafe<Array<{ max_id: bigint | number | null }>>(
-    `SELECT MAX(${quoteIdentifier(sequenceColumn)}) AS max_id FROM ${quoteIdentifier(tableName)}`,
-  );
-
-  const maxId = maxIdRows[0]?.max_id;
-
-  if (maxId === null || maxId === undefined) {
-    await prisma.$executeRawUnsafe(
-      `SELECT setval('${sequenceName.replace(/'/g, "''")}', 1, false)`,
-    );
-    return;
-  }
-
-  await prisma.$executeRawUnsafe(
-    `SELECT setval('${sequenceName.replace(/'/g, "''")}', ${maxId.toString()}, true)`,
-  );
-}
+/**
+ * 数据库种子脚本
+ * 
+ * 用途：初始化系统基础数据
+ * - 系统角色（root, admin, common）
+ * - 字典表（审核状态、开发状态、分类等）
+ * - 字典项（从数据库导出的实际数据）
+ * - 默认管理员账号（trae / trae1234）
+ * 
+ * 数据来源：
+ * - 角色、字典、字典项数据从 docs/seed-data.ts 导入
+ * - seed-data.ts 由 _temp_export_seed.js 脚本从数据库导出
+ * 
+ * 执行时机：
+ * - Docker 部署：entrypoint.sh 自动执行一次（RUN_DB_INIT=true）
+ * - 本地开发：手动运行 npm run db:seed
+ * - 安全保证：使用 upsert 操作，可重复执行
+ */
 
 async function main() {
-  const backupDir = path.join(process.cwd(), 'supabase_backup');
+  console.log('\n' + '='.repeat(60));
+  console.log('🌱 数据库种子数据初始化开始');
+  console.log('='.repeat(60));
+  console.log(`⏰ 执行时间: ${new Date().toISOString()}\n`);
 
-  console.log('Starting database seed...');
+  // ========================================
+  // 1. 初始化系统角色（从数据库导出）
+  // ========================================
+  console.log('\n📋 步骤 1: 初始化系统角色...');
 
-  // 读取并导入数据的顺序很重要（外键依赖）
-  const tables = [
-    'sys_dict',
-    'sys_dict_item',
-    'sys_role',
-    'sys_user',
-    'sys_user_role',
-    'sys_auth_log',
-    'sys_operation_log',
-    'work_tag',
-    'work_base',
-    'work_detail',
-    'work_image',
-    'work_team',
-    'work_honor',
-    'work_statistic',
-    'work_tag_relation',
-    'work_like',
-    'work_audit_log',
-  ];
+  let rootRole: Awaited<ReturnType<typeof prisma.sysRole.upsert>> | null = null;
+  let adminRole: Awaited<ReturnType<typeof prisma.sysRole.upsert>> | null = null;
+  let commonRole: Awaited<ReturnType<typeof prisma.sysRole.upsert>> | null = null;
 
-  for (const table of tables) {
-    const filePath = path.join(backupDir, `${table}.json`);
+  const roleStats = { created: 0, updated: 0, skipped: 0 };
 
-    if (!fs.existsSync(filePath)) {
-      console.log(`Skipping ${table} - file not found`);
-      continue;
-    }
+  for (const roleData of roles) {
+    // 检查是否已存在
+    const existing = await prisma.sysRole.findUnique({
+      where: { roleCode: roleData.roleCode },
+      select: { id: true },
+    });
 
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-
-    if (!data || data.length === 0) {
-      console.log(`Skipping ${table} - no data`);
-      continue;
-    }
-
-    console.log(`Importing ${data.length} records into ${table}...`);
-
-    // 使用 Prisma 的原始查询来插入数据
-    const tableName = table;
-    const keys = Object.keys(data[0]);
-
-    for (const record of data) {
-      const values = keys.map(key => {
-        const value = record[key];
-        if (value === null || value === undefined) return 'NULL';
-        if (typeof value === 'string') return `'${value.replace(/'/g, "''")}'`;
-        if (typeof value === 'boolean') return value ? 'true' : 'false';
-        if (typeof value === 'number') return value;
-        if (typeof value === 'object') return `'${JSON.stringify(value).replace(/'/g, "''")}'`;
-        return value;
+    if (existing) {
+      // 已存在的内置角色，跳过创建（不更新，保持配置不变）
+      roleStats.skipped++;
+      console.log(`  ⏭️  跳过（已存在）: ${roleData.roleName} (${roleData.roleCode})`);
+    } else {
+      // 新建角色
+      const role = await prisma.sysRole.create({
+        data: roleData,
       });
-
-      const sql = `INSERT INTO "${tableName}" (${keys.map(k => `"${k}"`).join(', ')}) VALUES (${values.join(', ')}) ON CONFLICT DO NOTHING`;
-
-      try {
-        await prisma.$executeRawUnsafe(sql);
-      } catch (error) {
-        console.error(`Error inserting into ${table}:`, error);
-      }
+      roleStats.created++;
+      console.log(`  ✅ 创建成功: ${role.roleName} (${role.roleCode})`);
     }
 
-    console.log(`✓ Completed ${table}`);
+    if (roleData.roleCode === 'root') rootRole = await prisma.sysRole.findUnique({ where: { roleCode: 'root' } });
+    if (roleData.roleCode === 'admin') adminRole = await prisma.sysRole.findUnique({ where: { roleCode: 'admin' } });
+    if (roleData.roleCode === 'common') commonRole = await prisma.sysRole.findUnique({ where: { roleCode: 'common' } });
   }
 
-  console.log('Resetting imported table sequences...');
+  // ========================================
+  // 2. 初始化字典表（从数据库导出）
+  // ========================================
+  console.log('\n📋 步骤 2: 初始化字典表...');
 
-  for (const table of tables) {
-    await resetTableSequence(table);
+  const dictStats = { created: 0, skipped: 0 };
+
+  for (const dictData of dicts) {
+    const existing = await prisma.sysDict.findUnique({
+      where: { dictCode: dictData.dictCode },
+      select: { id: true },
+    });
+
+    if (existing) {
+      dictStats.skipped++;
+      console.log(`  ⏭️  跳过（已存在）: ${dictData.dictName} (${dictData.dictCode})`);
+    } else {
+      await prisma.sysDict.create({ data: dictData });
+      dictStats.created++;
+      console.log(`  ✅ 创建成功: ${dictData.dictName} (${dictData.dictCode})`);
+    }
   }
+  
+  console.log(`  📊 字典统计: ${dictStats.created} 条新建, ${dictStats.skipped} 条跳过\n`);
 
-  // 初始化默认管理员账号
-  console.log('Initializing default admin user...');
+  // ========================================
+  // 3. 初始化字典项（从数据库导出）
+  // ========================================
+  console.log('\n📋 步骤 3: 初始化字典项...');
 
-  const adminEmail = 'traedemo@example.com';
-  const adminPassword = 'traedemo123';
-  const hashedPassword = await bcrypt.hash(adminPassword, 10);
+  const itemStats = { created: 0, skipped: 0 };
 
-  const adminUser = await prisma.sysUser.upsert({
+  for (const itemData of dictItems) {
+    const existing = await prisma.sysDictItem.findUnique({
+      where: { 
+        dictCode_itemValue: {
+          dictCode: itemData.dictCode,
+          itemValue: itemData.itemValue,
+        }
+      },
+      select: { id: true },
+    });
+
+    if (existing) {
+      itemStats.skipped++;
+    } else {
+      await prisma.sysDictItem.create({ data: itemData });
+      itemStats.created++;
+    }
+  }
+  
+  console.log(`  📊 字典项统计: ${itemStats.created} 条新建, ${itemStats.skipped} 条跳过 (共 ${dictItems.length} 条)\n`);
+
+  // ========================================
+  // 4. 初始化默认管理员账号
+  // ========================================
+  console.log('\n📋 步骤 4: 初始化默认管理员账号...');
+
+  const adminUsername = 'trae';
+  const adminEmail = 'trae@example.com';
+  const adminPassword = 'trae1234';
+
+  // 检查用户是否已存在
+  const existingUser = await prisma.sysUser.findUnique({
     where: { email: adminEmail },
-    update: {},
-    create: {
-      email: adminEmail,
-      username: 'traedemo',
-      passwordHash: hashedPassword,
-    },
+    select: { id: true, username: true },
   });
 
-  console.log(`✓ Admin user created: ${adminUser.email}`);
+  let adminUser;
+  let userAction = '';
 
-  // 分配根用户角色，需与备份数据和前端权限判断保持一致
-  // 系统内置角色固定为 root/admin/common，不可新增、修改或删除
-  const builtinRoles = [
-    { roleCode: 'root', roleName: '根用户', description: '系统最高权限用户，可访问全部控制台模块' },
-    { roleCode: 'admin', roleName: '管理员', description: '日常运营管理，可访问用户管理、作品管理、城市数据等模块' },
-    { roleCode: 'common', roleName: '普通用户', description: '注册用户，仅可使用前台功能' },
-  ];
-
-  let adminRole = null as Awaited<ReturnType<typeof prisma.sysRole.upsert>> | null;
-  for (const roleData of builtinRoles) {
-    const role = await prisma.sysRole.upsert({
-      where: { roleCode: roleData.roleCode },
-      update: {},
-      create: roleData,
+  if (existingUser) {
+    // 用户已存在，更新密码（防止密码泄露后无法登录）
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    adminUser = await prisma.sysUser.update({
+      where: { id: existingUser.id },
+      data: { 
+        username: adminUsername,
+        passwordHash: hashedPassword,
+      },
     });
-    if (roleData.roleCode === 'root') {
-      adminRole = role;
-    }
+    userAction = '🔄 已更新';
+    console.log(`  ${userAction}: ${adminUser.email}`);
+  } else {
+    // 新用户
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    adminUser = await prisma.sysUser.create({
+      data: {
+        username: adminUsername,
+        email: adminEmail,
+        passwordHash: hashedPassword,
+      },
+    });
+    userAction = '✅ 已创建';
+    console.log(`  ${userAction}: ${adminUser.email}`);
   }
 
-  await prisma.sysUserRole.upsert({
+  // ========================================
+  // 5. 分配 root 角色给管理员
+  // ========================================
+  console.log('\n📋 步骤 5: 分配 root 角色...');
+
+  if (!rootRole) {
+    throw new Error('❌ Root role not found. Please ensure step 1 completed successfully.');
+  }
+
+  // 检查关联是否已存在
+  const existingRelation = await prisma.sysUserRole.findUnique({
     where: {
       userId_roleId: {
         userId: adminUser.id,
-        roleId: adminRole!.id,
+        roleId: rootRole.id,
       },
-    },
-    update: {},
-    create: {
-      userId: adminUser.id,
-      roleId: adminRole!.id,
     },
   });
 
-  console.log(`✓ Admin role assigned: ${adminRole!.roleName}`);
+  if (!existingRelation) {
+    await prisma.sysUserRole.create({
+      data: {
+        userId: adminUser.id,
+        roleId: rootRole.id,
+      },
+    });
+    console.log(`  ✅ 分配成功: ${rootRole.roleName} (${rootRole.roleCode})`);
+  } else {
+    console.log(`  ⏭️  跳过（已存在）: ${rootRole.roleName}`);
+  }
 
-  console.log('Database seed completed!');
+  // ========================================
+  // 完成
+  // ========================================
+  console.log('\n' + '='.repeat(60));
+  console.log('✅ 数据库初始化完成！');
+  console.log('='.repeat(60));
+  
+  console.log('\n📝 执行摘要:');
+  console.log(`  • 角色: ${rootRole ? '✅' : '❌'} root 用户已就绪`);
+  console.log(`  • 字典: ✅ ${dicts.length} 个字典类型已就绪`);
+  console.log(`  • 字典项: ✅ ${dictItems.length} 条记录已就绪`);
+  console.log(`  • 管理员: ✅ ${adminUser.email} (${rootRole?.roleName})`);
+  
+  console.log('\n🔐 登录信息:');
+  console.log(`   用户名: ${adminUsername}`);
+  console.log(`   密码: ${adminPassword}`);
+  console.log(`   邮箱: ${adminEmail}`);
+  console.log(`   角色: ${rootRole?.roleName} (${rootRole?.roleCode})`);
+  console.log('\n' + '='.repeat(60) + '\n');
 }
 
+// 执行初始化
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('❌ 初始化失败:', e);
     process.exit(1);
   })
   .finally(async () => {
