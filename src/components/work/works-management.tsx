@@ -105,6 +105,19 @@ interface DictItem {
   labelI18n?: Record<string, string> | null
 }
 
+// 点赞用户记录
+interface LikeUserItem {
+  id: string
+  likedAt: string | null
+  user: {
+    id: string
+    username: string
+    email: string
+    avatarUrl: string | null
+    createdAt: string | null
+  } | null
+}
+
 // Schema
 const workSchema = z.object({
   title: z.string().min(1, '请输入作品名称'),
@@ -187,6 +200,14 @@ export function WorksManagement({
   const [isSavingAudit, setIsSavingAudit] = useState(false)
   const [selectedWorkIds, setSelectedWorkIds] = useState<string[]>([])
   const [auditTargetIds, setAuditTargetIds] = useState<string[]>([])
+
+  // Likes Dialog states
+  const [isLikesDialogOpen, setIsLikesDialogOpen] = useState(false)
+  const [likesWork, setLikesWork] = useState<WorkItem | null>(null)
+  const [likeUsers, setLikeUsers] = useState<LikeUserItem[]>([])
+  const [likeUsersTotal, setLikeUsersTotal] = useState(0)
+  const [isLoadingLikes, setIsLoadingLikes] = useState(false)
+
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [viewingWork, setViewingWork] = useState<WorkItem | null>(null)
   const [viewImageIndex, setViewImageIndex] = useState(0)
@@ -456,6 +477,30 @@ export function WorksManagement({
     setIsAuditDialogOpen(true)
   }
 
+  // 打开点赞用户弹窗，拉取该作品的点赞用户列表
+  const handleOpenLikesDialog = async (work: WorkItem) => {
+    setLikesWork(work)
+    setLikeUsers([])
+    setLikeUsersTotal(0)
+    setIsLikesDialogOpen(true)
+    try {
+      setIsLoadingLikes(true)
+      const res = await fetch(`/api/console/works/${work.id}/likes?page=1&pageSize=100`)
+      if (res.ok) {
+        const data = await res.json()
+        setLikeUsers(data.items || [])
+        setLikeUsersTotal(data.total || 0)
+      } else {
+        showFeedback('error', '点赞用户列表加载失败')
+      }
+    } catch (error) {
+      console.error('Failed to fetch like users:', error)
+      showFeedback('error', '点赞用户列表加载失败')
+    } finally {
+      setIsLoadingLikes(false)
+    }
+  }
+
   const handleToggleWorkSelection = (workId: string, checked: boolean) => {
     setSelectedWorkIds(prev =>
       checked ? [...prev, workId] : prev.filter(id => id !== workId)
@@ -537,6 +582,12 @@ export function WorksManagement({
   const viewingScenarios = normalizeStringList(viewingWork?.detail?.scenarios)
   const viewingImages = (viewingWork?.images || []).filter(image => Boolean(image.imageUrl))
   const currentViewImageIndex = viewingImages.length > 0 ? Math.min(viewImageIndex, viewingImages.length - 1) : 0
+
+  // 点赞用户中近 7 天注册的新账号数量（用于排查批量新用户刷点赞）
+  const newAccountLikes = likeUsers.filter(item => {
+    if (!item.user?.createdAt) return false
+    return Date.now() - new Date(item.user.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000
+  }).length
 
   return (
     <div className="space-y-6 relative min-h-[500px]">
@@ -718,6 +769,11 @@ export function WorksManagement({
                       {allowedActions.includes('audit') && (
                         <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-blue-500 hover:bg-blue-500/10" onClick={() => handleOpenAuditDialog(work)} title="审核作品">
                           <ShieldCheck size={16} />
+                        </Button>
+                      )}
+                      {scope === 'admin' && (
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-pink-500 hover:bg-pink-500/10" onClick={() => handleOpenLikesDialog(work)} title="查看点赞用户">
+                          <ThumbsUp size={16} />
                         </Button>
                       )}
                       {allowedActions.includes('edit') && (
@@ -1238,6 +1294,73 @@ export function WorksManagement({
             <Button onClick={onSaveAudit} disabled={isSavingAudit}>
               {isSavingAudit ? '保存中...' : '保存'}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Likes Users Dialog */}
+      <Dialog open={isLikesDialogOpen} onOpenChange={setIsLikesDialogOpen}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[640px] max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>点赞用户</DialogTitle>
+            <DialogDescription>
+              作品「{likesWork?.title}」共有 {likeUsersTotal} 位用户点赞
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2">
+            {newAccountLikes > 0 && (
+              <div className="rounded-md border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-400">
+                ⚠ 其中 {newAccountLikes} 位点赞用户为近 7 天注册的新账号，请留意是否存在批量刷点赞行为
+              </div>
+            )}
+
+            {isLoadingLikes ? (
+              <div className="text-sm text-muted-foreground text-center py-8">加载中...</div>
+            ) : likeUsers.length === 0 ? (
+              <div className="text-sm text-muted-foreground text-center py-8">暂无点赞记录</div>
+            ) : (
+              <div className="space-y-2">
+                {likeUsers.map(item => {
+                  const isNewAccount = item.user?.createdAt
+                    ? Date.now() - new Date(item.user.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000
+                    : false
+                  return (
+                    <div key={item.id} className="flex items-center gap-3 rounded-md border border-border/60 bg-secondary/20 px-3 py-2">
+                      {item.user?.avatarUrl ? (
+                        <img src={item.user.avatarUrl} alt={item.user.username} className="h-8 w-8 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-sm font-semibold">
+                          {item.user?.username?.charAt(0)?.toUpperCase() || '?'}
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium truncate">{item.user?.username || '未知用户'}</span>
+                          {isNewAccount && (
+                            <Badge variant="outline" className="text-xs border-yellow-500 text-yellow-500 bg-yellow-500/10">新账号</Badge>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">{item.user?.email || '-'}</div>
+                      </div>
+                      <div className="text-xs text-muted-foreground text-right shrink-0 space-y-0.5">
+                        <div>注册: {item.user?.createdAt ? new Date(item.user.createdAt).toLocaleDateString('zh-CN') : '-'}</div>
+                        <div>点赞: {item.likedAt ? new Date(item.likedAt).toLocaleString('zh-CN') : '-'}</div>
+                      </div>
+                    </div>
+                  )
+                })}
+                {likeUsersTotal > likeUsers.length && (
+                  <div className="text-xs text-muted-foreground text-center pt-1">
+                    仅展示最近 {likeUsers.length} 条点赞记录
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsLikesDialogOpen(false)}>关闭</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
