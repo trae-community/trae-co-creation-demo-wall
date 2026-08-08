@@ -6,7 +6,7 @@
 - **前端框架**: Next.js 15 (React 18) + App Router
 - **样式方案**: Tailwind CSS + Radix UI (Headless UI)
 - **后端接口**: Next.js API Routes (Serverless/Node.js)
-- **数据库**: PostgreSQL (推荐使用 Supabase 或自建 Docker 环境)
+- **数据库**: PostgreSQL 16（Docker Compose 自建，`docker-compose.yml` 中的 `db`/`db-dev` 服务）
 - **ORM 框架**: Prisma
 - **认证授权**: NextAuth.js (Auth.js v5) + 角色控制 (RBAC)
 - **状态管理**: Zustand (全局状态) + React Query (服务端状态与数据缓存)
