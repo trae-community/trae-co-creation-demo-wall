@@ -316,6 +316,32 @@ export function WorkDetailView() {
   <text x="${334 + index * 180}" y="450" text-anchor="middle" fill="#d4d4d8" font-size="14" font-family="Arial, sans-serif">#${safe(tag)}</text>`
       )
       .join('');
+    // 生成二维码（内容为当前作品详情页链接，扫码直达）；懒加载避免影响首屏
+    let qrSvg = '';
+    let qrViewBox = '';
+    try {
+      const QRCode = (await import('qrcode')).default;
+      const rawQr = await QRCode.toString(currentPageUrl, {
+        type: 'svg',
+        margin: 1,
+        errorCorrectionLevel: 'M',
+      });
+      // 提取原始 viewBox（模块数随 URL 长度变化，如 31/33/37），再剥离 xmlns/viewBox，
+      // 由外层重新提供，避免重复属性导致 XML 非法、图片无法渲染
+      const viewBoxMatch = rawQr.match(/viewBox="([^"]*)"/u);
+      qrViewBox = viewBoxMatch ? viewBoxMatch[1] : '';
+      qrSvg = rawQr
+        .replace(/<\?xml[^>]*\?>\s*/u, '')
+        .replace(/\sxmlns="[^"]*"/u, '')
+        .replace(/\sviewBox="[^"]*"/u, '');
+    } catch (err) {
+      console.error('QR code generation failed:', err);
+    }
+    const qrBlockSvg = qrSvg
+      ? `
+  <rect x="984" y="438" width="134" height="134" rx="12" fill="#ffffff"/>
+  <g transform="translate(991, 445)"><svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="${qrViewBox}"${qrSvg.slice('<svg'.length)}</g>`
+      : '';
     const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <defs>
@@ -355,9 +381,10 @@ export function WorkDetailView() {
   <text x="104" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">${safe(teamLabel)} ${safe(String(teamMembers.length || 0))}</text>
   <text x="372" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">${safe(submitLabel)} ${safe(createdAtText)}</text>
   <text x="710" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">${safe(likeLabel)} ${safe(String(work.likes || 0))}</text>
-  <text x="930" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">Views：${safe(String(viewsCount || 0))}</text>
-  <text x="76" y="574" fill="#64748b" font-size="16" font-family="Arial, sans-serif">${safe(currentPageUrl)}</text>
-  <text x="1124" y="574" text-anchor="end" fill="#22c55e" font-size="18" font-family="Arial, sans-serif" font-weight="700">${safe(siteTitle)} · ${safe(authorLine)}</text>
+  <text x="860" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">Views：${safe(String(viewsCount || 0))}</text>
+  <text x="76" y="574" fill="#64748b" font-size="16" font-family="Arial, sans-serif">${safe(truncate(currentPageUrl, 56))}</text>
+  <text x="968" y="574" text-anchor="end" fill="#22c55e" font-size="18" font-family="Arial, sans-serif" font-weight="700">${safe(siteTitle)} · ${safe(authorLine)}</text>
+  ${qrBlockSvg}
 </svg>`;
     setShareImageUrl(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`);
     setIsShareGenerating(false);
