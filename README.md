@@ -35,17 +35,19 @@ npm install
 
 ### 2. 启动数据库与 Redis
 
+> `docker-compose.yml` 内置两个 PostgreSQL 服务：`db`（生产库，端口 5432）与 `db-dev`（开发库，端口 5433）。本地开发请使用 `db-dev`，互不干扰。
+
 ```bash
-docker compose up -d db redis
+docker compose up -d db-dev redis
 ```
 
 ### 3. 配置环境变量
 
-创建 `.env`，将连接指向本地：
+创建 `.env`（参考 `.env.example`），将连接指向本地开发库：
 
 ```bash
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/trae_demo_wall?schema=public"
-DIRECT_URL="postgresql://postgres:postgres@localhost:5432/trae_demo_wall"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5433/trae_demo_wall_dev?schema=public"
+DIRECT_URL="postgresql://postgres:postgres@localhost:5433/trae_demo_wall_dev"
 REDIS_URL="redis://localhost:6379"
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="<任意随机字符串>"
