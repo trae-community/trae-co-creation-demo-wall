@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
-import { Edit, Trash2, Eye, ThumbsUp, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search, Inbox } from 'lucide-react'
+import { Edit, Trash2, Eye, ThumbsUp, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search, Inbox, Ban } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -498,6 +498,31 @@ export function WorksManagement({
       showFeedback('error', '点赞用户列表加载失败')
     } finally {
       setIsLoadingLikes(false)
+    }
+  }
+
+  // 快捷封禁点赞用户（针对批量小号刷赞场景）
+  const handleBanLikeUser = async (item: LikeUserItem) => {
+    if (!item.user) return
+    if (!window.confirm(`确定封禁用户「${item.user.username}」吗？封禁后该用户将无法登录。`)) return
+    try {
+      const res = await fetch(`/api/users/${item.user.id}/ban`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ banned: true })
+      })
+      if (res.ok) {
+        showFeedback('success', `已封禁用户「${item.user.username}」`)
+        // 从列表中移除已封禁用户
+        setLikeUsers(prev => prev.filter(l => l.id !== item.id))
+        setLikeUsersTotal(prev => Math.max(0, prev - 1))
+      } else {
+        const data = await res.json()
+        showFeedback('error', data.error || '封禁失败')
+      }
+    } catch (error) {
+      console.error('Failed to ban like user:', error)
+      showFeedback('error', '封禁失败')
     }
   }
 
@@ -1347,6 +1372,17 @@ export function WorksManagement({
                         <div>注册: {item.user?.createdAt ? new Date(item.user.createdAt).toLocaleDateString('zh-CN') : '-'}</div>
                         <div>点赞: {item.likedAt ? new Date(item.likedAt).toLocaleString('zh-CN') : '-'}</div>
                       </div>
+                      {item.user && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0 hover:text-red-500 hover:bg-red-500/10"
+                          onClick={() => handleBanLikeUser(item)}
+                          title="封禁该用户"
+                        >
+                          <Ban size={14} />
+                        </Button>
+                      )}
                     </div>
                   )
                 })}

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
 import { getAuthUser, isAdmin } from '@/lib/auth';
 import { writeOperationLog } from '@/lib/audit-log';
+import { getBannedUserIds } from '@/lib/ban';
 
 // Helper to sanitize user object (remove sensitive data)
 const sanitizeUser = (user: any) => {
@@ -88,8 +89,11 @@ export async function GET(req: NextRequest) {
       })
     ]);
 
+    // 附带封禁状态（黑名单存于字典表）
+    const bannedIds = await getBannedUserIds();
+
     return NextResponse.json({
-      items: users.map(sanitizeUser),
+      items: users.map(u => ({ ...sanitizeUser(u), banned: bannedIds.has(u.id.toString()) })),
       total,
       page: Math.max(page, 1),
       pageSize: Math.max(pageSize, 1)

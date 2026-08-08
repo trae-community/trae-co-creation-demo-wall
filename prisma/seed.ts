@@ -34,6 +34,8 @@ const SYSTEM_DICTS = [
   { dictCode: 'dev_status', dictName: '开发状态', description: '作品当前的开发阶段', isSystem: true },
   { dictCode: 'category_code', dictName: '作品分类', description: '作品所属的类别', isSystem: true },
   { dictCode: 'honor_type', dictName: '荣誉类型', description: '作品获得的荣誉类型', isSystem: true },
+  { dictCode: 'banned_users', dictName: '封禁用户黑名单', description: '被封禁的用户 ID，封禁后无法登录', isSystem: true },
+  { dictCode: 'blocked_email_domains', dictName: '注册屏蔽域名', description: '禁止注册的邮箱域名', isSystem: true },
 ];
 
 const AUDIT_STATUS_ITEMS = [
@@ -62,6 +64,13 @@ const HONOR_TYPE_ITEMS = [
   { itemLabel: '社区精选', itemValue: 'community_choice', sortOrder: 0 },
   { itemLabel: '城市人气', itemValue: 'city_star', sortOrder: 1 },
   { itemLabel: '城市推荐', itemValue: 'best_of_year', sortOrder: 2 },
+];
+
+// 默认禁止注册的邮箱域名（针对批量小号刷注册）
+const BLOCKED_DOMAIN_ITEMS = [
+  { itemLabel: 'example.com', itemValue: 'example.com', sortOrder: 0 },
+  { itemLabel: 'example.org', itemValue: 'example.org', sortOrder: 1 },
+  { itemLabel: 'example.net', itemValue: 'example.net', sortOrder: 2 },
 ];
 
 async function main() {
@@ -156,7 +165,13 @@ async function main() {
   for (const item of HONOR_TYPE_ITEMS) {
     await addItem('honor_type', item, itemStats);
   }
-  console.log(`  ✅ 荣誉类型: ${HONOR_TYPE_ITEMS.length} 条\n`);
+  console.log(`  ✅ 荣誉类型: ${HONOR_TYPE_ITEMS.length} 条`);
+
+  // 注册屏蔽域名（banned_users 初始为空，封禁时动态写入）
+  for (const item of BLOCKED_DOMAIN_ITEMS) {
+    await addItem('blocked_email_domains', item, itemStats);
+  }
+  console.log(`  ✅ 注册屏蔽域名: ${BLOCKED_DOMAIN_ITEMS.length} 条\n`);
 
   // ========================================
   // 4. 初始化省份城市数据（从导出文件）

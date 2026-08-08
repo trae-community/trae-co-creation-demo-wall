@@ -5,6 +5,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter'
 import { compare } from 'bcryptjs'
 import { prisma } from './prisma'
 import { writeAuthLog } from './audit-log'
+import { isUserBanned } from './ban'
 
 const authConfig = {
   providers: [
@@ -35,6 +36,17 @@ const authConfig = {
           return null
         }
 
+        // 封禁用户拒绝登录，并记录失败认证日志
+        if (await isUserBanned(user.id)) {
+          await writeAuthLog({
+            userId: user.id,
+            authType: 'sign_in',
+            authStatus: 'failed',
+            metadata: { email: user.email, reason: 'banned' },
+          })
+          return null
+        }
+
         return {
           id: user.id.toString(),
           email: user.email,
@@ -51,6 +63,10 @@ const authConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
+      }
+      // 已被封禁的账号：清空会话中的用户 ID，使其存量会话失效
+      if (token.id && (await isUserBanned(token.id as string))) {
+        token.id = ''
       }
       return token
     },

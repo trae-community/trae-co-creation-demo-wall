@@ -62,6 +62,8 @@ const ACTION_LABELS: Record<string, string> = {
   unlike: '取消点赞',
   view: '浏览',
   audit: '审核',
+  ban: '封禁',
+  unban: '解封',
 }
 
 const getModuleLabel = (module: string) => MODULE_LABELS[module] || module

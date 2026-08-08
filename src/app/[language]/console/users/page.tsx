@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Plus, User, Mail, Phone, Calendar, Shield, Filter } from 'lucide-react'
+import { Plus, User, Mail, Phone, Calendar, Shield, Filter, Ban, CircleCheck } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -53,6 +53,7 @@ interface UserItem {
   createdAt: string
   updatedAt: string
   roles: { role: Role }[]
+  banned: boolean
 }
 
 // Schema
@@ -87,6 +88,9 @@ export default function UsersPage() {
 
   // Filter states
   const [filterRoleCode, setFilterRoleCode] = useState('all')
+
+  // Ban states
+  const [banningUserId, setBanningUserId] = useState<string | null>(null)
 
   const { feedback, showFeedback } = useFeedback()
 
@@ -247,6 +251,35 @@ export default function UsersPage() {
     }
   }
 
+  // 封禁 / 解封用户
+  const handleToggleBan = async (user: UserItem) => {
+    if (user.banned) {
+      if (!window.confirm(`确定解封用户「${user.username}」吗？`)) return
+    } else {
+      if (!window.confirm(`确定封禁用户「${user.username}」吗？封禁后该用户将无法登录。`)) return
+    }
+    try {
+      setBanningUserId(user.id)
+      const res = await fetch(`/api/users/${user.id}/ban`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ banned: !user.banned })
+      })
+      if (res.ok) {
+        showFeedback('success', user.banned ? '用户已解封' : '用户已封禁')
+        fetchUsers()
+      } else {
+        const data = await res.json()
+        showFeedback('error', data.error || '操作失败')
+      }
+    } catch (error) {
+      console.error('Failed to ban/unban user:', error)
+      showFeedback('error', '操作失败')
+    } finally {
+      setBanningUserId(null)
+    }
+  }
+
   // Pagination calculations
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
   const current = Math.min(currentPage, totalPages)
@@ -334,6 +367,9 @@ export default function UsersPage() {
                 <div className="space-y-1 flex-1">
                   <div className="flex items-center gap-2">
                     <Link href={`/user/${user.id}`} className="font-semibold text-lg hover:text-primary transition-colors">{user.username}</Link>
+                    {user.banned && (
+                      <Badge variant="destructive" className="text-xs">已封禁</Badge>
+                    )}
                     {user.roles && user.roles.map(r => (
                       <Badge key={r.role.id} variant="secondary" className="text-xs">
                         {r.role.roleName}
@@ -370,6 +406,29 @@ export default function UsersPage() {
                 <Button variant="ghost" size="sm" onClick={() => handleOpenRoleDialog(user)} title="分配角色">
                   <Shield size={16} />
                 </Button>
+                {user.banned ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleToggleBan(user)}
+                    disabled={banningUserId === user.id}
+                    title="解封用户"
+                    className="hover:text-green-500 hover:bg-green-500/10"
+                  >
+                    <CircleCheck size={16} />
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleToggleBan(user)}
+                    disabled={banningUserId === user.id}
+                    title="封禁用户"
+                    className="hover:text-red-500 hover:bg-red-500/10"
+                  >
+                    <Ban size={16} />
+                  </Button>
+                )}
               </div>
             </div>
           </Card>
