@@ -9,6 +9,14 @@ import { CrudPagination } from '@/components/crud/crud-pagination'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import { DatePicker } from '@/components/ui/date-picker'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useFeedback } from '@/lib/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
 
@@ -35,12 +43,40 @@ interface OperationLogItem {
 
 type OperationFilter = 'all' | 'success' | 'failed'
 
+// 模块中文映射
+const MODULE_LABELS: Record<string, string> = {
+  work: '作品互动',
+  works: '作品管理',
+  users: '用户管理',
+  dictionary: '字典管理',
+  tags: '标签管理',
+  submit: '作品提交',
+}
+
+// 动作中文映射
+const ACTION_LABELS: Record<string, string> = {
+  create: '创建',
+  update: '更新',
+  delete: '删除',
+  like: '点赞',
+  unlike: '取消点赞',
+  view: '浏览',
+  audit: '审核',
+}
+
+const getModuleLabel = (module: string) => MODULE_LABELS[module] || module
+const getActionLabel = (action: string) => ACTION_LABELS[action] || action
+
 export default function OperationLogsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [items, setItems] = useState<OperationLogItem[]>([])
   const [totalItems, setTotalItems] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterMode, setFilterMode] = useState<OperationFilter>('all')
+  const [moduleFilter, setModuleFilter] = useState('all')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [availableModules, setAvailableModules] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 10
   const { feedback, showFeedback } = useFeedback()
@@ -52,8 +88,11 @@ export default function OperationLogsPage() {
         [CRUD_QUERY_PARAMS.page]: String(currentPage),
         [CRUD_QUERY_PARAMS.pageSize]: String(pageSize),
         [CRUD_QUERY_PARAMS.query]: searchTerm,
-        [CRUD_QUERY_PARAMS.filter]: filterMode
+        [CRUD_QUERY_PARAMS.filter]: filterMode,
+        module: moduleFilter,
       })
+      if (startDate) params.append('startDate', startDate)
+      if (endDate) params.append('endDate', endDate)
       const res = await fetch(`/api/logs/operations?${params.toString()}`)
       if (!res.ok) {
         showFeedback('error', '操作日志加载失败')
@@ -62,13 +101,16 @@ export default function OperationLogsPage() {
       const data = await res.json()
       setItems(data.items || [])
       setTotalItems(data.total || 0)
+      if (Array.isArray(data.modules)) {
+        setAvailableModules(data.modules)
+      }
     } catch (error) {
       console.error('Failed to fetch operation logs:', error)
       showFeedback('error', '操作日志加载失败')
     } finally {
       setIsLoading(false)
     }
-  }, [currentPage, pageSize, searchTerm, filterMode, showFeedback])
+  }, [currentPage, pageSize, searchTerm, filterMode, moduleFilter, startDate, endDate, showFeedback])
 
   useEffect(() => {
     fetchLogs()
@@ -76,7 +118,7 @@ export default function OperationLogsPage() {
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm, filterMode])
+  }, [searchTerm, filterMode, moduleFilter, startDate, endDate])
 
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
   const current = Math.min(currentPage, totalPages)
@@ -97,7 +139,7 @@ export default function OperationLogsPage() {
       </div>
 
       <CrudFilterBar
-        searchPlaceholder="搜索模块、动作、目标ID、操作者、路径..."
+        searchPlaceholder="搜索操作人、作品ID、路径、动作..."
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
         filterValue={filterMode}
@@ -108,6 +150,50 @@ export default function OperationLogsPage() {
         ]}
         onFilterChange={(value) => setFilterMode(value as OperationFilter)}
         filterPlaceholder="筛选结果"
+        extraFilters={
+          <>
+            <Select value={moduleFilter} onValueChange={setModuleFilter}>
+              <SelectTrigger className="w-full sm:w-36 bg-card border-border">
+                <SelectValue placeholder="选择模块" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部模块</SelectItem>
+                {availableModules.map((m) => (
+                  <SelectItem key={m} value={m}>
+                    {getModuleLabel(m)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="flex items-center gap-1">
+              <DatePicker
+                value={startDate}
+                onChange={setStartDate}
+                placeholder="开始日期"
+                variant="outline"
+              />
+              <span className="text-muted-foreground">~</span>
+              <DatePicker
+                value={endDate}
+                onChange={setEndDate}
+                placeholder="结束日期"
+                variant="outline"
+              />
+            </div>
+            {(moduleFilter !== 'all' || startDate || endDate) && (
+              <button
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => {
+                  setModuleFilter('all')
+                  setStartDate('')
+                  setEndDate('')
+                }}
+              >
+                重置
+              </button>
+            )}
+          </>
+        }
       />
 
       <div className="space-y-4">
@@ -121,8 +207,11 @@ export default function OperationLogsPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-semibold">
-                      {item.module}/{item.action}
+                      {getModuleLabel(item.module)} · {getActionLabel(item.action)}
                     </span>
+                    <Badge variant="outline" className="text-xs">
+                      {item.module}/{item.action}
+                    </Badge>
                     <Badge variant={item.success ? 'default' : 'destructive'}>
                       {item.success ? '成功' : '失败'}
                     </Badge>

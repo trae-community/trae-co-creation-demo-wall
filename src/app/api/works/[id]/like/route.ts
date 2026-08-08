@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { writeOperationLog } from "@/lib/audit-log";
 
 /**
  * POST /api/works/[id]/like
@@ -8,7 +9,7 @@ import { getAuthUser } from "@/lib/auth";
  * 需要登录。
  */
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -50,6 +51,14 @@ export async function POST(
           data: { likeCount: { decrement: 1 } },
         });
       }
+      await writeOperationLog({
+        operatorId: user.userId,
+        module: 'work',
+        action: 'unlike',
+        targetType: 'work',
+        targetId: workId,
+        request: req,
+      });
       return NextResponse.json({ liked: false });
     }
 
@@ -63,6 +72,15 @@ export async function POST(
         create: { workId, viewCount: 0, likeCount: 1 },
       }),
     ]);
+
+    await writeOperationLog({
+      operatorId: user.userId,
+      module: 'work',
+      action: 'like',
+      targetType: 'work',
+      targetId: workId,
+      request: req,
+    });
 
     return NextResponse.json({ liked: true });
   } catch (e) {

@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import {
@@ -23,6 +24,8 @@ interface CrudFilterBarProps {
   filterOptions: FilterOption[]
   onFilterChange: (value: string) => void
   filterPlaceholder?: string
+  /** 额外筛选控件（如模块下拉、日期范围），与筛选下拉同行展示 */
+  extraFilters?: ReactNode
 }
 
 export function CrudFilterBar({
@@ -33,6 +36,7 @@ export function CrudFilterBar({
   filterOptions,
   onFilterChange,
   filterPlaceholder = '筛选条件',
+  extraFilters,
 }: CrudFilterBarProps) {
   return (
     <div className="p-4 rounded-xl border border-border bg-card flex flex-col sm:flex-row gap-4 items-center justify-between">
@@ -45,8 +49,8 @@ export function CrudFilterBar({
           onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
-      {filterOptions.length > 0 && (
-        <div className="flex gap-2 w-full sm:w-auto">
+      <div className="flex flex-wrap gap-2 items-center w-full sm:w-auto">
+        {filterOptions.length > 0 && (
           <Select onValueChange={onFilterChange} defaultValue={filterValue}>
             <SelectTrigger className="w-full sm:w-40 bg-card border-border">
               <SelectValue placeholder={filterPlaceholder} />
@@ -59,8 +63,9 @@ export function CrudFilterBar({
               ))}
             </SelectContent>
           </Select>
-        </div>
-      )}
+        )}
+        {extraFilters}
+      </div>
     </div>
   )
 }

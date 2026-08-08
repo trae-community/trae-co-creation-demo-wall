@@ -16,6 +16,9 @@ export async function GET(req: NextRequest) {
     const pageSize = parseInt(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10')
     const query = searchParams.get(CRUD_QUERY_PARAMS.query) || ''
     const filter = searchParams.get(CRUD_QUERY_PARAMS.filter) || 'all'
+    const module = searchParams.get('module') || ''
+    const startDate = searchParams.get('startDate') || ''
+    const endDate = searchParams.get('endDate') || ''
 
     const skip = (page - 1) * pageSize
     const take = pageSize
@@ -27,6 +30,22 @@ export async function GET(req: NextRequest) {
       where.success = true
     } else if (filter === 'failed') {
       where.success = false
+    }
+
+    // Handle module filter
+    if (module && module !== 'all') {
+      where.module = module
+    }
+
+    // Handle date range filter
+    if (startDate || endDate) {
+      where.createdAt = {}
+      if (startDate) {
+        where.createdAt.gte = new Date(`${startDate}T00:00:00`)
+      }
+      if (endDate) {
+        where.createdAt.lte = new Date(`${endDate}T23:59:59.999`)
+      }
     }
 
     // Handle search query
@@ -47,7 +66,7 @@ export async function GET(req: NextRequest) {
       ]
     }
 
-    const [total, items] = await Promise.all([
+    const [total, items, moduleRows] = await Promise.all([
       prisma.sysOperationLog.count({ where }),
       prisma.sysOperationLog.findMany({
         where,
@@ -65,6 +84,11 @@ export async function GET(req: NextRequest) {
         },
         skip,
         take
+      }),
+      prisma.sysOperationLog.findMany({
+        distinct: ['module'],
+        select: { module: true },
+        orderBy: { module: 'asc' }
       })
     ])
 
@@ -77,7 +101,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       items: serializedItems,
-      total
+      total,
+      modules: moduleRows.map(row => row.module)
     })
   } catch (error) {
     console.error('Failed to fetch operation logs:', error)

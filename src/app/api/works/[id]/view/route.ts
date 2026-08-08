@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthUser } from "@/lib/auth";
+import { writeOperationLog } from "@/lib/audit-log";
 
 /**
  * POST /api/works/[id]/view
  * 记录一次作品浏览，浏览量 +1
  */
 export async function POST(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -29,6 +31,17 @@ export async function POST(
         viewCount: 1,
         likeCount: 0,
       },
+    });
+
+    // 记录浏览日志（便于排查刷浏览量；未登录用户 operatorId 为空，仅记录 IP）
+    const user = await getAuthUser().catch(() => null);
+    await writeOperationLog({
+      operatorId: user?.userId ?? null,
+      module: 'work',
+      action: 'view',
+      targetType: 'work',
+      targetId: workId,
+      request: req,
     });
 
     return NextResponse.json({ ok: true });
