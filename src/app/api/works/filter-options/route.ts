@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getDictionaries } from '@/lib/edge-config';
 import { sortFilterOptions } from './sort-filter-options';
 
 interface DictItem {
@@ -15,9 +14,6 @@ interface DictItem {
 }
 
 async function getRawDictionaries() {
-  const cached = await getDictionaries();
-  if (cached) return cached as any;
-
   const [countryDict, cityDict, categoryDict, honorDict] = await Promise.all([
     prisma.sysDict.findUnique({ where: { dictCode: 'country' }, include: { items: true } }),
     prisma.sysDict.findUnique({ where: { dictCode: 'city' }, include: { items: true } }),
