@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
-import { Loader2, User, Eye, ThumbsUp, Calendar, Sparkles } from 'lucide-react'
+import { User, Sparkles, Pencil, Eye, ThumbsUp } from 'lucide-react'
 import { Link } from '@/lib/language/navigation'
 
 interface PublicWork {
@@ -64,8 +64,33 @@ export function UserProfileView() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Profile skeleton */}
+        <section className="rounded-3xl border border-white/10 overflow-hidden">
+          <div className="h-32 bg-white/5 animate-pulse" />
+          <div className="px-6 md:px-8 pb-6 -mt-10 flex flex-col md:flex-row md:items-end gap-5">
+            <div className="w-20 h-20 rounded-2xl bg-white/5 animate-pulse border-4 border-card" />
+            <div className="flex-1 space-y-2">
+              <div className="h-7 w-40 bg-white/5 rounded animate-pulse" />
+              <div className="h-4 w-60 bg-white/5 rounded animate-pulse" />
+            </div>
+          </div>
+          <div className="px-6 md:px-8 pb-6 flex gap-6">
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-6 w-20 bg-white/5 rounded animate-pulse" />)}
+          </div>
+        </section>
+        {/* Works grid skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="rounded-2xl overflow-hidden border border-white/5" style={{ background: '#111318' }}>
+              <div className="animate-pulse bg-white/5" style={{ aspectRatio: '4/3' }} />
+              <div className="p-4 space-y-3">
+                <div className="animate-pulse h-4 bg-white/5 rounded-md w-3/4" />
+                <div className="animate-pulse h-3 bg-white/5 rounded-md w-full" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -82,17 +107,20 @@ export function UserProfileView() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Profile Card */}
+      {/* ── Profile Hero Card (无 Banner, inline stats) ── */}
       <section className="rounded-3xl border border-white/10 bg-card/80 backdrop-blur-md p-6 md:p-8">
+        {/* 上半：头像 + 用户名 + 操作按钮 */}
         <div className="flex flex-col md:flex-row md:items-center gap-5">
-          <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 bg-zinc-900 shrink-0">
-            {profile.avatarUrl ? (
-              <img src={profile.avatarUrl} alt={profile.username} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">
-                <User className="w-8 h-8" />
-              </div>
-            )}
+          <div className="relative shrink-0">
+            <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 bg-zinc-900">
+              {profile.avatarUrl ? (
+                <img src={profile.avatarUrl} alt={profile.username} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <User className="w-8 h-8" />
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex-1 min-w-0">
@@ -101,8 +129,22 @@ export function UserProfileView() {
               <p className="text-gray-400 mt-1 text-sm line-clamp-2">{profile.bio}</p>
             )}
           </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {profile.workCount > 0 ? (
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium border bg-white/5 text-zinc-400 border-white/10">
+                <Sparkles className="w-3.5 h-3.5" />
+                {profile.workCount} {t('works')}
+              </span>
+            ) : (
+              <button className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium border transition-all bg-primary/10 text-primary border-primary/25 hover:bg-primary/20">
+                <Pencil className="w-3.5 h-3.5" />{t('submitFirstWork')}
+              </button>
+            )}
+          </div>
         </div>
 
+        {/* 统计数据 inline */}
         <div className="mt-5 flex items-center gap-6 text-sm">
           <div className="flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
@@ -111,19 +153,16 @@ export function UserProfileView() {
           </div>
           <div className="w-px h-4 bg-white/10" />
           <div className="flex items-center gap-1.5">
-            <Eye className="w-3.5 h-3.5 text-primary" />
             <span className="text-gray-400">{t('views')}</span>
             <span className="text-white font-semibold">{profile.totalViews}</span>
           </div>
           <div className="w-px h-4 bg-white/10" />
           <div className="flex items-center gap-1.5">
-            <ThumbsUp className="w-3.5 h-3.5 text-primary" />
             <span className="text-gray-400">{t('likes')}</span>
             <span className="text-white font-semibold">{profile.totalLikes}</span>
           </div>
           <div className="w-px h-4 bg-white/10" />
           <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <Calendar className="w-3.5 h-3.5" />
             {t('joinedAt')}: {new Date(profile.joinedAt).toLocaleDateString(locale)}
           </div>
         </div>
