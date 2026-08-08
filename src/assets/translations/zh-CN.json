@@ -177,6 +177,7 @@
     "shareGenerating": "正在生成分享卡片...",
     "downloadImage": "下载图片",
     "copyLink": "复制链接",
+    "shareText": "我在 TRAE DEMO WALL 分享了作品《{name}》，快来看看吧！{url}",
     "copied": "已复制",
     "systemShare": "系统分享",
     "clickToPreview": "点击查看大图",
@@ -205,6 +206,7 @@
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
     "icp": "浙ICP备2026026485号-1",
+    "feedback": "问题反馈",
     "githubCommunity": "GitHub 社区",
     "traeOfficial": "Trae 官网",
     "traeCommunity": "Trae 社区"

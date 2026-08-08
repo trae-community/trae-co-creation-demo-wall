@@ -183,6 +183,7 @@
     "shareGenerating": "シェアカードを生成中...",
     "downloadImage": "画像をダウンロード",
     "copyLink": "リンクをコピー",
+    "shareText": "TRAE DEMO WALL で作品《{name}》をシェアしました。ぜひご覧ください！ {url}",
     "copied": "コピー完了",
     "systemShare": "システム共有",
     "clickToPreview": "クリックして拡大表示",
@@ -210,7 +211,8 @@
   },
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
-    "icp": "浙ICP備2026026485号-1",
+    "icp": "浙ICP备2026026485号-1",
+    "feedback": "フィードバック",
     "githubCommunity": "GitHub コミュニティ",
     "traeOfficial": "Trae 公式サイト",
     "traeCommunity": "Trae コミュニティ"

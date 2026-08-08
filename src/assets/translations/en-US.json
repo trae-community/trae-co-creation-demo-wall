@@ -177,6 +177,7 @@
     "shareGenerating": "Generating share card...",
     "downloadImage": "Download Image",
     "copyLink": "Copy Link",
+    "shareText": "I just shared \"{name}\" on TRAE DEMO WALL. Come check it out! {url}",
     "copied": "Copied",
     "systemShare": "System Share",
     "clickToPreview": "Click to preview",
@@ -205,6 +206,7 @@
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
     "icp": "浙ICP备2026026485号-1",
+    "feedback": "Feedback",
     "githubCommunity": "GitHub Community",
     "traeOfficial": "Trae Official",
     "traeCommunity": "Trae Community"

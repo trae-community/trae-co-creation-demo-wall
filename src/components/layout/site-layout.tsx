@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X, Trophy, Github, Code2, Globe, MessagesSquare } from "lucide-react";
+import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X, Trophy, Github, Code2, Globe, MessagesSquare, MessageSquarePlus } from "lucide-react";
 import { ParticlesBackground } from "./particles-background";
 import { useSession } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
@@ -394,6 +394,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           {/* 外链 — 胶囊风格，与导航/筛选 UI 一致 */}
           <div className="flex items-center gap-2">
             {[
+              { label: tFooter('feedback'), href: 'https://github.com/trae-community/trae-co-creation-demo-wall/issues', icon: MessageSquarePlus },
               { label: tFooter('githubCommunity'), href: 'https://github.com/trae-community', icon: Github },
               { label: tFooter('traeOfficial'), href: 'https://www.trae.cn', icon: Globe },
               { label: tFooter('traeCommunity'), href: 'https://forum.trae.cn', icon: MessagesSquare },
