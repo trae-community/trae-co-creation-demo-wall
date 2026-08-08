@@ -1,12 +1,13 @@
-# Prisma 目录结构说明
+# Prisma 目录说明
 
 ## 📁 目录内容
 
 ```
 prisma/
-├── schema.prisma      ← 数据库模型定义（核心文件）
-├── seed.ts            ← 种子数据脚本（初始化基础数据）
-└── README.md          ← 本说明文档
+├── schema.prisma             ← 数据库模型定义（核心文件）
+├── seed.ts                   ← 种子数据脚本（初始化基础数据）
+├── seed-data-countries.ts    ← 省份/城市字典数据（424 条，独立文件避免 seed.ts 臃肿）
+└── README.md                 ← 本说明文档
 ```
 
 ---
@@ -15,70 +16,51 @@ prisma/
 
 ### 1. `schema.prisma` - 数据库模型定义
 
-**用途：** ⭐ **核心文件，必须保留！**
+**用途：** ⭐ **核心文件，数据库结构的唯一权威来源**
 
-这是 Prisma ORM 的数据库模型定义文件，包含：
-- 所有数据表结构定义
-- 字段类型和约束
-- 表间关联关系
-- 数据库连接配置
+包含 18 张表的定义、字段约束与关联关系：
 
-**主要内容：**
 - 系统用户模块（sys_user, sys_role, sys_user_role）
 - 系统字典模块（sys_dict, sys_dict_item）
-- 作品模块（work_base, work_detail, work_image 等）
+- 作品模块（work_base, work_detail, work_image, work_tag, work_like, work_statistic, work_honor）
 - 审计日志模块（sys_auth_log, sys_operation_log）
 - NextAuth 会话模块（account, session, verification_token）
 
-**操作：**
-```bash
-# 根据 schema 生成 Prisma Client
-npm run db:generate
-
-# 同步到数据库（自动创建/更新表结构）
-npm run db:migrate
-
-# 或打开 Prisma Studio 可视化管理界面
-npm run db:studio
-```
+**约束：**
+- 数据库结构变更必须修改此文件，禁止直接改库
+- 所有 API 路由统一通过 Prisma Client 访问数据库，禁止原生 SQL
 
 ---
 
 ### 2. `seed.ts` - 种子数据脚本
 
-**用途：** ⭐ **初始化系统基础数据**
+**用途：** ⭐ 首次部署或重置数据库后，初始化系统基础数据。
 
-首次部署或清空数据库后，用于快速初始化系统所需的基础数据。
+**执行时机：**
+- Docker 部署：`entrypoint.sh` 先执行 `prisma db push` 同步表结构，再运行本脚本（幂等，可重复执行）
+- 本地开发：手动运行 `npm run seed`
 
-#### 数据来源
+**初始化内容：**
 
-所有角色、字典、字典项数据从 `docs/seed-data.ts` 导入，该文件由 `_temp_export_seed.js` 脚本从当前 PostgreSQL 数据库导出。
-
-**数据文件：**
-- `docs/seed-roles.json` - 3 条角色记录
-- `docs/seed-dicts.json` - 6 条字典记录
-- `docs/seed-dict-items.json` - 440 条字典项记录
-- `docs/seed-data.ts` - TypeScript 格式整合文件
-
-#### (1) 系统角色（3 个）
+#### (1) 系统角色（3 个，脚本内硬编码）
 | 角色编码 | 角色名称 | 说明 |
 |---------|---------|------|
 | root | 根用户 | 系统最高权限用户 |
 | admin | 管理员 | 日常运营管理 |
 | common | 普通角色 | 仅可使用前台功能 |
 
-#### (2) 字典表（6 类，从数据库导出）
+> 系统角色已固定为以上三个，不支持通过控制台新增/修改/删除。
+
+#### (2) 核心业务字典（脚本内硬编码）
 | 字典编码 | 字典名称 | 说明 |
 |---------|---------|------|
 | audit_status | 审核状态 | 作品审核流程状态 |
 | dev_status | 开发状态 | 作品当前的开发阶段 |
 | category_code | 作品分类 | 作品所属的类别 |
-| country | 省份 | 省份列表 |
-| city | 城市 | 城市列表 |
 | honor_type | 荣誉类型 | 作品获得的荣誉类型 |
 
-#### (3) 字典项（440 条，从数据库导出）
-包含所有字典表的完整字典项数据，实际存在于当前数据库中。
+#### (3) 省份/城市数据（424 条）
+从 `./seed-data-countries.ts` 导入（`country` + `city` 两级字典，数据量大故独立成文件）。
 
 #### (4) 默认管理员账号
 | 字段 | 值 |
@@ -88,111 +70,62 @@ npm run db:studio
 | 密码 | `trae1234` |
 | 角色 | root (根用户) |
 
+**幂等策略（先查后创）：**
+- 脚本对每条数据先查询是否存在，存在则跳过、不存在才创建
+- 重复执行安全，并在控制台输出详细执行报告（`✅ 创建成功` / `⏭️ 跳过（已存在）` + 分类统计），便于区分首次初始化与增量执行
+- 密码使用 bcrypt 加密存储
+- ⚠️ **例外：默认管理员账号**若已存在，每次执行会将其密码重置为 `trae1234`（防止密码泄露后无法恢复访问）。生产环境修改密码后请勿再重复执行 seed
+
 **使用方法：**
 ```bash
-# 执行种子脚本
-npm run db:seed
-
-# 或者直接使用 npx
-npx prisma db seed
-```
-
-**注意事项：**
-- ⚠️ 此脚本使用 `upsert` 操作，重复执行是安全的
-- 🔒 密码使用 bcrypt 加密存储
-- 🔄 如果管理员账号已存在，会自动更新密码
-- 📊 所有角色、字典数据来自 `docs/seed-data.ts`（从数据库导出）
-
-#### 更新导出的数据
-
-如果需要从数据库重新导出数据，运行：
-```bash
-# 运行导出脚本
-node _temp_export_seed.js
-
-# 生成的文件位置：
-# - docs/seed-roles.json
-# - docs/seed-dicts.json
-# - docs/seed-dict-items.json
-# - docs/seed-data.ts
+npm run seed
 ```
 
 ---
 
-### 3. 历史迁移文件归档
+### 3. 数据库资料归档
 
-**位置：** `docs/archive/prisma-migrations/`
+**位置：** `docs/database/`
 
-**内容：**
-- `migration_v0.1.sql` ~ `migration_v0.7.sql` - 历史迁移 SQL
-- `schema_v0.1.prisma` ~ `schema_v0.3.prisma` - 旧版 schema 备份
-- `migration_lock.toml` - 旧的 provider 锁定配置
+| 内容 | 说明 |
+|------|------|
+| `schema.sql` | 数据库结构 SQL 参考 |
+| `migrations/` | 历史迁移记录归档 |
+| `seed-data/` | 历史种子数据导出备份 |
 
-**用途：** 
-- 开发阶段回滚参考
-- 数据库结构变更审计
-- 从旧版本升级时参考
-
-**注意事项：**
-- ❌ 不要删除这些归档文件
-- ✅ 生产环境部署时参考这些 SQL 手动执行建表
+仅作开发参考与变更审计，不参与运行时流程（Docker 初始化走 `prisma db push`，无需迁移历史）。
 
 ---
 
-## 🚀 完整初始化流程
+## 🚀 初始化流程
 
-### 首次部署
+### 本地开发
 
 ```bash
-# 1. 确保 PostgreSQL 数据库已创建且可访问
-#    数据库名: trae_demo_wall
-#    用户名: postgres
-#    密码: postgres
+# 1. 启动开发数据库（db-dev，端口 5433）与 Redis
+docker compose up -d db-dev redis
 
-# 2. 安装依赖
-npm install
+# 2. 配置 .env，连接指向开发库
+#    DATABASE_URL="postgresql://postgres:postgres@localhost:5433/trae_demo_wall_dev?schema=public"
 
-# 3. 同步数据库结构
-npm run db:migrate
+# 3. 同步表结构
+npx prisma db push
 
-# 4. 初始化基础数据（角色、字典、root 用户）
-npm run db:seed
+# 4. 生成 Prisma Client
+npx prisma generate
 
-# 5. 启动开发服务器
+# 5. 初始化基础数据
+npm run seed
+
+# 6. 启动开发服务器
 npm run dev
 ```
 
-### 重置数据库（清空所有数据）
+### Docker 部署
 
-```bash
-# ⚠️ 警告：此操作将删除所有数据！
+由 `app-init` 容器自动完成：`prisma db push` + `npm run seed`（仅首次初始化时执行），无需手动操作。
 
-# 1. 删除迁移历史
-npm run db:migrate:reset
-
-# 2. 重新执行迁移
-npm run db:migrate
-
-# 3. 重新初始化数据
-npm run db:seed
-```
-
----
-
-## 📊 数据库表关系图
-
-```
-sys_user ──┬── sys_user_role ── sys_role
-           ├── work_base
-           ├── work_like
-           └── work_honor (granted_by)
-
-sys_dict ──┬── sys_dict_item (dict_code FK)
-           └── work_base (country_code FK)
-
-sys_dict_item ──┬── work_base (city FK, honor_level FK)
-                └── work_base (industry FK)
-```
+> 项目为双库架构：`db`（生产库，端口 5432，库名 `trae_demo_wall`）与 `db-dev`（开发库，端口 5433，库名 `trae_demo_wall_dev`），互不干扰。
 
 ---
 
@@ -200,75 +133,34 @@ sys_dict_item ──┬── work_base (city FK, honor_level FK)
 
 ```bash
 # 生成 Prisma Client
-npm run db:generate
+npx prisma generate
 
-# 同步数据库结构（创建/更新表）
-npm run db:migrate
+# 同步表结构（以 schema.prisma 为准推送建表）
+npx prisma db push
 
 # 执行种子数据
-npm run db:seed
+npm run seed
 
 # 打开 Prisma Studio 可视化界面
-npm run db:studio
+npx prisma studio
 
-# 查看迁移状态
-npm run db:status
-
-# 重置数据库（⚠️ 删除所有数据）
-npm run db:migrate:reset
+# 查看数据库连接状态
+npx prisma validate
 ```
 
 ---
 
 ## 🔐 安全建议
 
-### 生产环境
-
-1. **修改默认密码**
-   ```bash
-   # 登录后立即修改默认密码
-   # 或通过 Prisma Studio:
-   # http://localhost:5555 → sys_user → 编辑记录
-   ```
-
-2. **备份数据库**
-   ```bash
-   # 使用 pg_dump 备份整个数据库
-   pg_dump -U postgres trae_demo_wall > backup.sql
-   
-   # 或使用 Prisma + Node.js 导出特定表
-   ```
-
-3. **环境变量保护**
-   - 确保 `.env` 文件中的 `DATABASE_URL` 不泄露
-   - 生产环境使用环境变量注入，不要提交 `.env` 文件
+1. **修改默认密码**：生产环境登录后立即修改 `trae` 默认密码
+2. **备份数据库**：定期使用 `pg_dump` 备份，保留至少 7 天
+3. **环境变量保护**：`.env` 不提交仓库，生产环境通过环境变量注入
 
 ---
 
 ## 📚 相关文档
 
 - [Prisma 官方文档](https://www.prisma.io/docs)
-- [Prisma Schema 参考](https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference)
-- [Prisma Client API](https://www.prisma.io/docs/reference/api-reference/client-api-reference)
-- [数据库架构设计](../../docs/design/)
-- [数据库迁移历史](../../docs/archive/db/)
-
----
-
-## ⚠️ 注意事项
-
-1. **schema.prisma 是权威来源**
-   - 所有表结构以 `.prisma` 文件为准
-   - 不要手动修改数据库表结构
-
-2. **迁移记录不自动删除**
-   - 旧的迁移 SQL 会保留在 `docs/archive/prisma-migrations/`
-   - 保持 Git 仓库整洁定期清理
-
-3. **种子数据安全**
-   - seed.ts 中的默认密码应定期更换
-   - 生产环境应使用强密码
-
-4. **数据库备份**
-   - 定期备份 PostgreSQL 数据库
-   - 保留至少 7 天的备份副本
+- [项目概要设计](../docs/design/)
+- [Docker 部署指南](../docs/guides/docker-deployment.md)
+- [数据库资料归档](../docs/database/)

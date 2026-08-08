@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { countryCityItems } from '../docs/seed-data-countries';
+import { countryCityItems } from './seed-data-countries';
 
 const prisma = new PrismaClient();
 
@@ -15,7 +15,7 @@ const prisma = new PrismaClient();
  * 
  * 执行时机：
  * - Docker 部署：entrypoint.sh 自动执行一次（RUN_DB_INIT=true）
- * - 本地开发：手动运行 npm run db:seed
+ * - 本地开发：手动运行 npm run seed
  * - 安全保证：使用幂等操作，可重复执行
  */
 
