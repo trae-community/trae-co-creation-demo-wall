@@ -207,6 +207,9 @@ export function WorksManagement({
   const [likeUsers, setLikeUsers] = useState<LikeUserItem[]>([])
   const [likeUsersTotal, setLikeUsersTotal] = useState(0)
   const [isLoadingLikes, setIsLoadingLikes] = useState(false)
+  // 封禁点赞用户确认弹窗
+  const [banLikeTarget, setBanLikeTarget] = useState<LikeUserItem | null>(null)
+  const [isBanningLike, setIsBanningLike] = useState(false)
 
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [viewingWork, setViewingWork] = useState<WorkItem | null>(null)
@@ -502,20 +505,27 @@ export function WorksManagement({
   }
 
   // 快捷封禁点赞用户（针对批量小号刷赞场景）
-  const handleBanLikeUser = async (item: LikeUserItem) => {
+  const handleBanLikeUser = (item: LikeUserItem) => {
     if (!item.user) return
-    if (!window.confirm(`确定封禁用户「${item.user.username}」吗？封禁后该用户将无法登录。`)) return
+    setBanLikeTarget(item)
+  }
+
+  // 确认封禁点赞用户
+  const confirmBanLikeUser = async () => {
+    if (!banLikeTarget?.user) return
     try {
-      const res = await fetch(`/api/users/${item.user.id}/ban`, {
+      setIsBanningLike(true)
+      const res = await fetch(`/api/users/${banLikeTarget.user.id}/ban`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ banned: true })
       })
       if (res.ok) {
-        showFeedback('success', `已封禁用户「${item.user.username}」`)
+        showFeedback('success', `已封禁用户「${banLikeTarget.user.username}」`)
         // 从列表中移除已封禁用户
-        setLikeUsers(prev => prev.filter(l => l.id !== item.id))
+        setLikeUsers(prev => prev.filter(l => l.id !== banLikeTarget.id))
         setLikeUsersTotal(prev => Math.max(0, prev - 1))
+        setBanLikeTarget(null)
       } else {
         const data = await res.json()
         showFeedback('error', data.error || '封禁失败')
@@ -523,6 +533,8 @@ export function WorksManagement({
     } catch (error) {
       console.error('Failed to ban like user:', error)
       showFeedback('error', '封禁失败')
+    } finally {
+      setIsBanningLike(false)
     }
   }
 
@@ -1397,6 +1409,25 @@ export function WorksManagement({
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsLikesDialogOpen(false)}>关闭</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Ban Like User Confirmation Dialog */}
+      <Dialog open={!!banLikeTarget} onOpenChange={(open) => !open && setBanLikeTarget(null)}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>封禁用户</DialogTitle>
+            <DialogDescription>
+              确定要封禁用户「{banLikeTarget?.user?.username}」吗？封禁后该用户将无法登录，已登录的会话也会失效。
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBanLikeTarget(null)} disabled={isBanningLike}>取消</Button>
+            <Button variant="destructive" onClick={confirmBanLikeUser} disabled={isBanningLike}>
+              {isBanningLike ? '封禁中...' : '确认封禁'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

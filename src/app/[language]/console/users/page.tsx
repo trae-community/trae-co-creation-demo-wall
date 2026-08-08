@@ -89,8 +89,9 @@ export default function UsersPage() {
   // Filter states
   const [filterRoleCode, setFilterRoleCode] = useState('all')
 
-  // Ban states
-  const [banningUserId, setBanningUserId] = useState<string | null>(null)
+  // Ban Dialog states
+  const [banTargetUser, setBanTargetUser] = useState<UserItem | null>(null)
+  const [isBanning, setIsBanning] = useState(false)
 
   const { feedback, showFeedback } = useFeedback()
 
@@ -251,22 +252,24 @@ export default function UsersPage() {
     }
   }
 
-  // 封禁 / 解封用户
-  const handleToggleBan = async (user: UserItem) => {
-    if (user.banned) {
-      if (!window.confirm(`确定解封用户「${user.username}」吗？`)) return
-    } else {
-      if (!window.confirm(`确定封禁用户「${user.username}」吗？封禁后该用户将无法登录。`)) return
-    }
+  // 打开封禁 / 解封确认弹窗
+  const handleToggleBan = (user: UserItem) => {
+    setBanTargetUser(user)
+  }
+
+  // 确认封禁 / 解封用户
+  const confirmToggleBan = async () => {
+    if (!banTargetUser) return
     try {
-      setBanningUserId(user.id)
-      const res = await fetch(`/api/users/${user.id}/ban`, {
+      setIsBanning(true)
+      const res = await fetch(`/api/users/${banTargetUser.id}/ban`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ banned: !user.banned })
+        body: JSON.stringify({ banned: !banTargetUser.banned })
       })
       if (res.ok) {
-        showFeedback('success', user.banned ? '用户已解封' : '用户已封禁')
+        showFeedback('success', banTargetUser.banned ? '用户已解封' : '用户已封禁')
+        setBanTargetUser(null)
         fetchUsers()
       } else {
         const data = await res.json()
@@ -276,7 +279,7 @@ export default function UsersPage() {
       console.error('Failed to ban/unban user:', error)
       showFeedback('error', '操作失败')
     } finally {
-      setBanningUserId(null)
+      setIsBanning(false)
     }
   }
 
@@ -411,7 +414,6 @@ export default function UsersPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleToggleBan(user)}
-                    disabled={banningUserId === user.id}
                     title="解封用户"
                     className="hover:text-green-500 hover:bg-green-500/10"
                   >
@@ -422,7 +424,6 @@ export default function UsersPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleToggleBan(user)}
-                    disabled={banningUserId === user.id}
                     title="封禁用户"
                     className="hover:text-red-500 hover:bg-red-500/10"
                   >
@@ -536,6 +537,32 @@ export default function UsersPage() {
             <Button onClick={onSaveRoles} disabled={isSavingRoles}>
               {isSavingRoles ? '保存中...' : '保存'}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!banTargetUser} onOpenChange={(open) => !open && setBanTargetUser(null)}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>{banTargetUser?.banned ? '解封用户' : '封禁用户'}</DialogTitle>
+            <DialogDescription>
+              {banTargetUser?.banned
+                ? `确定要解封用户「${banTargetUser?.username}」吗？解封后该用户可正常登录。`
+                : `确定要封禁用户「${banTargetUser?.username}」吗？封禁后该用户将无法登录，已登录的会话也会失效。`}
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBanTargetUser(null)} disabled={isBanning}>取消</Button>
+            {banTargetUser?.banned ? (
+              <Button onClick={confirmToggleBan} disabled={isBanning}>
+                {isBanning ? '解封中...' : '确认解封'}
+              </Button>
+            ) : (
+              <Button variant="destructive" onClick={confirmToggleBan} disabled={isBanning}>
+                {isBanning ? '封禁中...' : '确认封禁'}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
