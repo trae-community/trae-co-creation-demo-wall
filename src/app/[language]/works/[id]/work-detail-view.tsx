@@ -160,6 +160,21 @@ export function WorkDetailView() {
     return from;
   })();
 
+  // Dynamic back button text based on referrer
+  const getBackButtonLabel = () => {
+    const from = searchParams.get('from');
+    if (!from || !from.startsWith('/')) {
+      return t('backList');
+    }
+    if (from.includes('/profile') || from.includes('/user/')) {
+      return t('backToProfile');
+    }
+    if (from.includes('/rankings')) {
+      return t('backRankings');
+    }
+    return t('backList');
+  };
+
   const handleLike = async () => {
     // 乐观更新：立即切换 UI
     const prevLiked = liked;
@@ -465,9 +480,10 @@ export function WorkDetailView() {
         className="inline-flex items-center text-gray-400 hover:text-primary transition-colors mb-4"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        {t('backList')}
+        {getBackButtonLabel()}
       </button>
 
+      {/* 封面区 - 精简 */}
       <div className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border">
         <div className="aspect-video w-full bg-zinc-900 relative group">
           <img
@@ -480,29 +496,28 @@ export function WorkDetailView() {
           <div className="absolute top-4 right-4 rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs text-white/90 backdrop-blur-sm transition-opacity group-hover:opacity-100 opacity-90 pointer-events-none">
             {t('clickToPreview')}
           </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end pointer-events-none">
-            <div className="p-8 text-white w-full">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="bg-primary text-black text-xs font-bold px-2 py-1 rounded">
-                  {work.city} · {work.country}
-                </span>
-                {(work.honors || []).map((honor) => (
-                  <span key={honor} className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
-                    <Award className="w-3 h-3" />
-                    {honor}
-                  </span>
-                ))}
-              </div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">{work.name}</h1>
-              <p className="text-gray-200 text-lg max-w-2xl">{work.intro}</p>
-            </div>
-          </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between p-6 bg-card border-b border-border gap-4">
+        {/* 标题和简介 - 移到封面下方 */}
+        <div className="p-6 border-b border-border">
+          <div className="flex items-center gap-3 mb-3">
+            {(work.honors || []).map((honor) => (
+              <span key={honor} className="bg-yellow-400/10 text-yellow-400 text-xs font-bold px-2.5 py-1 rounded-full border border-yellow-400/20 flex items-center gap-1">
+                <Award className="w-3 h-3" />
+                {honor}
+              </span>
+            ))}
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">{work.name}</h1>
+          <p className="text-gray-300 text-base leading-relaxed">{work.intro}</p>
+        </div>
+
+        {/* 元数据栏 - 分两行 */}
+        <div className="flex flex-wrap items-center justify-between p-6 gap-4">
             <div className="flex flex-col gap-4">
+              {/* 第一行：标签 */}
               <div className="flex flex-wrap gap-2">
-                <span className="bg-white/10 text-white text-xs font-medium px-2.5 py-1 rounded-full border border-white/10">
+                <span className="bg-green-500/10 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full border border-green-500/20">
                   {work.category}
                 </span>
                 {work.tags.map((tag) => (
@@ -511,6 +526,7 @@ export function WorkDetailView() {
                   </span>
                 ))}
               </div>
+              {/* 第二行：信息 */}
               <div className="flex flex-wrap gap-6 text-sm">
                 <div className="flex items-center gap-2 text-gray-400">
                   <Users className="w-4 h-4 text-gray-500" />
