@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "roleCode": "root",
+    "roleName": "根用户",
+    "description": null
+  },
+  {
+    "id": "2",
+    "roleCode": "admin",
+    "roleName": "管理员",
+    "description": null
+  },
+  {
+    "id": "3",
+    "roleCode": "common",
+    "roleName": "普通角色",
+    "description": null
+  }
+]

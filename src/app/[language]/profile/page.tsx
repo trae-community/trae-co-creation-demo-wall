@@ -432,7 +432,7 @@ export default function ProfilePage() {
             className={cn(
               "px-4 py-2 rounded-full text-sm font-medium border transition-all",
               activeTab === 'works'
-                ? "bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-black font-bold border-transparent shadow-[0_0_12px_rgba(34,197,94,0.25)]"
+                ? "bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold border-transparent shadow-[0_0_12px_rgba(50,240,140,0.25)]"
                 : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
             )}
           >
@@ -443,7 +443,7 @@ export default function ProfilePage() {
             className={cn(
               "px-4 py-2 rounded-full text-sm font-medium border transition-all",
               activeTab === 'liked'
-                ? "bg-gradient-to-r from-[#22C55E] to-[#16A34A] text-black font-bold border-transparent shadow-[0_0_12px_rgba(34,197,94,0.25)]"
+                ? "bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold border-transparent shadow-[0_0_12px_rgba(50,240,140,0.25)]"
                 : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
             )}
           >

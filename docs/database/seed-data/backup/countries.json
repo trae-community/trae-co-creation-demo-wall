@@ -1,0 +1,5514 @@
+[
+  {
+    "id": "342",
+    "dictCode": "city",
+    "itemLabel": "哈尔滨",
+    "labelI18n": {
+      "en-US": "Harbin",
+      "zh-CN": "哈尔滨"
+    },
+    "itemValue": "230100",
+    "parentValue": "HL",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "155",
+    "dictCode": "city",
+    "itemLabel": "澳门",
+    "labelI18n": {
+      "en-US": "Macau",
+      "zh-CN": "澳门"
+    },
+    "itemValue": "820100",
+    "parentValue": "MO",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "16",
+    "dictCode": "city",
+    "itemLabel": "北京",
+    "labelI18n": {
+      "en-US": "Beijing",
+      "zh-CN": "北京"
+    },
+    "itemValue": "110100",
+    "parentValue": "BJ",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "157",
+    "dictCode": "city",
+    "itemLabel": "呼和浩特",
+    "labelI18n": {
+      "en-US": "Hohhot",
+      "zh-CN": "呼和浩特"
+    },
+    "itemValue": "150100",
+    "parentValue": "NM",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "210",
+    "dictCode": "city",
+    "itemLabel": "海口",
+    "labelI18n": {
+      "en-US": "Haikou",
+      "zh-CN": "海口"
+    },
+    "itemValue": "460100",
+    "parentValue": "HI",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "129",
+    "dictCode": "city",
+    "itemLabel": "西宁",
+    "labelI18n": {
+      "en-US": "Xining",
+      "zh-CN": "西宁"
+    },
+    "itemValue": "630100",
+    "parentValue": "QH",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "336",
+    "dictCode": "city",
+    "itemLabel": "贵阳",
+    "labelI18n": {
+      "en-US": "Guiyang",
+      "zh-CN": "贵阳"
+    },
+    "itemValue": "520100",
+    "parentValue": "GZ",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "202",
+    "dictCode": "city",
+    "itemLabel": "拉萨",
+    "labelI18n": {
+      "en-US": "Lhasa",
+      "zh-CN": "拉萨"
+    },
+    "itemValue": "540100",
+    "parentValue": "XZ",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "215",
+    "dictCode": "city",
+    "itemLabel": "南昌",
+    "labelI18n": {
+      "en-US": "Nanchang",
+      "zh-CN": "南昌"
+    },
+    "itemValue": "360100",
+    "parentValue": "JX",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "23",
+    "dictCode": "city",
+    "itemLabel": "安阳",
+    "labelI18n": {
+      "en-US": "Anyang",
+      "zh-CN": "安阳"
+    },
+    "itemValue": "410500",
+    "parentValue": "HA",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "187",
+    "dictCode": "city",
+    "itemLabel": "石家庄",
+    "labelI18n": {
+      "en-US": "Shijiazhuang",
+      "zh-CN": "石家庄"
+    },
+    "itemValue": "130100",
+    "parentValue": "HE",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "407",
+    "dictCode": "city",
+    "itemLabel": "台北",
+    "labelI18n": {
+      "en-US": "Taipei",
+      "zh-CN": "台北"
+    },
+    "itemValue": "710100",
+    "parentValue": "TW",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "244",
+    "dictCode": "city",
+    "itemLabel": "香港",
+    "labelI18n": {
+      "en-US": "Hong Kong",
+      "zh-CN": "香港"
+    },
+    "itemValue": "810100",
+    "parentValue": "HK",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "288",
+    "dictCode": "city",
+    "itemLabel": "长沙",
+    "labelI18n": {
+      "en-US": "Changsha",
+      "zh-CN": "长沙"
+    },
+    "itemValue": "430100",
+    "parentValue": "HN",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "439",
+    "dictCode": "city",
+    "itemLabel": "银川",
+    "labelI18n": {
+      "en-US": "Yinchuan",
+      "zh-CN": "银川"
+    },
+    "itemValue": "640100",
+    "parentValue": "NX",
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "424",
+    "dictCode": "city",
+    "itemLabel": "无锡",
+    "labelI18n": {
+      "en-US": "Wuxi",
+      "zh-CN": "无锡"
+    },
+    "itemValue": "320200",
+    "parentValue": "JS",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "117",
+    "dictCode": "city",
+    "itemLabel": "山东大学",
+    "labelI18n": {
+      "en-US": "Shandong University",
+      "zh-CN": "山东大学"
+    },
+    "itemValue": "SDU",
+    "parentValue": "UNIV",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "308",
+    "dictCode": "city",
+    "itemLabel": "芜湖",
+    "labelI18n": {
+      "en-US": "Wuhu",
+      "zh-CN": "芜湖"
+    },
+    "itemValue": "340200",
+    "parentValue": "AH",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "290",
+    "dictCode": "city",
+    "itemLabel": "三亚",
+    "labelI18n": {
+      "en-US": "Sanya",
+      "zh-CN": "三亚"
+    },
+    "itemValue": "460200",
+    "parentValue": "HI",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "438",
+    "dictCode": "city",
+    "itemLabel": "嘉峪关",
+    "labelI18n": {
+      "en-US": "Jiayuguan",
+      "zh-CN": "嘉峪关"
+    },
+    "itemValue": "620200",
+    "parentValue": "GS",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "208",
+    "dictCode": "city",
+    "itemLabel": "日喀则",
+    "labelI18n": {
+      "en-US": "Shigatse",
+      "zh-CN": "日喀则"
+    },
+    "itemValue": "540200",
+    "parentValue": "XZ",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "444",
+    "dictCode": "city",
+    "itemLabel": "六盘水",
+    "labelI18n": {
+      "en-US": "Liupanshui",
+      "zh-CN": "六盘水"
+    },
+    "itemValue": "520200",
+    "parentValue": "GZ",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "24",
+    "dictCode": "city",
+    "itemLabel": "百色",
+    "labelI18n": {
+      "en-US": "Baise",
+      "zh-CN": "百色"
+    },
+    "itemValue": "451000",
+    "parentValue": "GX",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "411",
+    "dictCode": "city",
+    "itemLabel": "黄石",
+    "labelI18n": {
+      "en-US": "Huangshi",
+      "zh-CN": "黄石"
+    },
+    "itemValue": "420200",
+    "parentValue": "HB",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "188",
+    "dictCode": "city",
+    "itemLabel": "株洲",
+    "labelI18n": {
+      "en-US": "Zhuzhou",
+      "zh-CN": "株洲"
+    },
+    "itemValue": "430200",
+    "parentValue": "HN",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "17",
+    "dictCode": "city",
+    "itemLabel": "上海",
+    "labelI18n": {
+      "en-US": "Shanghai",
+      "zh-CN": "上海"
+    },
+    "itemValue": "310100",
+    "parentValue": "SH",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "184",
+    "dictCode": "city",
+    "itemLabel": "新北",
+    "labelI18n": {
+      "en-US": "New Taipei",
+      "zh-CN": "新北"
+    },
+    "itemValue": "710200",
+    "parentValue": "TW",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "224",
+    "dictCode": "city",
+    "itemLabel": "海东",
+    "labelI18n": {
+      "en-US": "Haidong",
+      "zh-CN": "海东"
+    },
+    "itemValue": "630200",
+    "parentValue": "QH",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "262",
+    "dictCode": "city",
+    "itemLabel": "韶关",
+    "labelI18n": {
+      "en-US": "Shaoguan",
+      "zh-CN": "韶关"
+    },
+    "itemValue": "440200",
+    "parentValue": "GD",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "448",
+    "dictCode": "city",
+    "itemLabel": "包头",
+    "labelI18n": {
+      "en-US": "Baotou",
+      "zh-CN": "包头"
+    },
+    "itemValue": "150200",
+    "parentValue": "NM",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "352",
+    "dictCode": "city",
+    "itemLabel": "齐齐哈尔",
+    "labelI18n": {
+      "en-US": "Qiqihar",
+      "zh-CN": "齐齐哈尔"
+    },
+    "itemValue": "230200",
+    "parentValue": "HL",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "147",
+    "dictCode": "city",
+    "itemLabel": "景德镇",
+    "labelI18n": {
+      "en-US": "Jingdezhen",
+      "zh-CN": "景德镇"
+    },
+    "itemValue": "360200",
+    "parentValue": "JX",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "344",
+    "dictCode": "city",
+    "itemLabel": "柳州",
+    "labelI18n": {
+      "en-US": "Liuzhou",
+      "zh-CN": "柳州"
+    },
+    "itemValue": "450200",
+    "parentValue": "GX",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "335",
+    "dictCode": "city",
+    "itemLabel": "克拉玛依",
+    "labelI18n": {
+      "en-US": "Karamay",
+      "zh-CN": "克拉玛依"
+    },
+    "itemValue": "650200",
+    "parentValue": "XJ",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "329",
+    "dictCode": "city",
+    "itemLabel": "石嘴山",
+    "labelI18n": {
+      "en-US": "Shizuishan",
+      "zh-CN": "石嘴山"
+    },
+    "itemValue": "640200",
+    "parentValue": "NX",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "137",
+    "dictCode": "city",
+    "itemLabel": "吉林",
+    "labelI18n": {
+      "en-US": "Jilin",
+      "zh-CN": "吉林"
+    },
+    "itemValue": "220200",
+    "parentValue": "JL",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "214",
+    "dictCode": "city",
+    "itemLabel": "铜川",
+    "labelI18n": {
+      "en-US": "Tongchuan",
+      "zh-CN": "铜川"
+    },
+    "itemValue": "610200",
+    "parentValue": "SN",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "320",
+    "dictCode": "city",
+    "itemLabel": "大同",
+    "labelI18n": {
+      "en-US": "Datong",
+      "zh-CN": "大同"
+    },
+    "itemValue": "140200",
+    "parentValue": "SX",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "317",
+    "dictCode": "city",
+    "itemLabel": "开封",
+    "labelI18n": {
+      "en-US": "Kaifeng",
+      "zh-CN": "开封"
+    },
+    "itemValue": "410200",
+    "parentValue": "HA",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "315",
+    "dictCode": "city",
+    "itemLabel": "曲靖",
+    "labelI18n": {
+      "en-US": "Qujing",
+      "zh-CN": "曲靖"
+    },
+    "itemValue": "530300",
+    "parentValue": "YN",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "284",
+    "dictCode": "city",
+    "itemLabel": "自贡",
+    "labelI18n": {
+      "en-US": "Zigong",
+      "zh-CN": "自贡"
+    },
+    "itemValue": "510300",
+    "parentValue": "SC",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "229",
+    "dictCode": "city",
+    "itemLabel": "莆田",
+    "labelI18n": {
+      "en-US": "Putian",
+      "zh-CN": "莆田"
+    },
+    "itemValue": "350300",
+    "parentValue": "FJ",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "387",
+    "dictCode": "city",
+    "itemLabel": "蚌埠",
+    "labelI18n": {
+      "en-US": "Bengbu",
+      "zh-CN": "蚌埠"
+    },
+    "itemValue": "340300",
+    "parentValue": "AH",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "440",
+    "dictCode": "city",
+    "itemLabel": "四平",
+    "labelI18n": {
+      "en-US": "Siping",
+      "zh-CN": "四平"
+    },
+    "itemValue": "220300",
+    "parentValue": "JL",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "298",
+    "dictCode": "city",
+    "itemLabel": "鞍山",
+    "labelI18n": {
+      "en-US": "Anshan",
+      "zh-CN": "鞍山"
+    },
+    "itemValue": "210300",
+    "parentValue": "LN",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "267",
+    "dictCode": "city",
+    "itemLabel": "昌都",
+    "labelI18n": {
+      "en-US": "Qamdo",
+      "zh-CN": "昌都"
+    },
+    "itemValue": "540300",
+    "parentValue": "XZ",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "292",
+    "dictCode": "city",
+    "itemLabel": "十堰",
+    "labelI18n": {
+      "en-US": "Shiyan",
+      "zh-CN": "十堰"
+    },
+    "itemValue": "420300",
+    "parentValue": "HB",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "230",
+    "dictCode": "city",
+    "itemLabel": "桃园",
+    "labelI18n": {
+      "en-US": "Taoyuan",
+      "zh-CN": "桃园"
+    },
+    "itemValue": "710300",
+    "parentValue": "TW",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "115",
+    "dictCode": "city",
+    "itemLabel": "中国矿业大学",
+    "labelI18n": {
+      "en-US": "China University of Mining and Technology",
+      "zh-CN": "中国矿业大学"
+    },
+    "itemValue": "CUMT",
+    "parentValue": "UNIV",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "25",
+    "dictCode": "city",
+    "itemLabel": "长春",
+    "labelI18n": {
+      "en-US": "Changchun",
+      "zh-CN": "长春"
+    },
+    "itemValue": "220100",
+    "parentValue": "JL",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "293",
+    "dictCode": "city",
+    "itemLabel": "乌海",
+    "labelI18n": {
+      "en-US": "Wuhai",
+      "zh-CN": "乌海"
+    },
+    "itemValue": "150300",
+    "parentValue": "NM",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "291",
+    "dictCode": "city",
+    "itemLabel": "玉溪",
+    "labelI18n": {
+      "en-US": "Yuxi",
+      "zh-CN": "玉溪"
+    },
+    "itemValue": "530400",
+    "parentValue": "YN",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "170",
+    "dictCode": "city",
+    "itemLabel": "徐州",
+    "labelI18n": {
+      "en-US": "Xuzhou",
+      "zh-CN": "徐州"
+    },
+    "itemValue": "320300",
+    "parentValue": "JS",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "237",
+    "dictCode": "city",
+    "itemLabel": "秦皇岛",
+    "labelI18n": {
+      "en-US": "Qinhuangdao",
+      "zh-CN": "秦皇岛"
+    },
+    "itemValue": "130300",
+    "parentValue": "HE",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "189",
+    "dictCode": "city",
+    "itemLabel": "阳泉",
+    "labelI18n": {
+      "en-US": "Yangquan",
+      "zh-CN": "阳泉"
+    },
+    "itemValue": "140300",
+    "parentValue": "SX",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "332",
+    "dictCode": "city",
+    "itemLabel": "萍乡",
+    "labelI18n": {
+      "en-US": "Pingxiang",
+      "zh-CN": "萍乡"
+    },
+    "itemValue": "360300",
+    "parentValue": "JX",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "18",
+    "dictCode": "city",
+    "itemLabel": "深圳",
+    "labelI18n": {
+      "en-US": "Shenzhen",
+      "zh-CN": "深圳"
+    },
+    "itemValue": "440300",
+    "parentValue": "GD",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "358",
+    "dictCode": "city",
+    "itemLabel": "海北",
+    "labelI18n": {
+      "en-US": "Haibei",
+      "zh-CN": "海北"
+    },
+    "itemValue": "632200",
+    "parentValue": "QH",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "177",
+    "dictCode": "city",
+    "itemLabel": "鸡西",
+    "labelI18n": {
+      "en-US": "Jixi",
+      "zh-CN": "鸡西"
+    },
+    "itemValue": "230300",
+    "parentValue": "HL",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "216",
+    "dictCode": "city",
+    "itemLabel": "金昌",
+    "labelI18n": {
+      "en-US": "Jinchang",
+      "zh-CN": "金昌"
+    },
+    "itemValue": "620300",
+    "parentValue": "GS",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "261",
+    "dictCode": "city",
+    "itemLabel": "三沙",
+    "labelI18n": {
+      "en-US": "Sansha",
+      "zh-CN": "三沙"
+    },
+    "itemValue": "460300",
+    "parentValue": "HI",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "131",
+    "dictCode": "city",
+    "itemLabel": "吐鲁番",
+    "labelI18n": {
+      "en-US": "Turpan",
+      "zh-CN": "吐鲁番"
+    },
+    "itemValue": "650400",
+    "parentValue": "XJ",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "179",
+    "dictCode": "city",
+    "itemLabel": "吴忠",
+    "labelI18n": {
+      "en-US": "Wuzhong",
+      "zh-CN": "吴忠"
+    },
+    "itemValue": "640300",
+    "parentValue": "NX",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "149",
+    "dictCode": "city",
+    "itemLabel": "宝鸡",
+    "labelI18n": {
+      "en-US": "Baoji",
+      "zh-CN": "宝鸡"
+    },
+    "itemValue": "610300",
+    "parentValue": "SN",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "209",
+    "dictCode": "city",
+    "itemLabel": "攀枝花",
+    "labelI18n": {
+      "en-US": "Panzhihua",
+      "zh-CN": "攀枝花"
+    },
+    "itemValue": "510400",
+    "parentValue": "SC",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "433",
+    "dictCode": "city",
+    "itemLabel": "湘潭",
+    "labelI18n": {
+      "en-US": "Xiangtan",
+      "zh-CN": "湘潭"
+    },
+    "itemValue": "430300",
+    "parentValue": "HN",
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "330",
+    "dictCode": "city",
+    "itemLabel": "梧州",
+    "labelI18n": {
+      "en-US": "Wuzhou",
+      "zh-CN": "梧州"
+    },
+    "itemValue": "450400",
+    "parentValue": "GX",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "273",
+    "dictCode": "city",
+    "itemLabel": "泸州",
+    "labelI18n": {
+      "en-US": "Luzhou",
+      "zh-CN": "泸州"
+    },
+    "itemValue": "510500",
+    "parentValue": "SC",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "395",
+    "dictCode": "city",
+    "itemLabel": "嘉兴",
+    "labelI18n": {
+      "en-US": "Jiaxing",
+      "zh-CN": "嘉兴"
+    },
+    "itemValue": "330400",
+    "parentValue": "ZJ",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "19",
+    "dictCode": "city",
+    "itemLabel": "杭州",
+    "labelI18n": {
+      "en-US": "Hangzhou",
+      "zh-CN": "杭州"
+    },
+    "itemValue": "330100",
+    "parentValue": "ZJ",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "394",
+    "dictCode": "city",
+    "itemLabel": "长治",
+    "labelI18n": {
+      "en-US": "Changzhi",
+      "zh-CN": "长治"
+    },
+    "itemValue": "140400",
+    "parentValue": "SX",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "251",
+    "dictCode": "city",
+    "itemLabel": "安顺",
+    "labelI18n": {
+      "en-US": "Anshun",
+      "zh-CN": "安顺"
+    },
+    "itemValue": "520400",
+    "parentValue": "GZ",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "171",
+    "dictCode": "city",
+    "itemLabel": "衡阳",
+    "labelI18n": {
+      "en-US": "Hengyang",
+      "zh-CN": "衡阳"
+    },
+    "itemValue": "430400",
+    "parentValue": "HN",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "258",
+    "dictCode": "city",
+    "itemLabel": "台中",
+    "labelI18n": {
+      "en-US": "Taichung",
+      "zh-CN": "台中"
+    },
+    "itemValue": "710400",
+    "parentValue": "TW",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "164",
+    "dictCode": "city",
+    "itemLabel": "辽源",
+    "labelI18n": {
+      "en-US": "Liaoyuan",
+      "zh-CN": "辽源"
+    },
+    "itemValue": "220400",
+    "parentValue": "JL",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "379",
+    "dictCode": "city",
+    "itemLabel": "林芝",
+    "labelI18n": {
+      "en-US": "Nyingchi",
+      "zh-CN": "林芝"
+    },
+    "itemValue": "540400",
+    "parentValue": "XZ",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "271",
+    "dictCode": "city",
+    "itemLabel": "鹤岗",
+    "labelI18n": {
+      "en-US": "Hegang",
+      "zh-CN": "鹤岗"
+    },
+    "itemValue": "230400",
+    "parentValue": "HL",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "362",
+    "dictCode": "city",
+    "itemLabel": "淮南",
+    "labelI18n": {
+      "en-US": "Huainan",
+      "zh-CN": "淮南"
+    },
+    "itemValue": "340400",
+    "parentValue": "AH",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "361",
+    "dictCode": "city",
+    "itemLabel": "固原",
+    "labelI18n": {
+      "en-US": "Guyuan",
+      "zh-CN": "固原"
+    },
+    "itemValue": "640400",
+    "parentValue": "NX",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "359",
+    "dictCode": "city",
+    "itemLabel": "九江",
+    "labelI18n": {
+      "en-US": "Jiujiang",
+      "zh-CN": "九江"
+    },
+    "itemValue": "360400",
+    "parentValue": "JX",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "357",
+    "dictCode": "city",
+    "itemLabel": "宜昌",
+    "labelI18n": {
+      "en-US": "Yichang",
+      "zh-CN": "宜昌"
+    },
+    "itemValue": "420500",
+    "parentValue": "HB",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "114",
+    "dictCode": "city",
+    "itemLabel": "江西师范大学",
+    "labelI18n": {
+      "en-US": "Jiangxi Normal University",
+      "zh-CN": "江西师范大学"
+    },
+    "itemValue": "JXNU",
+    "parentValue": "UNIV",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "266",
+    "dictCode": "city",
+    "itemLabel": "白银",
+    "labelI18n": {
+      "en-US": "Baiyin",
+      "zh-CN": "白银"
+    },
+    "itemValue": "620400",
+    "parentValue": "GS",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "441",
+    "dictCode": "city",
+    "itemLabel": "黄南",
+    "labelI18n": {
+      "en-US": "Huangnan",
+      "zh-CN": "黄南"
+    },
+    "itemValue": "632300",
+    "parentValue": "QH",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "304",
+    "dictCode": "city",
+    "itemLabel": "抚顺",
+    "labelI18n": {
+      "en-US": "Fushun",
+      "zh-CN": "抚顺"
+    },
+    "itemValue": "210400",
+    "parentValue": "LN",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "305",
+    "dictCode": "city",
+    "itemLabel": "保山",
+    "labelI18n": {
+      "en-US": "Baoshan",
+      "zh-CN": "保山"
+    },
+    "itemValue": "530500",
+    "parentValue": "YN",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "196",
+    "dictCode": "city",
+    "itemLabel": "赤峰",
+    "labelI18n": {
+      "en-US": "Chifeng",
+      "zh-CN": "赤峰"
+    },
+    "itemValue": "150400",
+    "parentValue": "NM",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "242",
+    "dictCode": "city",
+    "itemLabel": "枣庄",
+    "labelI18n": {
+      "en-US": "Zaozhuang",
+      "zh-CN": "枣庄"
+    },
+    "itemValue": "370400",
+    "parentValue": "SD",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "415",
+    "dictCode": "city",
+    "itemLabel": "咸阳",
+    "labelI18n": {
+      "en-US": "Xianyang",
+      "zh-CN": "咸阳"
+    },
+    "itemValue": "610400",
+    "parentValue": "SN",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "26",
+    "dictCode": "city",
+    "itemLabel": "常州",
+    "labelI18n": {
+      "en-US": "Changzhou",
+      "zh-CN": "常州"
+    },
+    "itemValue": "320400",
+    "parentValue": "JS",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "269",
+    "dictCode": "city",
+    "itemLabel": "平顶山",
+    "labelI18n": {
+      "en-US": "Pingdingshan",
+      "zh-CN": "平顶山"
+    },
+    "itemValue": "410400",
+    "parentValue": "HA",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "234",
+    "dictCode": "city",
+    "itemLabel": "儋州",
+    "labelI18n": {
+      "en-US": "Danzhou",
+      "zh-CN": "儋州"
+    },
+    "itemValue": "460400",
+    "parentValue": "HI",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "200",
+    "dictCode": "city",
+    "itemLabel": "哈密",
+    "labelI18n": {
+      "en-US": "Hami",
+      "zh-CN": "哈密"
+    },
+    "itemValue": "650500",
+    "parentValue": "XJ",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "211",
+    "dictCode": "city",
+    "itemLabel": "三明",
+    "labelI18n": {
+      "en-US": "Sanming",
+      "zh-CN": "三明"
+    },
+    "itemValue": "350400",
+    "parentValue": "FJ",
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "217",
+    "dictCode": "city",
+    "itemLabel": "中卫",
+    "labelI18n": {
+      "en-US": "Zhongwei",
+      "zh-CN": "中卫"
+    },
+    "itemValue": "640500",
+    "parentValue": "NX",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "222",
+    "dictCode": "city",
+    "itemLabel": "襄阳",
+    "labelI18n": {
+      "en-US": "Xiangyang",
+      "zh-CN": "襄阳"
+    },
+    "itemValue": "420600",
+    "parentValue": "HB",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "436",
+    "dictCode": "city",
+    "itemLabel": "台南",
+    "labelI18n": {
+      "en-US": "Tainan",
+      "zh-CN": "台南"
+    },
+    "itemValue": "710500",
+    "parentValue": "TW",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "420",
+    "dictCode": "city",
+    "itemLabel": "晋城",
+    "labelI18n": {
+      "en-US": "Jincheng",
+      "zh-CN": "晋城"
+    },
+    "itemValue": "140500",
+    "parentValue": "SX",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "417",
+    "dictCode": "city",
+    "itemLabel": "新余",
+    "labelI18n": {
+      "en-US": "Xinyu",
+      "zh-CN": "新余"
+    },
+    "itemValue": "360500",
+    "parentValue": "JX",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "27",
+    "dictCode": "city",
+    "itemLabel": "成都",
+    "labelI18n": {
+      "en-US": "Chengdu",
+      "zh-CN": "成都"
+    },
+    "itemValue": "510100",
+    "parentValue": "SC",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "399",
+    "dictCode": "city",
+    "itemLabel": "山南",
+    "labelI18n": {
+      "en-US": "Shannan",
+      "zh-CN": "山南"
+    },
+    "itemValue": "540500",
+    "parentValue": "XZ",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "367",
+    "dictCode": "city",
+    "itemLabel": "邵阳",
+    "labelI18n": {
+      "en-US": "Shaoyang",
+      "zh-CN": "邵阳"
+    },
+    "itemValue": "430500",
+    "parentValue": "HN",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "349",
+    "dictCode": "city",
+    "itemLabel": "天水",
+    "labelI18n": {
+      "en-US": "Tianshui",
+      "zh-CN": "天水"
+    },
+    "itemValue": "620500",
+    "parentValue": "GS",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "322",
+    "dictCode": "city",
+    "itemLabel": "马鞍山",
+    "labelI18n": {
+      "en-US": "Ma'anshan",
+      "zh-CN": "马鞍山"
+    },
+    "itemValue": "340500",
+    "parentValue": "AH",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "103",
+    "dictCode": "city",
+    "itemLabel": "西安石油大学",
+    "labelI18n": {
+      "en-US": "Xi'an Shiyou University",
+      "zh-CN": "西安石油大学"
+    },
+    "itemValue": "XSYU",
+    "parentValue": "UNIV",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "316",
+    "dictCode": "city",
+    "itemLabel": "通辽",
+    "labelI18n": {
+      "en-US": "Tongliao",
+      "zh-CN": "通辽"
+    },
+    "itemValue": "150500",
+    "parentValue": "NM",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "314",
+    "dictCode": "city",
+    "itemLabel": "五指山",
+    "labelI18n": {
+      "en-US": "Wuzhishan",
+      "zh-CN": "五指山"
+    },
+    "itemValue": "469001",
+    "parentValue": "HI",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "299",
+    "dictCode": "city",
+    "itemLabel": "汕头",
+    "labelI18n": {
+      "en-US": "Shantou",
+      "zh-CN": "汕头"
+    },
+    "itemValue": "440500",
+    "parentValue": "GD",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "297",
+    "dictCode": "city",
+    "itemLabel": "东营",
+    "labelI18n": {
+      "en-US": "Dongying",
+      "zh-CN": "东营"
+    },
+    "itemValue": "370500",
+    "parentValue": "SD",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "136",
+    "dictCode": "city",
+    "itemLabel": "渭南",
+    "labelI18n": {
+      "en-US": "Weinan",
+      "zh-CN": "渭南"
+    },
+    "itemValue": "610500",
+    "parentValue": "SN",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "151",
+    "dictCode": "city",
+    "itemLabel": "通化",
+    "labelI18n": {
+      "en-US": "Tonghua",
+      "zh-CN": "通化"
+    },
+    "itemValue": "220500",
+    "parentValue": "JL",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "253",
+    "dictCode": "city",
+    "itemLabel": "毕节",
+    "labelI18n": {
+      "en-US": "Bijie",
+      "zh-CN": "毕节"
+    },
+    "itemValue": "520500",
+    "parentValue": "GZ",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "175",
+    "dictCode": "city",
+    "itemLabel": "德阳",
+    "labelI18n": {
+      "en-US": "Deyang",
+      "zh-CN": "德阳"
+    },
+    "itemValue": "510600",
+    "parentValue": "SC",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "248",
+    "dictCode": "city",
+    "itemLabel": "邢台",
+    "labelI18n": {
+      "en-US": "Xingtai",
+      "zh-CN": "邢台"
+    },
+    "itemValue": "130500",
+    "parentValue": "HE",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "185",
+    "dictCode": "city",
+    "itemLabel": "昌吉",
+    "labelI18n": {
+      "en-US": "Changji",
+      "zh-CN": "昌吉"
+    },
+    "itemValue": "652300",
+    "parentValue": "XJ",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "243",
+    "dictCode": "city",
+    "itemLabel": "双鸭山",
+    "labelI18n": {
+      "en-US": "Shuangyashan",
+      "zh-CN": "双鸭山"
+    },
+    "itemValue": "230500",
+    "parentValue": "HL",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "194",
+    "dictCode": "city",
+    "itemLabel": "海南",
+    "labelI18n": {
+      "en-US": "Hainan",
+      "zh-CN": "海南"
+    },
+    "itemValue": "632500",
+    "parentValue": "QH",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "195",
+    "dictCode": "city",
+    "itemLabel": "本溪",
+    "labelI18n": {
+      "en-US": "Benxi",
+      "zh-CN": "本溪"
+    },
+    "itemValue": "210500",
+    "parentValue": "LN",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "201",
+    "dictCode": "city",
+    "itemLabel": "昭通",
+    "labelI18n": {
+      "en-US": "Zhaotong",
+      "zh-CN": "昭通"
+    },
+    "itemValue": "530600",
+    "parentValue": "YN",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "239",
+    "dictCode": "city",
+    "itemLabel": "北海",
+    "labelI18n": {
+      "en-US": "Beihai",
+      "zh-CN": "北海"
+    },
+    "itemValue": "450500",
+    "parentValue": "GX",
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "241",
+    "dictCode": "city",
+    "itemLabel": "朔州",
+    "labelI18n": {
+      "en-US": "Shuozhou",
+      "zh-CN": "朔州"
+    },
+    "itemValue": "140600",
+    "parentValue": "SX",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "165",
+    "dictCode": "city",
+    "itemLabel": "鄂州",
+    "labelI18n": {
+      "en-US": "Ezhou",
+      "zh-CN": "鄂州"
+    },
+    "itemValue": "420700",
+    "parentValue": "HB",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "425",
+    "dictCode": "city",
+    "itemLabel": "鹰潭",
+    "labelI18n": {
+      "en-US": "Yingtan",
+      "zh-CN": "鹰潭"
+    },
+    "itemValue": "360600",
+    "parentValue": "JX",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "408",
+    "dictCode": "city",
+    "itemLabel": "延安",
+    "labelI18n": {
+      "en-US": "Yan'an",
+      "zh-CN": "延安"
+    },
+    "itemValue": "610600",
+    "parentValue": "SN",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "204",
+    "dictCode": "city",
+    "itemLabel": "鹤壁",
+    "labelI18n": {
+      "en-US": "Hebi",
+      "zh-CN": "鹤壁"
+    },
+    "itemValue": "410600",
+    "parentValue": "HA",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "403",
+    "dictCode": "city",
+    "itemLabel": "那曲",
+    "labelI18n": {
+      "en-US": "Nagqu",
+      "zh-CN": "那曲"
+    },
+    "itemValue": "540600",
+    "parentValue": "XZ",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "384",
+    "dictCode": "city",
+    "itemLabel": "鄂尔多斯",
+    "labelI18n": {
+      "en-US": "Ordos",
+      "zh-CN": "鄂尔多斯"
+    },
+    "itemValue": "150600",
+    "parentValue": "NM",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "402",
+    "dictCode": "city",
+    "itemLabel": "淮北",
+    "labelI18n": {
+      "en-US": "Huaibei",
+      "zh-CN": "淮北"
+    },
+    "itemValue": "340600",
+    "parentValue": "AH",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "353",
+    "dictCode": "city",
+    "itemLabel": "博尔塔拉",
+    "labelI18n": {
+      "en-US": "Bortala",
+      "zh-CN": "博尔塔拉"
+    },
+    "itemValue": "652700",
+    "parentValue": "XJ",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "173",
+    "dictCode": "city",
+    "itemLabel": "白山",
+    "labelI18n": {
+      "en-US": "Baishan",
+      "zh-CN": "白山"
+    },
+    "itemValue": "220600",
+    "parentValue": "JL",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "212",
+    "dictCode": "city",
+    "itemLabel": "丹东",
+    "labelI18n": {
+      "en-US": "Dandong",
+      "zh-CN": "丹东"
+    },
+    "itemValue": "210600",
+    "parentValue": "LN",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "400",
+    "dictCode": "city",
+    "itemLabel": "漳州",
+    "labelI18n": {
+      "en-US": "Zhangzhou",
+      "zh-CN": "漳州"
+    },
+    "itemValue": "350600",
+    "parentValue": "FJ",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "331",
+    "dictCode": "city",
+    "itemLabel": "铜仁",
+    "labelI18n": {
+      "en-US": "Tongren",
+      "zh-CN": "铜仁"
+    },
+    "itemValue": "520600",
+    "parentValue": "GZ",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "180",
+    "dictCode": "city",
+    "itemLabel": "大庆",
+    "labelI18n": {
+      "en-US": "Daqing",
+      "zh-CN": "大庆"
+    },
+    "itemValue": "230600",
+    "parentValue": "HL",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "302",
+    "dictCode": "city",
+    "itemLabel": "绍兴",
+    "labelI18n": {
+      "en-US": "Shaoxing",
+      "zh-CN": "绍兴"
+    },
+    "itemValue": "330600",
+    "parentValue": "ZJ",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "218",
+    "dictCode": "city",
+    "itemLabel": "果洛",
+    "labelI18n": {
+      "en-US": "Golog",
+      "zh-CN": "果洛"
+    },
+    "itemValue": "632600",
+    "parentValue": "QH",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "106",
+    "dictCode": "city",
+    "itemLabel": "南昌航空大学",
+    "labelI18n": {
+      "en-US": "Nanchang Hangkong University",
+      "zh-CN": "南昌航空大学"
+    },
+    "itemValue": "NCHU",
+    "parentValue": "UNIV",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "360",
+    "dictCode": "city",
+    "itemLabel": "保定",
+    "labelI18n": {
+      "en-US": "Baoding",
+      "zh-CN": "保定"
+    },
+    "itemValue": "130600",
+    "parentValue": "HE",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "365",
+    "dictCode": "city",
+    "itemLabel": "绵阳",
+    "labelI18n": {
+      "en-US": "Mianyang",
+      "zh-CN": "绵阳"
+    },
+    "itemValue": "510700",
+    "parentValue": "SC",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "346",
+    "dictCode": "city",
+    "itemLabel": "武威",
+    "labelI18n": {
+      "en-US": "Wuwei",
+      "zh-CN": "武威"
+    },
+    "itemValue": "620600",
+    "parentValue": "GS",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "236",
+    "dictCode": "city",
+    "itemLabel": "岳阳",
+    "labelI18n": {
+      "en-US": "Yueyang",
+      "zh-CN": "岳阳"
+    },
+    "itemValue": "430600",
+    "parentValue": "HN",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "447",
+    "dictCode": "city",
+    "itemLabel": "防城港",
+    "labelI18n": {
+      "en-US": "Fangchenggang",
+      "zh-CN": "防城港"
+    },
+    "itemValue": "450600",
+    "parentValue": "GX",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "375",
+    "dictCode": "city",
+    "itemLabel": "丽江",
+    "labelI18n": {
+      "en-US": "Lijiang",
+      "zh-CN": "丽江"
+    },
+    "itemValue": "530700",
+    "parentValue": "YN",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "28",
+    "dictCode": "city",
+    "itemLabel": "重庆",
+    "labelI18n": {
+      "en-US": "Chongqing",
+      "zh-CN": "重庆"
+    },
+    "itemValue": "500100",
+    "parentValue": "CQ",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "376",
+    "dictCode": "city",
+    "itemLabel": "琼海",
+    "labelI18n": {
+      "en-US": "Qionghai",
+      "zh-CN": "琼海"
+    },
+    "itemValue": "469002",
+    "parentValue": "HI",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "240",
+    "dictCode": "city",
+    "itemLabel": "高雄",
+    "labelI18n": {
+      "en-US": "Kaohsiung",
+      "zh-CN": "高雄"
+    },
+    "itemValue": "710600",
+    "parentValue": "TW",
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "435",
+    "dictCode": "city",
+    "itemLabel": "玉树",
+    "labelI18n": {
+      "en-US": "Yushu",
+      "zh-CN": "玉树"
+    },
+    "itemValue": "632700",
+    "parentValue": "QH",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "139",
+    "dictCode": "city",
+    "itemLabel": "连云港",
+    "labelI18n": {
+      "en-US": "Lianyungang",
+      "zh-CN": "连云港"
+    },
+    "itemValue": "320700",
+    "parentValue": "JS",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "327",
+    "dictCode": "city",
+    "itemLabel": "张家口",
+    "labelI18n": {
+      "en-US": "Zhangjiakou",
+      "zh-CN": "张家口"
+    },
+    "itemValue": "130700",
+    "parentValue": "HE",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "270",
+    "dictCode": "city",
+    "itemLabel": "常德",
+    "labelI18n": {
+      "en-US": "Changde",
+      "zh-CN": "常德"
+    },
+    "itemValue": "430700",
+    "parentValue": "HN",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "143",
+    "dictCode": "city",
+    "itemLabel": "普洱",
+    "labelI18n": {
+      "en-US": "Pu'er",
+      "zh-CN": "普洱"
+    },
+    "itemValue": "530800",
+    "parentValue": "YN",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "341",
+    "dictCode": "city",
+    "itemLabel": "钦州",
+    "labelI18n": {
+      "en-US": "Qinzhou",
+      "zh-CN": "钦州"
+    },
+    "itemValue": "450700",
+    "parentValue": "GX",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "430",
+    "dictCode": "city",
+    "itemLabel": "松原",
+    "labelI18n": {
+      "en-US": "Songyuan",
+      "zh-CN": "松原"
+    },
+    "itemValue": "220700",
+    "parentValue": "JL",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "355",
+    "dictCode": "city",
+    "itemLabel": "张掖",
+    "labelI18n": {
+      "en-US": "Zhangye",
+      "zh-CN": "张掖"
+    },
+    "itemValue": "620700",
+    "parentValue": "GS",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "265",
+    "dictCode": "city",
+    "itemLabel": "阿里",
+    "labelI18n": {
+      "en-US": "Ngari",
+      "zh-CN": "阿里"
+    },
+    "itemValue": "542500",
+    "parentValue": "XZ",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "368",
+    "dictCode": "city",
+    "itemLabel": "巴音郭楞",
+    "labelI18n": {
+      "en-US": "Bayingol",
+      "zh-CN": "巴音郭楞"
+    },
+    "itemValue": "652800",
+    "parentValue": "XJ",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "382",
+    "dictCode": "city",
+    "itemLabel": "文昌",
+    "labelI18n": {
+      "en-US": "Wenchang",
+      "zh-CN": "文昌"
+    },
+    "itemValue": "469005",
+    "parentValue": "HI",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "254",
+    "dictCode": "city",
+    "itemLabel": "赣州",
+    "labelI18n": {
+      "en-US": "Ganzhou",
+      "zh-CN": "赣州"
+    },
+    "itemValue": "360700",
+    "parentValue": "JX",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "252",
+    "dictCode": "city",
+    "itemLabel": "黔西南",
+    "labelI18n": {
+      "en-US": "Qianxinan",
+      "zh-CN": "黔西南"
+    },
+    "itemValue": "522300",
+    "parentValue": "GZ",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "389",
+    "dictCode": "city",
+    "itemLabel": "晋中",
+    "labelI18n": {
+      "en-US": "Jinzhong",
+      "zh-CN": "晋中"
+    },
+    "itemValue": "140700",
+    "parentValue": "SX",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "398",
+    "dictCode": "city",
+    "itemLabel": "南平",
+    "labelI18n": {
+      "en-US": "Nanping",
+      "zh-CN": "南平"
+    },
+    "itemValue": "350700",
+    "parentValue": "FJ",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "247",
+    "dictCode": "city",
+    "itemLabel": "潍坊",
+    "labelI18n": {
+      "en-US": "Weifang",
+      "zh-CN": "潍坊"
+    },
+    "itemValue": "370700",
+    "parentValue": "SD",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "182",
+    "dictCode": "city",
+    "itemLabel": "新乡",
+    "labelI18n": {
+      "en-US": "Xinxiang",
+      "zh-CN": "新乡"
+    },
+    "itemValue": "410700",
+    "parentValue": "HA",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "245",
+    "dictCode": "city",
+    "itemLabel": "伊春",
+    "labelI18n": {
+      "en-US": "Yichun",
+      "zh-CN": "伊春"
+    },
+    "itemValue": "230700",
+    "parentValue": "HL",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "404",
+    "dictCode": "city",
+    "itemLabel": "广元",
+    "labelI18n": {
+      "en-US": "Guangyuan",
+      "zh-CN": "广元"
+    },
+    "itemValue": "510800",
+    "parentValue": "SC",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "190",
+    "dictCode": "city",
+    "itemLabel": "呼伦贝尔",
+    "labelI18n": {
+      "en-US": "Hulunbuir",
+      "zh-CN": "呼伦贝尔"
+    },
+    "itemValue": "150700",
+    "parentValue": "NM",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "29",
+    "dictCode": "city",
+    "itemLabel": "大连",
+    "labelI18n": {
+      "en-US": "Dalian",
+      "zh-CN": "大连"
+    },
+    "itemValue": "210200",
+    "parentValue": "LN",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "199",
+    "dictCode": "city",
+    "itemLabel": "铜陵",
+    "labelI18n": {
+      "en-US": "Tongling",
+      "zh-CN": "铜陵"
+    },
+    "itemValue": "340700",
+    "parentValue": "AH",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "418",
+    "dictCode": "city",
+    "itemLabel": "锦州",
+    "labelI18n": {
+      "en-US": "Jinzhou",
+      "zh-CN": "锦州"
+    },
+    "itemValue": "210700",
+    "parentValue": "LN",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "423",
+    "dictCode": "city",
+    "itemLabel": "荆门",
+    "labelI18n": {
+      "en-US": "Jingmen",
+      "zh-CN": "荆门"
+    },
+    "itemValue": "420800",
+    "parentValue": "HB",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "108",
+    "dictCode": "city",
+    "itemLabel": "中南大学",
+    "labelI18n": {
+      "en-US": "Central South University",
+      "zh-CN": "中南大学"
+    },
+    "itemValue": "CSU",
+    "parentValue": "UNIV",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "134",
+    "dictCode": "city",
+    "itemLabel": "汉中",
+    "labelI18n": {
+      "en-US": "Hanzhong",
+      "zh-CN": "汉中"
+    },
+    "itemValue": "610700",
+    "parentValue": "SN",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "238",
+    "dictCode": "city",
+    "itemLabel": "基隆",
+    "labelI18n": {
+      "en-US": "Keelung",
+      "zh-CN": "基隆"
+    },
+    "itemValue": "710700",
+    "parentValue": "TW",
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "445",
+    "dictCode": "city",
+    "itemLabel": "贵港",
+    "labelI18n": {
+      "en-US": "Guigang",
+      "zh-CN": "贵港"
+    },
+    "itemValue": "450800",
+    "parentValue": "GX",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "437",
+    "dictCode": "city",
+    "itemLabel": "淮安",
+    "labelI18n": {
+      "en-US": "Huai'an",
+      "zh-CN": "淮安"
+    },
+    "itemValue": "320800",
+    "parentValue": "JS",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "409",
+    "dictCode": "city",
+    "itemLabel": "孝感",
+    "labelI18n": {
+      "en-US": "Xiaogan",
+      "zh-CN": "孝感"
+    },
+    "itemValue": "420900",
+    "parentValue": "HB",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "228",
+    "dictCode": "city",
+    "itemLabel": "焦作",
+    "labelI18n": {
+      "en-US": "Jiaozuo",
+      "zh-CN": "焦作"
+    },
+    "itemValue": "410800",
+    "parentValue": "HA",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "235",
+    "dictCode": "city",
+    "itemLabel": "湛江",
+    "labelI18n": {
+      "en-US": "Zhanjiang",
+      "zh-CN": "湛江"
+    },
+    "itemValue": "440800",
+    "parentValue": "GD",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "140",
+    "dictCode": "city",
+    "itemLabel": "平凉",
+    "labelI18n": {
+      "en-US": "Pingliang",
+      "zh-CN": "平凉"
+    },
+    "itemValue": "620800",
+    "parentValue": "GS",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "381",
+    "dictCode": "city",
+    "itemLabel": "佳木斯",
+    "labelI18n": {
+      "en-US": "Jiamusi",
+      "zh-CN": "佳木斯"
+    },
+    "itemValue": "230800",
+    "parentValue": "HL",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "260",
+    "dictCode": "city",
+    "itemLabel": "安庆",
+    "labelI18n": {
+      "en-US": "Anqing",
+      "zh-CN": "安庆"
+    },
+    "itemValue": "340800",
+    "parentValue": "AH",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "283",
+    "dictCode": "city",
+    "itemLabel": "张家界",
+    "labelI18n": {
+      "en-US": "Zhangjiajie",
+      "zh-CN": "张家界"
+    },
+    "itemValue": "430800",
+    "parentValue": "HN",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "277",
+    "dictCode": "city",
+    "itemLabel": "万宁",
+    "labelI18n": {
+      "en-US": "Wanning",
+      "zh-CN": "万宁"
+    },
+    "itemValue": "469006",
+    "parentValue": "HI",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "263",
+    "dictCode": "city",
+    "itemLabel": "吉安",
+    "labelI18n": {
+      "en-US": "Ji'an",
+      "zh-CN": "吉安"
+    },
+    "itemValue": "360800",
+    "parentValue": "JX",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "326",
+    "dictCode": "city",
+    "itemLabel": "榆林",
+    "labelI18n": {
+      "en-US": "Yulin",
+      "zh-CN": "榆林"
+    },
+    "itemValue": "610800",
+    "parentValue": "SN",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "153",
+    "dictCode": "city",
+    "itemLabel": "巴彦淖尔",
+    "labelI18n": {
+      "en-US": "Bayannur",
+      "zh-CN": "巴彦淖尔"
+    },
+    "itemValue": "150800",
+    "parentValue": "NM",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "350",
+    "dictCode": "city",
+    "itemLabel": "新竹",
+    "labelI18n": {
+      "en-US": "Hsinchu",
+      "zh-CN": "新竹"
+    },
+    "itemValue": "710800",
+    "parentValue": "TW",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "272",
+    "dictCode": "city",
+    "itemLabel": "白城",
+    "labelI18n": {
+      "en-US": "Baicheng",
+      "zh-CN": "白城"
+    },
+    "itemValue": "220800",
+    "parentValue": "JL",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "205",
+    "dictCode": "city",
+    "itemLabel": "黔东南",
+    "labelI18n": {
+      "en-US": "Qiandongnan",
+      "zh-CN": "黔东南"
+    },
+    "itemValue": "522600",
+    "parentValue": "GZ",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "391",
+    "dictCode": "city",
+    "itemLabel": "营口",
+    "labelI18n": {
+      "en-US": "Yingkou",
+      "zh-CN": "营口"
+    },
+    "itemValue": "210800",
+    "parentValue": "LN",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "148",
+    "dictCode": "city",
+    "itemLabel": "阿克苏",
+    "labelI18n": {
+      "en-US": "Aksu",
+      "zh-CN": "阿克苏"
+    },
+    "itemValue": "652900",
+    "parentValue": "XJ",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "145",
+    "dictCode": "city",
+    "itemLabel": "临沧",
+    "labelI18n": {
+      "en-US": "Lincang",
+      "zh-CN": "临沧"
+    },
+    "itemValue": "530900",
+    "parentValue": "YN",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "183",
+    "dictCode": "city",
+    "itemLabel": "运城",
+    "labelI18n": {
+      "en-US": "Yuncheng",
+      "zh-CN": "运城"
+    },
+    "itemValue": "140800",
+    "parentValue": "SX",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "30",
+    "dictCode": "city",
+    "itemLabel": "东莞",
+    "labelI18n": {
+      "en-US": "Dongguan",
+      "zh-CN": "东莞"
+    },
+    "itemValue": "441900",
+    "parentValue": "GD",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "174",
+    "dictCode": "city",
+    "itemLabel": "承德",
+    "labelI18n": {
+      "en-US": "Chengde",
+      "zh-CN": "承德"
+    },
+    "itemValue": "130800",
+    "parentValue": "HE",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "311",
+    "dictCode": "city",
+    "itemLabel": "龙岩",
+    "labelI18n": {
+      "en-US": "Longyan",
+      "zh-CN": "龙岩"
+    },
+    "itemValue": "350800",
+    "parentValue": "FJ",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "385",
+    "dictCode": "city",
+    "itemLabel": "遂宁",
+    "labelI18n": {
+      "en-US": "Suining",
+      "zh-CN": "遂宁"
+    },
+    "itemValue": "510900",
+    "parentValue": "SC",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "432",
+    "dictCode": "city",
+    "itemLabel": "海西",
+    "labelI18n": {
+      "en-US": "Haixi",
+      "zh-CN": "海西"
+    },
+    "itemValue": "632800",
+    "parentValue": "QH",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "313",
+    "dictCode": "city",
+    "itemLabel": "衢州",
+    "labelI18n": {
+      "en-US": "Quzhou",
+      "zh-CN": "衢州"
+    },
+    "itemValue": "330800",
+    "parentValue": "ZJ",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "112",
+    "dictCode": "city",
+    "itemLabel": "四川大学",
+    "labelI18n": {
+      "en-US": "Sichuan University",
+      "zh-CN": "四川大学"
+    },
+    "itemValue": "SCU",
+    "parentValue": "UNIV",
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "338",
+    "dictCode": "city",
+    "itemLabel": "宜春",
+    "labelI18n": {
+      "en-US": "Yichun",
+      "zh-CN": "宜春"
+    },
+    "itemValue": "360900",
+    "parentValue": "JX",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "31",
+    "dictCode": "city",
+    "itemLabel": "佛山",
+    "labelI18n": {
+      "en-US": "Foshan",
+      "zh-CN": "佛山"
+    },
+    "itemValue": "440600",
+    "parentValue": "GD",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "105",
+    "dictCode": "city",
+    "itemLabel": "成都东软学院",
+    "labelI18n": {
+      "en-US": "Chengdu Neusoft University",
+      "zh-CN": "成都东软学院"
+    },
+    "itemValue": "CNU",
+    "parentValue": "UNIV",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "152",
+    "dictCode": "city",
+    "itemLabel": "黔南",
+    "labelI18n": {
+      "en-US": "Qiannan",
+      "zh-CN": "黔南"
+    },
+    "itemValue": "522700",
+    "parentValue": "GZ",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "156",
+    "dictCode": "city",
+    "itemLabel": "克孜勒苏",
+    "labelI18n": {
+      "en-US": "Kizilsu",
+      "zh-CN": "克孜勒苏"
+    },
+    "itemValue": "653000",
+    "parentValue": "XJ",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "159",
+    "dictCode": "city",
+    "itemLabel": "忻州",
+    "labelI18n": {
+      "en-US": "Xinzhou",
+      "zh-CN": "忻州"
+    },
+    "itemValue": "140900",
+    "parentValue": "SX",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "161",
+    "dictCode": "city",
+    "itemLabel": "黄山",
+    "labelI18n": {
+      "en-US": "Huangshan",
+      "zh-CN": "黄山"
+    },
+    "itemValue": "341000",
+    "parentValue": "AH",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "167",
+    "dictCode": "city",
+    "itemLabel": "嘉义",
+    "labelI18n": {
+      "en-US": "Chiayi",
+      "zh-CN": "嘉义"
+    },
+    "itemValue": "710900",
+    "parentValue": "TW",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "206",
+    "dictCode": "city",
+    "itemLabel": "益阳",
+    "labelI18n": {
+      "en-US": "Yiyang",
+      "zh-CN": "益阳"
+    },
+    "itemValue": "430900",
+    "parentValue": "HN",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "219",
+    "dictCode": "city",
+    "itemLabel": "楚雄",
+    "labelI18n": {
+      "en-US": "Chuxiong",
+      "zh-CN": "楚雄"
+    },
+    "itemValue": "532300",
+    "parentValue": "YN",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "246",
+    "dictCode": "city",
+    "itemLabel": "七台河",
+    "labelI18n": {
+      "en-US": "Qitaihe",
+      "zh-CN": "七台河"
+    },
+    "itemValue": "230900",
+    "parentValue": "HL",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "259",
+    "dictCode": "city",
+    "itemLabel": "玉林",
+    "labelI18n": {
+      "en-US": "Yulin",
+      "zh-CN": "玉林"
+    },
+    "itemValue": "450900",
+    "parentValue": "GX",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "275",
+    "dictCode": "city",
+    "itemLabel": "宁德",
+    "labelI18n": {
+      "en-US": "Ningde",
+      "zh-CN": "宁德"
+    },
+    "itemValue": "350900",
+    "parentValue": "FJ",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "278",
+    "dictCode": "city",
+    "itemLabel": "阜新",
+    "labelI18n": {
+      "en-US": "Fuxin",
+      "zh-CN": "阜新"
+    },
+    "itemValue": "210900",
+    "parentValue": "LN",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "279",
+    "dictCode": "city",
+    "itemLabel": "酒泉",
+    "labelI18n": {
+      "en-US": "Jiuquan",
+      "zh-CN": "酒泉"
+    },
+    "itemValue": "620900",
+    "parentValue": "GS",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "282",
+    "dictCode": "city",
+    "itemLabel": "濮阳",
+    "labelI18n": {
+      "en-US": "Puyang",
+      "zh-CN": "濮阳"
+    },
+    "itemValue": "410900",
+    "parentValue": "HA",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "289",
+    "dictCode": "city",
+    "itemLabel": "沧州",
+    "labelI18n": {
+      "en-US": "Cangzhou",
+      "zh-CN": "沧州"
+    },
+    "itemValue": "130900",
+    "parentValue": "HE",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "325",
+    "dictCode": "city",
+    "itemLabel": "乌兰察布",
+    "labelI18n": {
+      "en-US": "Ulanqab",
+      "zh-CN": "乌兰察布"
+    },
+    "itemValue": "150900",
+    "parentValue": "NM",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "351",
+    "dictCode": "city",
+    "itemLabel": "盐城",
+    "labelI18n": {
+      "en-US": "Yancheng",
+      "zh-CN": "盐城"
+    },
+    "itemValue": "320900",
+    "parentValue": "JS",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "354",
+    "dictCode": "city",
+    "itemLabel": "安康",
+    "labelI18n": {
+      "en-US": "Ankang",
+      "zh-CN": "安康"
+    },
+    "itemValue": "610900",
+    "parentValue": "SN",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "370",
+    "dictCode": "city",
+    "itemLabel": "内江",
+    "labelI18n": {
+      "en-US": "Neijiang",
+      "zh-CN": "内江"
+    },
+    "itemValue": "511000",
+    "parentValue": "SC",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "377",
+    "dictCode": "city",
+    "itemLabel": "舟山",
+    "labelI18n": {
+      "en-US": "Zhoushan",
+      "zh-CN": "舟山"
+    },
+    "itemValue": "330900",
+    "parentValue": "ZJ",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "406",
+    "dictCode": "city",
+    "itemLabel": "荆州",
+    "labelI18n": {
+      "en-US": "Jingzhou",
+      "zh-CN": "荆州"
+    },
+    "itemValue": "421000",
+    "parentValue": "HB",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "414",
+    "dictCode": "city",
+    "itemLabel": "东方",
+    "labelI18n": {
+      "en-US": "Dongfang",
+      "zh-CN": "东方"
+    },
+    "itemValue": "469007",
+    "parentValue": "HI",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "426",
+    "dictCode": "city",
+    "itemLabel": "延边",
+    "labelI18n": {
+      "en-US": "Yanbian",
+      "zh-CN": "延边"
+    },
+    "itemValue": "222400",
+    "parentValue": "JL",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "431",
+    "dictCode": "city",
+    "itemLabel": "茂名",
+    "labelI18n": {
+      "en-US": "Maoming",
+      "zh-CN": "茂名"
+    },
+    "itemValue": "440900",
+    "parentValue": "GD",
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "419",
+    "dictCode": "city",
+    "itemLabel": "郴州",
+    "labelI18n": {
+      "en-US": "Chenzhou",
+      "zh-CN": "郴州"
+    },
+    "itemValue": "431000",
+    "parentValue": "HN",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "301",
+    "dictCode": "city",
+    "itemLabel": "红河",
+    "labelI18n": {
+      "en-US": "Honghe",
+      "zh-CN": "红河"
+    },
+    "itemValue": "532500",
+    "parentValue": "YN",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "268",
+    "dictCode": "city",
+    "itemLabel": "威海",
+    "labelI18n": {
+      "en-US": "Weihai",
+      "zh-CN": "威海"
+    },
+    "itemValue": "371000",
+    "parentValue": "SD",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "144",
+    "dictCode": "city",
+    "itemLabel": "肇庆",
+    "labelI18n": {
+      "en-US": "Zhaoqing",
+      "zh-CN": "肇庆"
+    },
+    "itemValue": "441200",
+    "parentValue": "GD",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "32",
+    "dictCode": "city",
+    "itemLabel": "福州",
+    "labelI18n": {
+      "en-US": "Fuzhou",
+      "zh-CN": "福州"
+    },
+    "itemValue": "350100",
+    "parentValue": "FJ",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "446",
+    "dictCode": "city",
+    "itemLabel": "扬州",
+    "labelI18n": {
+      "en-US": "Yangzhou",
+      "zh-CN": "扬州"
+    },
+    "itemValue": "321000",
+    "parentValue": "JS",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "138",
+    "dictCode": "city",
+    "itemLabel": "台州",
+    "labelI18n": {
+      "en-US": "Taizhou",
+      "zh-CN": "台州"
+    },
+    "itemValue": "331000",
+    "parentValue": "ZJ",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "192",
+    "dictCode": "city",
+    "itemLabel": "临汾",
+    "labelI18n": {
+      "en-US": "Linfen",
+      "zh-CN": "临汾"
+    },
+    "itemValue": "141000",
+    "parentValue": "SX",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "300",
+    "dictCode": "city",
+    "itemLabel": "许昌",
+    "labelI18n": {
+      "en-US": "Xuchang",
+      "zh-CN": "许昌"
+    },
+    "itemValue": "411000",
+    "parentValue": "HA",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "319",
+    "dictCode": "city",
+    "itemLabel": "滁州",
+    "labelI18n": {
+      "en-US": "Chuzhou",
+      "zh-CN": "滁州"
+    },
+    "itemValue": "341100",
+    "parentValue": "AH",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "110",
+    "dictCode": "city",
+    "itemLabel": "中国人民大学",
+    "labelI18n": {
+      "en-US": "Renmin University of China",
+      "zh-CN": "中国人民大学"
+    },
+    "itemValue": "RUC",
+    "parentValue": "UNIV",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "255",
+    "dictCode": "city",
+    "itemLabel": "抚州",
+    "labelI18n": {
+      "en-US": "Fuzhou",
+      "zh-CN": "抚州"
+    },
+    "itemValue": "361000",
+    "parentValue": "JX",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "295",
+    "dictCode": "city",
+    "itemLabel": "牡丹江",
+    "labelI18n": {
+      "en-US": "Mudanjiang",
+      "zh-CN": "牡丹江"
+    },
+    "itemValue": "231000",
+    "parentValue": "HL",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "371",
+    "dictCode": "city",
+    "itemLabel": "喀什",
+    "labelI18n": {
+      "en-US": "Kashgar",
+      "zh-CN": "喀什"
+    },
+    "itemValue": "653100",
+    "parentValue": "XJ",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "287",
+    "dictCode": "city",
+    "itemLabel": "庆阳",
+    "labelI18n": {
+      "en-US": "Qingyang",
+      "zh-CN": "庆阳"
+    },
+    "itemValue": "621000",
+    "parentValue": "GS",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "434",
+    "dictCode": "city",
+    "itemLabel": "乐山",
+    "labelI18n": {
+      "en-US": "Leshan",
+      "zh-CN": "乐山"
+    },
+    "itemValue": "511100",
+    "parentValue": "SC",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "388",
+    "dictCode": "city",
+    "itemLabel": "定安",
+    "labelI18n": {
+      "en-US": "Ding'an",
+      "zh-CN": "定安"
+    },
+    "itemValue": "469021",
+    "parentValue": "HI",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "310",
+    "dictCode": "city",
+    "itemLabel": "兴安",
+    "labelI18n": {
+      "en-US": "Hinggan",
+      "zh-CN": "兴安"
+    },
+    "itemValue": "152200",
+    "parentValue": "NM",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "249",
+    "dictCode": "city",
+    "itemLabel": "黄冈",
+    "labelI18n": {
+      "en-US": "Huanggang",
+      "zh-CN": "黄冈"
+    },
+    "itemValue": "421100",
+    "parentValue": "HB",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "428",
+    "dictCode": "city",
+    "itemLabel": "商洛",
+    "labelI18n": {
+      "en-US": "Shangluo",
+      "zh-CN": "商洛"
+    },
+    "itemValue": "611000",
+    "parentValue": "SN",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "390",
+    "dictCode": "city",
+    "itemLabel": "辽阳",
+    "labelI18n": {
+      "en-US": "Liaoyang",
+      "zh-CN": "辽阳"
+    },
+    "itemValue": "211000",
+    "parentValue": "LN",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "421",
+    "dictCode": "city",
+    "itemLabel": "苗栗",
+    "labelI18n": {
+      "en-US": "Miaoli",
+      "zh-CN": "苗栗"
+    },
+    "itemValue": "711000",
+    "parentValue": "TW",
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "109",
+    "dictCode": "city",
+    "itemLabel": "桂林电子科技大学",
+    "labelI18n": {
+      "en-US": "Guilin University of Electronic Technology",
+      "zh-CN": "桂林电子科技大学"
+    },
+    "itemValue": "GUET",
+    "parentValue": "UNIV",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "309",
+    "dictCode": "city",
+    "itemLabel": "镇江",
+    "labelI18n": {
+      "en-US": "Zhenjiang",
+      "zh-CN": "镇江"
+    },
+    "itemValue": "321100",
+    "parentValue": "JS",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "232",
+    "dictCode": "city",
+    "itemLabel": "南充",
+    "labelI18n": {
+      "en-US": "Nanchong",
+      "zh-CN": "南充"
+    },
+    "itemValue": "511300",
+    "parentValue": "SC",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "33",
+    "dictCode": "city",
+    "itemLabel": "广州",
+    "labelI18n": {
+      "en-US": "Guangzhou",
+      "zh-CN": "广州"
+    },
+    "itemValue": "440100",
+    "parentValue": "GD",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "162",
+    "dictCode": "city",
+    "itemLabel": "盘锦",
+    "labelI18n": {
+      "en-US": "Panjin",
+      "zh-CN": "盘锦"
+    },
+    "itemValue": "211100",
+    "parentValue": "LN",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "160",
+    "dictCode": "city",
+    "itemLabel": "贺州",
+    "labelI18n": {
+      "en-US": "Hezhou",
+      "zh-CN": "贺州"
+    },
+    "itemValue": "451100",
+    "parentValue": "GX",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "146",
+    "dictCode": "city",
+    "itemLabel": "吕梁",
+    "labelI18n": {
+      "en-US": "Lvliang",
+      "zh-CN": "吕梁"
+    },
+    "itemValue": "141100",
+    "parentValue": "SX",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "412",
+    "dictCode": "city",
+    "itemLabel": "漯河",
+    "labelI18n": {
+      "en-US": "Luohe",
+      "zh-CN": "漯河"
+    },
+    "itemValue": "411100",
+    "parentValue": "HA",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "396",
+    "dictCode": "city",
+    "itemLabel": "永州",
+    "labelI18n": {
+      "en-US": "Yongzhou",
+      "zh-CN": "永州"
+    },
+    "itemValue": "431100",
+    "parentValue": "HN",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "393",
+    "dictCode": "city",
+    "itemLabel": "彰化",
+    "labelI18n": {
+      "en-US": "Changhua",
+      "zh-CN": "彰化"
+    },
+    "itemValue": "711100",
+    "parentValue": "TW",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "133",
+    "dictCode": "city",
+    "itemLabel": "屯昌",
+    "labelI18n": {
+      "en-US": "Tunchang",
+      "zh-CN": "屯昌"
+    },
+    "itemValue": "469022",
+    "parentValue": "HI",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "281",
+    "dictCode": "city",
+    "itemLabel": "衡水",
+    "labelI18n": {
+      "en-US": "Hengshui",
+      "zh-CN": "衡水"
+    },
+    "itemValue": "131100",
+    "parentValue": "HE",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "380",
+    "dictCode": "city",
+    "itemLabel": "锡林郭勒",
+    "labelI18n": {
+      "en-US": "Xilingol",
+      "zh-CN": "锡林郭勒"
+    },
+    "itemValue": "152500",
+    "parentValue": "NM",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "374",
+    "dictCode": "city",
+    "itemLabel": "黑河",
+    "labelI18n": {
+      "en-US": "Heihe",
+      "zh-CN": "黑河"
+    },
+    "itemValue": "231100",
+    "parentValue": "HL",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "373",
+    "dictCode": "city",
+    "itemLabel": "和田",
+    "labelI18n": {
+      "en-US": "Hotan",
+      "zh-CN": "和田"
+    },
+    "itemValue": "653200",
+    "parentValue": "XJ",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "372",
+    "dictCode": "city",
+    "itemLabel": "阜阳",
+    "labelI18n": {
+      "en-US": "Fuyang",
+      "zh-CN": "阜阳"
+    },
+    "itemValue": "341200",
+    "parentValue": "AH",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "366",
+    "dictCode": "city",
+    "itemLabel": "定西",
+    "labelI18n": {
+      "en-US": "Dingxi",
+      "zh-CN": "定西"
+    },
+    "itemValue": "621100",
+    "parentValue": "GS",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "363",
+    "dictCode": "city",
+    "itemLabel": "上饶",
+    "labelI18n": {
+      "en-US": "Shangrao",
+      "zh-CN": "上饶"
+    },
+    "itemValue": "361100",
+    "parentValue": "JX",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "294",
+    "dictCode": "city",
+    "itemLabel": "文山",
+    "labelI18n": {
+      "en-US": "Wenshan",
+      "zh-CN": "文山"
+    },
+    "itemValue": "532600",
+    "parentValue": "YN",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "343",
+    "dictCode": "city",
+    "itemLabel": "丽水",
+    "labelI18n": {
+      "en-US": "Lishui",
+      "zh-CN": "丽水"
+    },
+    "itemValue": "331100",
+    "parentValue": "ZJ",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "339",
+    "dictCode": "city",
+    "itemLabel": "日照",
+    "labelI18n": {
+      "en-US": "Rizhao",
+      "zh-CN": "日照"
+    },
+    "itemValue": "371100",
+    "parentValue": "SD",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "334",
+    "dictCode": "city",
+    "itemLabel": "咸宁",
+    "labelI18n": {
+      "en-US": "Xianning",
+      "zh-CN": "咸宁"
+    },
+    "itemValue": "421200",
+    "parentValue": "HB",
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "318",
+    "dictCode": "city",
+    "itemLabel": "眉山",
+    "labelI18n": {
+      "en-US": "Meishan",
+      "zh-CN": "眉山"
+    },
+    "itemValue": "511400",
+    "parentValue": "SC",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "333",
+    "dictCode": "city",
+    "itemLabel": "铁岭",
+    "labelI18n": {
+      "en-US": "Tieling",
+      "zh-CN": "铁岭"
+    },
+    "itemValue": "211200",
+    "parentValue": "LN",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "257",
+    "dictCode": "city",
+    "itemLabel": "绥化",
+    "labelI18n": {
+      "en-US": "Suihua",
+      "zh-CN": "绥化"
+    },
+    "itemValue": "231200",
+    "parentValue": "HL",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "369",
+    "dictCode": "city",
+    "itemLabel": "阿拉善",
+    "labelI18n": {
+      "en-US": "Alxa",
+      "zh-CN": "阿拉善"
+    },
+    "itemValue": "152900",
+    "parentValue": "NM",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "416",
+    "dictCode": "city",
+    "itemLabel": "伊犁",
+    "labelI18n": {
+      "en-US": "Ili",
+      "zh-CN": "伊犁"
+    },
+    "itemValue": "654000",
+    "parentValue": "XJ",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "221",
+    "dictCode": "city",
+    "itemLabel": "梅州",
+    "labelI18n": {
+      "en-US": "Meizhou",
+      "zh-CN": "梅州"
+    },
+    "itemValue": "441400",
+    "parentValue": "GD",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "250",
+    "dictCode": "city",
+    "itemLabel": "泰州",
+    "labelI18n": {
+      "en-US": "Taizhou",
+      "zh-CN": "泰州"
+    },
+    "itemValue": "321200",
+    "parentValue": "JS",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "34",
+    "dictCode": "city",
+    "itemLabel": "桂林",
+    "labelI18n": {
+      "en-US": "Guilin",
+      "zh-CN": "桂林"
+    },
+    "itemValue": "450300",
+    "parentValue": "GX",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "203",
+    "dictCode": "city",
+    "itemLabel": "西双版纳",
+    "labelI18n": {
+      "en-US": "Xishuangbanna",
+      "zh-CN": "西双版纳"
+    },
+    "itemValue": "532800",
+    "parentValue": "YN",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "429",
+    "dictCode": "city",
+    "itemLabel": "陇南",
+    "labelI18n": {
+      "en-US": "Longnan",
+      "zh-CN": "陇南"
+    },
+    "itemValue": "621200",
+    "parentValue": "GS",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "386",
+    "dictCode": "city",
+    "itemLabel": "随州",
+    "labelI18n": {
+      "en-US": "Suizhou",
+      "zh-CN": "随州"
+    },
+    "itemValue": "421300",
+    "parentValue": "HB",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "256",
+    "dictCode": "city",
+    "itemLabel": "南投",
+    "labelI18n": {
+      "en-US": "Nantou",
+      "zh-CN": "南投"
+    },
+    "itemValue": "711200",
+    "parentValue": "TW",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "383",
+    "dictCode": "city",
+    "itemLabel": "三门峡",
+    "labelI18n": {
+      "en-US": "Sanmenxia",
+      "zh-CN": "三门峡"
+    },
+    "itemValue": "411200",
+    "parentValue": "HA",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "324",
+    "dictCode": "city",
+    "itemLabel": "怀化",
+    "labelI18n": {
+      "en-US": "Huaihua",
+      "zh-CN": "怀化"
+    },
+    "itemValue": "431200",
+    "parentValue": "HN",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "113",
+    "dictCode": "city",
+    "itemLabel": "浙江师范大学",
+    "labelI18n": {
+      "en-US": "Zhejiang Normal University",
+      "zh-CN": "浙江师范大学"
+    },
+    "itemValue": "ZJNU",
+    "parentValue": "UNIV",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "213",
+    "dictCode": "city",
+    "itemLabel": "澄迈",
+    "labelI18n": {
+      "en-US": "Chengmai",
+      "zh-CN": "澄迈"
+    },
+    "itemValue": "469023",
+    "parentValue": "HI",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "286",
+    "dictCode": "city",
+    "itemLabel": "宿州",
+    "labelI18n": {
+      "en-US": "Suzhou",
+      "zh-CN": "宿州"
+    },
+    "itemValue": "341300",
+    "parentValue": "AH",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "166",
+    "dictCode": "city",
+    "itemLabel": "河池",
+    "labelI18n": {
+      "en-US": "Hechi",
+      "zh-CN": "河池"
+    },
+    "itemValue": "451200",
+    "parentValue": "GX",
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "35",
+    "dictCode": "city",
+    "itemLabel": "邯郸",
+    "labelI18n": {
+      "en-US": "Handan",
+      "zh-CN": "邯郸"
+    },
+    "itemValue": "130400",
+    "parentValue": "HE",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "176",
+    "dictCode": "city",
+    "itemLabel": "恩施",
+    "labelI18n": {
+      "en-US": "Enshi",
+      "zh-CN": "恩施"
+    },
+    "itemValue": "422800",
+    "parentValue": "HB",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "168",
+    "dictCode": "city",
+    "itemLabel": "大理",
+    "labelI18n": {
+      "en-US": "Dali",
+      "zh-CN": "大理"
+    },
+    "itemValue": "532900",
+    "parentValue": "YN",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "264",
+    "dictCode": "city",
+    "itemLabel": "塔城",
+    "labelI18n": {
+      "en-US": "Tacheng",
+      "zh-CN": "塔城"
+    },
+    "itemValue": "654200",
+    "parentValue": "XJ",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "285",
+    "dictCode": "city",
+    "itemLabel": "六安",
+    "labelI18n": {
+      "en-US": "Lu'an",
+      "zh-CN": "六安"
+    },
+    "itemValue": "341500",
+    "parentValue": "AH",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "312",
+    "dictCode": "city",
+    "itemLabel": "来宾",
+    "labelI18n": {
+      "en-US": "Laibin",
+      "zh-CN": "来宾"
+    },
+    "itemValue": "451300",
+    "parentValue": "GX",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "111",
+    "dictCode": "city",
+    "itemLabel": "西北工业大学",
+    "labelI18n": {
+      "en-US": "Northwestern Polytechnical University",
+      "zh-CN": "西北工业大学"
+    },
+    "itemValue": "NPU",
+    "parentValue": "UNIV",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "337",
+    "dictCode": "city",
+    "itemLabel": "娄底",
+    "labelI18n": {
+      "en-US": "Loudi",
+      "zh-CN": "娄底"
+    },
+    "itemValue": "431300",
+    "parentValue": "HN",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "340",
+    "dictCode": "city",
+    "itemLabel": "临夏",
+    "labelI18n": {
+      "en-US": "Linxia",
+      "zh-CN": "临夏"
+    },
+    "itemValue": "622900",
+    "parentValue": "GS",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "345",
+    "dictCode": "city",
+    "itemLabel": "汕尾",
+    "labelI18n": {
+      "en-US": "Shanwei",
+      "zh-CN": "汕尾"
+    },
+    "itemValue": "441500",
+    "parentValue": "GD",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "348",
+    "dictCode": "city",
+    "itemLabel": "临高",
+    "labelI18n": {
+      "en-US": "Lingao",
+      "zh-CN": "临高"
+    },
+    "itemValue": "469024",
+    "parentValue": "HI",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "442",
+    "dictCode": "city",
+    "itemLabel": "德州",
+    "labelI18n": {
+      "en-US": "Dezhou",
+      "zh-CN": "德州"
+    },
+    "itemValue": "371400",
+    "parentValue": "SD",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "378",
+    "dictCode": "city",
+    "itemLabel": "南阳",
+    "labelI18n": {
+      "en-US": "Nanyang",
+      "zh-CN": "南阳"
+    },
+    "itemValue": "411300",
+    "parentValue": "HA",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "397",
+    "dictCode": "city",
+    "itemLabel": "宜宾",
+    "labelI18n": {
+      "en-US": "Yibin",
+      "zh-CN": "宜宾"
+    },
+    "itemValue": "511500",
+    "parentValue": "SC",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "226",
+    "dictCode": "city",
+    "itemLabel": "宿迁",
+    "labelI18n": {
+      "en-US": "Suqian",
+      "zh-CN": "宿迁"
+    },
+    "itemValue": "321300",
+    "parentValue": "JS",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "231",
+    "dictCode": "city",
+    "itemLabel": "朝阳",
+    "labelI18n": {
+      "en-US": "Chaoyang",
+      "zh-CN": "朝阳"
+    },
+    "itemValue": "211300",
+    "parentValue": "LN",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "198",
+    "dictCode": "city",
+    "itemLabel": "大兴安岭",
+    "labelI18n": {
+      "en-US": "Daxinganling",
+      "zh-CN": "大兴安岭"
+    },
+    "itemValue": "232700",
+    "parentValue": "HL",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "193",
+    "dictCode": "city",
+    "itemLabel": "云林",
+    "labelI18n": {
+      "en-US": "Yunlin",
+      "zh-CN": "云林"
+    },
+    "itemValue": "711300",
+    "parentValue": "TW",
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "186",
+    "dictCode": "city",
+    "itemLabel": "湘西",
+    "labelI18n": {
+      "en-US": "Xiangxi",
+      "zh-CN": "湘西"
+    },
+    "itemValue": "433100",
+    "parentValue": "HN",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "306",
+    "dictCode": "city",
+    "itemLabel": "阿勒泰",
+    "labelI18n": {
+      "en-US": "Altay",
+      "zh-CN": "阿勒泰"
+    },
+    "itemValue": "654300",
+    "parentValue": "XJ",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "307",
+    "dictCode": "city",
+    "itemLabel": "亳州",
+    "labelI18n": {
+      "en-US": "Bozhou",
+      "zh-CN": "亳州"
+    },
+    "itemValue": "341600",
+    "parentValue": "AH",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "116",
+    "dictCode": "city",
+    "itemLabel": "青岛大学",
+    "labelI18n": {
+      "en-US": "Qingdao University",
+      "zh-CN": "青岛大学"
+    },
+    "itemValue": "QU",
+    "parentValue": "UNIV",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "227",
+    "dictCode": "city",
+    "itemLabel": "嘉义县",
+    "labelI18n": {
+      "en-US": "Chiayi County",
+      "zh-CN": "嘉义县"
+    },
+    "itemValue": "711400",
+    "parentValue": "TW",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "163",
+    "dictCode": "city",
+    "itemLabel": "聊城",
+    "labelI18n": {
+      "en-US": "Liaocheng",
+      "zh-CN": "聊城"
+    },
+    "itemValue": "371500",
+    "parentValue": "SD",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "296",
+    "dictCode": "city",
+    "itemLabel": "白沙",
+    "labelI18n": {
+      "en-US": "Baisha",
+      "zh-CN": "白沙"
+    },
+    "itemValue": "469025",
+    "parentValue": "HI",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "422",
+    "dictCode": "city",
+    "itemLabel": "德宏",
+    "labelI18n": {
+      "en-US": "Dehong",
+      "zh-CN": "德宏"
+    },
+    "itemValue": "533100",
+    "parentValue": "YN",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "410",
+    "dictCode": "city",
+    "itemLabel": "甘南",
+    "labelI18n": {
+      "en-US": "Gannan",
+      "zh-CN": "甘南"
+    },
+    "itemValue": "623000",
+    "parentValue": "GS",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "274",
+    "dictCode": "city",
+    "itemLabel": "广安",
+    "labelI18n": {
+      "en-US": "Guang'an",
+      "zh-CN": "广安"
+    },
+    "itemValue": "511600",
+    "parentValue": "SC",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "364",
+    "dictCode": "city",
+    "itemLabel": "崇左",
+    "labelI18n": {
+      "en-US": "Chongzuo",
+      "zh-CN": "崇左"
+    },
+    "itemValue": "451400",
+    "parentValue": "GX",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "181",
+    "dictCode": "city",
+    "itemLabel": "河源",
+    "labelI18n": {
+      "en-US": "Heyuan",
+      "zh-CN": "河源"
+    },
+    "itemValue": "441600",
+    "parentValue": "GD",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "392",
+    "dictCode": "city",
+    "itemLabel": "葫芦岛",
+    "labelI18n": {
+      "en-US": "Huludao",
+      "zh-CN": "葫芦岛"
+    },
+    "itemValue": "211400",
+    "parentValue": "LN",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "36",
+    "dictCode": "city",
+    "itemLabel": "合肥",
+    "labelI18n": {
+      "en-US": "Hefei",
+      "zh-CN": "合肥"
+    },
+    "itemValue": "340100",
+    "parentValue": "AH",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "130",
+    "dictCode": "city",
+    "itemLabel": "商丘",
+    "labelI18n": {
+      "en-US": "Shangqiu",
+      "zh-CN": "商丘"
+    },
+    "itemValue": "411400",
+    "parentValue": "HA",
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "142",
+    "dictCode": "city",
+    "itemLabel": "昌江",
+    "labelI18n": {
+      "en-US": "Changjiang",
+      "zh-CN": "昌江"
+    },
+    "itemValue": "469026",
+    "parentValue": "HI",
+    "sortOrder": 14,
+    "status": true
+  },
+  {
+    "id": "154",
+    "dictCode": "city",
+    "itemLabel": "信阳",
+    "labelI18n": {
+      "en-US": "Xinyang",
+      "zh-CN": "信阳"
+    },
+    "itemValue": "411500",
+    "parentValue": "HA",
+    "sortOrder": 14,
+    "status": true
+  },
+  {
+    "id": "104",
+    "dictCode": "city",
+    "itemLabel": "山东财经大学",
+    "labelI18n": {
+      "en-US": "Shandong University of Finance and Economics",
+      "zh-CN": "山东财经大学"
+    },
+    "itemValue": "SDUFE",
+    "parentValue": "UNIV",
+    "sortOrder": 14,
+    "status": true
+  },
+  {
+    "id": "303",
+    "dictCode": "city",
+    "itemLabel": "滨州",
+    "labelI18n": {
+      "en-US": "Binzhou",
+      "zh-CN": "滨州"
+    },
+    "itemValue": "371600",
+    "parentValue": "SD",
+    "sortOrder": 14,
+    "status": true
+  },
+  {
+    "id": "37",
+    "dictCode": "city",
+    "itemLabel": "湖州",
+    "labelI18n": {
+      "en-US": "Huzhou",
+      "zh-CN": "湖州"
+    },
+    "itemValue": "330500",
+    "parentValue": "ZJ",
+    "sortOrder": 14,
+    "status": true
+  },
+  {
+    "id": "132",
+    "dictCode": "city",
+    "itemLabel": "达州",
+    "labelI18n": {
+      "en-US": "Dazhou",
+      "zh-CN": "达州"
+    },
+    "itemValue": "511700",
+    "parentValue": "SC",
+    "sortOrder": 14,
+    "status": true
+  },
+  {
+    "id": "233",
+    "dictCode": "city",
+    "itemLabel": "屏东",
+    "labelI18n": {
+      "en-US": "Pingtung",
+      "zh-CN": "屏东"
+    },
+    "itemValue": "711500",
+    "parentValue": "TW",
+    "sortOrder": 14,
+    "status": true
+  },
+  {
+    "id": "427",
+    "dictCode": "city",
+    "itemLabel": "阳江",
+    "labelI18n": {
+      "en-US": "Yangjiang",
+      "zh-CN": "阳江"
+    },
+    "itemValue": "441700",
+    "parentValue": "GD",
+    "sortOrder": 14,
+    "status": true
+  },
+  {
+    "id": "347",
+    "dictCode": "city",
+    "itemLabel": "怒江",
+    "labelI18n": {
+      "en-US": "Nujiang",
+      "zh-CN": "怒江"
+    },
+    "itemValue": "533300",
+    "parentValue": "YN",
+    "sortOrder": 14,
+    "status": true
+  },
+  {
+    "id": "141",
+    "dictCode": "city",
+    "itemLabel": "池州",
+    "labelI18n": {
+      "en-US": "Chizhou",
+      "zh-CN": "池州"
+    },
+    "itemValue": "341700",
+    "parentValue": "AH",
+    "sortOrder": 14,
+    "status": true
+  },
+  {
+    "id": "38",
+    "dictCode": "city",
+    "itemLabel": "惠州",
+    "labelI18n": {
+      "en-US": "Huizhou",
+      "zh-CN": "惠州"
+    },
+    "itemValue": "441300",
+    "parentValue": "GD",
+    "sortOrder": 15,
+    "status": true
+  },
+  {
+    "id": "172",
+    "dictCode": "city",
+    "itemLabel": "菏泽",
+    "labelI18n": {
+      "en-US": "Heze",
+      "zh-CN": "菏泽"
+    },
+    "itemValue": "371700",
+    "parentValue": "SD",
+    "sortOrder": 15,
+    "status": true
+  },
+  {
+    "id": "150",
+    "dictCode": "city",
+    "itemLabel": "乐东",
+    "labelI18n": {
+      "en-US": "Ledong",
+      "zh-CN": "乐东"
+    },
+    "itemValue": "469027",
+    "parentValue": "HI",
+    "sortOrder": 15,
+    "status": true
+  },
+  {
+    "id": "413",
+    "dictCode": "city",
+    "itemLabel": "迪庆",
+    "labelI18n": {
+      "en-US": "Diqing",
+      "zh-CN": "迪庆"
+    },
+    "itemValue": "533400",
+    "parentValue": "YN",
+    "sortOrder": 15,
+    "status": true
+  },
+  {
+    "id": "135",
+    "dictCode": "city",
+    "itemLabel": "宜兰",
+    "labelI18n": {
+      "en-US": "Yilan",
+      "zh-CN": "宜兰"
+    },
+    "itemValue": "711600",
+    "parentValue": "TW",
+    "sortOrder": 15,
+    "status": true
+  },
+  {
+    "id": "328",
+    "dictCode": "city",
+    "itemLabel": "雅安",
+    "labelI18n": {
+      "en-US": "Ya'an",
+      "zh-CN": "雅安"
+    },
+    "itemValue": "511800",
+    "parentValue": "SC",
+    "sortOrder": 15,
+    "status": true
+  },
+  {
+    "id": "107",
+    "dictCode": "city",
+    "itemLabel": "江西农业大学",
+    "labelI18n": {
+      "en-US": "Jiangxi Agricultural University",
+      "zh-CN": "江西农业大学"
+    },
+    "itemValue": "JXAU",
+    "parentValue": "UNIV",
+    "sortOrder": 15,
+    "status": true
+  },
+  {
+    "id": "276",
+    "dictCode": "city",
+    "itemLabel": "宣城",
+    "labelI18n": {
+      "en-US": "Xuancheng",
+      "zh-CN": "宣城"
+    },
+    "itemValue": "341800",
+    "parentValue": "AH",
+    "sortOrder": 15,
+    "status": true
+  },
+  {
+    "id": "197",
+    "dictCode": "city",
+    "itemLabel": "周口",
+    "labelI18n": {
+      "en-US": "Zhoukou",
+      "zh-CN": "周口"
+    },
+    "itemValue": "411600",
+    "parentValue": "HA",
+    "sortOrder": 15,
+    "status": true
+  },
+  {
+    "id": "39",
+    "dictCode": "city",
+    "itemLabel": "江门",
+    "labelI18n": {
+      "en-US": "Jiangmen",
+      "zh-CN": "江门"
+    },
+    "itemValue": "440700",
+    "parentValue": "GD",
+    "sortOrder": 16,
+    "status": true
+  },
+  {
+    "id": "225",
+    "dictCode": "city",
+    "itemLabel": "驻马店",
+    "labelI18n": {
+      "en-US": "Zhumadian",
+      "zh-CN": "驻马店"
+    },
+    "itemValue": "411700",
+    "parentValue": "HA",
+    "sortOrder": 16,
+    "status": true
+  },
+  {
+    "id": "207",
+    "dictCode": "city",
+    "itemLabel": "花莲",
+    "labelI18n": {
+      "en-US": "Hualien",
+      "zh-CN": "花莲"
+    },
+    "itemValue": "711700",
+    "parentValue": "TW",
+    "sortOrder": 16,
+    "status": true
+  },
+  {
+    "id": "443",
+    "dictCode": "city",
+    "itemLabel": "巴中",
+    "labelI18n": {
+      "en-US": "Bazhong",
+      "zh-CN": "巴中"
+    },
+    "itemValue": "511900",
+    "parentValue": "SC",
+    "sortOrder": 16,
+    "status": true
+  },
+  {
+    "id": "220",
+    "dictCode": "city",
+    "itemLabel": "陵水",
+    "labelI18n": {
+      "en-US": "Lingshui",
+      "zh-CN": "陵水"
+    },
+    "itemValue": "469028",
+    "parentValue": "HI",
+    "sortOrder": 16,
+    "status": true
+  },
+  {
+    "id": "356",
+    "dictCode": "city",
+    "itemLabel": "台东",
+    "labelI18n": {
+      "en-US": "Taitung",
+      "zh-CN": "台东"
+    },
+    "itemValue": "711800",
+    "parentValue": "TW",
+    "sortOrder": 17,
+    "status": true
+  },
+  {
+    "id": "169",
+    "dictCode": "city",
+    "itemLabel": "保亭",
+    "labelI18n": {
+      "en-US": "Baoting",
+      "zh-CN": "保亭"
+    },
+    "itemValue": "469029",
+    "parentValue": "HI",
+    "sortOrder": 17,
+    "status": true
+  },
+  {
+    "id": "191",
+    "dictCode": "city",
+    "itemLabel": "资阳",
+    "labelI18n": {
+      "en-US": "Ziyang",
+      "zh-CN": "资阳"
+    },
+    "itemValue": "512000",
+    "parentValue": "SC",
+    "sortOrder": 17,
+    "status": true
+  },
+  {
+    "id": "40",
+    "dictCode": "city",
+    "itemLabel": "济南",
+    "labelI18n": {
+      "en-US": "Jinan",
+      "zh-CN": "济南"
+    },
+    "itemValue": "370100",
+    "parentValue": "SD",
+    "sortOrder": 17,
+    "status": true
+  },
+  {
+    "id": "41",
+    "dictCode": "city",
+    "itemLabel": "济宁",
+    "labelI18n": {
+      "en-US": "Jining",
+      "zh-CN": "济宁"
+    },
+    "itemValue": "370800",
+    "parentValue": "SD",
+    "sortOrder": 18,
+    "status": true
+  },
+  {
+    "id": "158",
+    "dictCode": "city",
+    "itemLabel": "潮州",
+    "labelI18n": {
+      "en-US": "Chaozhou",
+      "zh-CN": "潮州"
+    },
+    "itemValue": "445100",
+    "parentValue": "GD",
+    "sortOrder": 18,
+    "status": true
+  },
+  {
+    "id": "321",
+    "dictCode": "city",
+    "itemLabel": "阿坝",
+    "labelI18n": {
+      "en-US": "Aba",
+      "zh-CN": "阿坝"
+    },
+    "itemValue": "513200",
+    "parentValue": "SC",
+    "sortOrder": 18,
+    "status": true
+  },
+  {
+    "id": "223",
+    "dictCode": "city",
+    "itemLabel": "澎湖",
+    "labelI18n": {
+      "en-US": "Penghu",
+      "zh-CN": "澎湖"
+    },
+    "itemValue": "711900",
+    "parentValue": "TW",
+    "sortOrder": 18,
+    "status": true
+  },
+  {
+    "id": "178",
+    "dictCode": "city",
+    "itemLabel": "琼中",
+    "labelI18n": {
+      "en-US": "Qiongzhong",
+      "zh-CN": "琼中"
+    },
+    "itemValue": "469030",
+    "parentValue": "HI",
+    "sortOrder": 18,
+    "status": true
+  },
+  {
+    "id": "42",
+    "dictCode": "city",
+    "itemLabel": "金华",
+    "labelI18n": {
+      "en-US": "Jinhua",
+      "zh-CN": "金华"
+    },
+    "itemValue": "330700",
+    "parentValue": "ZJ",
+    "sortOrder": 19,
+    "status": true
+  },
+  {
+    "id": "405",
+    "dictCode": "city",
+    "itemLabel": "甘孜",
+    "labelI18n": {
+      "en-US": "Ganzi",
+      "zh-CN": "甘孜"
+    },
+    "itemValue": "513300",
+    "parentValue": "SC",
+    "sortOrder": 19,
+    "status": true
+  },
+  {
+    "id": "401",
+    "dictCode": "city",
+    "itemLabel": "揭阳",
+    "labelI18n": {
+      "en-US": "Jieyang",
+      "zh-CN": "揭阳"
+    },
+    "itemValue": "445200",
+    "parentValue": "GD",
+    "sortOrder": 19,
+    "status": true
+  },
+  {
+    "id": "323",
+    "dictCode": "city",
+    "itemLabel": "云浮",
+    "labelI18n": {
+      "en-US": "Yunfu",
+      "zh-CN": "云浮"
+    },
+    "itemValue": "445300",
+    "parentValue": "GD",
+    "sortOrder": 20,
+    "status": true
+  },
+  {
+    "id": "280",
+    "dictCode": "city",
+    "itemLabel": "凉山",
+    "labelI18n": {
+      "en-US": "Liangshan",
+      "zh-CN": "凉山"
+    },
+    "itemValue": "513400",
+    "parentValue": "SC",
+    "sortOrder": 20,
+    "status": true
+  },
+  {
+    "id": "43",
+    "dictCode": "city",
+    "itemLabel": "昆明",
+    "labelI18n": {
+      "en-US": "Kunming",
+      "zh-CN": "昆明"
+    },
+    "itemValue": "530100",
+    "parentValue": "YN",
+    "sortOrder": 20,
+    "status": true
+  },
+  {
+    "id": "44",
+    "dictCode": "city",
+    "itemLabel": "兰州",
+    "labelI18n": {
+      "en-US": "Lanzhou",
+      "zh-CN": "兰州"
+    },
+    "itemValue": "620100",
+    "parentValue": "GS",
+    "sortOrder": 21,
+    "status": true
+  },
+  {
+    "id": "45",
+    "dictCode": "city",
+    "itemLabel": "廊坊",
+    "labelI18n": {
+      "en-US": "Langfang",
+      "zh-CN": "廊坊"
+    },
+    "itemValue": "131000",
+    "parentValue": "HE",
+    "sortOrder": 22,
+    "status": true
+  },
+  {
+    "id": "46",
+    "dictCode": "city",
+    "itemLabel": "临沂",
+    "labelI18n": {
+      "en-US": "Linyi",
+      "zh-CN": "临沂"
+    },
+    "itemValue": "371300",
+    "parentValue": "SD",
+    "sortOrder": 23,
+    "status": true
+  },
+  {
+    "id": "47",
+    "dictCode": "city",
+    "itemLabel": "洛阳",
+    "labelI18n": {
+      "en-US": "Luoyang",
+      "zh-CN": "洛阳"
+    },
+    "itemValue": "410300",
+    "parentValue": "HA",
+    "sortOrder": 24,
+    "status": true
+  },
+  {
+    "id": "48",
+    "dictCode": "city",
+    "itemLabel": "南宁",
+    "labelI18n": {
+      "en-US": "Nanning",
+      "zh-CN": "南宁"
+    },
+    "itemValue": "450100",
+    "parentValue": "GX",
+    "sortOrder": 25,
+    "status": true
+  },
+  {
+    "id": "49",
+    "dictCode": "city",
+    "itemLabel": "南通",
+    "labelI18n": {
+      "en-US": "Nantong",
+      "zh-CN": "南通"
+    },
+    "itemValue": "320600",
+    "parentValue": "JS",
+    "sortOrder": 26,
+    "status": true
+  },
+  {
+    "id": "50",
+    "dictCode": "city",
+    "itemLabel": "南京",
+    "labelI18n": {
+      "en-US": "Nanjing",
+      "zh-CN": "南京"
+    },
+    "itemValue": "320100",
+    "parentValue": "JS",
+    "sortOrder": 27,
+    "status": true
+  },
+  {
+    "id": "51",
+    "dictCode": "city",
+    "itemLabel": "宁波",
+    "labelI18n": {
+      "en-US": "Ningbo",
+      "zh-CN": "宁波"
+    },
+    "itemValue": "330200",
+    "parentValue": "ZJ",
+    "sortOrder": 28,
+    "status": true
+  },
+  {
+    "id": "52",
+    "dictCode": "city",
+    "itemLabel": "青岛",
+    "labelI18n": {
+      "en-US": "Qingdao",
+      "zh-CN": "青岛"
+    },
+    "itemValue": "370200",
+    "parentValue": "SD",
+    "sortOrder": 29,
+    "status": true
+  },
+  {
+    "id": "53",
+    "dictCode": "city",
+    "itemLabel": "清远",
+    "labelI18n": {
+      "en-US": "Qingyuan",
+      "zh-CN": "清远"
+    },
+    "itemValue": "441800",
+    "parentValue": "GD",
+    "sortOrder": 30,
+    "status": true
+  },
+  {
+    "id": "54",
+    "dictCode": "city",
+    "itemLabel": "泉州",
+    "labelI18n": {
+      "en-US": "Quanzhou",
+      "zh-CN": "泉州"
+    },
+    "itemValue": "350500",
+    "parentValue": "FJ",
+    "sortOrder": 31,
+    "status": true
+  },
+  {
+    "id": "55",
+    "dictCode": "city",
+    "itemLabel": "沈阳",
+    "labelI18n": {
+      "en-US": "Shenyang",
+      "zh-CN": "沈阳"
+    },
+    "itemValue": "210100",
+    "parentValue": "LN",
+    "sortOrder": 32,
+    "status": true
+  },
+  {
+    "id": "56",
+    "dictCode": "city",
+    "itemLabel": "苏州",
+    "labelI18n": {
+      "en-US": "Suzhou",
+      "zh-CN": "苏州"
+    },
+    "itemValue": "320500",
+    "parentValue": "JS",
+    "sortOrder": 33,
+    "status": true
+  },
+  {
+    "id": "57",
+    "dictCode": "city",
+    "itemLabel": "泰安",
+    "labelI18n": {
+      "en-US": "Tai'an",
+      "zh-CN": "泰安"
+    },
+    "itemValue": "370900",
+    "parentValue": "SD",
+    "sortOrder": 34,
+    "status": true
+  },
+  {
+    "id": "58",
+    "dictCode": "city",
+    "itemLabel": "太原",
+    "labelI18n": {
+      "en-US": "Taiyuan",
+      "zh-CN": "太原"
+    },
+    "itemValue": "140100",
+    "parentValue": "SX",
+    "sortOrder": 35,
+    "status": true
+  },
+  {
+    "id": "59",
+    "dictCode": "city",
+    "itemLabel": "天津",
+    "labelI18n": {
+      "en-US": "Tianjin",
+      "zh-CN": "天津"
+    },
+    "itemValue": "120100",
+    "parentValue": "TJ",
+    "sortOrder": 36,
+    "status": true
+  },
+  {
+    "id": "60",
+    "dictCode": "city",
+    "itemLabel": "唐山",
+    "labelI18n": {
+      "en-US": "Tangshan",
+      "zh-CN": "唐山"
+    },
+    "itemValue": "130200",
+    "parentValue": "HE",
+    "sortOrder": 37,
+    "status": true
+  },
+  {
+    "id": "61",
+    "dictCode": "city",
+    "itemLabel": "淄博",
+    "labelI18n": {
+      "en-US": "Zibo",
+      "zh-CN": "淄博"
+    },
+    "itemValue": "370300",
+    "parentValue": "SD",
+    "sortOrder": 38,
+    "status": true
+  },
+  {
+    "id": "62",
+    "dictCode": "city",
+    "itemLabel": "乌鲁木齐",
+    "labelI18n": {
+      "en-US": "Urumqi",
+      "zh-CN": "乌鲁木齐"
+    },
+    "itemValue": "650100",
+    "parentValue": "XJ",
+    "sortOrder": 39,
+    "status": true
+  },
+  {
+    "id": "63",
+    "dictCode": "city",
+    "itemLabel": "武汉",
+    "labelI18n": {
+      "en-US": "Wuhan",
+      "zh-CN": "武汉"
+    },
+    "itemValue": "420100",
+    "parentValue": "HB",
+    "sortOrder": 40,
+    "status": true
+  },
+  {
+    "id": "64",
+    "dictCode": "city",
+    "itemLabel": "温州",
+    "labelI18n": {
+      "en-US": "Wenzhou",
+      "zh-CN": "温州"
+    },
+    "itemValue": "330300",
+    "parentValue": "ZJ",
+    "sortOrder": 41,
+    "status": true
+  },
+  {
+    "id": "65",
+    "dictCode": "city",
+    "itemLabel": "珠海",
+    "labelI18n": {
+      "en-US": "Zhuhai",
+      "zh-CN": "珠海"
+    },
+    "itemValue": "440400",
+    "parentValue": "GD",
+    "sortOrder": 42,
+    "status": true
+  },
+  {
+    "id": "66",
+    "dictCode": "city",
+    "itemLabel": "厦门",
+    "labelI18n": {
+      "en-US": "Xiamen",
+      "zh-CN": "厦门"
+    },
+    "itemValue": "350200",
+    "parentValue": "FJ",
+    "sortOrder": 43,
+    "status": true
+  },
+  {
+    "id": "67",
+    "dictCode": "city",
+    "itemLabel": "兴义",
+    "labelI18n": {
+      "en-US": "Xingyi",
+      "zh-CN": "兴义"
+    },
+    "itemValue": "522301",
+    "parentValue": "GZ",
+    "sortOrder": 44,
+    "status": true
+  },
+  {
+    "id": "68",
+    "dictCode": "city",
+    "itemLabel": "西安",
+    "labelI18n": {
+      "en-US": "Xi'an",
+      "zh-CN": "西安"
+    },
+    "itemValue": "610100",
+    "parentValue": "SN",
+    "sortOrder": 45,
+    "status": true
+  },
+  {
+    "id": "69",
+    "dictCode": "city",
+    "itemLabel": "烟台",
+    "labelI18n": {
+      "en-US": "Yantai",
+      "zh-CN": "烟台"
+    },
+    "itemValue": "370600",
+    "parentValue": "SD",
+    "sortOrder": 46,
+    "status": true
+  },
+  {
+    "id": "70",
+    "dictCode": "city",
+    "itemLabel": "郑州",
+    "labelI18n": {
+      "en-US": "Zhengzhou",
+      "zh-CN": "郑州"
+    },
+    "itemValue": "410100",
+    "parentValue": "HA",
+    "sortOrder": 47,
+    "status": true
+  },
+  {
+    "id": "71",
+    "dictCode": "city",
+    "itemLabel": "中山",
+    "labelI18n": {
+      "en-US": "Zhongshan",
+      "zh-CN": "中山"
+    },
+    "itemValue": "442000",
+    "parentValue": "GD",
+    "sortOrder": 48,
+    "status": true
+  },
+  {
+    "id": "72",
+    "dictCode": "city",
+    "itemLabel": "遵义",
+    "labelI18n": {
+      "en-US": "Zunyi",
+      "zh-CN": "遵义"
+    },
+    "itemValue": "520300",
+    "parentValue": "GZ",
+    "sortOrder": 49,
+    "status": true
+  },
+  {
+    "id": "79",
+    "dictCode": "country",
+    "itemLabel": "安徽",
+    "labelI18n": {
+      "en-US": "Anhui",
+      "zh-CN": "安徽"
+    },
+    "itemValue": "AH",
+    "parentValue": null,
+    "sortOrder": 0,
+    "status": true
+  },
+  {
+    "id": "80",
+    "dictCode": "country",
+    "itemLabel": "北京",
+    "labelI18n": {
+      "en-US": "Beijing",
+      "zh-CN": "北京"
+    },
+    "itemValue": "BJ",
+    "parentValue": null,
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "id": "81",
+    "dictCode": "country",
+    "itemLabel": "重庆",
+    "labelI18n": {
+      "en-US": "Chongqing",
+      "zh-CN": "重庆"
+    },
+    "itemValue": "CQ",
+    "parentValue": null,
+    "sortOrder": 2,
+    "status": true
+  },
+  {
+    "id": "82",
+    "dictCode": "country",
+    "itemLabel": "福建",
+    "labelI18n": {
+      "en-US": "Fujian",
+      "zh-CN": "福建"
+    },
+    "itemValue": "FJ",
+    "parentValue": null,
+    "sortOrder": 3,
+    "status": true
+  },
+  {
+    "id": "83",
+    "dictCode": "country",
+    "itemLabel": "甘肃",
+    "labelI18n": {
+      "en-US": "Gansu",
+      "zh-CN": "甘肃"
+    },
+    "itemValue": "GS",
+    "parentValue": null,
+    "sortOrder": 4,
+    "status": true
+  },
+  {
+    "id": "84",
+    "dictCode": "country",
+    "itemLabel": "广东",
+    "labelI18n": {
+      "en-US": "Guangdong",
+      "zh-CN": "广东"
+    },
+    "itemValue": "GD",
+    "parentValue": null,
+    "sortOrder": 5,
+    "status": true
+  },
+  {
+    "id": "85",
+    "dictCode": "country",
+    "itemLabel": "广西",
+    "labelI18n": {
+      "en-US": "Guangxi",
+      "zh-CN": "广西"
+    },
+    "itemValue": "GX",
+    "parentValue": null,
+    "sortOrder": 6,
+    "status": true
+  },
+  {
+    "id": "86",
+    "dictCode": "country",
+    "itemLabel": "贵州",
+    "labelI18n": {
+      "en-US": "Guizhou",
+      "zh-CN": "贵州"
+    },
+    "itemValue": "GZ",
+    "parentValue": null,
+    "sortOrder": 7,
+    "status": true
+  },
+  {
+    "id": "87",
+    "dictCode": "country",
+    "itemLabel": "河北",
+    "labelI18n": {
+      "en-US": "Hebei",
+      "zh-CN": "河北"
+    },
+    "itemValue": "HE",
+    "parentValue": null,
+    "sortOrder": 8,
+    "status": true
+  },
+  {
+    "id": "88",
+    "dictCode": "country",
+    "itemLabel": "河南",
+    "labelI18n": {
+      "en-US": "Henan",
+      "zh-CN": "河南"
+    },
+    "itemValue": "HA",
+    "parentValue": null,
+    "sortOrder": 9,
+    "status": true
+  },
+  {
+    "id": "89",
+    "dictCode": "country",
+    "itemLabel": "湖北",
+    "labelI18n": {
+      "en-US": "Hubei",
+      "zh-CN": "湖北"
+    },
+    "itemValue": "HB",
+    "parentValue": null,
+    "sortOrder": 10,
+    "status": true
+  },
+  {
+    "id": "90",
+    "dictCode": "country",
+    "itemLabel": "江苏",
+    "labelI18n": {
+      "en-US": "Jiangsu",
+      "zh-CN": "江苏"
+    },
+    "itemValue": "JS",
+    "parentValue": null,
+    "sortOrder": 11,
+    "status": true
+  },
+  {
+    "id": "91",
+    "dictCode": "country",
+    "itemLabel": "吉林",
+    "labelI18n": {
+      "en-US": "Jilin",
+      "zh-CN": "吉林"
+    },
+    "itemValue": "JL",
+    "parentValue": null,
+    "sortOrder": 12,
+    "status": true
+  },
+  {
+    "id": "92",
+    "dictCode": "country",
+    "itemLabel": "辽宁",
+    "labelI18n": {
+      "en-US": "Liaoning",
+      "zh-CN": "辽宁"
+    },
+    "itemValue": "LN",
+    "parentValue": null,
+    "sortOrder": 13,
+    "status": true
+  },
+  {
+    "id": "93",
+    "dictCode": "country",
+    "itemLabel": "山东",
+    "labelI18n": {
+      "en-US": "Shandong",
+      "zh-CN": "山东"
+    },
+    "itemValue": "SD",
+    "parentValue": null,
+    "sortOrder": 14,
+    "status": true
+  },
+  {
+    "id": "94",
+    "dictCode": "country",
+    "itemLabel": "山西",
+    "labelI18n": {
+      "en-US": "Shanxi",
+      "zh-CN": "山西"
+    },
+    "itemValue": "SX",
+    "parentValue": null,
+    "sortOrder": 15,
+    "status": true
+  },
+  {
+    "id": "95",
+    "dictCode": "country",
+    "itemLabel": "陕西",
+    "labelI18n": {
+      "en-US": "Shaanxi",
+      "zh-CN": "陕西"
+    },
+    "itemValue": "SN",
+    "parentValue": null,
+    "sortOrder": 16,
+    "status": true
+  },
+  {
+    "id": "96",
+    "dictCode": "country",
+    "itemLabel": "上海",
+    "labelI18n": {
+      "en-US": "Shanghai",
+      "zh-CN": "上海"
+    },
+    "itemValue": "SH",
+    "parentValue": null,
+    "sortOrder": 17,
+    "status": true
+  },
+  {
+    "id": "97",
+    "dictCode": "country",
+    "itemLabel": "四川",
+    "labelI18n": {
+      "en-US": "Sichuan",
+      "zh-CN": "四川"
+    },
+    "itemValue": "SC",
+    "parentValue": null,
+    "sortOrder": 18,
+    "status": true
+  },
+  {
+    "id": "98",
+    "dictCode": "country",
+    "itemLabel": "天津",
+    "labelI18n": {
+      "en-US": "Tianjin",
+      "zh-CN": "天津"
+    },
+    "itemValue": "TJ",
+    "parentValue": null,
+    "sortOrder": 19,
+    "status": true
+  },
+  {
+    "id": "99",
+    "dictCode": "country",
+    "itemLabel": "新疆",
+    "labelI18n": {
+      "en-US": "Xinjiang",
+      "zh-CN": "新疆"
+    },
+    "itemValue": "XJ",
+    "parentValue": null,
+    "sortOrder": 20,
+    "status": true
+  },
+  {
+    "id": "127",
+    "dictCode": "country",
+    "itemLabel": "黑龙江",
+    "labelI18n": {
+      "en-US": "Heilongjiang",
+      "zh-CN": "黑龙江"
+    },
+    "itemValue": "HL",
+    "parentValue": null,
+    "sortOrder": 20,
+    "status": true
+  },
+  {
+    "id": "100",
+    "dictCode": "country",
+    "itemLabel": "云南",
+    "labelI18n": {
+      "en-US": "Yunnan",
+      "zh-CN": "云南"
+    },
+    "itemValue": "YN",
+    "parentValue": null,
+    "sortOrder": 21,
+    "status": true
+  },
+  {
+    "id": "101",
+    "dictCode": "country",
+    "itemLabel": "浙江",
+    "labelI18n": {
+      "en-US": "Zhejiang",
+      "zh-CN": "浙江"
+    },
+    "itemValue": "ZJ",
+    "parentValue": null,
+    "sortOrder": 22,
+    "status": true
+  },
+  {
+    "id": "128",
+    "dictCode": "country",
+    "itemLabel": "江西",
+    "labelI18n": {
+      "en-US": "Jiangxi",
+      "zh-CN": "江西"
+    },
+    "itemValue": "JX",
+    "parentValue": null,
+    "sortOrder": 23,
+    "status": true
+  },
+  {
+    "id": "120",
+    "dictCode": "country",
+    "itemLabel": "湖南",
+    "labelI18n": {
+      "en-US": "Hunan",
+      "zh-CN": "湖南"
+    },
+    "itemValue": "HN",
+    "parentValue": null,
+    "sortOrder": 24,
+    "status": true
+  },
+  {
+    "id": "125",
+    "dictCode": "country",
+    "itemLabel": "海南",
+    "labelI18n": {
+      "en-US": "Hainan",
+      "zh-CN": "海南"
+    },
+    "itemValue": "HI",
+    "parentValue": null,
+    "sortOrder": 25,
+    "status": true
+  },
+  {
+    "id": "118",
+    "dictCode": "country",
+    "itemLabel": "青海",
+    "labelI18n": {
+      "en-US": "Qinghai",
+      "zh-CN": "青海"
+    },
+    "itemValue": "QH",
+    "parentValue": null,
+    "sortOrder": 26,
+    "status": true
+  },
+  {
+    "id": "121",
+    "dictCode": "country",
+    "itemLabel": "台湾",
+    "labelI18n": {
+      "en-US": "Taiwan",
+      "zh-CN": "台湾"
+    },
+    "itemValue": "TW",
+    "parentValue": null,
+    "sortOrder": 27,
+    "status": true
+  },
+  {
+    "id": "119",
+    "dictCode": "country",
+    "itemLabel": "内蒙古",
+    "labelI18n": {
+      "en-US": "Inner Mongolia",
+      "zh-CN": "内蒙古"
+    },
+    "itemValue": "NM",
+    "parentValue": null,
+    "sortOrder": 28,
+    "status": true
+  },
+  {
+    "id": "124",
+    "dictCode": "country",
+    "itemLabel": "西藏",
+    "labelI18n": {
+      "en-US": "Tibet",
+      "zh-CN": "西藏"
+    },
+    "itemValue": "XZ",
+    "parentValue": null,
+    "sortOrder": 29,
+    "status": true
+  },
+  {
+    "id": "122",
+    "dictCode": "country",
+    "itemLabel": "宁夏",
+    "labelI18n": {
+      "en-US": "Ningxia",
+      "zh-CN": "宁夏"
+    },
+    "itemValue": "NX",
+    "parentValue": null,
+    "sortOrder": 30,
+    "status": true
+  },
+  {
+    "id": "123",
+    "dictCode": "country",
+    "itemLabel": "香港",
+    "labelI18n": {
+      "en-US": "Hong Kong",
+      "zh-CN": "香港"
+    },
+    "itemValue": "HK",
+    "parentValue": null,
+    "sortOrder": 31,
+    "status": true
+  },
+  {
+    "id": "126",
+    "dictCode": "country",
+    "itemLabel": "澳门",
+    "labelI18n": {
+      "en-US": "Macau",
+      "zh-CN": "澳门"
+    },
+    "itemValue": "MO",
+    "parentValue": null,
+    "sortOrder": 32,
+    "status": true
+  },
+  {
+    "id": "102",
+    "dictCode": "country",
+    "itemLabel": "校园",
+    "labelI18n": {
+      "en-US": "University",
+      "zh-CN": "校园"
+    },
+    "itemValue": "UNIV",
+    "parentValue": null,
+    "sortOrder": 100,
+    "status": true
+  }
+]

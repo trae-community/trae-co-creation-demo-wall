@@ -1,7 +1,7 @@
 'use client'
 
 import { Work } from "@/lib/types";
-import { MapPin, Award, Eye, ThumbsUp, Clock } from "lucide-react";
+import { MapPin, Award, Eye, ThumbsUp, Clock, ArrowRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/language/navigation';
@@ -77,7 +77,7 @@ export function WorkCard({ work }: WorkCardProps) {
   return (
     <Link
       href={detailHref}
-      className="group flex h-full flex-col rounded-2xl overflow-hidden border border-white/8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(34,197,94,0.2)] hover:border-green-500/35"
+      className="group flex h-full flex-col rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(50,240,140,0.2)] hover:border-green-500/35"
       style={{ background: '#111318' }}
     >
       {/* Cover — 4:3 ratio */}
@@ -85,9 +85,14 @@ export function WorkCard({ work }: WorkCardProps) {
         <img
           src={work.coverUrl}
           alt={work.name}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = "https://placehold.co/600x450?text=No+Image";
+            const img = e.target as HTMLImageElement;
+            if (img.dataset.fallback) return; // 防止兑底图也失败时死循环
+            img.dataset.fallback = '1';
+            img.src = '/images/work-placeholder.svg';
           }}
         />
 
@@ -96,9 +101,7 @@ export function WorkCard({ work }: WorkCardProps) {
           style={{ background: 'rgba(0,0,0,0.5)' }}>
           <span className="text-white text-sm font-medium flex items-center gap-1.5">
             {t('viewDetails')}
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-            </svg>
+            <ArrowRight className="w-4 h-4" />
           </span>
         </div>
 
@@ -151,7 +154,7 @@ export function WorkCard({ work }: WorkCardProps) {
                   className={`text-[10px] px-2 py-0.5 rounded-full border ${
                     isSpecial
                       ? "bg-green-500/10 text-green-500 border-green-500/20"
-                      : "bg-white/5 text-zinc-600 border-white/8"
+                      : "bg-white/5 text-zinc-600 border-white/10"
                   }`}
                 >
                   {tag}
@@ -162,7 +165,7 @@ export function WorkCard({ work }: WorkCardProps) {
         )}
 
         {/* Footer: author + time + stats */}
-        <div className="flex min-w-0 items-center justify-between gap-3 pt-3.5 border-t border-white/6 mt-auto">
+        <div className="flex min-w-0 items-center justify-between gap-3 pt-3.5 border-t border-white/5 mt-auto">
           {/* Author / team */}
           <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
             {isTeam ? (
@@ -199,16 +202,23 @@ export function WorkCard({ work }: WorkCardProps) {
                 <button
                   type="button"
                   onClick={handleAuthorClick}
-                  className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-300 border border-zinc-600 hover:border-primary transition-colors shrink-0"
+                  className="w-6 h-6 rounded-full overflow-hidden border border-zinc-600 hover:border-primary transition-colors shrink-0 bg-zinc-700"
                   aria-label={`查看作者 ${work.author?.name || ''}`}
                 >
-                  {work.author?.name?.charAt(0) || '?'}
+                  {work.author?.avatar ? (
+                    <img src={work.author.avatar} alt={work.author.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="flex items-center justify-center w-full h-full text-[10px] font-bold text-zinc-300">
+                      {work.author?.name?.charAt(0) || '?'}
+                    </span>
+                  )}
                 </button>
                 <div className="min-w-0">
                   <button
                     type="button"
                     onClick={handleAuthorClick}
                     className="max-w-[80px] text-left text-xs text-zinc-300 font-medium leading-none line-clamp-1 [overflow-wrap:anywhere] hover:text-primary transition-colors"
+                    title={work.author?.name || teamMembers[0] || '-'}
                   >
                     {work.author?.name || teamMembers[0] || '-'}
                   </button>
@@ -230,11 +240,11 @@ export function WorkCard({ work }: WorkCardProps) {
 
           {/* Stats — eye-catching */}
           <div className="flex shrink-0 items-center gap-2.5">
-            <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-400/80">
+            <span className="flex items-center gap-1 text-[11px] font-semibold text-green-400/80">
               <Eye className="w-3.5 h-3.5" />
               {work.views >= 1000 ? `${(work.views / 1000).toFixed(1)}k` : work.views}
             </span>
-            <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-400/80">
+            <span className="flex items-center gap-1 text-[11px] font-semibold text-green-400/80">
               <ThumbsUp className="w-3.5 h-3.5" />
               {work.likes}
             </span>

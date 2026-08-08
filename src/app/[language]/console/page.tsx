@@ -132,7 +132,7 @@ export default function ConsolePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statEntries.map((stat, index) => (
-          <div key={index} className="p-6 rounded-xl border border-border bg-card hover:border-primary/50 transition-all duration-300 group hover:shadow-[0_0_20px_rgba(34,197,94,0.1)]">
+          <div key={index} className="p-6 rounded-xl border border-border bg-card hover:border-primary/50 transition-all duration-300 group hover:shadow-[0_0_20px_rgba(50,240,140,0.1)]">
             <div className="flex items-center justify-between mb-4">
               <div className={`p-3 rounded-lg ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform`}>
                 <stat.icon size={24} />

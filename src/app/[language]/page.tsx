@@ -4,11 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { WorkCard } from "@/components/work/work-card";
 import { CityFilter, FilterState } from "@/components/work/city-filter";
-import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight, Calendar, X } from "lucide-react";
+import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight, SearchX, X, ArrowUp } from "lucide-react";
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils";
 import { HeroBanner } from "@/components/common/hero-banner";
 import { useWorks } from "@/lib/use-works";
+import { DatePicker } from "@/components/ui/date-picker";
 
 export default function Page() {
   const t = useTranslations('Home');
@@ -29,6 +30,7 @@ export default function Page() {
   const [sortBy, setSortBy] = useState<'time' | 'likes' | 'views'>((searchParams.get('sort') as any) || 'time');
   const [selectedDate, setSelectedDate] = useState(searchParams.get('date') || '');
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const [sortTransitioning, setSortTransitioning] = useState(false);
   const pageSize = 12;
   const hasMountedRef = useRef(false);
 
@@ -37,6 +39,25 @@ export default function Page() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  // 翻页时滚回顶部
+  const prevPageRef = useRef(page);
+  useEffect(() => {
+    if (page !== prevPageRef.current) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      prevPageRef.current = page;
+    }
+  }, [page]);
+
+  // 回到顶部按钮显示状态
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   useEffect(() => {
     if (!hasMountedRef.current) {
       hasMountedRef.current = true;
@@ -44,6 +65,13 @@ export default function Page() {
     }
     setPage(1);
   }, [filters, debouncedSearch, sortBy, selectedDate]);
+
+  // Sort change transition
+  useEffect(() => {
+    setSortTransitioning(true);
+    const timer = setTimeout(() => setSortTransitioning(false), 200);
+    return () => clearTimeout(timer);
+  }, [sortBy]);
 
   // 同步状态到 URL
   useEffect(() => {
@@ -120,9 +148,18 @@ export default function Page() {
               placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-zinc-200 placeholder-zinc-600 border border-white/10 focus:outline-none focus:ring-1 focus:ring-green-500/40 focus:border-green-500/35 transition-all"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl text-sm text-zinc-200 placeholder-zinc-600 border border-white/10 focus:outline-none focus:ring-1 focus:ring-green-500/40 focus:border-green-500/35 transition-all"
               style={{ background: 'rgba(255,255,255,0.04)' }}
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-500 hover:text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           {/* Sort tabs + Date picker — fixed right */}
@@ -149,44 +186,23 @@ export default function Page() {
             {/* Divider */}
             <div className="w-px h-5 bg-white/10 mx-1" />
 
-            {/* Date picker — styled like sort buttons */}
-            <button
-              type="button"
-              onClick={() => {
-                const input = document.getElementById('date-filter-input') as HTMLInputElement | null;
-                if (input) input.showPicker?.();
-              }}
-              className={cn(
-                "flex items-center gap-1.5 px-2 sm:px-3.5 py-2 rounded-lg text-sm font-medium transition-all border",
-                selectedDate
-                  ? "bg-green-500/15 text-green-400 border-green-500/25"
-                  : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
-              )}
-            >
-              <Calendar className="w-3 h-3" />
-              <span className="hidden sm:inline">{selectedDate || t('dateLabel')}</span>
-              <span className="sm:hidden">{selectedDate ? selectedDate.slice(5) : t('dateLabel')}</span>
-              {selectedDate && (
-                <span
-                  onClick={(e) => { e.stopPropagation(); setSelectedDate(''); }}
-                  className="ml-0.5 w-4 h-4 flex items-center justify-center rounded-full hover:bg-white/10 transition-all"
-                >
-                  <X className="w-3 h-3" />
-                </span>
-              )}
-            </button>
-            <input
-              id="date-filter-input"
-              type="date"
+            {/* Date picker — 自定义日历弹窗，与 UI 风格一致 */}
+            <DatePicker
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="sr-only"
+              onChange={setSelectedDate}
+              placeholder={t('dateLabel')}
             />
           </div>
         </div>
 
-        {/* Row 2: Filter pills */}
-        <CityFilter filters={filters} onFilterChange={setFilters} />
+        {/* Row 2: Filter pills — 与作品管理页/个人主页统一交互 */}
+        <CityFilter
+          filters={filters}
+          onFilterChange={setFilters}
+          showReset
+          searchTerm={searchQuery}
+          onReset={() => setSearchQuery('')}
+        />
       </div>
 
       {/* ── WORK GRID ── */}
@@ -194,7 +210,7 @@ export default function Page() {
         /* Skeleton */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-2xl overflow-hidden border border-white/6" style={{ background: '#111318' }}>
+            <div key={i} className="rounded-2xl overflow-hidden border border-white/5" style={{ background: '#111318' }}>
               <div className="animate-pulse bg-white/5" style={{ aspectRatio: '4/3' }} />
               <div className="p-5 space-y-3">
                 <div className="animate-pulse h-4 bg-white/5 rounded-md w-3/4" />
@@ -205,22 +221,33 @@ export default function Page() {
           ))}
         </div>
       ) : works.length > 0 ? (
-        <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 transition-opacity duration-300", isLoading && "opacity-60")}>
-          {works.map((work) => (
-            <WorkCard key={work.id} work={work} />
+        <div className={cn(
+          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 transition-all duration-200",
+          isLoading && "opacity-60",
+          sortTransitioning && "opacity-40 scale-[0.98]"
+        )}>
+          {works.map((work, index) => (
+            <div
+              key={work.id}
+              style={{ animation: `cardFadeUp 0.4s ease-out ${index * 50}ms both` }}
+            >
+              <WorkCard key={work.id} work={work} />
+            </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 rounded-2xl border border-dashed border-white/8" style={{ background: 'rgba(255,255,255,0.02)' }}>
-          <div className="text-3xl mb-3">🔍</div>
-          <p className="text-zinc-400 text-sm mb-3">{t('noResults')}</p>
+        <div className="text-center py-20 rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+            <SearchX className="w-8 h-8 text-zinc-500" />
+          </div>
+          <p className="text-zinc-400 text-sm mb-4">{t('noResults')}</p>
           <button
             onClick={() => {
               setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [] });
               setSearchQuery("");
               setSelectedDate("");
             }}
-            className="text-green-500 text-sm font-medium hover:underline"
+            className="px-4 py-2 rounded-full text-sm font-medium text-green-400 border border-green-500/30 bg-green-500/10 hover:bg-green-500/20 transition-colors"
           >
             {t('clearFilters')}
           </button>
@@ -313,6 +340,19 @@ export default function Page() {
             </div>
           )}
         </div>
+      )}
+
+      {/* 回到顶部浮动按钮 */}
+      {showBackToTop && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-6 right-6 z-40 w-10 h-10 rounded-full bg-green-500/20 border border-green-500/30 text-green-400 flex items-center justify-center backdrop-blur-md hover:bg-green-500/30 transition-all shadow-lg animate-dropdown-pop"
+          aria-label="回到顶部"
+          title="回到顶部"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
       )}
     </div>
   );

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
 import { getAuthUser, isAdmin } from '@/lib/auth';
 import { writeOperationLog } from '@/lib/audit-log';
+import { getBannedUserIds } from '@/lib/ban';
 
 // Helper to sanitize user object (remove sensitive data)
 const sanitizeUser = (user: any) => {
@@ -30,6 +31,7 @@ export async function GET(req: NextRequest) {
     const page = Number(searchParams.get(CRUD_QUERY_PARAMS.page) || '1');
     const pageSize = Number(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10');
     const query = searchParams.get(CRUD_QUERY_PARAMS.query) || '';
+    const roleCode = searchParams.get('roleCode') || ''; // 按角色编码筛选
     
     // 构建过滤条件
     const whereFilters: Prisma.SysUserWhereInput[] = [];
@@ -40,6 +42,19 @@ export async function GET(req: NextRequest) {
           { email: { contains: query, mode: 'insensitive' } },
           { phone: { contains: query, mode: 'insensitive' } },
         ],
+      });
+    }
+
+    // 如果指定了角色编码，添加角色筛选条件
+    if (roleCode) {
+      whereFilters.push({
+        roles: {
+          some: {
+            role: {
+              roleCode: roleCode
+            }
+          }
+        }
       });
     }
 
@@ -61,7 +76,6 @@ export async function GET(req: NextRequest) {
           bio: true,
           createdAt: true,
           updatedAt: true,
-          clerkId: true,
           // Explicitly excluding passwordHash by not selecting it
           roles: {
             include: {
@@ -75,8 +89,11 @@ export async function GET(req: NextRequest) {
       })
     ]);
 
+    // 附带封禁状态（黑名单存于字典表）
+    const bannedIds = await getBannedUserIds();
+
     return NextResponse.json({
-      items: users.map(sanitizeUser),
+      items: users.map(u => ({ ...sanitizeUser(u), banned: bannedIds.has(u.id.toString()) })),
       total,
       page: Math.max(page, 1),
       pageSize: Math.max(pageSize, 1)
@@ -119,7 +136,6 @@ export async function POST(req: NextRequest) {
         bio: true,
         createdAt: true,
         updatedAt: true,
-        clerkId: true,
       }
     });
 
@@ -205,7 +221,6 @@ export async function PUT(req: NextRequest) {
         bio: true,
         createdAt: true,
         updatedAt: true,
-        clerkId: true,
         roles: {
           include: {
             role: true

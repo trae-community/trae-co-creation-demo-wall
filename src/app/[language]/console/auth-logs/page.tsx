@@ -9,13 +9,13 @@ import { CrudPagination } from '@/components/crud/crud-pagination'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import { DatePicker } from '@/components/ui/date-picker'
 import { useFeedback } from '@/lib/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
 
 interface AuthLogItem {
   id: string
   userId: string | null
-  clerkId: string | null
   authType: 'sign_in' | 'sign_up' | string
   authChannel: string | null
   authStatus: string
@@ -37,6 +37,8 @@ export default function AuthLogsPage() {
   const [totalItems, setTotalItems] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterMode, setFilterMode] = useState<AuthLogFilter>('all')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 10
   const { feedback, showFeedback } = useFeedback()
@@ -50,6 +52,8 @@ export default function AuthLogsPage() {
         [CRUD_QUERY_PARAMS.query]: searchTerm,
         [CRUD_QUERY_PARAMS.filter]: filterMode
       })
+      if (startDate) params.append('startDate', startDate)
+      if (endDate) params.append('endDate', endDate)
       const res = await fetch(`/api/logs/auth?${params.toString()}`)
       if (!res.ok) {
         showFeedback('error', '认证日志加载失败')
@@ -64,7 +68,7 @@ export default function AuthLogsPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [currentPage, pageSize, searchTerm, filterMode, showFeedback])
+  }, [currentPage, pageSize, searchTerm, filterMode, startDate, endDate, showFeedback])
 
   useEffect(() => {
     fetchLogs()
@@ -72,7 +76,7 @@ export default function AuthLogsPage() {
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm, filterMode])
+  }, [searchTerm, filterMode, startDate, endDate])
 
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
   const current = Math.min(currentPage, totalPages)
@@ -104,6 +108,36 @@ export default function AuthLogsPage() {
         ]}
         onFilterChange={(value) => setFilterMode(value as AuthLogFilter)}
         filterPlaceholder="筛选行为"
+        extraFilters={
+          <>
+            <div className="flex items-center gap-1">
+              <DatePicker
+                value={startDate}
+                onChange={setStartDate}
+                placeholder="开始日期"
+                variant="outline"
+              />
+              <span className="text-muted-foreground">~</span>
+              <DatePicker
+                value={endDate}
+                onChange={setEndDate}
+                placeholder="结束日期"
+                variant="outline"
+              />
+            </div>
+            {(startDate || endDate) && (
+              <button
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => {
+                  setStartDate('')
+                  setEndDate('')
+                }}
+              >
+                重置
+              </button>
+            )}
+          </>
+        }
       />
 
       <div className="space-y-4">
@@ -154,6 +188,7 @@ export default function AuthLogsPage() {
         endIndex={endIndex}
         current={current}
         totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
         onPrev={() => setCurrentPage(current - 1)}
         onNext={() => setCurrentPage(current + 1)}
       />

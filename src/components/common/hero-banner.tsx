@@ -34,7 +34,7 @@ export function HeroBanner() {
       <div
         className="absolute inset-0 z-0"
         style={{
-          background: 'linear-gradient(135deg,rgba(0,0,0,0.75) 0%,rgba(0,0,0,0.3) 50%,rgba(34,197,94,0.05) 100%)'
+          background: 'linear-gradient(135deg,rgba(0,0,0,0.75) 0%,rgba(0,0,0,0.3) 50%,rgba(50,240,140,0.05) 100%)'
         }}
       />
 
@@ -76,7 +76,7 @@ export function HeroBanner() {
 
       <div
         className="absolute top-1/2 right-0 pointer-events-none z-0"
-        style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%)', transform: 'translate(30%, -50%)' }}
+        style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(50,240,140,0.08) 0%, transparent 70%)', transform: 'translate(30%, -50%)' }}
       />
 
       <DottedGlowBackground

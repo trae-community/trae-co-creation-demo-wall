@@ -45,9 +45,9 @@ import { CrudFilterBar } from '@/components/crud/crud-filter-bar'
 ```
 
 ### 1.3 CrudPagination
-用于统一分页 UI。
+用于统一分页 UI，支持跳页、选页、每页条数切换等功能。
 
-**使用方式**
+**使用方式（基础）**
 ```tsx
 import { CrudPagination } from '@/components/crud/crud-pagination'
 
@@ -61,6 +61,34 @@ import { CrudPagination } from '@/components/crud/crud-pagination'
   onNext={() => setCurrentPage(current + 1)}
 />
 ```
+
+**增强功能（可选 Props）**
+
+| Prop | 类型 | 说明 |
+|------|------|------|
+| `onPageChange`? | `(page: number) => void` | 点击页码或输入框跳转时的回调 |
+| `pageSize`? | `number` | 当前每页条数（默认 10） |
+| `onPageSizeChange`? | `(size: number) => void` | 切换每页条数时的回调 |
+| `pageSizes`? | `number[]` | 可选的每页条数列表（默认 [5, 10, 20, 50]） |
+
+**示例：启用跳页和选页**
+```tsx
+<CrudPagination
+  totalItems={totalItems}
+  startIndex={startIndex}
+  endIndex={endIndex}
+  current={current}
+  totalPages={totalPages}
+  onPageChange={(page) => setCurrentPage(page)}
+  onPrev={() => setCurrentPage(current - 1)}
+  onNext={() => setCurrentPage(current + 1)}
+/>
+```
+
+**特性：**
+- ✅ 页码按钮：显示首尾页，中间省略号（如 `1 ... 4 5 [6] 7 8 ... 20`）
+- ✅ 跳页输入框：输入页码 + Enter 回车或点击“跳转”按钮
+- ✅ 每页条数选择：下拉菜单切换 5/10/20/50（需传入 `onPageSizeChange`）
 
 ### 1.4 useFeedback
 用于统一反馈状态管理（显示与自动消失）。

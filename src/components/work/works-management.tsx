@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
-import { Edit, Trash2, Eye, ThumbsUp, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { Edit, Trash2, Eye, ThumbsUp, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search, Inbox, Ban } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/select"
 import { EditForm } from '@/components/work/edit-form'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { DatePicker } from '@/components/ui/date-picker'
+import { cn } from '@/lib/utils'
 
 // Types
 interface TagItem {
@@ -101,6 +103,19 @@ interface DictItem {
   itemValue: string
   lang?: string
   labelI18n?: Record<string, string> | null
+}
+
+// 点赞用户记录
+interface LikeUserItem {
+  id: string
+  likedAt: string | null
+  user: {
+    id: string
+    username: string
+    email: string
+    avatarUrl: string | null
+    createdAt: string | null
+  } | null
 }
 
 // Schema
@@ -185,6 +200,17 @@ export function WorksManagement({
   const [isSavingAudit, setIsSavingAudit] = useState(false)
   const [selectedWorkIds, setSelectedWorkIds] = useState<string[]>([])
   const [auditTargetIds, setAuditTargetIds] = useState<string[]>([])
+
+  // Likes Dialog states
+  const [isLikesDialogOpen, setIsLikesDialogOpen] = useState(false)
+  const [likesWork, setLikesWork] = useState<WorkItem | null>(null)
+  const [likeUsers, setLikeUsers] = useState<LikeUserItem[]>([])
+  const [likeUsersTotal, setLikeUsersTotal] = useState(0)
+  const [isLoadingLikes, setIsLoadingLikes] = useState(false)
+  // 封禁点赞用户确认弹窗
+  const [banLikeTarget, setBanLikeTarget] = useState<LikeUserItem | null>(null)
+  const [isBanningLike, setIsBanningLike] = useState(false)
+
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [viewingWork, setViewingWork] = useState<WorkItem | null>(null)
   const [viewImageIndex, setViewImageIndex] = useState(0)
@@ -454,6 +480,64 @@ export function WorksManagement({
     setIsAuditDialogOpen(true)
   }
 
+  // 打开点赞用户弹窗，拉取该作品的点赞用户列表
+  const handleOpenLikesDialog = async (work: WorkItem) => {
+    setLikesWork(work)
+    setLikeUsers([])
+    setLikeUsersTotal(0)
+    setIsLikesDialogOpen(true)
+    try {
+      setIsLoadingLikes(true)
+      const res = await fetch(`/api/console/works/${work.id}/likes?page=1&pageSize=100`)
+      if (res.ok) {
+        const data = await res.json()
+        setLikeUsers(data.items || [])
+        setLikeUsersTotal(data.total || 0)
+      } else {
+        showFeedback('error', '点赞用户列表加载失败')
+      }
+    } catch (error) {
+      console.error('Failed to fetch like users:', error)
+      showFeedback('error', '点赞用户列表加载失败')
+    } finally {
+      setIsLoadingLikes(false)
+    }
+  }
+
+  // 快捷封禁点赞用户（针对批量小号刷赞场景）
+  const handleBanLikeUser = (item: LikeUserItem) => {
+    if (!item.user) return
+    setBanLikeTarget(item)
+  }
+
+  // 确认封禁点赞用户
+  const confirmBanLikeUser = async () => {
+    if (!banLikeTarget?.user) return
+    try {
+      setIsBanningLike(true)
+      const res = await fetch(`/api/users/${banLikeTarget.user.id}/ban`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ banned: true })
+      })
+      if (res.ok) {
+        showFeedback('success', `已封禁用户「${banLikeTarget.user.username}」`)
+        // 从列表中移除已封禁用户
+        setLikeUsers(prev => prev.filter(l => l.id !== banLikeTarget.id))
+        setLikeUsersTotal(prev => Math.max(0, prev - 1))
+        setBanLikeTarget(null)
+      } else {
+        const data = await res.json()
+        showFeedback('error', data.error || '封禁失败')
+      }
+    } catch (error) {
+      console.error('Failed to ban like user:', error)
+      showFeedback('error', '封禁失败')
+    } finally {
+      setIsBanningLike(false)
+    }
+  }
+
   const handleToggleWorkSelection = (workId: string, checked: boolean) => {
     setSelectedWorkIds(prev =>
       checked ? [...prev, workId] : prev.filter(id => id !== workId)
@@ -536,6 +620,12 @@ export function WorksManagement({
   const viewingImages = (viewingWork?.images || []).filter(image => Boolean(image.imageUrl))
   const currentViewImageIndex = viewingImages.length > 0 ? Math.min(viewImageIndex, viewingImages.length - 1) : 0
 
+  // 点赞用户中近 7 天注册的新账号数量（用于排查批量新用户刷点赞）
+  const newAccountLikes = likeUsers.filter(item => {
+    if (!item.user?.createdAt) return false
+    return Date.now() - new Date(item.user.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000
+  }).length
+
   return (
     <div className="space-y-6 relative min-h-[500px]">
       <LoadingOverlay isLoading={isLoading} />
@@ -552,7 +642,7 @@ export function WorksManagement({
 
       {/* Search + Filter */}
       <div className="p-4 rounded-xl border border-border bg-card space-y-3">
-        {/* Search */}
+        {/* Search + Date picker */}
         <div className="flex flex-col sm:flex-row gap-3 items-center">
           <div className="relative flex-1 max-w-md w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -564,23 +654,25 @@ export function WorksManagement({
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button
+
+          {/* Date picker — 自定义日历弹窗，与首页一致；独立放置用 outline 风格 */}
+          <DatePicker
+            value={selectedDate}
+            onChange={setSelectedDate}
+            placeholder="日期"
             variant="outline"
-            size="sm"
-            onClick={() => { setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [] }); setSelectedDate('') }}
             className="shrink-0"
-          >
-            重置筛选
-          </Button>
+          />
         </div>
 
-        {/* CityFilter — same as home page */}
+        {/* CityFilter — 与首页统一交互，内置重置按钮 */}
         <CityFilter
           filters={filters}
           onFilterChange={setFilters}
           auditStatusOptions={auditStatuses.map(s => ({ label: s.itemLabel, value: s.itemValue }))}
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
+          showReset
+          searchTerm={searchTerm}
+          onReset={() => { setSearchTerm(''); setSelectedDate('') }}
         />
       </div>
 
@@ -703,7 +795,7 @@ export function WorksManagement({
                     {/* Action Buttons */}
                     <div className="flex items-center gap-1 shrink-0">
                       {/* Jump to detail page */}
-                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-emerald-500 hover:bg-emerald-500/10" onClick={() => router.push(`/${locale}/works/${work.id}`)} title="查看详情页">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-green-400 hover:bg-green-500/10" onClick={() => router.push(`/${locale}/works/${work.id}`)} title="查看详情页">
                         <ExternalLink size={16} />
                       </Button>
                       {allowedActions.includes('view') && (
@@ -714,6 +806,11 @@ export function WorksManagement({
                       {allowedActions.includes('audit') && (
                         <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-blue-500 hover:bg-blue-500/10" onClick={() => handleOpenAuditDialog(work)} title="审核作品">
                           <ShieldCheck size={16} />
+                        </Button>
+                      )}
+                      {scope === 'admin' && (
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-pink-500 hover:bg-pink-500/10" onClick={() => handleOpenLikesDialog(work)} title="查看点赞用户">
+                          <ThumbsUp size={16} />
                         </Button>
                       )}
                       {allowedActions.includes('edit') && (
@@ -803,8 +900,9 @@ export function WorksManagement({
         ))}
         
         {works.length === 0 && (
-          <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg bg-card/30">
-            暂无作品
+          <div className="col-span-full flex flex-col items-center justify-center py-16 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg bg-card/30">
+            <Inbox className="w-12 h-12 text-zinc-600 mb-3" />
+            <span>暂无作品</span>
           </div>
         )}
       </div>
@@ -815,6 +913,7 @@ export function WorksManagement({
         endIndex={endIndex}
         current={current}
         totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
         onPrev={() => setCurrentPage(current - 1)}
         onNext={() => setCurrentPage(current + 1)}
       />
@@ -1231,6 +1330,103 @@ export function WorksManagement({
             <Button variant="outline" onClick={() => setIsAuditDialogOpen(false)}>取消</Button>
             <Button onClick={onSaveAudit} disabled={isSavingAudit}>
               {isSavingAudit ? '保存中...' : '保存'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Likes Users Dialog */}
+      <Dialog open={isLikesDialogOpen} onOpenChange={setIsLikesDialogOpen}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[640px] max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>点赞用户</DialogTitle>
+            <DialogDescription>
+              作品「{likesWork?.title}」共有 {likeUsersTotal} 位用户点赞
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2">
+            {newAccountLikes > 0 && (
+              <div className="rounded-md border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-400">
+                ⚠ 其中 {newAccountLikes} 位点赞用户为近 7 天注册的新账号，请留意是否存在批量刷点赞行为
+              </div>
+            )}
+
+            {isLoadingLikes ? (
+              <div className="text-sm text-muted-foreground text-center py-8">加载中...</div>
+            ) : likeUsers.length === 0 ? (
+              <div className="text-sm text-muted-foreground text-center py-8">暂无点赞记录</div>
+            ) : (
+              <div className="space-y-2">
+                {likeUsers.map(item => {
+                  const isNewAccount = item.user?.createdAt
+                    ? Date.now() - new Date(item.user.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000
+                    : false
+                  return (
+                    <div key={item.id} className="flex items-center gap-3 rounded-md border border-border/60 bg-secondary/20 px-3 py-2">
+                      {item.user?.avatarUrl ? (
+                        <img src={item.user.avatarUrl} alt={item.user.username} className="h-8 w-8 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-sm font-semibold">
+                          {item.user?.username?.charAt(0)?.toUpperCase() || '?'}
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium truncate">{item.user?.username || '未知用户'}</span>
+                          {isNewAccount && (
+                            <Badge variant="outline" className="text-xs border-yellow-500 text-yellow-500 bg-yellow-500/10">新账号</Badge>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">{item.user?.email || '-'}</div>
+                      </div>
+                      <div className="text-xs text-muted-foreground text-right shrink-0 space-y-0.5">
+                        <div>注册: {item.user?.createdAt ? new Date(item.user.createdAt).toLocaleDateString('zh-CN') : '-'}</div>
+                        <div>点赞: {item.likedAt ? new Date(item.likedAt).toLocaleString('zh-CN') : '-'}</div>
+                      </div>
+                      {item.user && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0 hover:text-red-500 hover:bg-red-500/10"
+                          onClick={() => handleBanLikeUser(item)}
+                          title="封禁该用户"
+                        >
+                          <Ban size={14} />
+                        </Button>
+                      )}
+                    </div>
+                  )
+                })}
+                {likeUsersTotal > likeUsers.length && (
+                  <div className="text-xs text-muted-foreground text-center pt-1">
+                    仅展示最近 {likeUsers.length} 条点赞记录
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsLikesDialogOpen(false)}>关闭</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Ban Like User Confirmation Dialog */}
+      <Dialog open={!!banLikeTarget} onOpenChange={(open) => !open && setBanLikeTarget(null)}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>封禁用户</DialogTitle>
+            <DialogDescription>
+              确定要封禁用户「{banLikeTarget?.user?.username}」吗？封禁后该用户将无法登录，已登录的会话也会失效。
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBanLikeTarget(null)} disabled={isBanningLike}>取消</Button>
+            <Button variant="destructive" onClick={confirmBanLikeUser} disabled={isBanningLike}>
+              {isBanningLike ? '封禁中...' : '确认封禁'}
             </Button>
           </DialogFooter>
         </DialogContent>

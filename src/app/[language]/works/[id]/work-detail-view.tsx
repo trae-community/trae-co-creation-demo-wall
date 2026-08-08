@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp, Mail, Award, ChevronLeft, ChevronRight, Download, Link2, Check } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp, Mail, Award, ChevronLeft, ChevronRight, Download, Link2, Check, MapPin, X } from "lucide-react";
 import { Button } from "@/components/common/action-button";
 import { useEffect, useState, useRef } from "react";
 import { useLocale, useTranslations } from 'next-intl';
@@ -9,6 +9,7 @@ import { Link } from '@/lib/language/navigation';
 import { Work } from "@/lib/types";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useWorksStore } from '@/lib/works-store';
+import { cn } from '@/lib/utils';
 
 const toStringList = (value: unknown): string[] => {
   if (Array.isArray(value)) {
@@ -52,7 +53,10 @@ export function WorkDetailView() {
   const [shareImageUrl, setShareImageUrl] = useState('');
   const [isShareGenerating, setIsShareGenerating] = useState(false);
   const [shareActionDone, setShareActionDone] = useState<'copied' | ''>('');
+  const [likeAnimating, setLikeAnimating] = useState(false);
   const viewRecorded = useRef(false);
+  const touchStartX = useRef(0);
+  const screenshotCarouselRef = useRef<HTMLDivElement>(null);
 
   const { detailCache, setDetailCache } = useWorksStore();
 
@@ -156,30 +160,107 @@ export function WorkDetailView() {
     return from;
   })();
 
+  // Dynamic back button text based on referrer
+  const getBackButtonLabel = () => {
+    const from = searchParams.get('from');
+    if (!from || !from.startsWith('/')) {
+      return t('backList');
+    }
+    if (from.includes('/profile') || from.includes('/user/')) {
+      return t('backToProfile');
+    }
+    if (from.includes('/rankings')) {
+      return t('backRankings');
+    }
+    return t('backList');
+  };
+
   const handleLike = async () => {
+    // 乐观更新：立即切换 UI
+    const prevLiked = liked;
+    const prevCount = likesCount;
+    setLiked(!prevLiked);
+    setLikesCount(prevLiked ? prevCount - 1 : prevCount + 1);
+    setLikeAnimating(true);
+    setTimeout(() => setLikeAnimating(false), 600);
+
     try {
       const res = await fetch(`/api/works/${id}/like`, { method: 'POST' });
       
       if (res.status === 401) {
-        // 未登录，跳转到登录页
+        // 未登录，回滚并跳转
+        setLiked(prevLiked);
+        setLikesCount(prevCount);
         router.push(`/${locale}/sign-in`);
         return;
       }
       
-      if (!res.ok) return;
+      if (!res.ok) {
+        setLiked(prevLiked);
+        setLikesCount(prevCount);
+        return;
+      }
       
       const data = await res.json();
       setLiked(data.liked);
-      setLikesCount((prev) => data.liked ? prev + 1 : Math.max(0, prev - 1));
+      setLikesCount(data.liked ? prevCount + (prevLiked ? 0 : 1) : prevCount - (prevLiked ? 1 : 0));
     } catch {
-      // 忽略错误
+      setLiked(prevLiked);
+      setLikesCount(prevCount);
     }
   };
 
+  // 截图轮播键盘导航（必须在 early return 之前）
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (screenshotList.length <= 1) return;
+      if (e.key === 'ArrowLeft') {
+        setActiveScreenshotIndex((prev) => (prev - 1 + screenshotList.length) % screenshotList.length);
+      }
+      if (e.key === 'ArrowRight') {
+        setActiveScreenshotIndex((prev) => (prev + 1) % screenshotList.length);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [screenshotList.length]);
+
   if (isLoading) {
     return (
-      <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-white">Loading...</h2>
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* 返回按钮骨架 */}
+        <div className="h-5 w-20 rounded bg-white/5 animate-pulse" />
+        {/* 封面区骨架 */}
+        <div className="bg-card rounded-2xl overflow-hidden border border-border">
+          <div className="aspect-video w-full bg-zinc-900 animate-pulse" />
+          <div className="p-8 space-y-4">
+            <div className="h-8 w-3/4 bg-white/5 rounded animate-pulse" />
+            <div className="h-4 w-full bg-white/5 rounded animate-pulse" />
+            <div className="h-4 w-2/3 bg-white/5 rounded animate-pulse" />
+            <div className="flex gap-3 pt-4">
+              <div className="h-10 w-32 rounded-full bg-white/5 animate-pulse" />
+              <div className="h-10 w-24 rounded-full bg-white/5 animate-pulse" />
+            </div>
+          </div>
+        </div>
+        {/* 内容区骨架 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2 space-y-6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="bg-card p-8 rounded-2xl border border-border space-y-3">
+                <div className="h-6 w-24 bg-white/5 rounded animate-pulse" />
+                <div className="h-4 w-full bg-white/5 rounded animate-pulse" />
+                <div className="h-4 w-5/6 bg-white/5 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+          <div className="space-y-6">
+            <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-3">
+              <div className="h-10 w-full rounded bg-white/5 animate-pulse" />
+              <div className="h-10 w-full rounded bg-white/5 animate-pulse" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -268,7 +349,7 @@ export function WorkDetailView() {
   <text x="104" y="282" fill="#ffffff" font-size="56" font-family="Arial, sans-serif" font-weight="700">${safe(title)}</text>
   <text x="104" y="326" fill="#e4e4e7" font-size="25" font-family="Arial, sans-serif">${safe(intro)}</text>
   <rect x="76" y="398" width="1048" height="132" rx="18" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)"/>
-  <rect x="104" y="430" width="128" height="30" rx="15" fill="rgba(34,197,94,0.14)" stroke="rgba(34,197,94,0.36)"/>
+  <rect x="104" y="430" width="128" height="30" rx="15" fill="rgba(50,240,140,0.14)" stroke="rgba(50,240,140,0.36)"/>
   <text x="168" y="450" text-anchor="middle" fill="#86efac" font-size="14" font-family="Arial, sans-serif">${safe(categoryLine)}</text>
   ${tagSvg}
   <text x="104" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">${safe(teamLabel)} ${safe(String(teamMembers.length || 0))}</text>
@@ -399,9 +480,10 @@ export function WorkDetailView() {
         className="inline-flex items-center text-gray-400 hover:text-primary transition-colors mb-4"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        {t('backList')}
+        {getBackButtonLabel()}
       </button>
 
+      {/* 封面区 - 精简 */}
       <div className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border">
         <div className="aspect-video w-full bg-zinc-900 relative group">
           <img
@@ -411,32 +493,31 @@ export function WorkDetailView() {
             onClick={() => openImagePreview([work.coverUrl], 0, work.name)}
             title={t('clickToPreview')}
           />
-          <div className="absolute top-4 right-4 rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs text-white/90 backdrop-blur-sm transition-opacity group-hover:opacity-100 opacity-90">
+          <div className="absolute top-4 right-4 rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs text-white/90 backdrop-blur-sm transition-opacity group-hover:opacity-100 opacity-90 pointer-events-none">
             {t('clickToPreview')}
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
-            <div className="p-8 text-white w-full">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="bg-primary text-black text-xs font-bold px-2 py-1 rounded">
-                  {work.city} · {work.country}
-                </span>
-                {(work.honors || []).map((honor) => (
-                  <span key={honor} className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
-                    <Award className="w-3 h-3" />
-                    {honor}
-                  </span>
-                ))}
-              </div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">{work.name}</h1>
-              <p className="text-gray-200 text-lg max-w-2xl">{work.intro}</p>
-            </div>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between p-6 bg-card border-b border-border gap-4">
+        {/* 标题和简介 - 移到封面下方 */}
+        <div className="p-6 border-b border-border">
+          <div className="flex items-center gap-3 mb-3">
+            {(work.honors || []).map((honor) => (
+              <span key={honor} className="bg-yellow-400/10 text-yellow-400 text-xs font-bold px-2.5 py-1 rounded-full border border-yellow-400/20 flex items-center gap-1">
+                <Award className="w-3 h-3" />
+                {honor}
+              </span>
+            ))}
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">{work.name}</h1>
+          <p className="text-gray-300 text-base leading-relaxed">{work.intro}</p>
+        </div>
+
+        {/* 元数据栏 - 分两行 */}
+        <div className="flex flex-wrap items-center justify-between p-6 gap-4">
             <div className="flex flex-col gap-4">
+              {/* 第一行：标签 */}
               <div className="flex flex-wrap gap-2">
-                <span className="bg-white/10 text-white text-xs font-medium px-2.5 py-1 rounded-full border border-white/10">
+                <span className="bg-green-500/10 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full border border-green-500/20">
                   {work.category}
                 </span>
                 {work.tags.map((tag) => (
@@ -445,6 +526,7 @@ export function WorkDetailView() {
                   </span>
                 ))}
               </div>
+              {/* 第二行：信息 */}
               <div className="flex flex-wrap gap-6 text-sm">
                 <div className="flex items-center gap-2 text-gray-400">
                   <Users className="w-4 h-4 text-gray-500" />
@@ -456,6 +538,12 @@ export function WorkDetailView() {
                   <span className="font-medium">{withColon(t('submitTime'))}</span>
                   <span className="text-gray-200">{new Date(work.createdAt).toLocaleDateString()}</span>
                 </div>
+                {(work.country || work.city) && (
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <MapPin className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-200">{[work.country, work.city].filter(Boolean).join(' / ')}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -464,11 +552,11 @@ export function WorkDetailView() {
                 onClick={handleLike}
                 className={`gap-2 transition-all duration-300 px-6 py-2.5 rounded-full font-medium ${
                   liked
-                    ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)] border-transparent scale-105"
-                    : "bg-zinc-800/80 text-gray-300 hover:text-white hover:bg-zinc-800 border border-white/10 backdrop-blur-md hover:border-green-500/50 hover:shadow-[0_0_15px_rgba(34,197,94,0.1)]"
+                    ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-[0_0_20px_rgba(50,240,140,0.4)] border-transparent scale-105"
+                    : "bg-zinc-800/80 text-gray-300 hover:text-white hover:bg-zinc-800 border border-white/10 backdrop-blur-md hover:border-green-500/50 hover:shadow-[0_0_15px_rgba(50,240,140,0.1)]"
                 }`}
               >
-                <ThumbsUp className={`w-4 h-4 ${liked ? "fill-current animate-bounce" : "group-hover:scale-110 transition-transform"}`} />
+                <ThumbsUp className={`w-4 h-4 transition-transform ${liked ? "fill-current" : ""} ${likeAnimating ? "scale-125" : "scale-100"}`} />
                 {liked ? t('liked') : t('likeProject')}
                 <span className={`ml-1.5 px-2 py-0.5 rounded-full text-xs font-mono ${liked ? "bg-white/20" : "bg-white/5 text-gray-400 group-hover:text-white"}`}>
                   {likesCount}
@@ -532,7 +620,19 @@ export function WorkDetailView() {
             </h2>
             {screenshotList.length > 0 ? (
               <div className="space-y-4">
-                <div className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/60 group">
+                <div
+                  ref={screenshotCarouselRef}
+                  tabIndex={0}
+                  className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/60 group outline-none focus-visible:ring-2 focus-visible:ring-green-500/50"
+                  onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                  onTouchEnd={(e) => {
+                    const diff = e.changedTouches[0].clientX - touchStartX.current;
+                    if (Math.abs(diff) > 50) {
+                      if (diff > 0) showPrevScreenshot();
+                      else showNextScreenshot();
+                    }
+                  }}
+                >
                   <img
                     src={screenshotList[activeScreenshotIndex]}
                     alt={`Screenshot ${activeScreenshotIndex + 1}`}
@@ -563,6 +663,27 @@ export function WorkDetailView() {
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
+                      {/* 圆点指示器 */}
+                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+                        {screenshotList.map((_, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => setActiveScreenshotIndex(index)}
+                            className={cn(
+                              "w-2 h-2 rounded-full transition-all",
+                              index === activeScreenshotIndex
+                                ? "bg-green-400 w-4"
+                                : "bg-white/40 hover:bg-white/60"
+                            )}
+                            aria-label={`第 ${index + 1} 张`}
+                          />
+                        ))}
+                      </div>
+                      {/* 计数器 */}
+                      <div className="absolute top-3 left-3 rounded-full bg-black/60 px-2 py-0.5 text-xs text-white/80 backdrop-blur-sm">
+                        {activeScreenshotIndex + 1} / {screenshotList.length}
+                      </div>
                     </>
                   )}
                 </div>
@@ -616,15 +737,6 @@ export function WorkDetailView() {
               <Share2 className="w-4 h-4" />
               {t('shareCard')}
             </Button>
-          </div>
-
-          <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
-            <h3 className="font-bold text-primary mb-2">{t('aboutProject')}</h3>
-            <p className="text-gray-400 text-sm mb-4">{t('aboutProjectDesc')}</p>
-            <div className="text-sm text-gray-300 space-y-2">
-              <p><span className="text-gray-500">{withColon(t('country'))}</span>{work.country || '-'}</p>
-              <p><span className="text-gray-500">{withColon(t('city'))}</span>{work.city || '-'}</p>
-            </div>
           </div>
 
           <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
@@ -691,6 +803,12 @@ export function WorkDetailView() {
           </div>
         </div>
       </div>
+
+      {/* 底部提示 */}
+      <div className="mt-8 pt-6 border-t border-zinc-800/50">
+        <p className="text-center text-xs text-gray-500">{t('aboutProjectDesc')}</p>
+      </div>
+
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="bg-zinc-950 border border-zinc-800 text-white sm:max-w-3xl">
           <DialogHeader>
@@ -704,8 +822,15 @@ export function WorkDetailView() {
               {shareImageUrl ? (
                 <img src={shareImageUrl} alt={t('sharePreviewAlt')} className="w-full aspect-[1200/630] object-cover" />
               ) : (
-                <div className="h-56 flex items-center justify-center text-zinc-500 text-sm">
-                  {isShareGenerating ? t('shareGenerating') : '-'}
+                <div className="h-56 flex flex-col items-center justify-center gap-3 text-zinc-500">
+                  {isShareGenerating ? (
+                    <>
+                      <div className="w-48 h-1.5 rounded-full bg-zinc-800 overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-green-500 to-green-400 rounded-full animate-[shareProgress_2s_ease-in-out_infinite]" style={{ width: '60%' }} />
+                      </div>
+                      <span className="text-xs">{t('shareGenerating')}</span>
+                    </>
+                  ) : '-'}
                 </div>
               )}
             </div>
@@ -730,65 +855,56 @@ export function WorkDetailView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Dialog open={isImagePreviewOpen} onOpenChange={setIsImagePreviewOpen}>
-        <DialogContent className="bg-zinc-950 border border-zinc-800 text-white sm:max-w-5xl">
-          <DialogHeader>
-            <DialogTitle>{previewTitle}</DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              {previewImages.length > 1 ? `${previewImageIndex + 1} / ${previewImages.length}` : previewTitle}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="relative rounded-xl overflow-hidden border border-zinc-800 bg-black/40">
-              {previewImages[previewImageIndex] ? (
-                <img
-                  src={previewImages[previewImageIndex]}
-                  alt={`${previewTitle}-${previewImageIndex + 1}`}
-                  className="w-full max-h-[75vh] object-contain bg-black"
-                />
-              ) : null}
-              {previewImages.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={showPrevPreviewImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2"
-                    aria-label="上一张"
-                    title="上一张"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={showNextPreviewImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2"
-                    aria-label="下一张"
-                    title="下一张"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </>
-              )}
+      {/* 轻量级图片预览 */}
+      {isImagePreviewOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center animate-fadeIn"
+          onClick={() => setIsImagePreviewOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setIsImagePreviewOpen(false)}
+            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
+            aria-label="关闭"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          
+          {previewImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); showPrevPreviewImage(); }}
+                className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
+                aria-label="上一张"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); showNextPreviewImage(); }}
+                className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
+                aria-label="下一张"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </>
+          )}
+          
+          <img
+            src={previewImages[previewImageIndex]}
+            alt={`${previewTitle}-${previewImageIndex + 1}`}
+            className="max-w-[90vw] max-h-[90vh] object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+          
+          {previewImages.length > 1 && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/60 backdrop-blur-md rounded-full px-4 py-2">
+              <span className="text-white text-sm">{previewImageIndex + 1} / {previewImages.length}</span>
             </div>
-            {previewImages.length > 1 && (
-              <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
-                {previewImages.map((image, index) => (
-                  <button
-                    key={`${image}-${index}`}
-                    type="button"
-                    onClick={() => setPreviewImageIndex(index)}
-                    className={`rounded-lg overflow-hidden border ${index === previewImageIndex ? 'border-primary' : 'border-zinc-800'}`}
-                    aria-label={`预览第 ${index + 1} 张图片`}
-                    title={`预览第 ${index + 1} 张图片`}
-                  >
-                    <img src={image} alt={`${previewTitle}-thumbnail-${index + 1}`} className="w-full h-16 object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+          )}
+        </div>
+      )}
     </div>
   );
 }

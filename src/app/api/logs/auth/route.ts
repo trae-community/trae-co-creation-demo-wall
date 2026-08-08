@@ -16,6 +16,8 @@ export async function GET(req: NextRequest) {
     const pageSize = parseInt(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10')
     const query = searchParams.get(CRUD_QUERY_PARAMS.query) || ''
     const filter = searchParams.get(CRUD_QUERY_PARAMS.filter) || 'all'
+    const startDate = searchParams.get('startDate') || ''
+    const endDate = searchParams.get('endDate') || ''
 
     const skip = (page - 1) * pageSize
     const take = pageSize
@@ -25,6 +27,17 @@ export async function GET(req: NextRequest) {
     // Handle filter
     if (filter !== 'all') {
       where.authType = filter
+    }
+
+    // Handle date range filter
+    if (startDate || endDate) {
+      where.createdAt = {}
+      if (startDate) {
+        where.createdAt.gte = new Date(`${startDate}T00:00:00`)
+      }
+      if (endDate) {
+        where.createdAt.lte = new Date(`${endDate}T23:59:59.999`)
+      }
     }
 
     // Handle search query

@@ -34,7 +34,11 @@
     "showing": "表示",
     "clearDate": "日付をクリア",
     "dateFilterHint": "投稿日で絞り込み",
-    "dateLabel": "日付"
+    "dateLabel": "日付",
+    "statWorks": "作品",
+    "statCreators": "クリエイター",
+    "statViews": "総閲覧数",
+    "statLikes": "総いいね数"
   },
   "Submit": {
     "title": "TRAE Demoの送信へようこそ！",
@@ -146,7 +150,9 @@
   "Work": {
     "notFound": "プロジェクトが見つかりません",
     "backHome": "ホームに戻る",
-    "backList": "一覧に戻る",
+    "backList": "リストに戻る",
+    "backToProfile": "プロフィールに戻る",
+    "backRankings": "ランキングに戻る",
     "cityFeatured": "都市おすすめ",
     "teamMembers": "チームメンバー:",
     "submitTime": "投稿日:",
@@ -190,7 +196,9 @@
     "auditStatus": "審査",
     "country": "都道府県",
     "city": "都市",
-    "dateLabel": "日付"
+    "filters": "フィルター",
+    "dateLabel": "日付",
+    "reset": "フィルターをリセット"
   },
   "Card": {
     "viewDetails": "詳細を見る",
@@ -202,8 +210,10 @@
   },
   "Footer": {
     "rights": "© 2026 TRAE DEMO WALL. All rights reserved.",
-    "slogan": "すべてのリアルな完成作品を展示する",
-    "icp": "浙ICP备2026026485号-1"
+    "icp": "浙ICP備2026026485号-1",
+    "githubCommunity": "GitHub コミュニティ",
+    "traeOfficial": "Trae 公式サイト",
+    "traeCommunity": "Trae コミュニティ"
   },
   "Admin": {
     "title": "管理画面",
@@ -299,6 +309,7 @@
     "views": "閲覧",
     "likes": "いいね",
     "noWorks": "公開作品はまだありません。",
+    "submitFirstWork": "最初の作品を投稿",
     "joinedAt": "参加日",
     "notFound": "ユーザーが見つかりません",
     "loadError": "ユーザー情報の読み込みに失敗しました"
@@ -319,6 +330,8 @@
     "totalLikes": "合計いいね",
     "author": "作者",
     "loadError": "ランキングデータの読み込みに失敗しました",
-    "noData": "まだランキングデータがありません"
+    "noData": "まだランキングデータがありません",
+    "trending": "トレンド",
+    "noTrendingData": "過去7日間に新しい作品がありません。最初の作品を提出しよう！"
   }
 }

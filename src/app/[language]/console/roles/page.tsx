@@ -1,26 +1,13 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Plus, Edit, Trash2, Shield } from 'lucide-react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
+import { Shield, Info, Lock } from 'lucide-react'
 
 import { CrudFeedback } from '@/components/crud/crud-feedback'
 import { CrudFilterBar } from '@/components/crud/crud-filter-bar'
 import { CrudPagination } from '@/components/crud/crud-pagination'
 import { useFeedback } from '@/lib/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog'
 import { Card } from '@/components/ui/card'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
 
@@ -32,14 +19,21 @@ interface RoleItem {
   description: string | null
 }
 
-// Schema
-const roleSchema = z.object({
-  roleCode: z.string().min(1, '请输入角色编码'),
-  roleName: z.string().min(1, '请输入角色名称'),
-  description: z.string().optional().or(z.literal('')),
-})
-
-type RoleFormValues = z.infer<typeof roleSchema>
+// 内置角色的权限说明（与系统权限控制保持一致）
+const BUILTIN_ROLE_INFO: Record<string, string[]> = {
+  root: [
+    '可访问全部控制台模块（概览、用户与权限、内容管理、系统配置、日志审计）',
+    '可为用户分配角色',
+  ],
+  admin: [
+    '可访问用户管理、作品管理、城市数据、标签管理、日志审计',
+    '不可访问角色管理、字典管理',
+  ],
+  common: [
+    '可浏览作品、点赞、评论、提交作品等前台功能',
+    '不可访问控制台',
+  ],
+}
 
 export default function RolesPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -49,23 +43,7 @@ export default function RolesPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 10
   
-  // Dialog states
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingRole, setEditingRole] = useState<RoleItem | null>(null)
-  const [isSaving, setIsSaving] = useState(false)
-  const [deletingRoleId, setDeletingRoleId] = useState<number | null>(null)
-  
   const { feedback, showFeedback } = useFeedback()
-
-  // Form
-  const form = useForm<RoleFormValues>({
-    resolver: zodResolver(roleSchema),
-    defaultValues: {
-      roleCode: '',
-      roleName: '',
-      description: '',
-    }
-  })
 
   // Fetch Roles
   const fetchRoles = useCallback(async () => {
@@ -103,82 +81,6 @@ export default function RolesPage() {
     setCurrentPage(1)
   }, [searchTerm])
 
-  // Handlers
-  const handleCreate = () => {
-    setEditingRole(null)
-    form.reset({
-      roleCode: '',
-      roleName: '',
-      description: '',
-    })
-    setIsDialogOpen(true)
-  }
-
-  const handleEdit = (role: RoleItem) => {
-    setEditingRole(role)
-    form.reset({
-      roleCode: role.roleCode,
-      roleName: role.roleName,
-      description: role.description || '',
-    })
-    setIsDialogOpen(true)
-  }
-
-  const handleDelete = async (id: number) => {
-    if (!confirm('确定要删除该角色吗？此操作不可恢复。')) return
-    
-    try {
-      setDeletingRoleId(id)
-      const res = await fetch(`/api/roles?id=${id}`, { method: 'DELETE' })
-      
-      if (res.ok) {
-        fetchRoles()
-        showFeedback('success', '角色已删除')
-      } else {
-        const data = await res.json()
-        showFeedback('error', data.error || '删除失败')
-      }
-    } catch (error) {
-      console.error('Failed to delete role:', error)
-      showFeedback('error', '删除失败')
-    } finally {
-      setDeletingRoleId(null)
-    }
-  }
-
-  const onSubmit = async (values: RoleFormValues) => {
-    try {
-      setIsSaving(true)
-      const url = '/api/roles'
-      const method = editingRole ? 'PUT' : 'POST'
-      const body = editingRole ? { ...values, id: editingRole.id } : values
-
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      })
-
-      if (res.ok) {
-        setIsDialogOpen(false)
-        fetchRoles()
-        showFeedback('success', editingRole ? '角色已更新' : '角色已创建')
-      } else {
-        const data = await res.json()
-        if (res.status === 409) {
-          showFeedback('error', '角色编码已存在')
-        } else {
-          showFeedback('error', data.error || '保存失败')
-        }
-      }
-    } catch (error) {
-      console.error('Failed to save role:', error)
-      showFeedback('error', '保存失败')
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
   // Pagination calculations
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
   const current = Math.min(currentPage, totalPages)
@@ -193,13 +95,22 @@ export default function RolesPage() {
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">角色管理</h2>
-          <p className="text-muted-foreground mt-1">管理系统角色权限</p>
+          <p className="text-muted-foreground mt-1">查看系统角色及其权限说明</p>
         </div>
-        <Button onClick={handleCreate} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20">
-          <Plus className="mr-2 h-4 w-4" />
-          新建角色
-        </Button>
       </div>
+
+      {/* 系统角色说明横幅 */}
+      <Card className="border-border bg-card/50 p-4">
+        <div className="flex items-start gap-3">
+          <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <Info size={16} />
+          </div>
+          <div className="text-sm text-muted-foreground space-y-1">
+            <p className="font-medium text-foreground">系统内置角色说明</p>
+            <p>系统固定为「根用户」「管理员」「普通用户」三个内置角色，不支持新增、修改或删除。如需调整权限范围，请联系开发人员。</p>
+          </div>
+        </div>
+      </Card>
 
       <CrudFilterBar
         searchPlaceholder="搜索角色名称或编码..."
@@ -221,10 +132,14 @@ export default function RolesPage() {
                 </div>
                 
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-semibold text-lg">{role.roleName}</span>
                     <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded font-mono">
                       {role.roleCode}
+                    </span>
+                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded inline-flex items-center gap-1">
+                      <Lock size={12} />
+                      内置角色
                     </span>
                   </div>
                   {role.description && (
@@ -232,22 +147,18 @@ export default function RolesPage() {
                       {role.description}
                     </p>
                   )}
+                  {/* 权限说明 */}
+                  {BUILTIN_ROLE_INFO[role.roleCode] && (
+                    <ul className="text-sm text-muted-foreground mt-2 space-y-1">
+                      {BUILTIN_ROLE_INFO[role.roleCode].map((item, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <span className="text-primary mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={() => handleEdit(role)}>
-                  <Edit size={16} />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-red-500 hover:text-red-400"
-                  onClick={() => handleDelete(role.id)}
-                  disabled={deletingRoleId === role.id}
-                >
-                  <Trash2 size={16} />
-                </Button>
               </div>
             </div>
           </Card>
@@ -255,7 +166,7 @@ export default function RolesPage() {
         
         {roles.length === 0 && (
           <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
-            暂无角色，点击右上角添加
+            暂无匹配的角色
           </div>
         )}
       </div>
@@ -266,46 +177,10 @@ export default function RolesPage() {
         endIndex={endIndex}
         current={current}
         totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
         onPrev={() => setCurrentPage(current - 1)}
         onNext={() => setCurrentPage(current + 1)}
       />
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>{editingRole ? '编辑角色' : '新建角色'}</DialogTitle>
-            <DialogDescription>
-              {editingRole ? '修改角色信息' : '创建新角色'}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">角色名称 <span className="text-red-500">*</span></label>
-              <Input {...form.register('roleName')} placeholder="例如：管理员" />
-              {form.formState.errors.roleName && <p className="text-red-500 text-xs">{form.formState.errors.roleName.message}</p>}
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">角色编码 <span className="text-red-500">*</span></label>
-              <Input {...form.register('roleCode')} placeholder="例如：admin" />
-              {form.formState.errors.roleCode && <p className="text-red-500 text-xs">{form.formState.errors.roleCode.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">描述</label>
-              <Input {...form.register('description')} placeholder="角色职责描述..." />
-            </div>
-
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>取消</Button>
-              <Button type="submit" disabled={isSaving}>
-                {isSaving ? '保存中...' : '保存'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { writeAuthLog } from '@/lib/audit-log'
+import { isEmailDomainBlocked } from '@/lib/ban'
 
 export async function POST(req: Request) {
   try {
@@ -10,6 +11,20 @@ export async function POST(req: Request) {
     if (!email || !password || !username) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+    // 屏蔽黑名单邮箱域名注册（如 example.com 等批量小号常用域名）
+    if (await isEmailDomainBlocked(email)) {
+      await writeAuthLog({
+        authType: 'sign_up',
+        authStatus: 'failed',
+        metadata: { email, username, reason: 'blocked_domain' },
+        request: req,
+      })
+      return NextResponse.json(
+        { error: '该邮箱不允许注册' },
         { status: 400 }
       )
     }

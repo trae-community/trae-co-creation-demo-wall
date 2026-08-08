@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Plus, User, Mail, Phone, Calendar, Shield } from 'lucide-react'
+import { Plus, User, Mail, Phone, Calendar, Shield, Filter, Ban, CircleCheck } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -27,6 +27,13 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
 import { Link } from '@/lib/language/navigation'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 // Types
 interface Role {
@@ -46,6 +53,7 @@ interface UserItem {
   createdAt: string
   updatedAt: string
   roles: { role: Role }[]
+  banned: boolean
 }
 
 // Schema
@@ -78,6 +86,13 @@ export default function UsersPage() {
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([])
   const [isSavingRoles, setIsSavingRoles] = useState(false)
 
+  // Filter states
+  const [filterRoleCode, setFilterRoleCode] = useState('all')
+
+  // Ban Dialog states
+  const [banTargetUser, setBanTargetUser] = useState<UserItem | null>(null)
+  const [isBanning, setIsBanning] = useState(false)
+
   const { feedback, showFeedback } = useFeedback()
 
   // Form
@@ -102,6 +117,11 @@ export default function UsersPage() {
         [CRUD_QUERY_PARAMS.query]: searchTerm,
       })
 
+      // 添加角色筛选参数
+      if (filterRoleCode && filterRoleCode !== 'all') {
+        params.set('roleCode', filterRoleCode)
+      }
+
       const res = await fetch(`/api/users?${params.toString()}`)
       if (res.ok) {
         const data = await res.json()
@@ -116,7 +136,7 @@ export default function UsersPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [currentPage, pageSize, searchTerm, showFeedback])
+  }, [currentPage, pageSize, searchTerm, filterRoleCode, showFeedback])
 
   // Fetch Roles
   const fetchRoles = useCallback(async () => {
@@ -137,10 +157,10 @@ export default function UsersPage() {
     fetchRoles()
   }, [fetchUsers, fetchRoles])
 
-  // Reset page when search changes
+  // Reset page when search or filter changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm])
+  }, [searchTerm, filterRoleCode])
 
   // Handlers
   const handleCreate = () => {
@@ -232,6 +252,37 @@ export default function UsersPage() {
     }
   }
 
+  // 打开封禁 / 解封确认弹窗
+  const handleToggleBan = (user: UserItem) => {
+    setBanTargetUser(user)
+  }
+
+  // 确认封禁 / 解封用户
+  const confirmToggleBan = async () => {
+    if (!banTargetUser) return
+    try {
+      setIsBanning(true)
+      const res = await fetch(`/api/users/${banTargetUser.id}/ban`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ banned: !banTargetUser.banned })
+      })
+      if (res.ok) {
+        showFeedback('success', banTargetUser.banned ? '用户已解封' : '用户已封禁')
+        setBanTargetUser(null)
+        fetchUsers()
+      } else {
+        const data = await res.json()
+        showFeedback('error', data.error || '操作失败')
+      }
+    } catch (error) {
+      console.error('Failed to ban/unban user:', error)
+      showFeedback('error', '操作失败')
+    } finally {
+      setIsBanning(false)
+    }
+  }
+
   // Pagination calculations
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
   const current = Math.min(currentPage, totalPages)
@@ -253,16 +304,55 @@ export default function UsersPage() {
         </Button>
       </div>
 
-      <CrudFilterBar
-        searchPlaceholder="搜索用户名、邮箱或手机号..."
-        searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
-        // No complex filters for now, but keeping prop consistent
-        filterValue="all"
-        filterOptions={[]} 
-        onFilterChange={() => {}}
-        filterPlaceholder="筛选用户"
-      />
+      <div className="p-4 rounded-xl border border-border bg-card space-y-3">
+        {/* Search */}
+        <div className="flex flex-col sm:flex-row gap-3 items-center">
+          <div className="relative flex-1 max-w-md w-full">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="搜索用户名、邮箱或手机号..."
+              className="w-full pl-10 pr-4 py-2 rounded-lg text-sm bg-secondary border border-border focus:outline-none focus:ring-1 focus:ring-primary/40"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          {/* Role Filter Dropdown */}
+          <div className="flex items-center gap-2">
+            <Filter size={16} className="text-muted-foreground" />
+            <Select value={filterRoleCode} onValueChange={(value) => setFilterRoleCode(value)}>
+              <SelectTrigger className="w-[200px] bg-secondary border-border">
+                <SelectValue placeholder="全部角色" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部角色</SelectItem>
+                {availableRoles.map(role => (
+                  <SelectItem key={role.id} value={role.roleCode}>
+                    {role.roleName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {(searchTerm || filterRoleCode !== 'all') && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSearchTerm('')
+                setFilterRoleCode('all')
+              }}
+              className="shrink-0"
+            >
+              重置筛选
+            </Button>
+          )}
+        </div>
+      </div>
 
       <div className="space-y-4">
         {users.map(user => (
@@ -280,6 +370,9 @@ export default function UsersPage() {
                 <div className="space-y-1 flex-1">
                   <div className="flex items-center gap-2">
                     <Link href={`/user/${user.id}`} className="font-semibold text-lg hover:text-primary transition-colors">{user.username}</Link>
+                    {user.banned && (
+                      <Badge variant="destructive" className="text-xs">已封禁</Badge>
+                    )}
                     {user.roles && user.roles.map(r => (
                       <Badge key={r.role.id} variant="secondary" className="text-xs">
                         {r.role.roleName}
@@ -316,6 +409,27 @@ export default function UsersPage() {
                 <Button variant="ghost" size="sm" onClick={() => handleOpenRoleDialog(user)} title="分配角色">
                   <Shield size={16} />
                 </Button>
+                {user.banned ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleToggleBan(user)}
+                    title="解封用户"
+                    className="hover:text-green-500 hover:bg-green-500/10"
+                  >
+                    <CircleCheck size={16} />
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleToggleBan(user)}
+                    title="封禁用户"
+                    className="hover:text-red-500 hover:bg-red-500/10"
+                  >
+                    <Ban size={16} />
+                  </Button>
+                )}
               </div>
             </div>
           </Card>
@@ -334,6 +448,7 @@ export default function UsersPage() {
         endIndex={endIndex}
         current={current}
         totalPages={totalPages}
+        onPageChange={(page) => setCurrentPage(page)}
         onPrev={() => setCurrentPage(current - 1)}
         onNext={() => setCurrentPage(current + 1)}
       />
@@ -422,6 +537,32 @@ export default function UsersPage() {
             <Button onClick={onSaveRoles} disabled={isSavingRoles}>
               {isSavingRoles ? '保存中...' : '保存'}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!banTargetUser} onOpenChange={(open) => !open && setBanTargetUser(null)}>
+        <DialogContent className="bg-card border border-border text-foreground sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>{banTargetUser?.banned ? '解封用户' : '封禁用户'}</DialogTitle>
+            <DialogDescription>
+              {banTargetUser?.banned
+                ? `确定要解封用户「${banTargetUser?.username}」吗？解封后该用户可正常登录。`
+                : `确定要封禁用户「${banTargetUser?.username}」吗？封禁后该用户将无法登录，已登录的会话也会失效。`}
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBanTargetUser(null)} disabled={isBanning}>取消</Button>
+            {banTargetUser?.banned ? (
+              <Button onClick={confirmToggleBan} disabled={isBanning}>
+                {isBanning ? '解封中...' : '确认解封'}
+              </Button>
+            ) : (
+              <Button variant="destructive" onClick={confirmToggleBan} disabled={isBanning}>
+                {isBanning ? '封禁中...' : '确认封禁'}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

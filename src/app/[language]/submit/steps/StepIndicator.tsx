@@ -41,7 +41,7 @@ export function StepIndicator({ current, onStepClick }: StepIndicatorProps) {
                 className={cn(
                   "w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2",
                   done && "bg-green-500 border-green-500 text-black",
-                  active && "border-green-500 text-green-400 bg-transparent shadow-[0_0_16px_rgba(34,197,94,0.3)]",
+                  active && "border-green-500 text-green-400 bg-transparent shadow-[0_0_16px_rgba(50,240,140,0.3)]",
                   !done && !active && "border-zinc-700 text-zinc-600 bg-transparent"
                 )}
               >
