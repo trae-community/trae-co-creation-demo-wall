@@ -398,10 +398,14 @@ export function WorkDetailView() {
 
   const handleCopyLink = async () => {
     if (!currentPageUrl) return;
+    // 复制内容带上分享文案，方便直接粘贴到聊天工具里宣传
+    const copyText = work
+      ? t('shareText', { name: work.name, url: currentPageUrl })
+      : currentPageUrl;
     try {
       // 尝试使用 Clipboard API
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(currentPageUrl);
+        await navigator.clipboard.writeText(copyText);
         setShareActionDone('copied');
         setTimeout(() => setShareActionDone(''), 1500);
         return;
@@ -413,7 +417,7 @@ export function WorkDetailView() {
     // Fallback: 使用传统的 execCommand 方法（移动端兼容性更好）
     try {
       const textArea = document.createElement('textarea');
-      textArea.value = currentPageUrl;
+      textArea.value = copyText;
       textArea.style.position = 'fixed';
       textArea.style.left = '-999999px';
       textArea.style.top = '-999999px';

@@ -183,6 +183,7 @@
     "shareGenerating": "シェアカードを生成中...",
     "downloadImage": "画像をダウンロード",
     "copyLink": "リンクをコピー",
+    "shareText": "TRAE DEMO WALL で作品《{name}》をシェアしました。ぜひご覧ください！ {url}",
     "copied": "コピー完了",
     "systemShare": "システム共有",
     "clickToPreview": "クリックして拡大表示",
