@@ -108,3 +108,7 @@ prisma/
 ## 文档
 
 所有文档位于 `docs/` 目录，索引见 [docs/README.md](docs/README.md)。
+
+## 开源协议
+
+本项目基于 [GNU General Public License v3.0](LICENSE) 开源。Copyright (C) 2026 Trae Demo Wall Team.
