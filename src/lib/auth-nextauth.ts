@@ -64,8 +64,15 @@ const authConfig = {
       if (user) {
         token.id = user.id
       }
-      // 已被封禁的账号：清空会话中的用户 ID，使其存量会话失效
-      if (token.id && (await isUserBanned(token.id as string))) {
+      // Edge Runtime（中间件）无法运行 Prisma，跳过封禁检查；
+      // 封禁生效点：authorize 登录拦截 + API 路由的 getAuthUser 会话校验
+      if (
+        token.id &&
+        typeof process !== 'undefined' &&
+        process.env.NEXT_RUNTIME === 'nodejs' &&
+        (await isUserBanned(token.id as string))
+      ) {
+        // 已被封禁的账号：清空会话中的用户 ID，使其存量会话失效
         token.id = ''
       }
       return token

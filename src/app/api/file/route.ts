@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server";
 import { cos, COS_BUCKET, COS_REGION } from "@/lib/cos";
 import { v4 as uuidv4 } from "uuid";
+import { getAuthUser } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
+    // 0. Authentication check
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     // 1. Parse FormData
     const formData = await request.formData();
     const file = formData.get("file") as File;
@@ -73,6 +83,15 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    // 0. Authentication check
+    const user = await getAuthUser();
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { path, url } = body;
 
