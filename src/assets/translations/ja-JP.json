@@ -10,7 +10,7 @@
     "country": "国"
   },
   "Home": {
-    "heroTitle": "Ship Faster with",
+    "heroTitle": "Trae クリエイティビティコンテスト",
     "heroSubtitle1": "Built with",
     "heroSubtitle2": "Built by",
     "heroSubtitleTRAE": "TRAE",
@@ -123,25 +123,46 @@
     "validationCity": "都市を選択してください",
     "validationCountry": "国を選択してください",
     "validationCategory": "カテゴリを選択してください",
+
+    "validationIntroMin": "作品紹介は少なくとも10文字必要です",
+
+    "validationIntroMax": "作品紹介は100文字以内で入力してください",
     "validationTagsMin": "タグを1個以上選択してください",
+    "validationTagsRequired": "作品ソースを選択してください",
     "validationTagsMax": "タグは最大5個まで",
     "validationTeam": "チームメンバーを入力してください",
     "validationTeamMemberRequired": "チームメンバー名を入力してください",
+
+    "validationTeamMemberMax": "メンバー名は20文字以内で入力してください",
     "validationTeamMin": "最低1人のチームメンバーが必要です",
     "validationTeamIntro": "チーム紹介を入力してください",
+
+    "validationTeamIntroMax": "チーム紹介は500文字以内で入力してください",
     "validationCover": "カバー画像をアップロードしてください",
+
+    "validationStoryMin": "作品ストーリーは少なくとも20文字必要です",
+
+    "validationStoryMax": "作品ストーリーは2000文字以内で入力してください",
     "validationProblemMin": "問題の説明は20文字以上必要です",
     "validationSolutionMin": "解決方法は20文字以上必要です",
     "validationDemoUrl": "有効なデモリンクを入力してください",
     "validationRepoUrl": "有効なリポジトリリンクを入力してください",
     "validationHighlightMax": "ハイライトは30文字以内",
+
+    "validationHighlightRequired": "ハイライト内容を入力してください",
     "validationHighlightsMin": "ハイライトは最低1つ必要です",
     "validationHighlightsMax": "ハイライトは最大5つまで",
     "validationScenariosMin": "シナリオは最低1つ必要です",
     "validationScenarioRequired": "使用シナリオを入力してください",
+
+    "validationScenarioMax": "各シーンは100文字以内で入力してください",
     "validationScreenshotsMin": "スクリーンショットは最低1枚必要です",
     "validationScreenshotsMax": "スクリーンショットは最大5枚まで",
     "validationEmail": "有効なメールアドレスを入力してください",
+
+    "validationPhoneMax": "連絡先電話番号は20文字以内で入力してください",
+
+    "validationEmailMax": "メールアドレスは100文字以内で入力してください",
     "nextStep": "次へ",
     "prevStep": "戻る",
     "uploadError": "アップロードに失敗しました",
@@ -182,6 +203,7 @@
     "sharePreviewAlt": "シェアカードプレビュー",
     "shareGenerating": "シェアカードを生成中...",
     "downloadImage": "画像をダウンロード",
+    "printPoster": "ポスターを印刷",
     "copyLink": "リンクをコピー",
     "shareText": "TRAE DEMO WALL で作品《{name}》をシェアしました。ぜひご覧ください！ {url}",
     "copied": "コピー完了",

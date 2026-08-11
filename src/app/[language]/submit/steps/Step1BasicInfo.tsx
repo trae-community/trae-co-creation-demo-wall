@@ -56,13 +56,17 @@ export function Step1BasicInfo({
           {...register('name')}
           className={inputClass}
           placeholder={t('projectNamePlaceholder')}
+          maxLength={50}
         />
-        {errors.name && (
-          <p className="text-red-500 text-xs flex items-center gap-1">
-            <AlertCircle className="w-3 h-3" />
-            {errors.name.message}
-          </p>
-        )}
+        <div className="flex justify-between items-center">
+          {errors.name ? (
+            <p className="text-red-500 text-xs flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />
+              {errors.name.message}
+            </p>
+          ) : <span />}
+          <span className="text-xs text-zinc-500">{form.watch('name')?.length || 0}/50</span>
+        </div>
       </div>
 
       {/* Intro */}
@@ -74,13 +78,17 @@ export function Step1BasicInfo({
           {...register('intro')}
           className={inputClass}
           placeholder={t('introPlaceholder')}
+          maxLength={100}
         />
-        {errors.intro && (
-          <p className="text-red-500 text-xs flex items-center gap-1">
-            <AlertCircle className="w-3 h-3" />
-            {errors.intro.message}
-          </p>
-        )}
+        <div className="flex justify-between items-center">
+          {errors.intro ? (
+            <p className="text-red-500 text-xs flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />
+              {errors.intro.message}
+            </p>
+          ) : <span />}
+          <span className="text-xs text-zinc-500">{form.watch('intro')?.length || 0}/100</span>
+        </div>
       </div>
 
       {/* Province + City */}

@@ -5,7 +5,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
@@ -18,6 +18,7 @@ interface RichTextEditorProps {
   onChange: (html: string) => void
   placeholder?: string
   hasError?: boolean
+  maxLength?: number
 }
 
 const ToolbarButton = ({
@@ -44,10 +45,11 @@ const ToolbarButton = ({
   </button>
 )
 
-export function RichTextEditor({ value, onChange, placeholder, hasError }: RichTextEditorProps) {
+export function RichTextEditor({ value, onChange, placeholder, hasError, maxLength }: RichTextEditorProps) {
   // Track if this is the initial mount to properly sync external value
   const isInitialMount = useRef(true)
   const previousValueRef = useRef<string>(value)
+  const [charCount, setCharCount] = useState(0)
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -78,7 +80,18 @@ export function RichTextEditor({ value, onChange, placeholder, hasError }: RichT
       },
     },
     onUpdate({ editor }) {
-      onChange(editor.getHTML())
+      const html = editor.getHTML()
+      // 计算纯文本字数（去除 HTML 标签）
+      const text = html.replace(/<[^>]*>/g, '').trim()
+      setCharCount(text.length)
+      
+      // 如果超过最大长度，截断内容
+      if (maxLength && text.length > maxLength) {
+        toast.warning(`创作故事不能超过 ${maxLength} 字`)
+        return
+      }
+      
+      onChange(html)
     },
   })
 
@@ -173,6 +186,18 @@ export function RichTextEditor({ value, onChange, placeholder, hasError }: RichT
 
       {/* Editor area */}
       <EditorContent editor={editor} />
+      
+      {/* Character count */}
+      {maxLength && (
+        <div className="px-4 py-2 border-t border-zinc-700/60 text-right">
+          <span className={cn(
+            "text-xs",
+            charCount > maxLength ? "text-red-500" : "text-zinc-500"
+          )}>
+            {charCount}/{maxLength}
+          </span>
+        </div>
+      )}
     </div>
   )
 }

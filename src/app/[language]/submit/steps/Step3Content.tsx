@@ -48,15 +48,19 @@ export function Step3Content({ form }: Step3Props) {
               onChange={field.onChange}
               placeholder={t('storyPlaceholder')}
               hasError={!!errors.story}
+              maxLength={2000}
             />
           )}
         />
-        {errors.story && (
-          <p className="text-red-500 text-xs flex items-center gap-1">
-            <AlertCircle className="w-3 h-3" />
-            {errors.story.message}
-          </p>
-        )}
+        <div className="flex justify-between items-center">
+          {errors.story ? (
+            <p className="text-red-500 text-xs flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />
+              {errors.story.message}
+            </p>
+          ) : <span />}
+          <span className="text-xs text-zinc-500">最多 2000 字</span>
+        </div>
       </div>
 
       {/* Highlights */}
@@ -78,12 +82,15 @@ export function Step3Content({ form }: Step3Props) {
                   placeholder={t('highlightPlaceholder', { index: index + 1 })}
                   maxLength={30}
                 />
-                {errors.highlights?.[index]?.value && (
-                  <p className="text-red-500 text-xs flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {errors.highlights[index]?.value?.message}
-                  </p>
-                )}
+                <div className="flex justify-between items-center">
+                  {errors.highlights?.[index]?.value ? (
+                    <p className="text-red-500 text-xs flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.highlights[index]?.value?.message}
+                    </p>
+                  ) : <span />}
+                  <span className="text-xs text-zinc-500">{form.watch(`highlights.${index}.value`)?.length || 0}/30</span>
+                </div>
               </div>
               {highlightFields.length > 1 && (
                 <button
@@ -133,13 +140,17 @@ export function Step3Content({ form }: Step3Props) {
                   {...register(`scenarios.${index}.value` as const)}
                   className={inputClass}
                   placeholder={t('scenarioPlaceholder', { index: index + 1 })}
+                  maxLength={100}
                 />
-                {errors.scenarios?.[index]?.value && (
-                  <p className="text-red-500 text-xs flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {errors.scenarios[index]?.value?.message}
-                  </p>
-                )}
+                <div className="flex justify-between items-center">
+                  {errors.scenarios?.[index]?.value ? (
+                    <p className="text-red-500 text-xs flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.scenarios[index]?.value?.message}
+                    </p>
+                  ) : <span />}
+                  <span className="text-xs text-zinc-500">{form.watch(`scenarios.${index}.value`)?.length || 0}/100</span>
+                </div>
               </div>
               {scenarioFields.length > 1 && (
                 <button
