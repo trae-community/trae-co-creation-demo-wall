@@ -42,18 +42,10 @@ export function buildWorkFormSchema(
     devStatus: z.string().min(1, t('validationDevStatus')),
     tags: z
       .array(z.number())
-      .min(1, t('validationTagsMin') || t('validationTagsRequired'))
+      .min(1, t('validationTagsMin'))
       .max(5, t('validationTagsMax')),
-    team: z
-      .array(z.object({ value: z.string().min(1, t('validationTeamMemberRequired')) }))
-      .min(1, t('validationTeamMin')),
-    teamIntro: requireTeamIntro
-      ? z.string().min(1, t('validationTeamIntro'))
-      : z.string(),
-    contactPhone: z.string(),
-    contactEmail: z.union([z.string().email(t('validationEmail')), z.literal('')]),
     coverUrl: z.string().min(1, t('validationCover')),
-    story: z.string().min(20, t('validationStoryMin')),
+    story: z.string().min(20, t('validationStoryMin')).max(2000, t('validationStoryMax')),
     highlights: z
       .array(
         z.object({
@@ -66,7 +58,14 @@ export function buildWorkFormSchema(
       .min(1, t('validationHighlightsMin'))
       .max(5, t('validationHighlightsMax')),
     scenarios: z
-      .array(z.object({ value: z.string().min(1, t('validationScenarioRequired')) }))
+      .array(
+        z.object({
+          value: z
+            .string()
+            .min(1, t('validationScenarioRequired'))
+            .max(100, t('validationScenarioMax')),
+        })
+      )
       .min(1, t('validationScenariosMin')),
     screenshots: z
       .array(z.string())
@@ -74,5 +73,23 @@ export function buildWorkFormSchema(
       .max(5, t('validationScreenshotsMax')),
     demoUrl: z.union([z.string().url(t('validationDemoUrl')), z.literal('')]),
     repoUrl: z.union([z.string().url(t('validationRepoUrl')), z.literal('')]),
+    team: z
+      .array(
+        z.object({
+          value: z
+            .string()
+            .min(1, t('validationTeamMemberRequired'))
+            .max(20, t('validationTeamMemberMax')),
+        })
+      )
+      .min(1, t('validationTeamMin')),
+    teamIntro: requireTeamIntro
+      ? z.string().min(1, t('validationTeamIntro')).max(500, t('validationTeamIntroMax'))
+      : z.string().max(500, t('validationTeamIntroMax')),
+    contactPhone: z.string().max(20, t('validationPhoneMax')),
+    contactEmail: z.union([
+      z.string().email(t('validationEmail')).max(100, t('validationEmailMax')),
+      z.literal(''),
+    ]),
   });
 }

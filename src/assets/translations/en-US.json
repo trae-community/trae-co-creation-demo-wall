@@ -9,7 +9,7 @@
     "console": "Console"
   },
   "Home": {
-    "heroTitle": "Ship Faster with",
+    "heroTitle": "Trae Creativity Contest",
     "heroSubtitle1": "Built with",
     "heroSubtitle2": "Built by",
     "heroSubtitleTRAE": "TRAE",
@@ -120,24 +120,36 @@
     "validationCity": "Please select a city",
     "validationCategory": "Please select a category",
     "validationTagsMin": "Please select at least 1 tag",
+
+    "validationTagsRequired": "Please select the work source",
     "validationTagsMax": "Max 5 tags allowed",
     "validationTeam": "Please fill in team members",
     "validationCover": "Please upload a cover image",
     "validationStoryMin": "Story must be at least 20 characters",
+
+    "validationStoryMax": "Story must be at most 2000 characters",
     "validationHighlightRequired": "Please enter highlight content",
     "validationHighlightMax": "Highlight must be at most 30 characters",
     "validationHighlightsMin": "At least 1 highlight required",
     "validationHighlightsMax": "Max 5 highlights allowed",
     "validationScenariosMin": "At least 1 scenario required",
     "validationScenarioRequired": "Please enter usage scenario",
+
+    "validationScenarioMax": "Scenario must be at most 100 characters",
     "validationScreenshotsMin": "At least 1 screenshot required",
     "validationScreenshotsMax": "Max 5 screenshots allowed",
     "validationDemoUrl": "Please enter a valid Demo link",
     "validationRepoUrl": "Please enter a valid repository link",
     "validationTeamMemberRequired": "Team member name required",
+
+    "validationTeamMemberMax": "Member name must be at most 20 characters",
     "validationTeamMin": "At least 1 team member required",
     "validationTeamIntro": "Please fill in the team introduction",
+
+    "validationTeamIntroMax": "Team introduction must be at most 500 characters",
     "validationEmail": "Please enter a valid email",
+    "validationPhoneMax": "Phone number must be at most 20 characters",
+    "validationEmailMax": "Email must be at most 100 characters",
     "nextStep": "Next",
     "prevStep": "Back",
     "uploadError": "Upload failed, please retry",
@@ -176,6 +188,7 @@
     "sharePreviewAlt": "Share card preview",
     "shareGenerating": "Generating share card...",
     "downloadImage": "Download Image",
+    "printPoster": "Print Poster",
     "copyLink": "Copy Link",
     "shareText": "I just shared \"{name}\" on TRAE DEMO WALL. Come check it out! {url}",
     "copied": "Copied",

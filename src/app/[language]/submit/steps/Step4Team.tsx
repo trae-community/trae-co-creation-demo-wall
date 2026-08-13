@@ -40,13 +40,17 @@ export function Step4Team({ form }: Step4Props) {
                   {...register(`team.${index}.value` as const)}
                   className={inputClass}
                   placeholder={t('teamPlaceholder')}
+                  maxLength={20}
                 />
-                {errors.team?.[index]?.value && (
-                  <p className="text-red-500 text-xs flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {errors.team[index]?.value?.message}
-                  </p>
-                )}
+                <div className="flex justify-between items-center">
+                  {errors.team?.[index]?.value ? (
+                    <p className="text-red-500 text-xs flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.team[index]?.value?.message}
+                    </p>
+                  ) : <span />}
+                  <span className="text-xs text-zinc-500">{form.watch(`team.${index}.value`)?.length || 0}/20</span>
+                </div>
               </div>
               {teamFields.length > 1 && (
                 <button
@@ -90,13 +94,17 @@ export function Step4Team({ form }: Step4Props) {
           rows={4}
           className={inputClass}
           placeholder={t('teamIntroPlaceholder')}
+          maxLength={500}
         />
-        {errors.teamIntro && (
-          <p className="text-red-500 text-xs flex items-center gap-1">
-            <AlertCircle className="w-3 h-3" />
-            {errors.teamIntro.message}
-          </p>
-        )}
+        <div className="flex justify-between items-center">
+          {errors.teamIntro ? (
+            <p className="text-red-500 text-xs flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />
+              {errors.teamIntro.message}
+            </p>
+          ) : <span />}
+          <span className="text-xs text-zinc-500">{form.watch('teamIntro')?.length || 0}/500</span>
+        </div>
       </div>
 
       {/* Contact Info */}
@@ -108,7 +116,9 @@ export function Step4Team({ form }: Step4Props) {
             className={inputClass}
             placeholder={t('contactPhonePlaceholder')}
             type="tel"
+            maxLength={20}
           />
+          <span className="text-xs text-zinc-500 block text-right">{form.watch('contactPhone')?.length || 0}/20</span>
         </div>
 
         <div className="space-y-2">
@@ -118,13 +128,17 @@ export function Step4Team({ form }: Step4Props) {
             className={inputClass}
             placeholder={t('contactEmailPlaceholder')}
             type="email"
+            maxLength={100}
           />
-          {errors.contactEmail && (
-            <p className="text-red-500 text-xs flex items-center gap-1">
-              <AlertCircle className="w-3 h-3" />
-              {errors.contactEmail.message}
-            </p>
-          )}
+          <div className="flex justify-between items-center">
+            {errors.contactEmail ? (
+              <p className="text-red-500 text-xs flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
+                {errors.contactEmail.message}
+              </p>
+            ) : <span />}
+            <span className="text-xs text-zinc-500">{form.watch('contactEmail')?.length || 0}/100</span>
+          </div>
         </div>
       </div>
     </div>

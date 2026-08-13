@@ -21,6 +21,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'File too large (max 2MB)' }, { status: 400 });
     }
 
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid file type. Only JPG, PNG, WEBP, and SVG are allowed.' },
+        { status: 400 }
+      );
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer());
     const ext = file.name.split('.').pop();
     const fileName = `avatars/${user.userId}-${Date.now()}.${ext}`;

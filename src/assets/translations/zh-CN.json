@@ -9,7 +9,7 @@
     "console": "控制台"
   },
   "Home": {
-    "heroTitle": "Ship Faster with",
+    "heroTitle": "Trae 创造力大赛",
     "heroSubtitle1": "Built with",
     "heroSubtitle2": "Built by",
     "heroSubtitleTRAE": "TRAE",
@@ -124,20 +124,30 @@
     "validationTeam": "请填写团队成员",
     "validationCover": "请上传封面图",
     "validationStoryMin": "创作故事至少20个字符",
+
+    "validationStoryMax": "创作故事不能超过2000个字符",
     "validationHighlightRequired": "请填写亮点内容",
     "validationHighlightMax": "亮点内容不能超过30个字符",
     "validationHighlightsMin": "至少需要1个亮点",
     "validationHighlightsMax": "最多支持5个亮点",
     "validationScenariosMin": "至少需要1个场景",
     "validationScenarioRequired": "请填写使用场景",
+
+    "validationScenarioMax": "每条应用场景不能超过100个字符",
     "validationScreenshotsMin": "请至少上传1张截图",
     "validationScreenshotsMax": "最多支持5张截图",
     "validationDemoUrl": "请输入有效的演示链接",
     "validationRepoUrl": "请输入有效的仓库链接",
     "validationTeamMemberRequired": "请填写团队成员姓名",
+
+    "validationTeamMemberMax": "成员姓名不能超过20个字符",
     "validationTeamMin": "至少需要1名团队成员",
     "validationTeamIntro": "请填写团队介绍",
+
+    "validationTeamIntroMax": "团队介绍不能超过500个字符",
     "validationEmail": "请输入有效的邮箱地址",
+    "validationPhoneMax": "联系电话不能超过20个字符",
+    "validationEmailMax": "邮箱地址不能超过100个字符",
     "nextStep": "下一步",
     "prevStep": "上一步",
     "uploadError": "上传失败，请重试",
@@ -176,6 +186,7 @@
     "sharePreviewAlt": "分享卡片预览",
     "shareGenerating": "正在生成分享卡片...",
     "downloadImage": "下载图片",
+    "printPoster": "打印海报",
     "copyLink": "复制链接",
     "shareText": "我在 TRAE DEMO WALL 分享了作品《{name}》，快来看看吧！{url}",
     "copied": "已复制",
