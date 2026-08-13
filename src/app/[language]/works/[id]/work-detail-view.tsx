@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp, Mail, Award, ChevronLeft, ChevronRight, Download, Link2, Check, MapPin, X } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp, Mail, Award, ChevronLeft, ChevronRight, Download, Link2, Check, MapPin, X, Printer } from "lucide-react";
 import { Button } from "@/components/common/action-button";
 import { useEffect, useState, useRef } from "react";
 import { useLocale, useTranslations } from 'next-intl';
@@ -283,18 +283,16 @@ export function WorkDetailView() {
       const text = value.trim();
       return text.length > max ? `${text.slice(0, max)}...` : text;
     };
-    const title = truncate(work.name || '-', 32);
-    const intro = truncate(work.intro || '-', 70);
-    const locationLine = truncate(`${work.city || '-'} · ${work.country || '-'}`, 24);
-    const categoryLine = truncate(work.category || '-', 12);
-    const tagList = work.tags.slice(0, 3).map((tag) => truncate(tag, 12));
-    const honorList = (work.honors || []).slice(0, 2).map((honor) => truncate(honor, 14));
-    const createdAtText = new Date(work.createdAt).toLocaleDateString(locale || 'zh-CN');
-    const siteTitle = 'TRAE DEMO WALL';
-    const likeLabel = withColon(t('likeProject'));
-    const submitLabel = withColon(t('submitTime'));
-    const teamLabel = withColon(t('teamMembers'));
+    const title = truncate(work.name || '-', 38);
+    const intro = truncate(work.intro || '-', 84);
     const authorLine = truncate(work.author.name || '-', 20);
+    // 标题超长时拆成两行，避免溢出画面（字号 32 时每行约 18 字）
+    const titleLines = title.length > 18 ? [title.slice(0, 18), title.slice(18)] : [title];
+    // 简介按每行 36 字换行，最多 2 行（字号 24，对齐原设计稿简介区 y 638~717）
+    const introLines: string[] = [];
+    for (let i = 0; i < intro.length && introLines.length < 2; i += 36) {
+      introLines.push(intro.slice(i, i + 36));
+    }
     const safe = (value: string) =>
       value
         .replace(/&/g, '&amp;')
@@ -302,20 +300,6 @@ export function WorkDetailView() {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
-    const honorSvg = honorList
-      .map(
-        (honor, index) => `
-  <rect x="884" y="${104 + index * 44}" width="220" height="32" rx="16" fill="rgba(250,204,21,0.18)" stroke="rgba(250,204,21,0.38)"/>
-  <text x="994" y="${125 + index * 44}" text-anchor="middle" fill="#fef08a" font-size="15" font-family="Arial, sans-serif" font-weight="700">${safe(honor)}</text>`
-      )
-      .join('');
-    const tagSvg = tagList
-      .map(
-        (tag, index) => `
-  <rect x="${250 + index * 180}" y="430" width="168" height="30" rx="15" fill="rgba(39,39,42,0.78)" stroke="rgba(255,255,255,0.08)"/>
-  <text x="${334 + index * 180}" y="450" text-anchor="middle" fill="#d4d4d8" font-size="14" font-family="Arial, sans-serif">#${safe(tag)}</text>`
-      )
-      .join('');
     // 生成二维码（内容为当前作品详情页链接，扫码直达）；懒加载避免影响首屏
     let qrSvg = '';
     let qrViewBox = '';
@@ -337,55 +321,134 @@ export function WorkDetailView() {
     } catch (err) {
       console.error('QR code generation failed:', err);
     }
-    const qrBlockSvg = qrSvg
+    // 加载海报模板（设计稿导出：封面布满 + 底部白色渐隐，动态内容已预剔除）
+    // 模板坐标系 viewBox 0 0 1190.55 841.89（A3 横版 @72dpi）
+    let template = '';
+    try {
+      const res = await fetch('/images/poster-template.svg');
+      if (res.ok) template = await res.text();
+    } catch (err) {
+      console.error('Poster template load failed:', err);
+    }
+    // 将作品封面转为 base64 内嵌进 SVG，保证预览与 canvas 导出不受跨域限制；
+    // 同时返回 Image 元素，供后续采样封面亮度决定 logo 颜色
+    const toDataUrl = (url: string, timeoutMs = 8000): Promise<{ dataUrl: string; img: HTMLImageElement }> =>
+      new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        const timer = setTimeout(() => reject(new Error('cover load timeout')), timeoutMs);
+        img.onload = () => {
+          clearTimeout(timer);
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) throw new Error('canvas context unavailable');
+            ctx.drawImage(img, 0, 0);
+            resolve({ dataUrl: canvas.toDataURL('image/png'), img });
+          } catch (err) {
+            reject(err);
+          }
+        };
+        img.onerror = () => {
+          clearTimeout(timer);
+          reject(new Error('cover load failed'));
+        };
+        img.src = url;
+      });
+    let coverDataUrl = '';
+    let coverImg: HTMLImageElement | null = null;
+    if (work.coverUrl) {
+      try {
+        const r = await toDataUrl(work.coverUrl);
+        coverDataUrl = r.dataUrl;
+        coverImg = r.img;
+      } catch (err) {
+        console.error('Cover image embedding failed:', err);
+      }
+    }
+    // logo 主题自适应：按 slice 铺满规则模拟裁切，采样左上角 logo 区域的平均亮度，
+    // 亮色封面（如纯白图）用黑 logo，暗色封面用白 logo
+    const logoFill = (() => {
+      if (!coverImg || !coverImg.naturalWidth) return '#ffffff'; // 无封面时底是深色
+      try {
+        const W = 1190.55, H = 841.89;
+        const scale = Math.max(W / coverImg.naturalWidth, H / coverImg.naturalHeight);
+        const dw = coverImg.naturalWidth * scale;
+        const dh = coverImg.naturalHeight * scale;
+        const sc = document.createElement('canvas');
+        sc.width = 300;
+        sc.height = Math.round((300 * H) / W);
+        const sctx = sc.getContext('2d');
+        if (!sctx) return '#ffffff';
+        sctx.drawImage(coverImg, (W - dw) / 2, (H - dh) / 2, dw, dh, 0, 0, sc.width, sc.height);
+        // logo 区域约模板坐标 x 40~250、y 30~95，按同比例采样
+        const d = sctx.getImageData(0, 0, Math.round((300 * 250) / W), Math.round((sc.height * 95) / H)).data;
+        let sum = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          sum += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+        }
+        const luma = sum / (d.length / 4);
+        return luma > 150 ? '#111827' : '#ffffff';
+      } catch {
+        return '#ffffff';
+      }
+    })();
+    // 注入背景层：优先真实封面（铺满 A3 画板居中裁切）；无封面时用深色底填充。
+    // 模板中的设计稿背景大图已剔除，插入到裁剪分组内避免封面溢出画板
+    const bgLayer = coverDataUrl
+      ? `<image width="1190.55" height="841.89" preserveAspectRatio="xMidYMid slice" href="${coverDataUrl}" xlink:href="${coverDataUrl}"/>`
+      : `<rect width="1190.55" height="841.89" fill="#1a1d23"/>`;
+    if (template) {
+      template = template.replace(
+        /<g style="clip-path: url\(#clippath\);">/u,
+        (m0) => m0 + bgLayer
+      );
+      // 左上角 logo（图标+字标为单一 path，模板无 fill 默认黑色）注入自适应颜色
+      template = template.replace(
+        /<path d="M74\.93,63\.57/u,
+        `<path fill="${logoFill}" d="M74.93,63.57`
+      );
+    }
+    const fontStack = "'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', Arial, sans-serif";
+    // 标题区（原模板 y 574~599，白字，实测字号约 32）：蓝色方块标记 + 标题文字
+    const titleBaseY = 600;
+    const titleSvg =
+      `<rect x="21.47" y="${titleBaseY - 27}" width="27.28" height="27.28" style="fill: #3554f4; opacity: .87;"/>` +
+      titleLines
+        .map(
+          (line, idx) =>
+            `<text x="62" y="${titleBaseY + idx * 44}" fill="#ffffff" font-size="32" font-weight="800" font-family="${fontStack}">${safe(line)}</text>`
+        )
+        .join('\n  ');
+    // 简介区（原模板 y 638~717，实测字号约 24，行距约 40，深色字适配底部白色渐隐）
+    const introStartY = titleLines.length > 1 ? 692 : 664;
+    const introSvg = introLines
+      .map(
+        (line, idx) =>
+          `<text x="62" y="${introStartY + idx * 40}" fill="#1f2937" font-size="24" font-family="${fontStack}">${safe(line)}</text>`
+      )
+      .join('\n  ');
+    // 二维码白卡（原模板位置 978,555 尺寸 171×171）：真实二维码替换模板占位灰块
+    const qrCardCenterX = 978.12 + 171.54 / 2;
+    const qrCardSvg = qrSvg
       ? `
-  <rect x="984" y="438" width="134" height="134" rx="12" fill="#ffffff"/>
-  <g transform="translate(991, 445)"><svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="${qrViewBox}"${qrSvg.slice('<svg'.length)}</g>`
+  <g>
+    <rect x="978.12" y="555.08" width="171.54" height="171.54" rx="4.77" fill="#ffffff"/>
+    <g transform="translate(987.65, 564.61)"><svg xmlns="http://www.w3.org/2000/svg" width="152.48" height="152.48" viewBox="${qrViewBox}"${qrSvg.slice('<svg'.length)}</g>
+    <text x="${qrCardCenterX}" y="757" text-anchor="middle" fill="#4b5563" font-size="22" font-family="${fontStack}">扫码浏览作品</text>
+    <text x="${qrCardCenterX}" y="800" text-anchor="middle" fill="#111827" font-size="28" font-weight="800" font-family="${fontStack}">@${safe(authorLine)}</text>
+  </g>`
       : '';
-    const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <defs>
-    <linearGradient id="pageBg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#09090b"/>
-      <stop offset="100%" stop-color="#0f172a"/>
-    </linearGradient>
-    <linearGradient id="heroBg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#111827"/>
-      <stop offset="100%" stop-color="#27272a"/>
-    </linearGradient>
-    <linearGradient id="heroMask" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="rgba(0,0,0,0.15)"/>
-      <stop offset="100%" stop-color="rgba(0,0,0,0.70)"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#22c55e"/>
-      <stop offset="100%" stop-color="#16a34a"/>
-    </linearGradient>
-    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="12" stdDeviation="20" flood-color="#000000" flood-opacity="0.35"/>
-    </filter>
-  </defs>
-  <rect width="1200" height="630" fill="url(#pageBg)"/>
-  <rect x="40" y="40" width="1120" height="550" rx="28" fill="#111827" stroke="rgba(255,255,255,0.12)" filter="url(#softShadow)"/>
-  <rect x="76" y="76" width="1048" height="298" rx="22" fill="url(#heroBg)"/>
-  <rect x="76" y="76" width="1048" height="298" rx="22" fill="url(#heroMask)"/>
-  <rect x="104" y="102" width="240" height="36" rx="18" fill="url(#accent)"/>
-  <text x="224" y="126" text-anchor="middle" fill="#052e16" font-size="16" font-family="Arial, sans-serif" font-weight="700">${safe(locationLine)}</text>
-  ${honorSvg}
-  <text x="104" y="282" fill="#ffffff" font-size="56" font-family="Arial, sans-serif" font-weight="700">${safe(title)}</text>
-  <text x="104" y="326" fill="#e4e4e7" font-size="25" font-family="Arial, sans-serif">${safe(intro)}</text>
-  <rect x="76" y="398" width="1048" height="132" rx="18" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)"/>
-  <rect x="104" y="430" width="128" height="30" rx="15" fill="rgba(50,240,140,0.14)" stroke="rgba(50,240,140,0.36)"/>
-  <text x="168" y="450" text-anchor="middle" fill="#86efac" font-size="14" font-family="Arial, sans-serif">${safe(categoryLine)}</text>
-  ${tagSvg}
-  <text x="104" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">${safe(teamLabel)} ${safe(String(teamMembers.length || 0))}</text>
-  <text x="372" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">${safe(submitLabel)} ${safe(createdAtText)}</text>
-  <text x="710" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">${safe(likeLabel)} ${safe(String(work.likes || 0))}</text>
-  <text x="860" y="500" fill="#a1a1aa" font-size="17" font-family="Arial, sans-serif">Views：${safe(String(viewsCount || 0))}</text>
-  <text x="76" y="574" fill="#64748b" font-size="16" font-family="Arial, sans-serif">${safe(truncate(currentPageUrl, 56))}</text>
-  <text x="968" y="574" text-anchor="end" fill="#22c55e" font-size="18" font-family="Arial, sans-serif" font-weight="700">${safe(siteTitle)} · ${safe(authorLine)}</text>
-  ${qrBlockSvg}
-</svg>`;
+    // 将动态内容叠加到模板上；模板加载失败时降级为纯色底
+    const baseSvg =
+      template ||
+      `<svg xmlns="http://www.w3.org/2000/svg" width="1190.55" height="841.89" viewBox="0 0 1190.55 841.89"><rect width="1190.55" height="841.89" fill="#0b1c3f"/></svg>`;
+    const svg = baseSvg.replace(
+      '</svg>',
+      `\n  ${titleSvg}\n  ${introSvg}\n  ${qrCardSvg}\n</svg>`
+    );
     setShareImageUrl(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`);
     setIsShareGenerating(false);
   };
@@ -438,6 +501,61 @@ export function WorkDetailView() {
     }
   };
 
+  const handlePrintPoster = () => {
+    if (!shareImageUrl || !work) return;
+    // 创建打印窗口，A3 横版尺寸
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${work.name} - TRAE 创造力大赛</title>
+          <style>
+            @page {
+              size: A3 landscape;
+              margin: 0;
+            }
+            body {
+              margin: 0;
+              padding: 0;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+              background: #f3f4f6;
+            }
+            img {
+              max-width: 100%;
+              max-height: 100vh;
+              object-fit: contain;
+            }
+            @media print {
+              body {
+                background: white;
+              }
+              img {
+                max-width: none;
+                max-height: none;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <img src="${shareImageUrl}" alt="${work.name}" />
+          <script>
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+              }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
   const handleSystemShare = async () => {
     if (!work || !currentPageUrl) return;
     if (navigator.share) {
@@ -460,14 +578,15 @@ export function WorkDetailView() {
     const image = new Image();
     image.onload = () => {
       const canvas = document.createElement('canvas');
-      canvas.width = 1200;
-      canvas.height = 630;
+      // 与模板 viewBox 同比例（1190.55×841.89 即 A3 横版，约 96dpi）
+      canvas.width = 1191;
+      canvas.height = 842;
       const context = canvas.getContext('2d');
       if (!context) return;
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
       const downloadUrl = canvas.toDataURL('image/png');
       const link = document.createElement('a');
-      const fileName = `${work.name || 'work'}-share-card`.replace(/[\\/:*?"<>|]+/g, '-');
+      const fileName = `${work.name || 'work'}-poster`.replace(/[\\/:*?"<>|]+/g, '-');
       link.href = downloadUrl;
       link.download = `${fileName}.png`;
       link.click();
@@ -851,7 +970,7 @@ export function WorkDetailView() {
           <div className="space-y-4">
             <div className="rounded-xl border border-zinc-700 bg-gradient-to-br from-zinc-900 to-zinc-950 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
               {shareImageUrl ? (
-                <img src={shareImageUrl} alt={t('sharePreviewAlt')} className="w-full aspect-[1200/630] object-cover" />
+                <img src={shareImageUrl} alt={t('sharePreviewAlt')} className="w-full aspect-[1190.55/841.89] object-cover" />
               ) : (
                 <div className="h-56 flex flex-col items-center justify-center gap-3 text-zinc-500">
                   {isShareGenerating ? (
@@ -874,6 +993,10 @@ export function WorkDetailView() {
             <Button variant="secondary" className="gap-2 bg-white/10 text-white border-white/10" onClick={handleDownloadShareImage} disabled={!shareImageUrl || isShareGenerating}>
               <Download className="w-4 h-4" />
               {t('downloadImage')}
+            </Button>
+            <Button variant="outline" className="gap-2 border-white/20 text-white hover:bg-white/10" onClick={handlePrintPoster} disabled={!shareImageUrl || isShareGenerating}>
+              <Printer className="w-4 h-4" />
+              {t('printPoster') || '打印海报'}
             </Button>
             <Button variant="outline" className="gap-2 border-white/20 text-white hover:bg-white/10" onClick={handleCopyLink}>
               {shareActionDone === 'copied' ? <Check className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
