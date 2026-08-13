@@ -131,11 +131,13 @@ export default function Page() {
   ];
 
   return (
-    <div className="space-y-8">
+    <>
+      {/* Banner 移出 space-y 包裹层，以便抵住顶栏并铺满视口宽度 */}
       <HeroBanner />
-
-      {/* ── FILTER TOOLBAR ── */}
-      <div id="projects" className="space-y-4">
+      <div className="mt-8 space-y-8">
+        {/* ── FILTER TOOLBAR ── */}
+      {/* scroll-mt 预留 sticky 顶栏高度，避免跳转后筛选栏被遮挡 */}
+      <div id="projects" className="scroll-mt-20 space-y-4">
         {/* Row 1: Search (left) + Sort (right) */}
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           {/* Search — takes up remaining space */}
@@ -354,6 +356,7 @@ export default function Page() {
           <ArrowUp className="w-5 h-5" />
         </button>
       )}
-    </div>
+      </div>
+    </>
   );
 }

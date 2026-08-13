@@ -1,100 +1,86 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import { DottedGlowBackground } from "@/components/ui/dotted-glow-background";
+import React from "react";
 import { useTranslations, useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
+/**
+ * 首页 Banner：设计稿原图（含标题/标语，仅剔除静态按钮图形）横向铺满浏览器宽度。
+ * 背景图为设计稿 SVG 光栅化产物，见 public/images/banner-bg.jpg（viewBox 979.42×419.75，21:9）。
+ * 两个真实交互按钮按设计稿按钮坐标（百分比）绝对定位叠加，还原原位点击体验。
+ */
+
+// 设计稿按钮坐标（viewBox 979.42×419.75）换算为百分比
+const SUBMIT_BTN = { left: 330.91 / 979.42, top: 297.85 / 419.75, width: 171.07 / 979.42, height: 43.38 / 419.75 };
+const BROWSE_BTN = { left: 524.03 / 979.42, top: 297.85 / 419.75, width: 124.57 / 979.42, height: 43.38 / 419.75 };
+
 export function HeroBanner() {
-  const [isHovering, setIsHovering] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
   const t = useTranslations('Home');
   const locale = useLocale();
   const router = useRouter();
   const { data: session } = useSession();
 
   const handleSubmitClick = () => {
-    if (session) {
-      router.push(`/${locale}/submit`);
-    } else {
-      router.push(`/${locale}/sign-in`);
-    }
+    // 未登录先去登录，登录后回到提交页
+    router.push(session ? `/${locale}/submit` : `/${locale}/sign-in`);
   };
 
   return (
     <section
-      ref={containerRef}
-      className="relative rounded-2xl md:rounded-3xl p-6 md:p-10 lg:p-16 text-white overflow-hidden border border-white/15 shadow-2xl"
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
+      className="relative w-screen overflow-hidden -mt-8"
+      style={{ marginLeft: 'calc(50% - 50vw)' }}
     >
-      <div className="absolute inset-0 z-0" style={{ background: '#0d1117' }} />
+      {/* 标题/标语都在设计稿图内，仅对屏幕阅读器提供语义 */}
+      <h1 className="sr-only">{t('heroTitle')}</h1>
 
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background: 'linear-gradient(135deg,rgba(0,0,0,0.75) 0%,rgba(0,0,0,0.3) 50%,rgba(50,240,140,0.05) 100%)'
-        }}
-      />
+      {/* 背景图横向铺满：容器保持设计稿 979.42×419.75（21:9）比例，图片不裁切不变形 */}
+      <div className="relative aspect-[979.42/419.75]">
+        <img
+          src="/images/banner-bg.jpg"
+          alt={t('heroTitle')}
+          className="absolute inset-0 h-full w-full object-fill"
+        />
 
-      <div className="relative z-10 max-w-2xl">
-        <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium mb-4 md:mb-6" style={{ backgroundColor: 'rgba(50, 240, 140, 0.1)', borderColor: 'rgba(50, 240, 140, 0.2)', border: '1px solid', color: '#32F08C' }}>
-          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#32F08C' }} />
-          {t('heroBadge') || '在这里，看见全国各地用户的 TRAE 创作作品'}
-        </div>
+        {/* 底部黑色渐变：平滑过渡到下方作品区，避免硬切边 */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-[26%] pointer-events-none"
+          style={{ background: 'linear-gradient(to bottom, transparent, var(--background))' }}
+        />
 
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-5 tracking-tight leading-tight">
-          {t('heroTitle')}{' '}
-          <span style={{ color: '#32F08C' }}>TRAE</span>
-        </h1>
+        {/* 真实按钮：提交我的作品（覆盖设计稿紫色按钮位） */}
+        <button
+          onClick={handleSubmitClick}
+          className="absolute flex items-center justify-center gap-[0.4em] rounded-full font-bold text-white transition-all hover:brightness-110 hover:scale-[1.04] text-[clamp(11px,1.5vw,24px)]"
+          style={{
+            left: `${SUBMIT_BTN.left * 100}%`,
+            top: `${SUBMIT_BTN.top * 100}%`,
+            width: `${SUBMIT_BTN.width * 100}%`,
+            height: `${SUBMIT_BTN.height * 100}%`,
+            background: '#4b3fe3',
+            // 还原设计稿按钮下方的绿色底板层（偏移约 4 单位）+ 发光
+            boxShadow: '0 4px 0 0 #32f08e, 0 10px 24px rgba(50, 240, 142, 0.55)',
+          }}
+        >
+          {t('submitWork')}
+          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
 
-        <p className="text-base md:text-lg text-zinc-400 mb-6 md:mb-8 max-w-lg leading-relaxed">
-          {t('heroSubtitle1')}{' '}
-          <span className="font-semibold text-zinc-200">{t('heroSubtitleTRAE')}</span>.{' '}
-          {t('heroSubtitle2')}{' '}
-          <span className="font-semibold text-zinc-200">{t('heroSubtitleFriends')}</span>.
-        </p>
-
-        <div className="flex flex-col sm:flex-row flex-wrap gap-3">
-          <button
-            onClick={handleSubmitClick}
-            className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-bold text-sm text-black flex items-center justify-center gap-2 transition-all hover:opacity-90"
-            style={{ background: '#32F08C', boxShadow: '0 0 20px rgba(50, 240, 140, 0.3)' }}
-          >
-            {t('submitWork')}
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-          </button>
-          <a
-            href="#projects"
-            className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-semibold text-sm text-zinc-300 border border-white/10 bg-white/5 hover:bg-white/10 transition-all backdrop-blur-md text-center"
-          >
-            {t('browseWork')}
-          </a>
-        </div>
+        {/* 真实按钮：浏览作品（覆盖设计稿藏青按钮位，锚点滚动到作品列表） */}
+        <a
+          href="#projects"
+          className="absolute flex items-center justify-center rounded-full font-bold text-white transition-all hover:brightness-125 hover:scale-[1.04] text-[clamp(11px,1.5vw,24px)]"
+          style={{
+            left: `${BROWSE_BTN.left * 100}%`,
+            top: `${BROWSE_BTN.top * 100}%`,
+            width: `${BROWSE_BTN.width * 100}%`,
+            height: `${BROWSE_BTN.height * 100}%`,
+            background: '#000335',
+          }}
+        >
+          {t('browseWork')}
+        </a>
       </div>
-
-      <div
-        className="absolute top-1/2 right-0 pointer-events-none z-0"
-        style={{ width: 600, height: 600, background: 'radial-gradient(circle, rgba(50,240,140,0.08) 0%, transparent 70%)', transform: 'translate(30%, -50%)' }}
-      />
-
-      <DottedGlowBackground
-        className="pointer-events-none"
-        opacity={0.8}
-        gap={10}
-        radius={1.6}
-        colorLightVar="--color-neutral-500"
-        glowColorLightVar="--color-neutral-600"
-        colorDarkVar="--color-neutral-500"
-        glowColorDarkVar="--color-sky-800"
-        highlightColor="#32F08C"
-        highlightPercentage={0.08}
-        backgroundOpacity={0}
-        speedMin={0.3}
-        speedMax={1.6}
-        speedScale={isHovering ? 1.5 : 0.5}
-      />
     </section>
   );
 }

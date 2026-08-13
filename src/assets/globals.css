@@ -116,6 +116,10 @@
   * {
     @apply border-border;
   }
+  /* 锚点跳转（如 Banner 的“浏览作品”）平滑滚动 */
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
   }
