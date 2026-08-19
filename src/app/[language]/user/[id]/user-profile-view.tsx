@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
-import { User, Sparkles, Pencil, Eye, ThumbsUp } from 'lucide-react'
+import { User, Sparkles, Pencil, Eye, ThumbsUp, ArrowLeft } from 'lucide-react'
 import { Link } from '@/lib/language/navigation'
 
 interface PublicWork {
@@ -35,7 +35,29 @@ export function UserProfileView() {
   const t = useTranslations('UserProfile')
   const locale = useLocale()
   const params = useParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const id = params?.id as string
+
+  // Build current URL (with query) for passing as `from` param
+  const currentListHref = (() => {
+    const query = searchParams.toString()
+    return query ? `${pathname}?${query}` : pathname
+  })()
+
+  // Back button: use `from` param if available, otherwise fallback
+  const backHref = (() => {
+    const from = searchParams.get('from')
+    if (from && from.startsWith('/')) return from
+    return `/${locale}`
+  })()
+
+  const backLabel = (() => {
+    const from = searchParams.get('from')
+    if (from && from.includes('/rankings')) return t('backRankings')
+    return t('back')
+  })()
 
   const [profile, setProfile] = useState<PublicProfile | null>(null)
   const [works, setWorks] = useState<PublicWork[]>([])
@@ -107,6 +129,16 @@ export function UserProfileView() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      {/* ── Back Button ── */}
+      <button
+        type="button"
+        onClick={() => router.push(backHref)}
+        className="inline-flex items-center text-gray-400 hover:text-primary transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        {backLabel}
+      </button>
+
       {/* ── Profile Hero Card (无 Banner, inline stats) ── */}
       <section className="rounded-3xl border border-white/10 bg-card/80 backdrop-blur-md p-6 md:p-8">
         {/* 上半：头像 + 用户名 + 操作按钮 */}
@@ -175,7 +207,7 @@ export function UserProfileView() {
             {works.map((work) => (
               <Link
                 key={work.id}
-                href={`/works/${work.id}`}
+                href={`/works/${work.id}?from=${encodeURIComponent(currentListHref)}`}
                 className="group flex flex-col rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(50,240,140,0.2)] hover:border-green-500/35"
                 style={{ background: '#111318' }}
               >

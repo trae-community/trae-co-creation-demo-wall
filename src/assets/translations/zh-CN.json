@@ -312,6 +312,8 @@
   },
   "UserProfile": {
     "title": "用户主页",
+    "back": "返回",
+    "backRankings": "返回排行",
     "works": "作品",
     "views": "浏览",
     "likes": "点赞",

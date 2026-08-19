@@ -285,7 +285,7 @@ export default function RankingsPage() {
       { icon: Eye, label: t('views'), value: work.views },
       { icon: ThumbsUp, label: t('likes'), value: work.likes },
     ],
-    onClick: () => router.push(`/${locale}/works/${work.id}`),
+    onClick: () => router.push(`/${locale}/works/${work.id}?from=${encodeURIComponent(`/${locale}/rankings`)}`),
   })
 
   const creatorPodiumItem = (creator: CreatorRankingItem): PodiumItem => ({
@@ -297,7 +297,7 @@ export default function RankingsPage() {
       { icon: Eye, label: t('totalViews'), value: creator.totalViews },
       { icon: ThumbsUp, label: t('totalLikes'), value: creator.totalLikes },
     ],
-    onClick: () => router.push(`/${locale}/user/${creator.userId}`),
+    onClick: () => router.push(`/${locale}/user/${creator.userId}?from=${encodeURIComponent(`/${locale}/rankings`)}`),
   })
 
   // ── Sorted data ──
@@ -526,7 +526,7 @@ export default function RankingsPage() {
             sortedWorks.slice(3).map((work, idx) => (
               <div
                 key={work.id}
-                onClick={() => router.push(`/${locale}/works/${work.id}`)}
+                onClick={() => router.push(`/${locale}/works/${work.id}?from=${encodeURIComponent(`/${locale}/rankings`)}`)}
                 className={cn(
                   "rounded-xl border p-4 flex items-center gap-4 transition-all hover:border-white/10 cursor-pointer group",
                   rankRowBg(idx + 3)
@@ -549,7 +549,7 @@ export default function RankingsPage() {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-white truncate group-hover:text-primary transition-colors">{work.title}</p>
-                  <p className="text-xs text-zinc-500 mt-0.5">{t('author')}: <Link href={`/user/${work.author.id}`} onClick={(e) => e.stopPropagation()} className="hover:text-primary transition-colors">{work.author.name}</Link></p>
+                  <p className="text-xs text-zinc-500 mt-0.5">{t('author')}: <Link href={`/user/${work.author.id}?from=${encodeURIComponent(`/${locale}/rankings`)}`} onClick={(e) => e.stopPropagation()} className="hover:text-primary transition-colors">{work.author.name}</Link></p>
                 </div>
 
                 {/* Stats */}
@@ -633,7 +633,7 @@ export default function RankingsPage() {
               {(data?.trendingWorks || []).map((work, idx) => (
                 <div
                   key={work.id}
-                  onClick={() => router.push(`/${locale}/works/${work.id}`)}
+                  onClick={() => router.push(`/${locale}/works/${work.id}?from=${encodeURIComponent(`/${locale}/rankings`)}`)}
                   className={cn(
                     "rounded-xl border p-4 flex items-center gap-4 transition-all hover:border-white/10 cursor-pointer group",
                     rankRowBg(idx)

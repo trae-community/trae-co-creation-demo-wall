@@ -314,6 +314,8 @@
   },
   "UserProfile": {
     "title": "User Profile",
+    "back": "Back",
+    "backRankings": "Back to Rankings",
     "works": "Works",
     "views": "Views",
     "likes": "Likes",
