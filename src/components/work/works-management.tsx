@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
-import { Edit, Trash2, Eye, ThumbsUp, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search, Inbox, Ban } from 'lucide-react'
+import { Edit, Trash2, Eye, ThumbsUp, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search, Inbox, Ban, Clock } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -95,6 +95,7 @@ interface WorkItem {
     contactPhone: string | null
     contactEmail: string | null
   } | null
+  lastAuditReason?: string | null
 }
 
 interface DictItem {
@@ -160,6 +161,7 @@ export function WorksManagement({
     cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [],
   })
   const [selectedDate, setSelectedDate] = useState('')
+  const [sortBy, setSortBy] = useState<'time' | 'likes' | 'views'>('time')
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 10
   
@@ -279,6 +281,7 @@ export function WorksManagement({
       if (filters.honors.length) params.append('honor', filters.honors[0])
       if (filters.auditStatuses.length) params.append('auditStatus', filters.auditStatuses[0])
       if (selectedDate) params.append('date', selectedDate)
+      if (sortBy !== 'time') params.append('sort', sortBy)
 
       const res = await fetch(`/api/console/works?${params.toString()}`)
       if (res.ok) {
@@ -296,7 +299,7 @@ export function WorksManagement({
     } finally {
       setIsLoading(false)
     }
-  }, [currentPage, pageSize, searchTerm, showFeedback, userId, filters, selectedDate])
+  }, [currentPage, pageSize, searchTerm, showFeedback, userId, filters, selectedDate, sortBy])
 
   // Initial fetch
   useEffect(() => {
@@ -307,7 +310,7 @@ export function WorksManagement({
   // Reset page when search or filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm, filters, selectedDate])
+  }, [searchTerm, filters, selectedDate, sortBy])
 
   // Handlers
   const handleEdit = async (work: WorkItem) => {
@@ -476,7 +479,8 @@ export function WorksManagement({
       : '0'
     setAuditTargetIds([work.id])
     setSelectedAuditStatus(status)
-    setAuditReason('') // Reset reason
+    // Pre-fill with previous audit reason if exists
+    setAuditReason(work.lastAuditReason || '')
     setIsAuditDialogOpen(true)
   }
 
@@ -655,14 +659,39 @@ export function WorksManagement({
             />
           </div>
 
-          {/* Date picker — 自定义日历弹窗，与首页一致；独立放置用 outline 风格 */}
-          <DatePicker
-            value={selectedDate}
-            onChange={setSelectedDate}
-            placeholder="日期"
-            variant="outline"
-            className="shrink-0"
-          />
+          {/* Sort tabs + Date picker — 与首页统一风格 */}
+          <div className="flex items-center rounded-lg border border-border p-0.5 gap-0.5 shrink-0">
+            {[
+              { key: 'time' as const, icon: <Clock className="w-3 h-3" />, label: '最新' },
+              { key: 'likes' as const, icon: <ThumbsUp className="w-3 h-3" />, label: '点赞' },
+              { key: 'views' as const, icon: <Eye className="w-3 h-3" />, label: '热门' },
+            ].map(({ key, icon, label }) => (
+              <button
+                key={key}
+                onClick={() => setSortBy(key)}
+                className={cn(
+                  "flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
+                  sortBy === key
+                    ? "bg-primary/10 text-primary border-primary/20"
+                    : "text-muted-foreground border-transparent hover:text-foreground hover:bg-secondary"
+                )}
+              >
+                {icon}
+                <span className="hidden sm:inline">{label}</span>
+              </button>
+            ))}
+
+            {/* Divider */}
+            <div className="w-px h-4 bg-border mx-0.5" />
+
+            {/* Date picker */}
+            <DatePicker
+              value={selectedDate}
+              onChange={setSelectedDate}
+              placeholder="日期"
+              className="shrink-0"
+            />
+          </div>
         </div>
 
         {/* CityFilter — 与首页统一交互，内置重置按钮 */}
@@ -672,7 +701,7 @@ export function WorksManagement({
           auditStatusOptions={auditStatuses.map(s => ({ label: s.itemLabel, value: s.itemValue }))}
           showReset
           searchTerm={searchTerm}
-          onReset={() => { setSearchTerm(''); setSelectedDate('') }}
+          onReset={() => { setSearchTerm(''); setSelectedDate(''); setSortBy('time') }}
         />
       </div>
 
@@ -847,6 +876,14 @@ export function WorksManagement({
                     <p className="text-sm text-muted-foreground mt-2 line-clamp-2" title={work.summary}>
                       {work.summary}
                     </p>
+                  )}
+
+                  {/* Audit rejection reason */}
+                  {work.statistic && work.statistic.auditStatus !== 1 && work.lastAuditReason && (
+                    <div className="mt-2 flex items-start gap-1.5 text-xs text-red-400/90 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                      <span className="shrink-0 font-medium">审核意见:</span>
+                      <span className="line-clamp-2">{work.lastAuditReason}</span>
+                    </div>
                   )}
                 </div>
 

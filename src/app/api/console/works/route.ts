@@ -60,6 +60,7 @@ export async function GET(req: NextRequest) {
     const countryCode = searchParams.get('country');
     const honorCode = searchParams.get('honor');
     const auditStatus = searchParams.get('auditStatus');
+    const sort = searchParams.get('sort') || 'newest'; // newest, likes, views
 
     // 构建过滤条件
     const whereFilters: Prisma.WorkBaseWhereInput[] = [];
@@ -105,6 +106,14 @@ export async function GET(req: NextRequest) {
     const whereClause = whereFilters.length ? { AND: whereFilters } : undefined;
     const skip = (Math.max(page, 1) - 1) * Math.max(pageSize, 1);
     const take = Math.max(pageSize, 1);
+
+    // 排序逻辑
+    let orderBy: Prisma.WorkBaseOrderByWithRelationInput = { createdAt: 'desc' };
+    if (sort === 'likes') {
+      orderBy = { statistic: { likeCount: 'desc' } };
+    } else if (sort === 'views') {
+      orderBy = { statistic: { viewCount: 'desc' } };
+    }
 
     // 查询总数和数据
     const [total, works] = await Promise.all([
@@ -186,14 +195,40 @@ export async function GET(req: NextRequest) {
             }
           }
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         skip,
         take
       })
     ]);
 
+    // Fetch latest audit reasons for non-approved works
+    const nonApprovedWorkIds = works
+      .filter(w => w.statistic && w.statistic.auditStatus !== 1)
+      .map(w => w.id);
+
+    let auditReasonMap: Record<string, string> = {};
+    if (nonApprovedWorkIds.length > 0) {
+      const auditLogs = await prisma.workAuditLog.findMany({
+        where: { workId: { in: nonApprovedWorkIds } },
+        orderBy: { createdAt: 'desc' },
+      });
+      // Keep only the latest log per work
+      for (const log of auditLogs) {
+        const wid = log.workId.toString();
+        if (!auditReasonMap[wid] && log.reason) {
+          auditReasonMap[wid] = log.reason;
+        }
+      }
+    }
+
+    // Attach lastAuditReason to each work
+    const enrichedWorks = works.map(work => ({
+      ...work,
+      lastAuditReason: auditReasonMap[work.id.toString()] || null,
+    }));
+
     return NextResponse.json({
-      items: sanitize(works),
+      items: sanitize(enrichedWorks),
       total,
       page: Math.max(page, 1),
       pageSize: Math.max(pageSize, 1)
