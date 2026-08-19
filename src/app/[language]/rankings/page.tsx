@@ -395,20 +395,21 @@ export default function RankingsPage() {
       </div>
 
       {/* ── Main Tabs ── */}
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
         {mainTabs.map(({ key, icon: Icon, label }) => (
           <button
             key={key}
             onClick={() => handleMainTab(key)}
             className={cn(
-              "flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border transition-all",
+              "flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium border transition-all",
               mainTab === key
                 ? "bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold border-transparent shadow-[0_0_12px_rgba(50,240,140,0.25)]"
                 : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
             )}
           >
-            <Icon className="w-4 h-4" />
-            {label}
+            <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">{label}</span>
+            <span className="sm:hidden">{label.slice(0, 2)}</span>
           </button>
         ))}
       </div>
