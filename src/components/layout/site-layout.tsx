@@ -381,7 +381,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-40 bg-gradient-to-r from-transparent via-green-500/50 to-transparent" />
         <div className="container mx-auto px-4 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
           {/* 版权 + 备案 */}
-          <div className="flex items-center gap-2.5 text-xs text-zinc-500">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 text-xs text-zinc-500">
             <span>{tFooter('rights')}</span>
             <span className="w-1 h-1 rounded-full bg-zinc-700 hidden sm:block" />
             <a
@@ -395,7 +395,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* 外链 — 胶囊风格，与导航/筛选 UI 一致 */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
             {[
               { label: tFooter('feedback'), href: 'https://github.com/trae-community/trae-co-creation-demo-wall/issues', icon: MessageSquarePlus },
               { label: tFooter('githubCommunity'), href: 'https://github.com/trae-community', icon: Github },
@@ -408,10 +408,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={label}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-zinc-400 border border-white/10 bg-white/5 hover:text-green-400 hover:border-green-500/30 hover:bg-green-500/10 transition-all"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] text-zinc-400 border border-white/10 bg-white/5 hover:text-green-400 hover:border-green-500/30 hover:bg-green-500/10 transition-all whitespace-nowrap"
               >
-                <Icon className="w-3.5 h-3.5" />
-                {label}
+                <Icon className="w-3 h-3" />
+                <span className="sm:inline">{label}</span>
               </a>
             ))}
           </div>

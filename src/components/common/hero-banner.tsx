@@ -48,17 +48,17 @@ export function HeroBanner() {
           style={{ background: 'linear-gradient(to bottom, transparent, var(--background))' }}
         />
 
-        {/* 真实按钮：提交我的作品（覆盖设计稿紫色按钮位） */}
+        {/* 真实按钮：提交我的作品 + 浏览作品 */}
+        {/* 桌面端：按设计稿百分比绝对定位 */}
         <button
           onClick={handleSubmitClick}
-          className="absolute flex items-center justify-center gap-[0.4em] rounded-full font-bold text-white transition-all hover:brightness-110 hover:scale-[1.04] text-[clamp(11px,1.5vw,24px)]"
+          className="hidden sm:flex absolute items-center justify-center gap-[0.4em] rounded-full font-bold text-white transition-all hover:brightness-110 hover:scale-[1.04] text-[clamp(11px,1.5vw,24px)]"
           style={{
             left: `${SUBMIT_BTN.left * 100}%`,
             top: `${SUBMIT_BTN.top * 100}%`,
             width: `${SUBMIT_BTN.width * 100}%`,
             height: `${SUBMIT_BTN.height * 100}%`,
             background: '#4b3fe3',
-            // 还原设计稿按钮下方的绿色底板层（偏移约 4 单位）+ 发光
             boxShadow: '0 4px 0 0 #32f08e, 0 10px 24px rgba(50, 240, 142, 0.55)',
           }}
         >
@@ -66,10 +66,9 @@ export function HeroBanner() {
           <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </button>
 
-        {/* 真实按钮：浏览作品（覆盖设计稿藏青按钮位，锚点滚动到作品列表） */}
         <a
           href="#projects"
-          className="absolute flex items-center justify-center rounded-full font-bold text-white transition-all hover:brightness-125 hover:scale-[1.04] text-[clamp(11px,1.5vw,24px)]"
+          className="hidden sm:flex absolute items-center justify-center rounded-full font-bold text-white transition-all hover:brightness-125 hover:scale-[1.04] text-[clamp(11px,1.5vw,24px)]"
           style={{
             left: `${BROWSE_BTN.left * 100}%`,
             top: `${BROWSE_BTN.top * 100}%`,
@@ -80,6 +79,28 @@ export function HeroBanner() {
         >
           {t('browseWork')}
         </a>
+
+        {/* 移动端：底部居中，自然尺寸 */}
+        <div className="sm:hidden absolute bottom-[14%] left-0 right-0 flex items-center justify-center gap-2 px-4">
+          <button
+            onClick={handleSubmitClick}
+            className="flex items-center justify-center gap-1 rounded-full font-bold text-white text-xs px-4 py-2 transition-all active:scale-95"
+            style={{
+              background: '#4b3fe3',
+              boxShadow: '0 3px 0 0 #32f08e, 0 8px 20px rgba(50, 240, 142, 0.45)',
+            }}
+          >
+            {t('submitWork')}
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+          <a
+            href="#projects"
+            className="flex items-center justify-center rounded-full font-bold text-white text-xs px-4 py-2 transition-all active:scale-95"
+            style={{ background: '#000335' }}
+          >
+            {t('browseWork')}
+          </a>
+        </div>
       </div>
     </section>
   );
