@@ -163,6 +163,14 @@ export const countryCityItems: Array<{
   },
   {
     "dictCode": "city",
+    "itemLabel": "线下活动",
+    "itemValue": "OFFLINE",
+    "parentValue": "TRAECC",
+    "sortOrder": 1,
+    "status": true
+  },
+  {
+    "dictCode": "city",
     "itemLabel": "芜湖",
     "itemValue": "340200",
     "parentValue": "AH",
@@ -3411,10 +3419,18 @@ export const countryCityItems: Array<{
   },
   {
     "dictCode": "country",
+    "itemLabel": "Trae创造力大赛",
+    "itemValue": "TRAECC",
+    "parentValue": null,
+    "sortOrder": -2,
+    "status": true
+  },
+  {
+    "dictCode": "country",
     "itemLabel": "校园",
     "itemValue": "UNIV",
     "parentValue": null,
-    "sortOrder": 100,
+    "sortOrder": -1,
     "status": true
   },
 ];
