@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { WorkCard } from "@/components/work/work-card";
 import { CityFilter, FilterState } from "@/components/work/city-filter";
-import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight, SearchX, X, ArrowUp } from "lucide-react";
+import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight, SearchX, X } from "lucide-react";
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils";
 import { HeroBanner } from "@/components/common/hero-banner";
@@ -47,16 +47,6 @@ export default function Page() {
       prevPageRef.current = page;
     }
   }, [page]);
-
-  // 回到顶部按钮显示状态
-  const [showBackToTop, setShowBackToTop] = useState(false);
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 400);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     if (!hasMountedRef.current) {
@@ -344,18 +334,6 @@ export default function Page() {
         </div>
       )}
 
-      {/* 回到顶部浮动按钮 */}
-      {showBackToTop && (
-        <button
-          type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-6 right-6 z-40 w-10 h-10 rounded-full bg-green-500/20 border border-green-500/30 text-green-400 flex items-center justify-center backdrop-blur-md hover:bg-green-500/30 transition-all shadow-lg animate-dropdown-pop"
-          aria-label="回到顶部"
-          title="回到顶部"
-        >
-          <ArrowUp className="w-5 h-5" />
-        </button>
-      )}
       </div>
     </>
   );

@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X, Trophy, Github, Code2, Globe, MessagesSquare, MessageSquarePlus } from "lucide-react";
 import { ParticlesBackground } from "./particles-background";
+import { BackToTop } from "@/components/common/back-to-top";
 import { useSession } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/language/navigation';
@@ -372,6 +373,8 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 container mx-auto px-4 pt-20 pb-8">
         {children}
       </main>
+
+      <BackToTop />
 
       <footer className="relative border-t border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
         {/* 顶部渐变装饰线 — 科技感点缀 */}
