@@ -283,15 +283,13 @@ export function WorkDetailView() {
       const text = value.trim();
       return text.length > max ? `${text.slice(0, max)}...` : text;
     };
-    const title = truncate(work.name || '-', 38);
-    const intro = truncate(work.intro || '-', 84);
+    const title = truncate(work.name || '-', 21);
+    const intro = truncate(work.intro || '-', 87);
     const authorLine = truncate(work.author.name || '-', 20);
-    // 标题超长时拆成两行，避免溢出画面（字号 32 时每行约 18 字）
-    const titleLines = title.length > 18 ? [title.slice(0, 18), title.slice(18)] : [title];
-    // 简介按每行 36 字换行，最多 2 行（字号 24，对齐原设计稿简介区 y 638~717）
+    // 简介按每行 29 字换行，最多 3 行（字号 8，对齐竖版设计稿简介区 y 323~355）
     const introLines: string[] = [];
-    for (let i = 0; i < intro.length && introLines.length < 2; i += 36) {
-      introLines.push(intro.slice(i, i + 36));
+    for (let i = 0; i < intro.length && introLines.length < 3; i += 29) {
+      introLines.push(intro.slice(i, i + 29));
     }
     const safe = (value: string) =>
       value
@@ -321,8 +319,10 @@ export function WorkDetailView() {
     } catch (err) {
       console.error('QR code generation failed:', err);
     }
-    // 加载海报模板（设计稿导出：封面布满 + 底部白色渐隐，动态内容已预剔除）
-    // 模板坐标系 viewBox 0 0 1190.55 841.89（A3 横版 @72dpi）
+    // 加载海报模板（竖版设计稿导出：封面布满 + 底部白色渐隐，动态内容已预剔除）
+    // 模板坐标系 viewBox 0 0 283.46 425.2（竖版 100×150mm @72dpi）
+    const POSTER_W = 283.46;
+    const POSTER_H = 425.2;
     let template = '';
     try {
       const res = await fetch('/images/poster-template.svg');
@@ -330,9 +330,10 @@ export function WorkDetailView() {
     } catch (err) {
       console.error('Poster template load failed:', err);
     }
-    // 将作品封面转为 base64 内嵌进 SVG，保证预览与 canvas 导出不受跨域限制；
-    // 同时返回 Image 元素，供后续采样封面亮度决定 logo 颜色
-    const toDataUrl = (url: string, timeoutMs = 8000): Promise<{ dataUrl: string; img: HTMLImageElement }> =>
+    // 将封面转为 base64 内嵌进 SVG，保证预览与 canvas 导出不受跨域限制。
+    // 始终带 CORS 加载：成功则 canvas 干净可导出；失败（图床未配 CORS 等）
+    // 直接走内置默认背景图兜底，不做无 CORS 重试（重试会污染 canvas 报 SecurityError）
+    const toDataUrl = (url: string, timeoutMs = 8000): Promise<string> =>
       new Promise((resolve, reject) => {
         const img = new Image();
         img.crossOrigin = 'anonymous';
@@ -346,7 +347,7 @@ export function WorkDetailView() {
             const ctx = canvas.getContext('2d');
             if (!ctx) throw new Error('canvas context unavailable');
             ctx.drawImage(img, 0, 0);
-            resolve({ dataUrl: canvas.toDataURL('image/png'), img });
+            resolve(canvas.toDataURL('image/png'));
           } catch (err) {
             reject(err);
           }
@@ -358,93 +359,57 @@ export function WorkDetailView() {
         img.src = url;
       });
     let coverDataUrl = '';
-    let coverImg: HTMLImageElement | null = null;
     if (work.coverUrl) {
       try {
-        const r = await toDataUrl(work.coverUrl);
-        coverDataUrl = r.dataUrl;
-        coverImg = r.img;
-      } catch (err) {
-        console.error('Cover image embedding failed:', err);
+        coverDataUrl = await toDataUrl(work.coverUrl);
+      } catch {
+        // 封面跨域/加载失败：静默回退内置默认背景图（同域资源，canvas 永远干净），
+        // 按作品 id 从 4 套设计稿背景中稳定选取，不打断分享流程
+        const fallbackIdx = ((Number(id) || 0) % 4) + 1;
+        try {
+          coverDataUrl = await toDataUrl(`/images/poster-default-${fallbackIdx}.jpg`);
+        } catch {
+          coverDataUrl = '';
+        }
       }
     }
-    // logo 主题自适应：按 slice 铺满规则模拟裁切，采样左上角 logo 区域的平均亮度，
-    // 亮色封面（如纯白图）用黑 logo，暗色封面用白 logo
-    const logoFill = (() => {
-      if (!coverImg || !coverImg.naturalWidth) return '#ffffff'; // 无封面时底是深色
-      try {
-        const W = 1190.55, H = 841.89;
-        const scale = Math.max(W / coverImg.naturalWidth, H / coverImg.naturalHeight);
-        const dw = coverImg.naturalWidth * scale;
-        const dh = coverImg.naturalHeight * scale;
-        const sc = document.createElement('canvas');
-        sc.width = 300;
-        sc.height = Math.round((300 * H) / W);
-        const sctx = sc.getContext('2d');
-        if (!sctx) return '#ffffff';
-        sctx.drawImage(coverImg, (W - dw) / 2, (H - dh) / 2, dw, dh, 0, 0, sc.width, sc.height);
-        // logo 区域约模板坐标 x 40~250、y 30~95，按同比例采样
-        const d = sctx.getImageData(0, 0, Math.round((300 * 250) / W), Math.round((sc.height * 95) / H)).data;
-        let sum = 0;
-        for (let i = 0; i < d.length; i += 4) {
-          sum += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-        }
-        const luma = sum / (d.length / 4);
-        return luma > 150 ? '#111827' : '#ffffff';
-      } catch {
-        return '#ffffff';
-      }
-    })();
-    // 注入背景层：优先真实封面（铺满 A3 画板居中裁切）；无封面时用深色底填充。
-    // 模板中的设计稿背景大图已剔除，插入到裁剪分组内避免封面溢出画板
+    // 注入背景层：优先真实封面（铺满竖版画板居中裁切）；无封面时用深色底填充。
+    // 模板中的设计稿示例图已剔除，封面插到裁剪分组末尾（设计稿底层色块之后）避免溢出画板
     const bgLayer = coverDataUrl
-      ? `<image width="1190.55" height="841.89" preserveAspectRatio="xMidYMid slice" href="${coverDataUrl}" xlink:href="${coverDataUrl}"/>`
-      : `<rect width="1190.55" height="841.89" fill="#1a1d23"/>`;
+      ? `<image width="${POSTER_W}" height="${POSTER_H}" preserveAspectRatio="xMidYMid slice" href="${coverDataUrl}" xlink:href="${coverDataUrl}"/>`
+      : `<rect width="${POSTER_W}" height="${POSTER_H}" fill="#1a1d23"/>`;
     if (template) {
       template = template.replace(
-        /<g style="clip-path: url\(#clippath\);">/u,
-        (m0) => m0 + bgLayer
-      );
-      // 左上角 logo（图标+字标为单一 path，模板无 fill 默认黑色）注入自适应颜色
-      template = template.replace(
-        /<path d="M74\.93,63\.57/u,
-        `<path fill="${logoFill}" d="M74.93,63.57`
+        /(<g style="clip-path: url\(#clippath\);">[\s\S]*?)(<\/g>)/u,
+        (_m, groupHead, groupClose) => groupHead + bgLayer + groupClose
       );
     }
     const fontStack = "'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', Arial, sans-serif";
-    // 标题区（原模板 y 574~599，白字，实测字号约 32）：蓝色方块标记 + 标题文字
-    const titleBaseY = 600;
+    // 标题区（模板蓝色标题条 y 292.25~310.1 为静态设计元素，白字单行压在条内）
     const titleSvg =
-      `<rect x="21.47" y="${titleBaseY - 27}" width="27.28" height="27.28" style="fill: #3554f4; opacity: .87;"/>` +
-      titleLines
-        .map(
-          (line, idx) =>
-            `<text x="62" y="${titleBaseY + idx * 44}" fill="#ffffff" font-size="32" font-weight="800" font-family="${fontStack}">${safe(line)}</text>`
-        )
-        .join('\n  ');
-    // 简介区（原模板 y 638~717，实测字号约 24，行距约 40，深色字适配底部白色渐隐）
-    const introStartY = titleLines.length > 1 ? 692 : 664;
+      `<text x="24.6" y="304.8" fill="#ffffff" font-size="10" font-weight="800" font-family="${fontStack}">${safe(title)}</text>`;
+    // 简介区（原设计稿 y 323~355，实测字号约 8，行距约 12.3，深色字适配底部白色渐隐）
     const introSvg = introLines
       .map(
         (line, idx) =>
-          `<text x="62" y="${introStartY + idx * 40}" fill="#1f2937" font-size="24" font-family="${fontStack}">${safe(line)}</text>`
+          `<text x="21.9" y="${330.5 + idx * 12.3}" fill="#1f2937" font-size="8" font-weight="700" font-family="${fontStack}">${safe(line)}</text>`
       )
       .join('\n  ');
-    // 二维码白卡（原模板位置 978,555 尺寸 171×171）：真实二维码替换模板占位灰块
-    const qrCardCenterX = 978.12 + 171.54 / 2;
+    // 二维码白卡（原设计稿占位位置 223.19,368.48 尺寸 41.23×43.56）：真实二维码替换模板占位灰块；
+    // 竖版文案在二维码左侧（扫码提示 + @作者）
     const qrCardSvg = qrSvg
       ? `
   <g>
-    <rect x="978.12" y="555.08" width="171.54" height="171.54" rx="4.77" fill="#ffffff"/>
-    <g transform="translate(987.65, 564.61)"><svg xmlns="http://www.w3.org/2000/svg" width="152.48" height="152.48" viewBox="${qrViewBox}"${qrSvg.slice('<svg'.length)}</g>
-    <text x="${qrCardCenterX}" y="757" text-anchor="middle" fill="#4b5563" font-size="22" font-family="${fontStack}">扫码浏览作品</text>
-    <text x="${qrCardCenterX}" y="800" text-anchor="middle" fill="#111827" font-size="28" font-weight="800" font-family="${fontStack}">@${safe(authorLine)}</text>
+    <rect x="223.19" y="368.48" width="41.23" height="43.56" rx="2.47" fill="#ffffff"/>
+    <g transform="translate(225.8, 372.26)"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="${qrViewBox}"${qrSvg.slice('<svg'.length)}</g>
+    <text x="218" y="399" text-anchor="end" fill="#4b5563" font-size="8" font-weight="700" font-family="${fontStack}">扫码浏览作品</text>
+    <text x="218" y="410.5" text-anchor="end" fill="#111827" font-size="9" font-weight="800" font-family="${fontStack}">@${safe(authorLine)}</text>
   </g>`
       : '';
     // 将动态内容叠加到模板上；模板加载失败时降级为纯色底
     const baseSvg =
       template ||
-      `<svg xmlns="http://www.w3.org/2000/svg" width="1190.55" height="841.89" viewBox="0 0 1190.55 841.89"><rect width="1190.55" height="841.89" fill="#0b1c3f"/></svg>`;
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}"><rect width="${POSTER_W}" height="${POSTER_H}" fill="#0b1c3f"/></svg>`;
     const svg = baseSvg.replace(
       '</svg>',
       `\n  ${titleSvg}\n  ${introSvg}\n  ${qrCardSvg}\n</svg>`
@@ -503,7 +468,7 @@ export function WorkDetailView() {
 
   const handlePrintPoster = () => {
     if (!shareImageUrl || !work) return;
-    // 创建打印窗口，A3 横版尺寸
+    // 创建打印窗口，竖版海报（设计稿 100×150mm，2:3）
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
     printWindow.document.write(`
@@ -513,7 +478,7 @@ export function WorkDetailView() {
           <title>${work.name} - TRAE 创造力大赛</title>
           <style>
             @page {
-              size: A3 landscape;
+              size: A3 portrait;
               margin: 0;
             }
             body {
@@ -578,9 +543,9 @@ export function WorkDetailView() {
     const image = new Image();
     image.onload = () => {
       const canvas = document.createElement('canvas');
-      // 与模板 viewBox 同比例（1190.55×841.89 即 A3 横版，约 96dpi）
-      canvas.width = 1191;
-      canvas.height = 842;
+      // 与竖版模板 viewBox 同比例（283.46×425.2 即 2:3，4 倍导出约 144dpi）
+      canvas.width = 1134;
+      canvas.height = 1701;
       const context = canvas.getContext('2d');
       if (!context) return;
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -968,9 +933,9 @@ export function WorkDetailView() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="rounded-xl border border-zinc-700 bg-gradient-to-br from-zinc-900 to-zinc-950 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
+            <div className="rounded-xl border border-zinc-700 bg-gradient-to-br from-zinc-900 to-zinc-950 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)] max-w-[340px] mx-auto">
               {shareImageUrl ? (
-                <img src={shareImageUrl} alt={t('sharePreviewAlt')} className="w-full aspect-[1190.55/841.89] object-cover" />
+                <img src={shareImageUrl} alt={t('sharePreviewAlt')} className="w-full aspect-[283.46/425.2] object-cover" />
               ) : (
                 <div className="h-56 flex flex-col items-center justify-center gap-3 text-zinc-500">
                   {isShareGenerating ? (
