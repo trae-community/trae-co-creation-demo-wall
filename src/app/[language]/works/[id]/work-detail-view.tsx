@@ -330,44 +330,22 @@ export function WorkDetailView() {
     } catch (err) {
       console.error('Poster template load failed:', err);
     }
-    // 将封面转为 base64 内嵌进 SVG，保证预览与 canvas 导出不受跨域限制。
-    // 始终带 CORS 加载：成功则 canvas 干净可导出；失败（图床未配 CORS 等）
-    // 直接走内置默认背景图兜底，不做无 CORS 重试（重试会污染 canvas 报 SecurityError）
-    const toDataUrl = (url: string, timeoutMs = 8000): Promise<string> =>
-      new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        const timer = setTimeout(() => reject(new Error('cover load timeout')), timeoutMs);
-        img.onload = () => {
-          clearTimeout(timer);
-          try {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.naturalWidth;
-            canvas.height = img.naturalHeight;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) throw new Error('canvas context unavailable');
-            ctx.drawImage(img, 0, 0);
-            resolve(canvas.toDataURL('image/png'));
-          } catch (err) {
-            reject(err);
-          }
-        };
-        img.onerror = () => {
-          clearTimeout(timer);
-          reject(new Error('cover load failed'));
-        };
-        img.src = url;
-      });
+    // 通过服务端代理获取封面 base64，彻底绕过浏览器 CORS 限制。
+    // 代理失败时静默回退内置默认背景图（同域资源，canvas 永远干净），
+    // 按作品 id 从 4 套设计稿背景中稳定选取，不打断分享流程。
+    const fetchCoverAsDataUrl = async (url: string): Promise<string> => {
+      const res = await fetch(`/api/cover-proxy?url=${encodeURIComponent(url)}`);
+      if (!res.ok) throw new Error(`proxy returned ${res.status}`);
+      return res.text(); // data:image/...;base64,...
+    };
     let coverDataUrl = '';
     if (work.coverUrl) {
       try {
-        coverDataUrl = await toDataUrl(work.coverUrl);
+        coverDataUrl = await fetchCoverAsDataUrl(work.coverUrl);
       } catch {
-        // 封面跨域/加载失败：静默回退内置默认背景图（同域资源，canvas 永远干净），
-        // 按作品 id 从 4 套设计稿背景中稳定选取，不打断分享流程
         const fallbackIdx = ((Number(id) || 0) % 4) + 1;
         try {
-          coverDataUrl = await toDataUrl(`/images/poster-default-${fallbackIdx}.jpg`);
+          coverDataUrl = await fetchCoverAsDataUrl(`/images/poster-default-${fallbackIdx}.jpg`);
         } catch {
           coverDataUrl = '';
         }
@@ -927,17 +905,17 @@ export function WorkDetailView() {
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="bg-zinc-950 border border-zinc-800 text-white sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>{t('shareCardTitle')}</DialogTitle>
-            <DialogDescription className="text-zinc-400">
+            <DialogTitle className="text-base sm:text-lg pr-8">{t('shareCardTitle')}</DialogTitle>
+            <DialogDescription className="text-zinc-400 text-xs sm:text-sm">
               {t('shareCardDesc')}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="rounded-xl border border-zinc-700 bg-gradient-to-br from-zinc-900 to-zinc-950 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)] max-w-[340px] mx-auto">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="rounded-xl border border-zinc-700 bg-gradient-to-br from-zinc-900 to-zinc-950 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)] max-w-[260px] sm:max-w-[340px] mx-auto">
               {shareImageUrl ? (
                 <img src={shareImageUrl} alt={t('sharePreviewAlt')} className="w-full aspect-[283.46/425.2] object-cover" />
               ) : (
-                <div className="h-56 flex flex-col items-center justify-center gap-3 text-zinc-500">
+                <div className="h-40 sm:h-56 flex flex-col items-center justify-center gap-3 text-zinc-500">
                   {isShareGenerating ? (
                     <>
                       <div className="w-48 h-1.5 rounded-full bg-zinc-800 overflow-hidden">
@@ -949,26 +927,26 @@ export function WorkDetailView() {
                 </div>
               )}
             </div>
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 text-sm text-zinc-300 flex items-center gap-2 break-all">
-              <Link2 className="w-4 h-4 text-zinc-500 shrink-0" />
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-2.5 sm:p-3 text-xs sm:text-sm text-zinc-300 flex items-center gap-2 break-all">
+              <Link2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500 shrink-0" />
               <span>{currentPageUrl}</span>
             </div>
           </div>
-          <DialogFooter className="gap-2">
-            <Button variant="secondary" className="gap-2 bg-white/10 text-white border-white/10" onClick={handleDownloadShareImage} disabled={!shareImageUrl || isShareGenerating}>
-              <Download className="w-4 h-4" />
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="secondary" size="sm" className="gap-1.5 sm:gap-2 bg-white/10 text-white border-white/10 w-full sm:w-auto" onClick={handleDownloadShareImage} disabled={!shareImageUrl || isShareGenerating}>
+              <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               {t('downloadImage')}
             </Button>
-            <Button variant="outline" className="gap-2 border-white/20 text-white hover:bg-white/10" onClick={handlePrintPoster} disabled={!shareImageUrl || isShareGenerating}>
-              <Printer className="w-4 h-4" />
+            <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 border-white/20 text-white hover:bg-white/10 w-full sm:w-auto" onClick={handlePrintPoster} disabled={!shareImageUrl || isShareGenerating}>
+              <Printer className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               {t('printPoster') || '打印海报'}
             </Button>
-            <Button variant="outline" className="gap-2 border-white/20 text-white hover:bg-white/10" onClick={handleCopyLink}>
-              {shareActionDone === 'copied' ? <Check className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
+            <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 border-white/20 text-white hover:bg-white/10 w-full sm:w-auto" onClick={handleCopyLink}>
+              {shareActionDone === 'copied' ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Link2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
               {shareActionDone === 'copied' ? t('copied') : t('copyLink')}
             </Button>
-            <Button className="gap-2" onClick={handleSystemShare}>
-              <Share2 className="w-4 h-4" />
+            <Button size="sm" className="gap-1.5 sm:gap-2 w-full sm:w-auto" onClick={handleSystemShare}>
+              <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               {t('systemShare')}
             </Button>
           </DialogFooter>
@@ -983,7 +961,7 @@ export function WorkDetailView() {
           <button
             type="button"
             onClick={() => setIsImagePreviewOpen(false)}
-            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
             aria-label="关闭"
           >
             <X className="w-5 h-5" />
@@ -994,18 +972,18 @@ export function WorkDetailView() {
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); showPrevPreviewImage(); }}
-                className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
+                className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
                 aria-label="上一张"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); showNextPreviewImage(); }}
-                className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
+                className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
                 aria-label="下一张"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </>
           )}
@@ -1013,13 +991,13 @@ export function WorkDetailView() {
           <img
             src={previewImages[previewImageIndex]}
             alt={`${previewTitle}-${previewImageIndex + 1}`}
-            className="max-w-[90vw] max-h-[90vh] object-contain"
+            className="max-w-[92vw] max-h-[85vh] object-contain"
             onClick={(e) => e.stopPropagation()}
           />
           
           {previewImages.length > 1 && (
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/60 backdrop-blur-md rounded-full px-4 py-2">
-              <span className="text-white text-sm">{previewImageIndex + 1} / {previewImages.length}</span>
+            <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/60 backdrop-blur-md rounded-full px-3 sm:px-4 py-1.5 sm:py-2">
+              <span className="text-white text-xs sm:text-sm">{previewImageIndex + 1} / {previewImages.length}</span>
             </div>
           )}
         </div>
