@@ -84,6 +84,7 @@ model SysUser {
   roles         SysUserRole[]
   auditedLogs   WorkAuditLog[]    @relation("Auditor")
   works         WorkBase[]
+  workPosters   WorkPoster[]
   grantedHonors WorkHonor[]       @relation("GrantedBy")
   likes         WorkLike[]
 
@@ -401,6 +402,35 @@ model Session {
   user         SysUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("session")
+}
+
+/// 海报制作表: 用户快速生成的分享海报记录
+model WorkPoster {
+  /// 主键
+  id          BigInt    @id @default(autoincrement())
+  /// 创建者 ID
+  userId      BigInt    @map("user_id")
+  /// 海报上显示的昵称
+  nickname    String    @db.VarChar(100)
+  /// 作品描述
+  description String?   @db.VarChar(500)
+  /// 上传的作品图片 (COS)
+  imageUrl    String    @map("image_url") @db.VarChar(255)
+  /// 作品 Demo 地址（生成二维码）
+  demoUrl     String    @map("demo_url") @db.VarChar(255)
+  /// 审核状态: 0=待审, 1=通过, 2=拒绝
+  auditStatus Int       @default(0) @map("audit_status")
+  /// 标签 (JSON数组，含免审核标签可跳过审核)
+  tags        Json?
+  /// 创建时间
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  /// 更新时间
+  updatedAt   DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user        SysUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([auditStatus])
+  @@map("work_posters")
 }
 
 model VerificationToken {

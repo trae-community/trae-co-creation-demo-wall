@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X, Trophy, Github, Code2, Globe, MessagesSquare, MessageSquarePlus } from "lucide-react";
+import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X, Trophy, Github, Code2, Globe, MessagesSquare, MessageSquarePlus, Palette } from "lucide-react";
 import { ParticlesBackground } from "./particles-background";
 import { BackToTop } from "@/components/common/back-to-top";
 import { useSession } from 'next-auth/react';
@@ -144,6 +144,18 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               <PlusCircle className="w-3.5 h-3.5" />
               {t('submit')}
             </button>
+            <Link
+              href="/poster-maker"
+              className={cn(
+                "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
+                pathname === "/poster-maker"
+                  ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
+                  : "text-gray-400 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Palette className="w-3.5 h-3.5" />
+              {t('posterMaker')}
+            </Link>
 
             {showConsole && (
               <Link
@@ -286,6 +298,19 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 <PlusCircle className="w-4 h-4" />
                 {t('submit')}
               </button>
+              <Link
+                href="/poster-maker"
+                onClick={() => setMobileMenuOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                  pathname === "/poster-maker"
+                    ? "bg-green-500/10 text-green-500 border border-green-500/20"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <Palette className="w-4 h-4" />
+                {t('posterMaker')}
+              </Link>
 
               {showConsole && (
                 <Link
