@@ -13,6 +13,8 @@ interface DatePickerProps {
   className?: string
   /** 触发按钮风格：ghost 融入排序栏（默认）/ outline 独立使用带边框 */
   variant?: 'ghost' | 'outline'
+  /** 禁用状态 */
+  disabled?: boolean
 }
 
 const WEEKDAYS_ZH = ['一', '二', '三', '四', '五', '六', '日']
@@ -48,7 +50,7 @@ function buildCalendarDays(year: number, month: number) {
   return days
 }
 
-export function DatePicker({ value, onChange, placeholder = '日期', className, variant = 'ghost' }: DatePickerProps) {
+export function DatePicker({ value, onChange, placeholder = '日期', className, variant = 'ghost', disabled = false }: DatePickerProps) {
   const locale = useLocale()
   const [isOpen, setIsOpen] = useState(false)
   // 弹窗内当前展示的年月
@@ -59,6 +61,9 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
   const [panel, setPanel] = useState<'day' | 'month' | 'year'>('day')
   const [yearRangeStart, setYearRangeStart] = useState(Math.floor((selected?.getFullYear() ?? new Date().getFullYear()) / 12) * 12)
   const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  // 弹窗采用 fixed 定位：避免被父容器 overflow（如 Dialog）裁剪
+  const [popupPos, setPopupPos] = useState<{ top: number; left: number } | null>(null)
 
   const weekdays = locale === 'zh' ? WEEKDAYS_ZH : locale === 'ja' ? WEEKDAYS_JA : WEEKDAYS_EN
   const months = locale === 'en' ? MONTHS_EN : MONTHS_ZH
@@ -74,6 +79,27 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
     }
   }, [isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 打开时根据触发按钮计算弹窗位置（右对齐，视口内收敛，下方空间不足时向上弹出）
+  useEffect(() => {
+    if (!isOpen || !triggerRef.current) return
+    const rect = triggerRef.current.getBoundingClientRect()
+    const width = 300
+    const height = 400
+    const left = Math.max(8, Math.min(rect.right - width, window.innerWidth - width - 8))
+    let top = rect.bottom + 8
+    if (top + height > window.innerHeight - 8) {
+      top = Math.max(8, rect.top - height - 8)
+    }
+    setPopupPos({ top, left })
+    // 页面滚动时关闭弹窗，避免弹窗位置与触发按钮脱离
+    const closeOnScroll = () => setIsOpen(false)
+    window.addEventListener('scroll', closeOnScroll, true)
+    return () => {
+      window.removeEventListener('scroll', closeOnScroll, true)
+      setPopupPos(null)
+    }
+  }, [isOpen])
+
   // 点击外部关闭
   useEffect(() => {
     if (!isOpen) return
@@ -85,7 +111,6 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [isOpen])
-
   const todayIso = (() => {
     const now = new Date()
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
@@ -148,10 +173,13 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
     <div ref={containerRef} className={cn('relative', className)}>
       {/* 触发按钮 — ghost 与排序 tabs 风格一致，outline 适合独立放置 */}
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
+        disabled={disabled}
         className={cn(
           'flex items-center gap-1.5 px-2 sm:px-3.5 py-2 rounded-lg text-sm font-medium transition-all border',
+          disabled && 'opacity-50 cursor-not-allowed',
           value
             ? 'bg-green-500/15 text-green-400 border-green-500/25'
             : variant === 'outline'
@@ -172,10 +200,14 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
         )}
       </button>
 
-      {/* 日历弹窗 */}
+      {/* 日历弹窗（fixed 定位，跟随触发按钮且不被父容器裁剪） */}
       {isOpen && (
         <div
-          className="absolute right-0 top-full mt-2 z-50 w-[300px] rounded-2xl border border-border bg-card p-4 shadow-2xl animate-dropdown-pop"
+          style={popupPos ? { top: popupPos.top, left: popupPos.left } : undefined}
+          className={cn(
+            'z-50 w-[300px] rounded-2xl border border-border bg-card p-4 shadow-2xl animate-dropdown-pop',
+            popupPos ? 'fixed' : 'absolute right-0 top-full mt-2'
+          )}
         >
           {/* 导航：日视图按月翻页 / 选月按年翻页 / 选年按区间翻页 */}
           <div className="flex items-center justify-between mb-3">

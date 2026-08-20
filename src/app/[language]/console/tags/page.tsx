@@ -31,6 +31,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { DatePicker } from '@/components/ui/date-picker'
 
 interface WorkTag {
   id: number
@@ -383,38 +384,38 @@ export default function TagsPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">自动过审开始时间</label>
                 <div className="flex items-center gap-2">
-                  <Input
-                    type="date"
-                    {...tagForm.register('auditStartDate')}
-                    className="bg-background border-border"
+                  <DatePicker
+                    value={tagForm.watch('auditStartDate') || ''}
+                    onChange={(date) => tagForm.setValue('auditStartDate', date, { shouldDirty: true })}
+                    placeholder="选择日期"
+                    variant="outline"
                     disabled={!isAutoAuditEnabled}
-                    onFocus={(event) => event.currentTarget.showPicker?.()}
+                    className="flex-1"
                   />
                   <Input
                     type="time"
                     {...tagForm.register('auditStartClock')}
-                    className="bg-background border-border w-36"
+                    className="bg-background border-border w-36 [color-scheme:dark]"
                     disabled={!isAutoAuditEnabled}
-                    onFocus={(event) => event.currentTarget.showPicker?.()}
                   />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">自动过审结束时间</label>
                 <div className="flex items-center gap-2">
-                  <Input
-                    type="date"
-                    {...tagForm.register('auditEndDate')}
-                    className="bg-background border-border"
+                  <DatePicker
+                    value={tagForm.watch('auditEndDate') || ''}
+                    onChange={(date) => tagForm.setValue('auditEndDate', date, { shouldDirty: true })}
+                    placeholder="选择日期"
+                    variant="outline"
                     disabled={!isAutoAuditEnabled}
-                    onFocus={(event) => event.currentTarget.showPicker?.()}
+                    className="flex-1"
                   />
                   <Input
                     type="time"
                     {...tagForm.register('auditEndClock')}
-                    className="bg-background border-border w-36"
+                    className="bg-background border-border w-36 [color-scheme:dark]"
                     disabled={!isAutoAuditEnabled}
-                    onFocus={(event) => event.currentTarget.showPicker?.()}
                   />
                 </div>
               </div>
