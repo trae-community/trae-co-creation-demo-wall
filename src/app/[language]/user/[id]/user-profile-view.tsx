@@ -169,7 +169,7 @@ export function UserProfileView() {
                 {profile.workCount} {t('works')}
               </span>
             ) : (
-              <button className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium border transition-all bg-primary/10 text-primary border-primary/25 hover:bg-primary/20">
+              <button className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-sm font-medium border transition-all bg-primary/10 text-primary border-primary/25 hover:bg-primary/20">
                 <Pencil className="w-3.5 h-3.5" />{t('submitFirstWork')}
               </button>
             )}
@@ -277,7 +277,7 @@ export function UserProfileView() {
             <p className="text-zinc-400 text-sm mb-4">{t('noWorks')}</p>
             <Link
               href="/submit"
-              className="px-4 py-2 rounded-full text-sm font-medium text-green-400 border border-green-500/30 bg-green-500/10 hover:bg-green-500/20 transition-colors"
+              className="px-4 py-2 rounded-md text-sm font-medium text-green-400 border border-green-500/30 bg-green-500/10 hover:bg-green-500/20 transition-colors"
             >
               {t('submitFirstWork')}
             </Link>

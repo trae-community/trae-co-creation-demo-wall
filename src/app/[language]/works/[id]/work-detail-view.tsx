@@ -149,7 +149,7 @@ export function WorkDetailView() {
     .map(line => line.trim())
     .filter(Boolean);
   const emailList = work?.contactEmail ? [work.contactEmail] : [];
-  const currentPageUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const currentPageUrl = typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : '';
   const normalizeLabel = (label: string) => label.replace(/[:：]\s*$/, '');
   const withColon = (label: string) => `${normalizeLabel(label)}：`;
   const returnToListHref = (() => {
@@ -643,7 +643,7 @@ export function WorkDetailView() {
             <div className="flex gap-3">
               <Button
                 onClick={handleLike}
-                className={`gap-2 transition-all duration-300 px-6 py-2.5 rounded-full font-medium ${
+                className={`gap-2 transition-all duration-300 px-6 py-2.5 rounded-md font-medium ${
                   liked
                     ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-[0_0_20px_rgba(50,240,140,0.4)] border-transparent scale-105"
                     : "bg-zinc-800/80 text-gray-300 hover:text-white hover:bg-zinc-800 border border-white/10 backdrop-blur-md hover:border-green-500/50 hover:shadow-[0_0_15px_rgba(50,240,140,0.1)]"

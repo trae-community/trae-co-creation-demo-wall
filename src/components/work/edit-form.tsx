@@ -368,7 +368,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
             <label className="text-sm font-medium text-gray-300">{t('projectName')} <span className="text-red-500">*</span></label>
             <input
               {...register("name")}
-              className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
+              className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
               placeholder={t('projectNamePlaceholder')}
             />
             {errors.name && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.name.message}</p>}
@@ -407,7 +407,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
             <label className="text-sm font-medium text-gray-300">{t('intro')} <span className="text-red-500">*</span></label>
             <input
                 {...register("intro")}
-                className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
+                className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
                 placeholder={t('introPlaceholder')}
               />
             {errors.intro && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.intro.message}</p>}
@@ -554,7 +554,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
                 <div className="flex-1 space-y-1">
                   <input
                     {...register(`highlights.${index}.value` as const)}
-                    className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
+                    className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
                     placeholder={t('highlightPlaceholder', { index: index + 1 })}
                     maxLength={30}
                   />
@@ -584,7 +584,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
                 <div className="flex-1 space-y-1">
                   <input
                     {...register(`scenarios.${index}.value` as const)}
-                    className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
+                    className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
                     placeholder={t('scenarioPlaceholder', { index: index + 1 })}
                   />
                   {errors.scenarios?.[index]?.value && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.scenarios[index]?.value?.message}</p>}
@@ -656,7 +656,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
               <label className="text-sm font-medium text-gray-300">{t('demoUrl')}</label>
               <input
                 {...register("demoUrl")}
-                className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
+                className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
                 placeholder="https://..."
               />
               {errors.demoUrl && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.demoUrl.message}</p>}
@@ -666,7 +666,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
               <label className="text-sm font-medium text-gray-300">{t('repoUrl')}</label>
               <input
                 {...register("repoUrl")}
-                className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
+                className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
                 placeholder="https://github.com/..."
               />
               {errors.repoUrl && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.repoUrl.message}</p>}
@@ -690,7 +690,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
                 <div className="flex-1 space-y-1">
                   <input
                     {...register(`team.${index}.value` as const)}
-                    className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
+                    className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
                     placeholder={t('teamPlaceholder')}
                   />
                   {errors.team?.[index]?.value && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.team[index]?.value?.message}</p>}
@@ -713,7 +713,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
             <textarea
               {...register("teamIntro")}
               rows={4}
-              className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
+              className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
               placeholder={t('teamIntroPlaceholder')}
             />
           </div>
@@ -723,7 +723,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
               <label className="text-sm font-medium text-gray-300">{t('contactPhone')}</label>
               <input
                 {...register("contactPhone")}
-                className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
+                className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
                 placeholder={t('contactPhonePlaceholder')}
               />
             </div>
@@ -731,7 +731,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
               <label className="text-sm font-medium text-gray-300">{t('contactEmail')}</label>
               <input
                 {...register("contactEmail")}
-                className="w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600"
+                className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
                 placeholder={t('contactEmailPlaceholder')}
               />
               {errors.contactEmail && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.contactEmail.message}</p>}

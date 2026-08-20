@@ -15,7 +15,7 @@
     --secondary: rgb(26, 27, 29);
     --secondary-foreground: rgb(245, 249, 254);
     --muted: rgb(42, 45, 49);
-    --muted-foreground: rgb(245, 249, 254);
+    --muted-foreground: rgb(180, 180, 180);
     --accent: rgb(42, 45, 49);
     --accent-foreground: rgb(245, 249, 254);
     --destructive: rgb(239, 68, 68);

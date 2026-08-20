@@ -51,25 +51,25 @@ export function Select({
       <div
         onClick={() => !disabled && setIsOpen(!isOpen)}
         className={`
-          w-full px-4 py-3 rounded-lg border-b-2 bg-zinc-900/50 text-white 
+          w-full px-4 py-3 rounded-lg border-b-2 bg-muted text-foreground 
           flex items-center justify-between cursor-pointer transition-colors
-          ${disabled ? 'opacity-50 cursor-not-allowed border-zinc-800' : 'border-zinc-700 hover:border-zinc-600'}
+          ${disabled ? 'opacity-50 cursor-not-allowed border-border' : 'border-input hover:border-ring'}
           ${isOpen ? 'border-primary' : ''}
         `}
       >
         <div className="flex items-center gap-3 overflow-hidden">
-          {icon && <span className="text-zinc-500 flex-shrink-0">{icon}</span>}
-          <span className={`truncate ${!selectedOption ? 'text-zinc-500' : ''}`}>
+          {icon && <span className="text-muted-foreground flex-shrink-0">{icon}</span>}
+          <span className={`truncate ${!selectedOption ? 'text-muted-foreground' : ''}`}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
         <ChevronDown 
-          className={`w-4 h-4 text-zinc-500 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} 
+          className={`w-4 h-4 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} 
         />
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-2 bg-card border border-border rounded-lg shadow-xl max-h-60 overflow-y-auto">
           {options.length > 0 ? (
             options.map((option) => (
               <div
@@ -77,7 +77,7 @@ export function Select({
                 onClick={() => handleSelect(option.value)}
                 className={`
                   px-4 py-2.5 cursor-pointer flex items-center justify-between text-sm transition-colors
-                  ${option.value === value ? 'bg-primary/10 text-primary' : 'text-zinc-300 hover:bg-zinc-800'}
+                  ${option.value === value ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-muted'}
                 `}
               >
                 <span className="truncate">{option.label}</span>
@@ -85,7 +85,7 @@ export function Select({
               </div>
             ))
           ) : (
-            <div className="px-4 py-3 text-sm text-zinc-500 text-center">
+            <div className="px-4 py-3 text-sm text-muted-foreground text-center">
               No options
             </div>
           )}

@@ -21,7 +21,7 @@ export function Step4Team({ form }: Step4Props) {
   } = useFieldArray({ control, name: 'team' })
 
   const inputClass =
-    'w-full px-4 py-3 rounded-lg border-b-2 border-zinc-700 bg-zinc-900/50 text-white focus:border-primary focus:outline-none transition-colors placeholder:text-zinc-600'
+    'w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground'
 
   return (
     <div className="space-y-8">
