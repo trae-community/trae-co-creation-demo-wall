@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 const SUBMIT_BTN = { left: 330.91 / 979.42, top: 297.85 / 419.75, width: 171.07 / 979.42, height: 43.38 / 419.75 };
 const BROWSE_BTN = { left: 524.03 / 979.42, top: 297.85 / 419.75, width: 124.57 / 979.42, height: 43.38 / 419.75 };
 
-export function HeroBanner() {
+export function HeroBanner({ onBrowseWorks }: { onBrowseWorks?: () => void }) {
   const t = useTranslations('Home');
   const locale = useLocale();
   const router = useRouter();
@@ -66,8 +66,8 @@ export function HeroBanner() {
           <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </button>
 
-        <a
-          href="#projects"
+        <button
+          onClick={onBrowseWorks}
           className="hidden sm:flex absolute items-center justify-center rounded-full font-bold text-white transition-all hover:brightness-125 hover:scale-[1.04] text-[clamp(11px,1.5vw,24px)]"
           style={{
             left: `${BROWSE_BTN.left * 100}%`,
@@ -78,7 +78,7 @@ export function HeroBanner() {
           }}
         >
           {t('browseWork')}
-        </a>
+        </button>
 
         {/* 移动端：底部居中，自然尺寸 */}
         <div className="sm:hidden absolute bottom-[14%] left-0 right-0 flex items-center justify-center gap-2 px-4">
@@ -93,13 +93,13 @@ export function HeroBanner() {
             {t('submitWork')}
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </button>
-          <a
-            href="#projects"
+          <button
+            onClick={onBrowseWorks}
             className="flex items-center justify-center rounded-full font-bold text-white text-xs px-4 py-2 transition-all active:scale-95"
             style={{ background: '#000335' }}
           >
             {t('browseWork')}
-          </a>
+          </button>
         </div>
       </div>
     </section>

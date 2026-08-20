@@ -127,7 +127,7 @@ export default function Page() {
   return (
     <>
       {/* Banner 移出 space-y 包裹层，以便抵住顶栏并铺满视口宽度 */}
-      <HeroBanner />
+      <HeroBanner onBrowseWorks={() => { setActiveTab('works'); setTimeout(() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }), 50); }} />
       <div className="mt-8 space-y-8">
         {/* ── 作品/海报 Tab 切换 ── */}
         <div className="flex items-center justify-center">
@@ -142,7 +142,7 @@ export default function Page() {
               )}
             >
               <LayoutGrid className="w-4 h-4" />
-              {tNav('home')}
+              {t('worksTabLabel')}
             </button>
             <button
               onClick={() => setActiveTab('posters')}

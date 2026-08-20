@@ -268,7 +268,7 @@ export default function PosterMakerPage() {
     <div className="max-w-6xl mx-auto">
       {/* 页面标题 */}
       <div className="text-center mb-10">
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">{t('title')}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{t('title')}</h1>
         <p className="text-muted-foreground text-sm sm:text-base">{t('subtitle')}</p>
       </div>
 
@@ -491,7 +491,7 @@ export default function PosterMakerPage() {
         <div className="bg-card p-6 sm:p-8 rounded-2xl shadow-lg border border-border flex flex-col items-center">
           <h3 className="text-sm font-medium text-muted-foreground mb-4 self-start">{t('previewTitle')}</h3>
           <div
-            className="relative w-full max-w-[340px] rounded-2xl overflow-hidden border border-border"
+            className="relative w-full max-w-[420px] rounded-2xl overflow-hidden border border-border"
             style={{ aspectRatio: '283.46 / 425.2' }}
           >
             {isGenerating ? (
