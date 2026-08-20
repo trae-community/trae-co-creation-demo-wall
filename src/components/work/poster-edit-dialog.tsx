@@ -128,7 +128,7 @@ export function PosterEditDialog({ open, onOpenChange, poster, onSuccess }: Post
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={100}
-              className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted/60 text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
+              className="w-full px-4 py-3 rounded-lg border-b-2 border-input !bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
             />
           </div>
 
@@ -143,7 +143,7 @@ export function PosterEditDialog({ open, onOpenChange, poster, onSuccess }: Post
               onChange={(e) => setDescription(e.target.value)}
               maxLength={500}
               rows={3}
-              className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted/60 text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground resize-none"
+              className="w-full px-4 py-3 rounded-lg border-b-2 border-input !bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground resize-none"
             />
           </div>
 
@@ -202,7 +202,7 @@ export function PosterEditDialog({ open, onOpenChange, poster, onSuccess }: Post
               type="url"
               value={demoUrl}
               onChange={(e) => setDemoUrl(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted/60 text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
+              className="w-full px-4 py-3 rounded-lg border-b-2 border-input !bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
             />
           </div>
 
