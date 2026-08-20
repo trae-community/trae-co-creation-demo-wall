@@ -391,7 +391,7 @@ export default function DictionariesPage() {
           <Card key={dict.id} className="overflow-hidden border-border bg-card/50">
             {/* Dict Header */}
             <div 
-              className="p-4 flex items-center justify-between hover:bg-white/5 cursor-pointer transition-colors"
+              className="p-4 flex items-center justify-between hover:bg-muted cursor-pointer transition-colors"
               onClick={() => toggleExpand(dict.dictCode)}
             >
               <div className="flex items-center gap-4">
@@ -454,7 +454,7 @@ export default function DictionariesPage() {
                             </div>
                           )}
                         </div>
-                        <div className="text-xs text-muted-foreground font-mono bg-white/5 px-1.5 py-0.5 rounded w-fit">
+                        <div className="text-xs text-muted-foreground font-mono bg-muted px-1.5 py-0.5 rounded w-fit">
                           {item.itemValue}
                         </div>
                       </div>

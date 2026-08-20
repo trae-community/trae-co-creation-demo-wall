@@ -208,12 +208,12 @@ export default function ConsoleLayout({
           <button
             onClick={() => toggleGroup(item.name)}
             className={cn(
-              "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 group hover:bg-white/5 hover:text-foreground text-muted-foreground",
+              "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 group hover:bg-muted hover:text-foreground text-muted-foreground",
               isActiveGroup ? "text-foreground" : ""
             )}
           >
             <div className="flex items-center gap-3">
-              {item.icon && <item.icon size={20} className={cn("transition-colors", isActiveGroup ? "text-primary" : "group-hover:text-white")} />}
+              {item.icon && <item.icon size={20} className={cn("transition-colors", isActiveGroup ? "text-primary" : "group-hover:text-foreground")} />}
               <span className="font-medium">{item.name}</span>
             </div>
             <ChevronDown size={16} className={cn("transition-transform duration-200", isExpanded ? "rotate-180" : "")} />
@@ -239,7 +239,7 @@ export default function ConsoleLayout({
           "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative overflow-hidden",
           isActive 
             ? "bg-primary/10 text-primary border border-primary/20" 
-            : "text-muted-foreground hover:bg-white/5 hover:text-foreground border border-transparent",
+            : "text-muted-foreground hover:bg-muted hover:text-foreground border border-transparent",
           depth > 0 ? "pl-11" : "" // Indent children
         )}
       >
@@ -247,7 +247,7 @@ export default function ConsoleLayout({
           <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" />
         )}
         {/* Only show icon if depth is 0 (top level items like Overview), otherwise hide icon for children to keep it clean, or optional */}
-        {depth === 0 && item.icon && <item.icon size={20} className={cn("transition-colors", isActive ? "text-primary" : "group-hover:text-white")} />}
+        {depth === 0 && item.icon && <item.icon size={20} className={cn("transition-colors", isActive ? "text-primary" : "group-hover:text-foreground")} />}
         <span className="font-medium">{item.name}</span>
       </Link>
     )
@@ -259,7 +259,7 @@ export default function ConsoleLayout({
       <div className="lg:hidden mb-4 flex items-center justify-between">
         <button 
           onClick={() => setIsSidebarOpen(true)}
-          className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-white/5 transition-colors border border-border bg-card"
+          className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors border border-border bg-card"
         >
           <Menu size={20} />
           <span className="sr-only">打开菜单</span>

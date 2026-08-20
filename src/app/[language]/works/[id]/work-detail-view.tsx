@@ -229,17 +229,17 @@ export function WorkDetailView() {
     return (
       <div className="max-w-4xl mx-auto space-y-8">
         {/* 返回按钮骨架 */}
-        <div className="h-5 w-20 rounded bg-white/5 animate-pulse" />
+        <div className="h-5 w-20 rounded bg-muted animate-pulse" />
         {/* 封面区骨架 */}
         <div className="bg-card rounded-2xl overflow-hidden border border-border">
-          <div className="aspect-video w-full bg-zinc-900 animate-pulse" />
+          <div className="aspect-video w-full bg-muted animate-pulse" />
           <div className="p-8 space-y-4">
-            <div className="h-8 w-3/4 bg-white/5 rounded animate-pulse" />
-            <div className="h-4 w-full bg-white/5 rounded animate-pulse" />
-            <div className="h-4 w-2/3 bg-white/5 rounded animate-pulse" />
+            <div className="h-8 w-3/4 bg-muted rounded animate-pulse" />
+            <div className="h-4 w-full bg-muted rounded animate-pulse" />
+            <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
             <div className="flex gap-3 pt-4">
-              <div className="h-10 w-32 rounded-full bg-white/5 animate-pulse" />
-              <div className="h-10 w-24 rounded-full bg-white/5 animate-pulse" />
+              <div className="h-10 w-32 rounded-full bg-muted animate-pulse" />
+              <div className="h-10 w-24 rounded-full bg-muted animate-pulse" />
             </div>
           </div>
         </div>
@@ -248,16 +248,16 @@ export function WorkDetailView() {
           <div className="md:col-span-2 space-y-6">
             {[1, 2, 3].map(i => (
               <div key={i} className="bg-card p-8 rounded-2xl border border-border space-y-3">
-                <div className="h-6 w-24 bg-white/5 rounded animate-pulse" />
-                <div className="h-4 w-full bg-white/5 rounded animate-pulse" />
-                <div className="h-4 w-5/6 bg-white/5 rounded animate-pulse" />
+                <div className="h-6 w-24 bg-muted rounded animate-pulse" />
+                <div className="h-4 w-full bg-muted rounded animate-pulse" />
+                <div className="h-4 w-5/6 bg-muted rounded animate-pulse" />
               </div>
             ))}
           </div>
           <div className="space-y-6">
-            <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 space-y-3">
-              <div className="h-10 w-full rounded bg-white/5 animate-pulse" />
-              <div className="h-10 w-full rounded bg-white/5 animate-pulse" />
+            <div className="bg-card p-6 rounded-2xl border border-border space-y-3">
+              <div className="h-10 w-full rounded bg-muted animate-pulse" />
+              <div className="h-10 w-full rounded bg-muted animate-pulse" />
             </div>
           </div>
         </div>
@@ -268,7 +268,7 @@ export function WorkDetailView() {
   if (!work) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-white">{t('notFound')}</h2>
+        <h2 className="text-2xl font-bold text-foreground">{t('notFound')}</h2>
         <Link href="/" className="text-primary hover:underline mt-4 block">
           {t('backHome')}
         </Link>
@@ -570,7 +570,7 @@ export function WorkDetailView() {
       <button
         type="button"
         onClick={() => router.push(returnToListHref)}
-        className="inline-flex items-center text-gray-400 hover:text-primary transition-colors mb-4"
+        className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors mb-4"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
         {getBackButtonLabel()}
@@ -578,7 +578,7 @@ export function WorkDetailView() {
 
       {/* 封面区 - 精简 */}
       <div className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border">
-        <div className="aspect-video w-full bg-zinc-900 relative group">
+        <div className="aspect-video w-full bg-muted relative group">
           <img
             src={work.coverUrl}
             alt={work.name}
@@ -601,8 +601,8 @@ export function WorkDetailView() {
               </span>
             ))}
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">{work.name}</h1>
-          <p className="text-gray-300 text-base leading-relaxed">{work.intro}</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-card-foreground mb-2">{work.name}</h1>
+          <p className="text-muted-foreground text-base leading-relaxed">{work.intro}</p>
         </div>
 
         {/* 元数据栏 - 分两行 */}
@@ -614,27 +614,27 @@ export function WorkDetailView() {
                   {work.category}
                 </span>
                 {work.tags.map((tag) => (
-                  <span key={tag} className="bg-zinc-800 text-gray-300 text-xs font-medium px-2.5 py-1 rounded-full border border-zinc-700">
+                  <span key={tag} className="bg-muted text-muted-foreground text-xs font-medium px-2.5 py-1 rounded-full border border-border">
                     #{tag}
                   </span>
                 ))}
               </div>
               {/* 第二行：信息 */}
               <div className="flex flex-wrap gap-6 text-sm">
-                <div className="flex items-center gap-2 text-gray-400">
-                  <Users className="w-4 h-4 text-gray-500" />
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Users className="w-4 h-4 text-muted-foreground" />
                   <span className="font-medium">{withColon(t('teamMembers'))}</span>
-                  <span className="text-gray-200">{teamMembers.length > 0 ? teamMembers.length : '-'}</span>
+                  <span className="text-foreground">{teamMembers.length > 0 ? teamMembers.length : '-'}</span>
                 </div>
-                <div className="flex items-center gap-2 text-gray-400">
-                  <Calendar className="w-4 h-4 text-gray-500" />
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
                   <span className="font-medium">{withColon(t('submitTime'))}</span>
-                  <span className="text-gray-200">{new Date(work.createdAt).toLocaleDateString()}</span>
+                  <span className="text-foreground">{new Date(work.createdAt).toLocaleDateString()}</span>
                 </div>
                 {(work.country || work.city) && (
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <MapPin className="w-4 h-4 text-gray-500" />
-                    <span className="text-gray-200">{[work.country, work.city].filter(Boolean).join(' / ')}</span>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-foreground">{[work.country, work.city].filter(Boolean).join(' / ')}</span>
                   </div>
                 )}
               </div>
@@ -646,12 +646,12 @@ export function WorkDetailView() {
                 className={`gap-2 transition-all duration-300 px-6 py-2.5 rounded-md font-medium ${
                   liked
                     ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-[0_0_20px_rgba(50,240,140,0.4)] border-transparent scale-105"
-                    : "bg-zinc-800/80 text-gray-300 hover:text-white hover:bg-zinc-800 border border-white/10 backdrop-blur-md hover:border-green-500/50 hover:shadow-[0_0_15px_rgba(50,240,140,0.1)]"
+                    : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-border backdrop-blur-md hover:border-green-500/50 hover:shadow-[0_0_15px_rgba(50,240,140,0.1)]"
                 }`}
               >
                 <ThumbsUp className={`w-4 h-4 transition-transform ${liked ? "fill-current" : ""} ${likeAnimating ? "scale-125" : "scale-100"}`} />
                 {liked ? t('liked') : t('likeProject')}
-                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-xs font-mono ${liked ? "bg-white/20" : "bg-white/5 text-gray-400 group-hover:text-white"}`}>
+                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-xs font-mono ${liked ? "bg-white/20" : "bg-white/10 text-muted-foreground group-hover:text-foreground"}`}>
                   {likesCount}
                 </span>
               </Button>
@@ -662,52 +662,52 @@ export function WorkDetailView() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-8">
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary rounded-full"></span>
               {t('story')}
             </h2>
             <div
-              className="prose prose-invert max-w-none leading-relaxed prose-headings:text-white prose-p:text-gray-300 prose-strong:text-white prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-li:text-gray-300 prose-blockquote:text-gray-400 prose-code:text-primary"
+              className="prose prose-invert max-w-none leading-relaxed prose-headings:text-card-foreground prose-p:text-muted-foreground prose-strong:text-card-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-li:text-muted-foreground prose-blockquote:text-muted-foreground prose-code:text-primary"
               dangerouslySetInnerHTML={{ __html: work.story || '<p>-</p>' }}
             />
           </section>
 
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary rounded-full"></span>
               {t('features')}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {featureLines.map((feature, index) => (
-                <div key={index} className="flex items-start gap-3 bg-zinc-900/50 p-4 rounded-xl border border-white/5">
+                <div key={index} className="flex items-start gap-3 bg-muted p-4 rounded-xl border border-border">
                   <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <span className="text-primary text-xs font-bold">{index + 1}</span>
                   </div>
-                  <span className="text-gray-300">{feature}</span>
+                  <span className="text-muted-foreground">{feature}</span>
                 </div>
               ))}
             </div>
           </section>
 
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary rounded-full"></span>
               {t('scenarios')}
             </h2>
             <div className="grid grid-cols-1 gap-3">
               {scenarioLines.map((scenario, index) => (
-                <div key={`${scenario}-${index}`} className="flex items-start gap-4 bg-zinc-900/30 p-4 rounded-xl border border-white/5">
+                <div key={`${scenario}-${index}`} className="flex items-start gap-4 bg-muted p-4 rounded-xl border border-border">
                   <div className="mt-1.5">
                     <div className="w-2 h-2 rounded-full bg-primary/60 ring-4 ring-primary/10"></div>
                   </div>
-                  <p className="text-gray-300 leading-relaxed">{scenario}</p>
+                  <p className="text-muted-foreground leading-relaxed">{scenario}</p>
                 </div>
               ))}
             </div>
           </section>
 
           <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-primary rounded-full"></span>
               {t('screenshots')}
             </h2>
@@ -716,7 +716,7 @@ export function WorkDetailView() {
                 <div
                   ref={screenshotCarouselRef}
                   tabIndex={0}
-                  className="relative rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/60 group outline-none focus-visible:ring-2 focus-visible:ring-green-500/50"
+                  className="relative rounded-xl overflow-hidden border border-border bg-muted group outline-none focus-visible:ring-2 focus-visible:ring-green-500/50"
                   onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
                   onTouchEnd={(e) => {
                     const diff = e.changedTouches[0].clientX - touchStartX.current;
@@ -787,7 +787,7 @@ export function WorkDetailView() {
                         type="button"
                         key={`${url}-${index}`}
                         onClick={() => setActiveScreenshotIndex(index)}
-                        className={`rounded-lg overflow-hidden border ${index === activeScreenshotIndex ? 'border-primary' : 'border-zinc-800'}`}
+                        className={`rounded-lg overflow-hidden border ${index === activeScreenshotIndex ? 'border-primary' : 'border-border'}`}
                       >
                         <img src={url} alt={`Thumbnail ${index + 1}`} className="w-full h-16 object-cover" />
                       </button>
@@ -796,14 +796,14 @@ export function WorkDetailView() {
                 )}
               </div>
             ) : (
-              <div className="text-gray-500">-</div>
+              <div className="text-muted-foreground">-</div>
             )}
           </section>
 
         </div>
 
         <div className="space-y-6">
-          <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 flex flex-col gap-3">
+          <div className="bg-card p-6 rounded-2xl border border-border flex flex-col gap-3">
             {demoUrl && (
               <a href={demoUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
                 <Button className="w-full gap-2 font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40">
@@ -815,7 +815,7 @@ export function WorkDetailView() {
 
             {repoUrl && (
               <a href={repoUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
-                <Button variant="secondary" className="w-full gap-2 bg-white/10 hover:bg-white/20 border-white/5 text-white">
+                <Button variant="secondary" className="w-full gap-2 bg-muted hover:bg-muted/80 border-border text-foreground">
                   <Github className="w-4 h-4" />
                   {t('codeRepo')}
                 </Button>
@@ -825,14 +825,14 @@ export function WorkDetailView() {
             <Button
               variant="outline"
               onClick={handleShare}
-              className="w-full gap-2 border-white/10 hover:bg-white/5 hover:text-white hover:border-white/20 text-gray-400"
+              className="w-full gap-2 border-border hover:bg-muted hover:text-foreground hover:border-border/70 text-muted-foreground"
             >
               <Share2 className="w-4 h-4" />
               {t('shareCard')}
             </Button>
           </div>
 
-          <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+          <div className="bg-card p-6 rounded-2xl border border-border">
             <h3 className="font-bold text-primary mb-4 flex items-center gap-2">
               <Users className="w-4 h-4" />
               {t('aboutAuthor')}
@@ -847,10 +847,10 @@ export function WorkDetailView() {
                     <img
                       src={work.author.avatar}
                       alt={work.author.name}
-                      className="w-10 h-10 rounded-full object-cover border border-zinc-700 hover:border-primary transition-colors"
+                      className="w-10 h-10 rounded-full object-cover border border-border hover:border-primary transition-colors"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-bold text-zinc-300 border border-zinc-600 hover:border-primary transition-colors">
+                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-bold text-foreground border border-border hover:border-primary transition-colors">
                       {work.author.name?.charAt(0) || '?'}
                     </div>
                   )}
@@ -858,33 +858,33 @@ export function WorkDetailView() {
                 <div>
                   <Link
                     href={`/user/${work.author.id}`}
-                    className="text-sm text-gray-200 font-medium hover:text-primary transition-colors"
+                    className="text-sm text-foreground font-medium hover:text-primary transition-colors"
                   >
                     {work.author.name || '-'}
                   </Link>
-                  <p className="text-xs text-gray-500 mt-1">{work.author.bio || '-'}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{work.author.bio || '-'}</p>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-zinc-800">
+              <div className="pt-4 border-t border-border">
                 {emailList.map((email) => (
-                  <div key={email} className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                  <div key={email} className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                     <Mail className="w-4 h-4" />
                     <span>{withColon(t('email'))}{email}</span>
                   </div>
                 ))}
                 {work.teamIntro && (
-                  <div className="mt-4 text-sm text-gray-400">
-                    <p className="text-gray-500 mb-1">{withColon(t('teamIntro'))}</p>
-                    <p className="text-gray-300">{work.teamIntro}</p>
+                  <div className="mt-4 text-sm text-muted-foreground">
+                    <p className="text-muted-foreground mb-1">{withColon(t('teamIntro'))}</p>
+                    <p className="text-foreground">{work.teamIntro}</p>
                   </div>
                 )}
                 {teamMembers.length > 0 && (
                   <div className="mt-4">
-                    <p className="text-gray-500 text-sm mb-2">{withColon(t('teamMembers'))}</p>
+                    <p className="text-muted-foreground text-sm mb-2">{withColon(t('teamMembers'))}</p>
                     <div className="flex flex-wrap gap-2">
                       {teamMembers.map((member) => (
-                        <span key={member} className="bg-zinc-800 text-gray-300 text-xs font-medium px-2.5 py-1 rounded-full border border-zinc-700">
+                        <span key={member} className="bg-muted text-muted-foreground text-xs font-medium px-2.5 py-1 rounded-full border border-border">
                           {member}
                         </span>
                       ))}
@@ -898,27 +898,27 @@ export function WorkDetailView() {
       </div>
 
       {/* 底部提示 */}
-      <div className="mt-8 pt-6 border-t border-zinc-800/50">
-        <p className="text-center text-xs text-gray-500">{t('aboutProjectDesc')}</p>
+      <div className="mt-8 pt-6 border-t border-border/50">
+        <p className="text-center text-xs text-muted-foreground">{t('aboutProjectDesc')}</p>
       </div>
 
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
-        <DialogContent className="bg-zinc-950 border border-zinc-800 text-white sm:max-w-3xl">
+        <DialogContent className="bg-background border border-border text-foreground sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg pr-8">{t('shareCardTitle')}</DialogTitle>
-            <DialogDescription className="text-zinc-400 text-xs sm:text-sm">
+            <DialogDescription className="text-muted-foreground text-xs sm:text-sm">
               {t('shareCardDesc')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 sm:space-y-4">
-            <div className="rounded-xl border border-zinc-700 bg-gradient-to-br from-zinc-900 to-zinc-950 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)] max-w-[260px] sm:max-w-[340px] mx-auto">
+            <div className="rounded-xl border border-border bg-gradient-to-br from-card to-background overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.45)] max-w-[260px] sm:max-w-[340px] mx-auto">
               {shareImageUrl ? (
                 <img src={shareImageUrl} alt={t('sharePreviewAlt')} className="w-full aspect-[283.46/425.2] object-cover" />
               ) : (
-                <div className="h-40 sm:h-56 flex flex-col items-center justify-center gap-3 text-zinc-500">
+                <div className="h-40 sm:h-56 flex flex-col items-center justify-center gap-3 text-muted-foreground">
                   {isShareGenerating ? (
                     <>
-                      <div className="w-48 h-1.5 rounded-full bg-zinc-800 overflow-hidden">
+                      <div className="w-48 h-1.5 rounded-full bg-muted overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-green-500 to-green-400 rounded-full animate-[shareProgress_2s_ease-in-out_infinite]" style={{ width: '60%' }} />
                       </div>
                       <span className="text-xs">{t('shareGenerating')}</span>
@@ -927,21 +927,21 @@ export function WorkDetailView() {
                 </div>
               )}
             </div>
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-2.5 sm:p-3 text-xs sm:text-sm text-zinc-300 flex items-center gap-2 break-all">
-              <Link2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500 shrink-0" />
+            <div className="rounded-xl border border-border bg-muted p-2.5 sm:p-3 text-xs sm:text-sm text-muted-foreground flex items-center gap-2 break-all">
+              <Link2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground shrink-0" />
               <span>{currentPageUrl}</span>
             </div>
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="secondary" size="sm" className="gap-1.5 sm:gap-2 bg-white/10 text-white border-white/10 w-full sm:w-auto" onClick={handleDownloadShareImage} disabled={!shareImageUrl || isShareGenerating}>
+            <Button variant="secondary" size="sm" className="gap-1.5 sm:gap-2 bg-muted text-foreground border-border w-full sm:w-auto" onClick={handleDownloadShareImage} disabled={!shareImageUrl || isShareGenerating}>
               <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               {t('downloadImage')}
             </Button>
-            <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 border-white/20 text-white hover:bg-white/10 w-full sm:w-auto" onClick={handlePrintPoster} disabled={!shareImageUrl || isShareGenerating}>
+            <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 border-border text-foreground hover:bg-muted w-full sm:w-auto" onClick={handlePrintPoster} disabled={!shareImageUrl || isShareGenerating}>
               <Printer className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               {t('printPoster') || '打印海报'}
             </Button>
-            <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 border-white/20 text-white hover:bg-white/10 w-full sm:w-auto" onClick={handleCopyLink}>
+            <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 border-border text-foreground hover:bg-muted w-full sm:w-auto" onClick={handleCopyLink}>
               {shareActionDone === 'copied' ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Link2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
               {shareActionDone === 'copied' ? t('copied') : t('copyLink')}
             </Button>

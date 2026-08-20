@@ -281,15 +281,15 @@ export default function ProfilePage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* ── Profile Hero Card (头像 + 信息 + 统计 一体) ── */}
-      <section className="rounded-3xl border border-white/10 bg-card/80 backdrop-blur-md p-6 md:p-8">
+      <section className="rounded-3xl border border-border bg-card/80 backdrop-blur-md p-6 md:p-8">
         {/* 上半：头像 + 用户名/邮箱 + 操作按钮 */}
         <div className="flex flex-col md:flex-row md:items-center gap-5">
           <div className="relative group shrink-0">
-            <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 bg-zinc-900">
+            <div className="w-20 h-20 rounded-2xl overflow-hidden border border-border bg-muted">
               {data.profile.avatarUrl ? (
                 <img src={data.profile.avatarUrl} alt={data.profile.username} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                   <User className="w-8 h-8" />
                 </div>
               )}
@@ -311,8 +311,8 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl md:text-3xl font-bold text-white truncate">{data.profile.username}</h1>
-            <p className="text-gray-400 mt-1 text-sm truncate">{data.profile.email}</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-card-foreground truncate">{data.profile.username}</h1>
+            <p className="text-muted-foreground mt-1 text-sm truncate">{data.profile.email}</p>
           </div>
 
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
@@ -321,7 +321,7 @@ export default function ProfilePage() {
               className={cn(
                 "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium border transition-all",
                 isEditing
-                  ? "text-zinc-400 border-white/10 hover:text-white hover:bg-white/5"
+                  ? "text-muted-foreground border-border hover:text-foreground hover:bg-muted"
                   : "text-primary border-primary/25 bg-primary/10 hover:bg-primary/20"
               )}
             >
@@ -329,14 +329,14 @@ export default function ProfilePage() {
             </button>
             <button
               onClick={() => setShowPasswordModal(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-colors text-sm"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-sm"
             >
               <Key className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">{t("changePassword")}</span>
             </button>
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-colors text-sm"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors text-sm"
             >
               <LogOut className="w-3.5 h-3.5" />
               {t("signOut")}
@@ -348,21 +348,21 @@ export default function ProfilePage() {
         <div className="mt-5 flex items-center gap-6 text-sm">
           <div className="flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
-            <span className="text-gray-400">{t("statsWorks")}</span>
-            <span className="text-white font-semibold">{data.profile.workCount}</span>
+            <span className="text-muted-foreground">{t("statsWorks")}</span>
+            <span className="text-foreground font-semibold">{data.profile.workCount}</span>
           </div>
-          <div className="w-px h-4 bg-white/10" />
+          <div className="w-px h-4 bg-border" />
           <div className="flex items-center gap-1.5">
-            <span className="text-gray-400">{t("statsViews")}</span>
-            <span className="text-white font-semibold">{data.profile.totalViews}</span>
+            <span className="text-muted-foreground">{t("statsViews")}</span>
+            <span className="text-foreground font-semibold">{data.profile.totalViews}</span>
           </div>
-          <div className="w-px h-4 bg-white/10" />
+          <div className="w-px h-4 bg-border" />
           <div className="flex items-center gap-1.5">
-            <span className="text-gray-400">{t("statsLikes")}</span>
-            <span className="text-white font-semibold">{data.profile.totalLikes}</span>
+            <span className="text-muted-foreground">{t("statsLikes")}</span>
+            <span className="text-foreground font-semibold">{data.profile.totalLikes}</span>
           </div>
-          <div className="w-px h-4 bg-white/10" />
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+          <div className="w-px h-4 bg-border" />
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             {t("lastSignIn")}: {data.profile.lastSignInAt ? new Date(data.profile.lastSignInAt).toLocaleString(locale) : t("na")}
           </div>
         </div>
@@ -370,10 +370,10 @@ export default function ProfilePage() {
         {/* 基础信息（可折叠，编辑模式展开） */}
         {isEditing && (
           <>
-            <div className="mt-5 border-t border-white/5 pt-5">
+            <div className="mt-5 border-t border-border pt-5">
               <div className="flex items-center gap-2 mb-4">
                 <Sparkles className="w-4 h-4 text-primary" />
-                <h2 className="text-sm font-semibold text-white">{t("basicsTitle")}</h2>
+                <h2 className="text-sm font-semibold text-foreground">{t("basicsTitle")}</h2>
               </div>
 
               {error && <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{error}</div>}
@@ -381,7 +381,7 @@ export default function ProfilePage() {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-300">{t("usernameLabel")}</label>
+                  <label className="text-sm text-muted-foreground">{t("usernameLabel")}</label>
                   <input
                     value={form.username}
                     onChange={(event) => setForm((prev) => ({ ...prev, username: event.target.value }))}
@@ -391,7 +391,7 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-300">{t("introLabel")}</label>
+                  <label className="text-sm text-muted-foreground">{t("introLabel")}</label>
                   <textarea
                     rows={3}
                     value={form.bio}
@@ -401,7 +401,7 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-300">{t("phoneLabel")}</label>
+                  <label className="text-sm text-muted-foreground">{t("phoneLabel")}</label>
                   <input
                     value={form.phone}
                     onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}
@@ -426,7 +426,7 @@ export default function ProfilePage() {
       </section>
 
       {/* ── Works / Liked — Tab（延展占满） ── */}
-      <section className="rounded-2xl border border-white/10 bg-card p-6">
+      <section className="rounded-2xl border border-border bg-card p-6">
         <div className="flex items-center gap-2 mb-6">
           <button
             onClick={() => setActiveTab('works')}
@@ -434,7 +434,7 @@ export default function ProfilePage() {
               "px-4 py-2 rounded-md text-sm font-medium border transition-all",
               activeTab === 'works'
                 ? "bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold border-transparent shadow-[0_0_12px_rgba(50,240,140,0.25)]"
-                : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
+                : "bg-muted text-muted-foreground border-border hover:bg-muted/80 hover:text-foreground"
             )}
           >
             {t("worksTab")}
@@ -445,7 +445,7 @@ export default function ProfilePage() {
               "px-4 py-2 rounded-md text-sm font-medium border transition-all",
               activeTab === 'liked'
                 ? "bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold border-transparent shadow-[0_0_12px_rgba(50,240,140,0.25)]"
-                : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
+                : "bg-muted text-muted-foreground border-border hover:bg-muted/80 hover:text-foreground"
             )}
           >
             {t("likedTab")}
@@ -456,7 +456,7 @@ export default function ProfilePage() {
               "px-4 py-2 rounded-md text-sm font-medium border transition-all",
               activeTab === 'posters'
                 ? "bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold border-transparent shadow-[0_0_12px_rgba(50,240,140,0.25)]"
-                : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
+                : "bg-muted text-muted-foreground border-border hover:bg-muted/80 hover:text-foreground"
             )}
           >
             {t("postersTab")}
@@ -483,12 +483,12 @@ export default function ProfilePage() {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setShowPasswordModal(false)}
           />
-          <div className="relative w-full max-w-md bg-[#0A0A0C] border border-white/10 rounded-2xl p-6 shadow-2xl">
-            <h3 className="text-lg font-semibold text-white mb-4">{t("changePassword")}</h3>
+          <div className="relative w-full max-w-md bg-card border border-border rounded-2xl p-6 shadow-2xl">
+            <h3 className="text-lg font-semibold text-foreground mb-4">{t("changePassword")}</h3>
             
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm text-gray-300">{t("oldPassword")}</label>
+                <label className="text-sm text-muted-foreground">{t("oldPassword")}</label>
                 <input
                   type="password"
                   value={passwordForm.oldPassword}
@@ -499,7 +499,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-gray-300">{t("newPassword")}</label>
+                <label className="text-sm text-muted-foreground">{t("newPassword")}</label>
                 <input
                   type="password"
                   value={passwordForm.newPassword}
@@ -510,7 +510,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-gray-300">{t("confirmPassword")}</label>
+                <label className="text-sm text-muted-foreground">{t("confirmPassword")}</label>
                 <input
                   type="password"
                   value={passwordForm.confirmPassword}
@@ -543,7 +543,7 @@ export default function ProfilePage() {
                     setPasswordSuccess("");
                   }}
                   disabled={isChangingPassword}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-white/10 text-gray-300 hover:bg-white/5 transition-colors disabled:opacity-50"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-border text-muted-foreground hover:bg-muted transition-colors disabled:opacity-50"
                 >
                   {t("cancel")}
                 </button>

@@ -51,7 +51,7 @@ export default function PostersPage() {
     <div className="max-w-6xl mx-auto">
       {/* 页面标题 */}
       <div className="text-center mb-10">
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">{t('title')}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{t('title')}</h1>
         <p className="text-muted-foreground text-sm sm:text-base">{t('subtitle')}</p>
       </div>
 
@@ -125,22 +125,22 @@ export default function PostersPage() {
                 </div>
                 {/* 信息 */}
                 <div className="flex min-w-0 flex-1 flex-col p-5">
-                  <h3 className="font-bold text-white text-base mb-1.5 line-clamp-1 group-hover:text-green-400 transition-colors [overflow-wrap:anywhere]">{poster.nickname}</h3>
+                  <h3 className="font-bold text-card-foreground text-base mb-1.5 line-clamp-1 group-hover:text-green-400 transition-colors [overflow-wrap:anywhere]">{poster.nickname}</h3>
                   {poster.description && (
-                    <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2 mb-4 [overflow-wrap:anywhere]">{poster.description}</p>
+                    <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2 mb-4 [overflow-wrap:anywhere]">{poster.description}</p>
                   )}
                   {/* Tags — 与作品卡片统一样式 */}
                   {Array.isArray(poster.tags) && poster.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mb-4">
                       {poster.tags.slice(0, 3).map((tag, idx) => (
-                        <span key={`${tag}-${idx}`} className="text-[10px] px-2 py-0.5 rounded-full border bg-white/5 text-zinc-600 border-white/10">{tag}</span>
+                        <span key={`${tag}-${idx}`} className="text-[10px] px-2 py-0.5 rounded-full border bg-muted text-muted-foreground border-border">{tag}</span>
                       ))}
                     </div>
                   )}
                   {/* Footer: time — 与作品卡片统一样式 */}
-                  <div className="flex min-w-0 items-center gap-1 pt-3.5 border-t border-white/5 mt-auto">
+                  <div className="flex min-w-0 items-center gap-1 pt-3.5 border-t border-border mt-auto">
                     <Clock className="w-2.5 h-2.5 shrink-0" />
-                    <span className="text-[10px] text-zinc-600">
+                    <span className="text-[10px] text-muted-foreground">
                       {new Date(poster.createdAt).getFullYear()}/{String(new Date(poster.createdAt).getMonth() + 1).padStart(2, '0')}/{String(new Date(poster.createdAt).getDate()).padStart(2, '0')}
                     </span>
                   </div>

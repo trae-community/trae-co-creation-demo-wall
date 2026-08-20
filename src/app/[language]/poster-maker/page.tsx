@@ -269,7 +269,7 @@ export default function PosterMakerPage() {
       {/* 页面标题 */}
       <div className="text-center mb-10">
         <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">{t('title')}</h1>
-        <p className="text-zinc-400 text-sm sm:text-base">{t('subtitle')}</p>
+        <p className="text-muted-foreground text-sm sm:text-base">{t('subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -332,7 +332,7 @@ export default function PosterMakerPage() {
               {isUploading ? (
                 <div className="flex flex-col items-center gap-2 py-4">
                   <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
-                  <p className="text-sm text-zinc-400">{t('uploading')}</p>
+                  <p className="text-sm text-muted-foreground">{t('uploading')}</p>
                 </div>
               ) : imageUrl ? (
                 <div className="relative">
@@ -341,8 +341,8 @@ export default function PosterMakerPage() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-2 py-4">
-                  <Upload className="w-8 h-8 text-zinc-400" />
-                  <p className="text-sm text-zinc-400">{t('uploadClick')}</p>
+                  <Upload className="w-8 h-8 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">{t('uploadClick')}</p>
                   <p className="text-xs text-muted-foreground">{t('uploadHint')}</p>
                 </div>
               )}
@@ -507,9 +507,9 @@ export default function PosterMakerPage() {
                 className="w-full h-full object-contain"
               />
             ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3" style={{ background: '#111318' }}>
-                <ImageIcon className="w-10 h-10 text-zinc-600" />
-                <p className="text-sm text-zinc-500 px-4 text-center">{t('uploadToPreview')}</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-card">
+                <ImageIcon className="w-10 h-10 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground px-4 text-center">{t('uploadToPreview')}</p>
               </div>
             )}
           </div>

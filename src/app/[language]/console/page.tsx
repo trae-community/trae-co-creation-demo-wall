@@ -148,9 +148,9 @@ export default function ConsolePage() {
               {stat.tip && (
                 <span className="relative group/tip cursor-help">
                   <Info size={14} className="text-muted-foreground/60 hover:text-muted-foreground transition-colors" />
-                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs text-white bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl whitespace-normal w-56 text-left opacity-0 invisible group-hover/tip:opacity-100 group-hover/tip:visible transition-all duration-200 pointer-events-none z-50">
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs text-foreground bg-muted border border-border rounded-lg shadow-xl whitespace-normal w-56 text-left opacity-0 invisible group-hover/tip:opacity-100 group-hover/tip:visible transition-all duration-200 pointer-events-none z-50">
                     {stat.tip}
-                    <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-zinc-800" />
+                    <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-muted" />
                   </span>
                 </span>
               )}
@@ -170,7 +170,7 @@ export default function ConsolePage() {
             <select
               value={String(windowDays)}
               onChange={(event) => setWindowDays(Number(event.target.value) as OverviewWindow)}
-              className="bg-zinc-800 border border-border rounded-lg text-sm px-3 py-1 text-white outline-none cursor-pointer hover:bg-zinc-700 transition-colors"
+              className="bg-muted border border-border rounded-lg text-sm px-3 py-1 text-foreground outline-none cursor-pointer hover:bg-muted/80 transition-colors"
             >
               <option value="7">最近7天</option>
               <option value="30">最近30天</option>
@@ -234,9 +234,9 @@ export default function ConsolePage() {
                         {item.tip && (
                           <span className="relative group/dist cursor-help">
                             <Info size={12} className="text-muted-foreground/60 hover:text-muted-foreground transition-colors" />
-                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs text-white bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl whitespace-normal w-52 text-left opacity-0 invisible group-hover/dist:opacity-100 group-hover/dist:visible transition-all duration-200 pointer-events-none z-50">
+                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs text-foreground bg-muted border border-border rounded-lg shadow-xl whitespace-normal w-52 text-left opacity-0 invisible group-hover/dist:opacity-100 group-hover/dist:visible transition-all duration-200 pointer-events-none z-50">
                               {item.tip}
-                              <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-zinc-800" />
+                              <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-muted" />
                             </span>
                           </span>
                         )}

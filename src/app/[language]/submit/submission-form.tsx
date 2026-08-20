@@ -280,8 +280,8 @@ export function SubmissionForm() {
         <div className="w-20 h-20 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle className="w-10 h-10" />
         </div>
-        <h2 className="text-3xl font-bold text-white mb-4">{t('successTitle')}</h2>
-        <p className="text-gray-400 mb-8 max-w-md mx-auto">{t('successMessage')}</p>
+        <h2 className="text-3xl font-bold text-card-foreground mb-4">{t('successTitle')}</h2>
+        <p className="text-muted-foreground mb-8 max-w-md mx-auto">{t('successMessage')}</p>
         <div className="flex justify-center gap-4">
           {submittedWorkId && (
             <Button onClick={() => router.push(`/${locale}/works/${submittedWorkId}`)} variant="outline">
@@ -299,8 +299,8 @@ export function SubmissionForm() {
     <div className="max-w-3xl mx-auto">
       {/* Header */}
       <div className="mb-10 text-center">
-        <h1 className="text-3xl font-bold text-white mb-2">{t('title')}</h1>
-        <p className="text-gray-400">{t('description')}</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('description')}</p>
       </div>
 
       <form

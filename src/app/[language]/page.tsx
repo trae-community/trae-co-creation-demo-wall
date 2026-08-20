@@ -131,14 +131,14 @@ export default function Page() {
       <div className="mt-8 space-y-8">
         {/* ── 作品/海报 Tab 切换 ── */}
         <div className="flex items-center justify-center">
-          <div className="inline-flex items-center rounded-xl border border-white/10 p-1 gap-0.5" style={{ background: 'rgba(255,255,255,0.03)' }}>
+          <div className="inline-flex items-center rounded-xl border border-border bg-muted p-1 gap-0.5">
             <button
               onClick={() => setActiveTab('works')}
               className={cn(
                 "flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-lg text-sm font-medium transition-all border",
                 activeTab === 'works'
                   ? "bg-green-500/15 text-green-400 border-green-500/25"
-                  : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
+                  : "text-muted-foreground border-transparent hover:text-foreground hover:bg-muted"
               )}
             >
               <LayoutGrid className="w-4 h-4" />
@@ -150,7 +150,7 @@ export default function Page() {
                 "flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-lg text-sm font-medium transition-all border",
                 activeTab === 'posters'
                   ? "bg-green-500/15 text-green-400 border-green-500/25"
-                  : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
+                  : "text-muted-foreground border-transparent hover:text-foreground hover:bg-muted"
               )}
             >
               <ImageIcon className="w-4 h-4" />
@@ -169,7 +169,7 @@ export default function Page() {
           {/* Search — takes up remaining space */}
           <div className="relative flex-1 group">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <Search className="w-4 h-4 text-zinc-600 group-focus-within:text-green-500 transition-colors" />
+              <Search className="w-4 h-4 text-muted-foreground group-focus-within:text-green-500 transition-colors" />
             </div>
             <input
               type="text"
@@ -182,7 +182,7 @@ export default function Page() {
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-500 hover:text-white transition-colors"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -191,8 +191,7 @@ export default function Page() {
 
           {/* Sort tabs + Date picker — fixed right */}
           <div
-            className="flex items-center rounded-xl border border-white/10 p-1 gap-0.5 shrink-0"
-            style={{ background: 'rgba(255,255,255,0.03)' }}
+            className="flex items-center rounded-xl border border-border bg-muted p-1 gap-0.5 shrink-0"
           >
             {sortOptions.map(({ key, icon, label }) => (
               <button
@@ -202,7 +201,7 @@ export default function Page() {
                   "flex items-center gap-1.5 px-2 sm:px-3.5 py-2 rounded-lg text-sm font-medium transition-all border",
                   sortBy === key
                     ? "bg-green-500/15 text-green-400 border-green-500/25"
-                    : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
+                    : "text-muted-foreground border-transparent hover:text-foreground hover:bg-muted"
                 )}
               >
                 {icon}
@@ -211,7 +210,7 @@ export default function Page() {
             ))}
 
             {/* Divider */}
-            <div className="w-px h-5 bg-white/10 mx-1" />
+            <div className="w-px h-5 bg-border mx-1" />
 
             {/* Date picker — 自定义日历弹窗，与 UI 风格一致 */}
             <DatePicker
@@ -237,12 +236,12 @@ export default function Page() {
         /* Skeleton */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-2xl overflow-hidden border border-white/5" style={{ background: '#111318' }}>
-              <div className="animate-pulse bg-white/5" style={{ aspectRatio: '4/3' }} />
+            <div key={i} className="rounded-2xl overflow-hidden border border-border bg-card">
+              <div className="animate-pulse bg-muted" style={{ aspectRatio: '4/3' }} />
               <div className="p-5 space-y-3">
-                <div className="animate-pulse h-4 bg-white/5 rounded-md w-3/4" />
-                <div className="animate-pulse h-3 bg-white/5 rounded-md w-full" />
-                <div className="animate-pulse h-3 bg-white/5 rounded-md w-5/6" />
+                <div className="animate-pulse h-4 bg-muted rounded-md w-3/4" />
+                <div className="animate-pulse h-3 bg-muted rounded-md w-full" />
+                <div className="animate-pulse h-3 bg-muted rounded-md w-5/6" />
               </div>
             </div>
           ))}
@@ -263,11 +262,11 @@ export default function Page() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
-          <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-            <SearchX className="w-8 h-8 text-zinc-500" />
+        <div className="text-center py-20 rounded-2xl border border-dashed border-border bg-card flex flex-col items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+            <SearchX className="w-8 h-8 text-muted-foreground" />
           </div>
-          <p className="text-zinc-400 text-sm mb-4">{t('noResults')}</p>
+          <p className="text-muted-foreground text-sm mb-4">{t('noResults')}</p>
           <button
             onClick={() => {
               setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [] });
@@ -284,9 +283,9 @@ export default function Page() {
       {/* ── PAGINATION ── */}
       {!isLoading && totalItems > 0 && (
         <div className="flex items-center justify-between pt-2">
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-muted-foreground">
             {t('resultCount') || '共'}{' '}
-            <span className="text-zinc-300 font-medium">{totalItems}</span>{' '}
+            <span className="text-foreground font-medium">{totalItems}</span>{' '}
             {t('resultCountUnit') || '个作品'}
           </p>
           {totalPages > 1 && (
@@ -294,8 +293,7 @@ export default function Page() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-600 border border-white/10 hover:border-white/20 hover:text-white transition-all disabled:opacity-30"
-                style={{ background: 'rgba(255,255,255,0.04)' }}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground border border-border hover:border-primary/50 hover:text-foreground transition-all disabled:opacity-30 bg-muted"
                 aria-label={t('prevPage')}
                 title={t('prevPage')}
               >
@@ -306,7 +304,7 @@ export default function Page() {
               <div className="hidden sm:flex items-center gap-1">
                 {getPageNumbers().map((p, i) =>
                   p === null ? (
-                    <span key={`ellipsis-${i}`} className="text-zinc-700 px-1 text-sm">…</span>
+                    <span key={`ellipsis-${i}`} className="text-muted-foreground/50 px-1 text-sm">…</span>
                   ) : (
                     <button
                       key={p}
@@ -314,25 +312,21 @@ export default function Page() {
                       className={cn(
                         "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all",
                         p === page
-                          ? "text-black font-bold"
-                          : "text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white"
+                          ? "text-black font-bold bg-green-400"
+                          : "text-muted-foreground border border-border hover:border-primary/50 hover:text-foreground bg-muted"
                       )}
-                      style={p === page
-                        ? { background: '#32F08C', color: '#000' }
-                        : { background: 'rgba(255,255,255,0.04)' }
-                      }
                     >
                       {p}
                     </button>
                   )
                 )}
               </div>
-
+              
               {/* Mobile pagination */}
               <div className="flex sm:hidden items-center gap-1">
                 {getMobilePageNumbers().map((p, i) =>
                   p === null ? (
-                    <span key={`ellipsis-${i}`} className="text-zinc-700 px-1 text-sm">…</span>
+                    <span key={`ellipsis-${i}`} className="text-muted-foreground/50 px-1 text-sm">…</span>
                   ) : (
                     <button
                       key={p}
@@ -340,13 +334,9 @@ export default function Page() {
                       className={cn(
                         "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all",
                         p === page
-                          ? "text-black font-bold"
-                          : "text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white"
+                          ? "text-black font-bold bg-green-400"
+                          : "text-muted-foreground border border-border hover:border-primary/50 hover:text-foreground bg-muted"
                       )}
-                      style={p === page
-                        ? { background: '#32F08C', color: '#000' }
-                        : { background: 'rgba(255,255,255,0.04)' }
-                      }
                     >
                       {p}
                     </button>
@@ -357,8 +347,7 @@ export default function Page() {
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-600 border border-white/10 hover:border-white/20 hover:text-white transition-all disabled:opacity-30"
-                style={{ background: 'rgba(255,255,255,0.04)' }}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground border border-border hover:border-primary/50 hover:text-foreground transition-all disabled:opacity-30 bg-muted"
                 aria-label={t('nextPage')}
                 title={t('nextPage')}
               >
@@ -442,22 +431,22 @@ function PostersTab() {
               />
             </div>
             <div className="flex min-w-0 flex-1 flex-col p-5">
-              <h3 className="font-bold text-white text-base mb-1.5 line-clamp-1 group-hover:text-green-400 transition-colors [overflow-wrap:anywhere]">{poster.nickname}</h3>
+              <h3 className="font-bold text-card-foreground text-base mb-1.5 line-clamp-1 group-hover:text-green-400 transition-colors [overflow-wrap:anywhere]">{poster.nickname}</h3>
               {poster.description && (
-                <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2 mb-4 [overflow-wrap:anywhere]">{poster.description}</p>
+                <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2 mb-4 [overflow-wrap:anywhere]">{poster.description}</p>
               )}
               {/* Tags — 与作品卡片统一样式 */}
               {Array.isArray(poster.tags) && poster.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-4">
                   {poster.tags.slice(0, 3).map((tag, idx) => (
-                    <span key={`${tag}-${idx}`} className="text-[10px] px-2 py-0.5 rounded-full border bg-white/5 text-zinc-600 border-white/10">{tag}</span>
+                    <span key={`${tag}-${idx}`} className="text-[10px] px-2 py-0.5 rounded-full border bg-muted text-muted-foreground border-border">{tag}</span>
                   ))}
                 </div>
               )}
               {/* Footer: time — 与作品卡片统一样式 */}
-              <div className="flex min-w-0 items-center gap-1 pt-3.5 border-t border-white/5 mt-auto">
+              <div className="flex min-w-0 items-center gap-1 pt-3.5 border-t border-border mt-auto">
                 <Clock className="w-2.5 h-2.5 shrink-0" />
-                <span className="text-[10px] text-zinc-600">
+                <span className="text-[10px] text-muted-foreground">
                   {new Date(poster.createdAt).getFullYear()}/{String(new Date(poster.createdAt).getMonth() + 1).padStart(2, '0')}/{String(new Date(poster.createdAt).getDate()).padStart(2, '0')}
                 </span>
               </div>

@@ -7,16 +7,16 @@ export default function SignInPage() {
     <div className="flex items-center justify-center min-h-[calc(100vh-64px)] relative">
       <ParticlesBackground />
       <div className="relative z-10 w-full max-w-md">
-        <div className="bg-[#0A0A0C] border border-white/10 shadow-xl p-8 rounded-xl">
+        <div className="bg-card border border-border shadow-xl p-8 rounded-xl">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-white mb-2">登录</h1>
-            <p className="text-gray-400">欢迎回来，请登录您的账户</p>
+            <h1 className="text-2xl font-bold text-foreground mb-2">登录</h1>
+            <p className="text-muted-foreground">欢迎回来，请登录您的账户</p>
           </div>
 
           <SignInForm />
 
           <div className="mt-6 text-center">
-            <p className="text-gray-400">
+            <p className="text-muted-foreground">
               还没有账户？{" "}
               <Link
                 href="/sign-up"
