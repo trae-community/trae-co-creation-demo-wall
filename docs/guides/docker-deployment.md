@@ -60,8 +60,14 @@ docker compose up -d --build
 代码更新后重新部署时，**必须加 `--force-recreate`**，否则数据库初始化不会重跑：
 
 ```bash
+# 服务器（当前生产环境使用 docker-compose V1）
+docker-compose -f docker-compose.prod.yml up -d --build --force-recreate
+
+# 本地或已安装 compose V2 插件的环境
 docker compose -f docker-compose.prod.yml up -d --build --force-recreate
 ```
+
+> ⚠️ 命令选择：`docker compose`（空格，V2 插件）与 `docker-compose`（连字符，V1）不兼容。若执行时报 `unknown shorthand flag: 'f'`，说明环境只有 V1，改用连字符写法即可。
 
 > ⚠️ 原理说明：`app-init` 是一次性初始化容器（`restart: "no"`），`app` 通过 `service_completed_successfully` 等待它。Docker Compose 判断条件时依据的是容器**上一次的退出状态**——如果 `app-init` 旧容器已存在且退出码为 0，Compose 认为条件已满足，直接启动 `app`，不会重跑初始化。`--force-recreate` 强制重建所有容器，确保每次更新都会重新执行 `prisma db push` + `seed`。
 
@@ -69,21 +75,34 @@ docker compose -f docker-compose.prod.yml up -d --build --force-recreate
 
 | 步骤 | 行为 |
 |------|------|
+| 构建镜像 | 打包本次所有代码改动到镜像 |
 | `prisma db push` | 按 schema 差异**增量同步**表结构（只加表、加字段），不删数据 |
 | `seed` | 幂等执行：角色、字典等基础数据存在即跳过；root 用户**已存在则完全跳过**（不覆盖用户名和密码） |
 | 数据卷 | PostgreSQL / Redis 数据在命名卷（`postgres-data` / `redis-data`）中，容器重建不影响 |
 
+### 更新后验证
+
+命令跑完后无需额外操作，但建议花 30 秒验证：
+
+```bash
+# 1. 容器状态：app-init 应为 Exited (0)，app 应为 Up 且持续运行
+docker-compose -f docker-compose.prod.yml ps
+```
+
+2. 浏览器访问网站，验证本次更新的功能点是否生效
+3. 用 root 账号登录，确认密码未被重置
+
 ### 数据安全说明
 
 - ✅ `--force-recreate` 只销毁重建**容器**（进程），不碰数据卷，业务数据全部保留
-- ✅ 唯一删数据的方式是 `docker compose down -v`（`-v` 删除数据卷），禁止在生产使用
+- ✅ 唯一删数据的方式是 `docker-compose down -v`（`-v` 删除数据卷），禁止在生产使用
 - ✅ 数据库迁移已**禁止破坏性变更**：`entrypoint.sh` 中的 `prisma db push` 不使用 `--accept-data-loss`，schema 中的删列 / 改字段类型操作会导致迁移失败并阻断部署，需人工备份确认后处理
 
 ### 更新失败排查
 
 ```bash
-docker compose logs app-init   # 查看迁移 / seed 是否报错
-docker compose logs app        # 应用启动日志
+docker-compose -f docker-compose.prod.yml logs app-init   # 查看迁移 / seed 是否报错
+docker-compose -f docker-compose.prod.yml logs app        # 应用启动日志
 ```
 
 ## 数据迁移（从 Supabase / 旧环境）
