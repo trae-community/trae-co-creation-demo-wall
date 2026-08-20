@@ -51,6 +51,8 @@ const MODULE_LABELS: Record<string, string> = {
   dictionary: '字典管理',
   tags: '标签管理',
   submit: '作品提交',
+  poster: '海报管理',
+  profile: '个人中心',
 }
 
 // 动作中文映射
