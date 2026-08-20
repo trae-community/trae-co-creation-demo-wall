@@ -158,7 +158,6 @@ export default function PosterDetailPage() {
             <h3 className="text-sm font-medium text-foreground">{t('scanToExperience')}</h3>
             {qrDataUrl && (
               <div className="bg-white rounded-xl p-3 w-fit">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={qrDataUrl} alt={t('qrCode')} className="w-32 h-32" />
               </div>
             )}

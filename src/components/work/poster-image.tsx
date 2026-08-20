@@ -62,7 +62,6 @@ export function PosterImage({
   if (failed) {
     // 降级：直接展示原始封面
     return (
-      // eslint-disable-next-line @next/next/no-img-element
       <img src={imageUrl} alt={nickname} className={cn('w-full h-full object-cover', className)} />
     );
   }
@@ -79,7 +78,6 @@ export function PosterImage({
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={dataUrl}
       alt={nickname}

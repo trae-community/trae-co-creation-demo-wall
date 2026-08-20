@@ -282,7 +282,6 @@ export function PostersManagement() {
             <div className="flex flex-1 flex-col sm:flex-row">
               {/* 封面缩略图 */}
               <div className="w-full sm:w-48 h-40 sm:h-auto bg-muted shrink-0 relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={poster.imageUrl}
                   alt={poster.nickname}
