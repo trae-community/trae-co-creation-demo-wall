@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error('[API] Failed to fetch posters:', error);
-    return NextResponse.json({ error: 'Failed to fetch posters' }, { status: 500 });
+    return NextResponse.json({ error: '获取海报列表失败' }, { status: 500 });
   }
 }
 
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     // 验证必填字段
     if (!nickname || !imageUrl || !demoUrl) {
       return NextResponse.json(
-        { error: 'Missing required fields: nickname, imageUrl, demoUrl' },
+        { error: '缺少必填字段：昵称、封面图、作品链接' },
         { status: 400 }
       );
     }
@@ -97,14 +97,14 @@ export async function POST(req: NextRequest) {
     try {
       new URL(demoUrl);
     } catch {
-      return NextResponse.json({ error: 'Invalid demo URL' }, { status: 400 });
+      return NextResponse.json({ error: '作品链接格式无效，请输入有效的 URL' }, { status: 400 });
     }
 
     // 标签验证：必须选择标签；含有效自动过审标签时免审核
     // （与作品提交 /api/submit 的自动过审校验逻辑保持一致）
     const ids: number[] = Array.isArray(tagIds) ? tagIds.map(Number).filter(n => Number.isInteger(n) && n > 0) : [];
     if (ids.length === 0) {
-      return NextResponse.json({ error: 'Please select at least one tag' }, { status: 400 });
+      return NextResponse.json({ error: '请至少选择一个作品来源' }, { status: 400 });
     }
 
     const now = new Date();
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
     ]);
 
     if (selectedTags.length === 0) {
-      return NextResponse.json({ error: 'Invalid tag selection' }, { status: 400 });
+      return NextResponse.json({ error: '选择的标签无效，请重新选择' }, { status: 400 });
     }
 
     const isAutoApproved = autoAuditTags.length > 0;
@@ -159,9 +159,9 @@ export async function POST(req: NextRequest) {
       action: 'create',
       targetType: 'work_poster',
       success: false,
-      errorMessage: error instanceof Error ? error.message : 'unknown error',
+      errorMessage: error instanceof Error ? error.message : '未知错误',
       request: req,
     });
-    return NextResponse.json({ error: 'Failed to create poster' }, { status: 500 });
+    return NextResponse.json({ error: '海报创建失败，请稍后重试' }, { status: 500 });
   }
 }

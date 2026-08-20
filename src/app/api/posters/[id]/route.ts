@@ -39,17 +39,17 @@ export async function GET(
     });
 
     if (!poster) {
-      return NextResponse.json({ error: 'Poster not found' }, { status: 404 });
+      return NextResponse.json({ error: '海报不存在' }, { status: 404 });
     }
 
     // 未通过审核的海报仅管理员或创建者可见
     if (poster.auditStatus !== 1 && !adminMode && (!user || poster.userId !== user.userId)) {
-      return NextResponse.json({ error: 'Poster not found' }, { status: 404 });
+      return NextResponse.json({ error: '海报不存在' }, { status: 404 });
     }
 
     return NextResponse.json(sanitize(poster));
   } catch {
-    return NextResponse.json({ error: 'Invalid poster ID' }, { status: 400 });
+    return NextResponse.json({ error: '海报 ID 格式无效' }, { status: 400 });
   }
 }
 
@@ -92,7 +92,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch {
-    return NextResponse.json({ error: 'Failed to delete poster' }, { status: 500 });
+    return NextResponse.json({ error: '删除海报失败' }, { status: 500 });
   }
 }
 
@@ -122,7 +122,7 @@ export async function PATCH(
       select: { userId: true, auditStatus: true },
     });
     if (!existing) {
-      return NextResponse.json({ error: 'Poster not found' }, { status: 404 });
+      return NextResponse.json({ error: '海报不存在' }, { status: 404 });
     }
 
     const adminMode = isAdmin(user);
@@ -131,7 +131,7 @@ export async function PATCH(
     // ── 管理员更新审核状态 ──
     if (typeof body.auditStatus === 'number' && adminMode) {
       if (![0, 1, 2].includes(body.auditStatus)) {
-        return NextResponse.json({ error: 'Invalid audit status' }, { status: 400 });
+        return NextResponse.json({ error: '审核状态无效，可选值：0(待审)/1(通过)/2(拒绝)' }, { status: 400 });
       }
       const updated = await prisma.workPoster.update({
         where: { id },
@@ -160,7 +160,7 @@ export async function PATCH(
     if (body.imageUrl !== undefined) updateData.imageUrl = String(body.imageUrl).slice(0, 255);
     if (body.demoUrl !== undefined) {
       try { new URL(body.demoUrl); } catch {
-        return NextResponse.json({ error: 'Invalid demo URL' }, { status: 400 });
+        return NextResponse.json({ error: '作品链接格式无效，请输入有效的 URL' }, { status: 400 });
       }
       updateData.demoUrl = String(body.demoUrl).slice(0, 255);
     }
@@ -171,7 +171,7 @@ export async function PATCH(
     }
 
     if (Object.keys(updateData).length === 0) {
-      return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
+      return NextResponse.json({ error: '没有需要更新的字段' }, { status: 400 });
     }
 
     const updated = await prisma.workPoster.update({
@@ -191,6 +191,6 @@ export async function PATCH(
 
     return NextResponse.json({ ...sanitize(updated), downgraded: existing.auditStatus === 1 && updateData.auditStatus === 0 });
   } catch {
-    return NextResponse.json({ error: 'Failed to update poster' }, { status: 500 });
+    return NextResponse.json({ error: '更新海报失败' }, { status: 500 });
   }
 }

@@ -69,6 +69,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error('[API] Failed to fetch console posters:', error);
-    return NextResponse.json({ error: 'Failed to fetch posters' }, { status: 500 });
+    return NextResponse.json({ error: '获取海报列表失败' }, { status: 500 });
   }
 }
