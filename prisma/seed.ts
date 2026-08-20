@@ -236,24 +236,17 @@ async function main() {
 
   const existingUser = await prisma.sysUser.findUnique({
     where: { email: adminEmail },
-    select: { id: true, username: true },
+    select: { id: true, username: true, email: true },
   });
 
   let adminUser;
   let userAction = '';
 
   if (existingUser) {
-    // 用户已存在，更新密码（防止密码泄露后无法登录）
-    const hashedPassword = await bcrypt.hash(adminPassword, 10);
-    adminUser = await prisma.sysUser.update({
-      where: { id: existingUser.id },
-      data: { 
-        username: adminUsername,
-        passwordHash: hashedPassword,
-      },
-    });
-    userAction = '🔄 已更新';
-    console.log(`  ${userAction}: ${adminUser.email}`);
+    // 用户已存在，完全跳过（保留线上已修改的用户名和密码）
+    adminUser = existingUser as any;
+    userAction = '⏭️ 已跳过';
+    console.log(`  ${userAction}: ${adminUser.email}（保留线上配置）`);
   } else {
     // 新用户
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
