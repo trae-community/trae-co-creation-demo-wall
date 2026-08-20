@@ -51,7 +51,7 @@ export function HeroBanner({ onBrowseWorks }: { onBrowseWorks?: () => void }) {
         {/* 真实按钮：提交我的作品 + 浏览作品 */}
         {/* 桌面端：按设计稿百分比绝对定位 */}
         <button
-          onClick={handleSubmitClick}
+          onClick={() => router.push(`/${locale}/poster-maker`)}
           className="hidden sm:flex absolute items-center justify-center gap-[0.4em] rounded-full font-bold text-white transition-all hover:brightness-110 hover:scale-[1.04] text-[clamp(11px,1.5vw,24px)]"
           style={{
             left: `${SUBMIT_BTN.left * 100}%`,
@@ -62,7 +62,7 @@ export function HeroBanner({ onBrowseWorks }: { onBrowseWorks?: () => void }) {
             boxShadow: '0 4px 0 0 #32f08e, 0 10px 24px rgba(50, 240, 142, 0.55)',
           }}
         >
-          {t('submitWork')}
+          {t('makePoster')}
           <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </button>
 
@@ -83,14 +83,14 @@ export function HeroBanner({ onBrowseWorks }: { onBrowseWorks?: () => void }) {
         {/* 移动端：底部居中，自然尺寸 */}
         <div className="sm:hidden absolute bottom-[14%] left-0 right-0 flex items-center justify-center gap-2 px-4">
           <button
-            onClick={handleSubmitClick}
+            onClick={() => router.push(`/${locale}/poster-maker`)}
             className="flex items-center justify-center gap-1 rounded-full font-bold text-white text-xs px-4 py-2 transition-all active:scale-95"
             style={{
               background: '#4b3fe3',
               boxShadow: '0 3px 0 0 #32f08e, 0 8px 20px rgba(50, 240, 142, 0.45)',
             }}
           >
-            {t('submitWork')}
+            {t('makePoster')}
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </button>
           <button
