@@ -146,7 +146,7 @@ export default function PosterMakerPage() {
     setIsSaving(true);
     setSubmitMessage('');
     try {
-      // 防重复提交：提交后至少转圈等待 5 秒，期间按钮禁用不可再次点击
+      // 防重复提交：提交后至少转圈等待 3 秒，期间按钮禁用不可再次点击
       const [res] = await Promise.all([
         fetch('/api/posters', {
           method: 'POST',
@@ -159,7 +159,7 @@ export default function PosterMakerPage() {
             tagIds: selectedTagIds,
           }),
         }),
-        new Promise(resolve => setTimeout(resolve, 5000)),
+        new Promise(resolve => setTimeout(resolve, 3000)),
       ]);
 
       if (res.ok) {
@@ -168,7 +168,9 @@ export default function PosterMakerPage() {
         setSubmitMessage(data.autoApproved ? t('submitSuccessAuto') : t('submitSuccess'));
         setTimeout(() => setSaved(false), 3000);
       } else {
-        setErrors(prev => ({ ...prev, save: t('submitFailed') }));
+        const errData = await res.json().catch(() => null);
+        const errMsg = errData?.error || t('submitFailed');
+        setErrors(prev => ({ ...prev, save: errMsg }));
       }
     } catch {
       setErrors(prev => ({ ...prev, save: t('submitFailed') }));
