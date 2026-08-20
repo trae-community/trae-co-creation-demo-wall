@@ -146,25 +146,27 @@ export default function PosterMakerPage() {
     setIsSaving(true);
     setSubmitMessage('');
     try {
-      const res = await fetch('/api/posters', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nickname: nickname.trim(),
-          description: description.trim() || undefined,
-          imageUrl,
-          demoUrl: demoUrl.trim(),
-          tagIds: selectedTagIds,
+      // 防重复提交：提交后至少转圈等待 5 秒，期间按钮禁用不可再次点击
+      const [res] = await Promise.all([
+        fetch('/api/posters', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nickname: nickname.trim(),
+            description: description.trim() || undefined,
+            imageUrl,
+            demoUrl: demoUrl.trim(),
+            tagIds: selectedTagIds,
+          }),
         }),
-      });
+        new Promise(resolve => setTimeout(resolve, 5000)),
+      ]);
 
       if (res.ok) {
         const data = await res.json();
         setSaved(true);
         setSubmitMessage(data.autoApproved ? t('submitSuccessAuto') : t('submitSuccess'));
         setTimeout(() => setSaved(false), 3000);
-      } else if (res.status === 429) {
-        setErrors(prev => ({ ...prev, save: t('submitTooFrequent') }));
       } else {
         setErrors(prev => ({ ...prev, save: t('submitFailed') }));
       }

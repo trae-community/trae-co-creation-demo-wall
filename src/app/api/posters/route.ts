@@ -82,21 +82,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 防重复提交：同一用户 30 秒内只能提交一次
-    const recentPoster = await prisma.workPoster.findFirst({
-      where: {
-        userId: user.userId,
-        createdAt: { gte: new Date(Date.now() - 30 * 1000) },
-      },
-      select: { id: true },
-    });
-    if (recentPoster) {
-      return NextResponse.json(
-        { error: 'Too many submissions, please wait a moment' },
-        { status: 429 }
-      );
-    }
-
     const body = await req.json();
     const { nickname, description, imageUrl, demoUrl, tagIds } = body;
 
