@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
+import { writeOperationLog } from '@/lib/audit-log';
 
 // Helper to sanitize BigInt
 const sanitize = (data: unknown) => {
@@ -81,6 +82,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // 防重复提交：同一用户 30 秒内只能提交一次
+    const recentPoster = await prisma.workPoster.findFirst({
+      where: {
+        userId: user.userId,
+        createdAt: { gte: new Date(Date.now() - 30 * 1000) },
+      },
+      select: { id: true },
+    });
+    if (recentPoster) {
+      return NextResponse.json(
+        { error: 'Too many submissions, please wait a moment' },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const { nickname, description, imageUrl, demoUrl, tagIds } = body;
 
@@ -140,9 +156,27 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await writeOperationLog({
+      operatorId: user.userId,
+      module: 'poster',
+      action: 'create',
+      targetType: 'work_poster',
+      targetId: poster.id,
+      payload: { nickname: String(nickname).slice(0, 100), tags: tagNames, autoApproved: isAutoApproved },
+      request: req,
+    });
+
     return NextResponse.json({ ...sanitize(poster), autoApproved: isAutoApproved }, { status: 201 });
   } catch (error) {
     console.error('[API] Failed to create poster:', error);
+    await writeOperationLog({
+      module: 'poster',
+      action: 'create',
+      targetType: 'work_poster',
+      success: false,
+      errorMessage: error instanceof Error ? error.message : 'unknown error',
+      request: req,
+    });
     return NextResponse.json({ error: 'Failed to create poster' }, { status: 500 });
   }
 }

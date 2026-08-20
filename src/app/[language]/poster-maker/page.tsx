@@ -163,6 +163,8 @@ export default function PosterMakerPage() {
         setSaved(true);
         setSubmitMessage(data.autoApproved ? t('submitSuccessAuto') : t('submitSuccess'));
         setTimeout(() => setSaved(false), 3000);
+      } else if (res.status === 429) {
+        setErrors(prev => ({ ...prev, save: t('submitTooFrequent') }));
       } else {
         setErrors(prev => ({ ...prev, save: t('submitFailed') }));
       }
@@ -279,7 +281,7 @@ export default function PosterMakerPage() {
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-foreground/80 mb-2">
               <User className="w-4 h-4" />
-              {t('nicknameLabel')} *
+              {t('nicknameLabel')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -312,7 +314,7 @@ export default function PosterMakerPage() {
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-foreground/80 mb-2">
               <ImageIcon className="w-4 h-4" />
-              {t('imageLabel')} *
+              {t('imageLabel')} <span className="text-red-500">*</span>
             </label>
             <div
               onClick={() => fileInputRef.current?.click()}
@@ -365,7 +367,7 @@ export default function PosterMakerPage() {
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-foreground/80 mb-2">
               <Link2 className="w-4 h-4" />
-              {t('demoUrlLabel')} *
+              {t('demoUrlLabel')} <span className="text-red-500">*</span>
             </label>
             <input
               type="url"
@@ -378,11 +380,11 @@ export default function PosterMakerPage() {
             {errors.demoUrl && <p className="mt-1 text-xs text-red-400">{errors.demoUrl}</p>}
           </div>
 
-          {/* 标签选择 */}
+          {/* 作品来源标签（与作品提交页同款样式，免审标签带徽章） */}
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-foreground/80 mb-2">
               <Tag className="w-4 h-4" />
-              {t('tagsLabel')} *
+              {t('tagsLabel')} <span className="text-red-500">*</span>
             </label>
             {availableTags.length > 0 ? (
               <div className="flex flex-wrap gap-2">
@@ -397,15 +399,18 @@ export default function PosterMakerPage() {
                         isSelected ? prev.filter(id => id !== tag.id) : [...prev, tag.id]
                       )}
                       className={cn(
-                        "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                        "px-3 py-1.5 rounded-full text-xs font-medium border transition-colors",
                         isSelected
-                          ? "bg-green-500/20 border-green-500/50 text-green-400"
-                          : "bg-input border-input text-muted-foreground hover:border-ring hover:text-foreground"
+                          ? "bg-primary text-black border-primary"
+                          : "bg-muted text-muted-foreground border-border hover:border-primary/50"
                       )}
                     >
                       {tag.name}
                       {isAutoActive && (
-                        <span className="ml-1 inline-flex items-center gap-0.5 text-green-400">
+                        <span className={cn(
+                          "ml-1 inline-flex items-center gap-0.5",
+                          isSelected ? "text-black/70" : "text-green-400"
+                        )}>
                           <ShieldCheck className="w-3 h-3" />
                           {t('autoAuditBadge')}
                         </span>
@@ -487,11 +492,11 @@ export default function PosterMakerPage() {
           {errors.save && <p className="text-xs text-red-400">{errors.save}</p>}
         </div>
 
-        {/* ─── 右侧预览（同款卡片容器） ─── */}
+        {/* ─── 右侧预览（同款卡片容器，预览区域自适应放大） ─── */}
         <div className="bg-card p-6 sm:p-8 rounded-2xl shadow-lg border border-border flex flex-col items-center">
           <h3 className="text-sm font-medium text-muted-foreground mb-4 self-start">{t('previewTitle')}</h3>
           <div
-            className="relative w-full max-w-[420px] rounded-2xl overflow-hidden border border-border"
+            className="relative w-full max-w-[560px] rounded-2xl overflow-hidden border border-border"
             style={{ aspectRatio: '283.46 / 425.2' }}
           >
             {isGenerating ? (
