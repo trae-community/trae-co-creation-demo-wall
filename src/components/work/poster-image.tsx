@@ -70,7 +70,7 @@ export function PosterImage({
   if (!dataUrl) {
     return (
       <div
-        className={cn('flex items-center justify-center bg-white/5', className)}
+        className={cn('flex items-center justify-center bg-muted', className)}
         style={{ aspectRatio: `${POSTER_W} / ${POSTER_H}` }}
       >
         <Loader2 className="w-6 h-6 text-green-500 animate-spin" />

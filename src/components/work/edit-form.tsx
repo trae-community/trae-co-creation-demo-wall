@@ -337,7 +337,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
           <CheckCircle className="w-8 h-8" />
         </div>
         <h2 className="text-2xl font-bold text-white mb-2">{t('editSuccessTitle')}</h2>
-        <p className="text-gray-400 mb-6 max-w-md mx-auto">
+        <p className="text-muted-foreground mb-6 max-w-md mx-auto">
           {t('editSuccessMessage')}
         </p>
         <div className="flex justify-center gap-4">
@@ -353,7 +353,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
     <div className="max-w-3xl mx-auto">
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold text-white mb-1">{t('editTitle')}</h1>
-        <p className="text-sm text-gray-400">{t('editDescription')}</p>
+        <p className="text-sm text-muted-foreground">{t('editDescription')}</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -365,7 +365,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
           </h2>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">{t('projectName')} <span className="text-red-500">*</span></label>
+            <label className="text-sm font-medium text-muted-foreground">{t('projectName')} <span className="text-red-500">*</span></label>
             <input
               {...register("name")}
               className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
@@ -376,7 +376,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">{t('country')} <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium text-muted-foreground">{t('country')} <span className="text-red-500">*</span></label>
               <Select
                 options={availableCountries.map(country => ({ label: country.itemLabel, value: country.itemValue }))}
                 value={selectedCountry}
@@ -389,7 +389,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">{t('city')} <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium text-muted-foreground">{t('city')} <span className="text-red-500">*</span></label>
               <Select
                 options={filteredCities.map(city => ({ label: city.itemLabel, value: city.itemValue }))}
                 value={watch("city")}
@@ -404,7 +404,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">{t('intro')} <span className="text-red-500">*</span></label>
+            <label className="text-sm font-medium text-muted-foreground">{t('intro')} <span className="text-red-500">*</span></label>
             <input
                 {...register("intro")}
                 className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
@@ -415,7 +415,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
 
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">{t('category')} <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium text-muted-foreground">{t('category')} <span className="text-red-500">*</span></label>
               <Select
                 options={availableCategories.map(category => ({ label: category.itemLabel, value: category.itemValue }))}
                 value={watch("category")}
@@ -428,7 +428,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">{t('devStatus')} <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium text-muted-foreground">{t('devStatus')} <span className="text-red-500">*</span></label>
               <Select
                 options={availableDevStatuses.map(status => ({ label: status.itemLabel, value: status.itemValue }))}
                 value={watch("devStatus")}
@@ -441,7 +441,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">{t('tags')} <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium text-muted-foreground">{t('tags')} <span className="text-red-500">*</span></label>
               <div className="flex flex-wrap gap-2">
                 {availableTags.map((tag) => {
                   const isSelected = (selectedTags as number[]).includes(tag.id);
@@ -453,7 +453,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
                         isSelected 
                           ? "bg-primary text-black border-primary" 
-                          : "bg-zinc-900/50 text-zinc-400 border-zinc-700 hover:border-zinc-500"
+                          : "bg-muted text-muted-foreground border-border hover:border-primary/50"
                       }`}
                     >
                       {tag.name}
@@ -463,7 +463,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
               </div>
               <input type="hidden" {...register("tags")} />
               {errors.tags && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.tags.message}</p>}
-              <p className="text-xs text-zinc-500 mt-1">{t('tagsDesc')}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('tagsDesc')}</p>
             </div>
           </div>
         </section>
@@ -471,16 +471,16 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
         {/* Cover Image */}
         <section className="space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">{t('coverImageLabel')} <span className="text-red-500">*</span></label>
+            <label className="text-sm font-medium text-muted-foreground">{t('coverImageLabel')} <span className="text-red-500">*</span></label>
             {!previewCoverUrl ? (
               <div className="flex gap-4 items-start">
                 <div className="flex-1">
                   <div className="flex items-center justify-center w-full">
-                    <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-zinc-700 border-dashed rounded-lg cursor-pointer bg-zinc-900/50 hover:bg-zinc-800 transition-colors">
+                    <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-border border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80 transition-colors">
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <UploadCloud className="w-8 h-8 mb-3 text-zinc-500" />
-                        <p className="mb-2 text-sm text-zinc-400"><span className="font-semibold text-primary">{t('uploadClick')}</span> {t('uploadDrag')}</p>
-                        <p className="text-xs text-zinc-500">{t('uploadFormat')}</p>
+                        <UploadCloud className="w-8 h-8 mb-3 text-muted-foreground" />
+                        <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold text-primary">{t('uploadClick')}</span> {t('uploadDrag')}</p>
+                        <p className="text-xs text-muted-foreground">{t('uploadFormat')}</p>
                       </div>
                       <input
                         id="dropzone-file"
@@ -496,7 +496,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
               </div>
             ) : (
               /* Preview */
-              <div className="mt-4 w-full aspect-video bg-zinc-900 rounded-lg overflow-hidden border border-border flex items-center justify-center relative group">
+              <div className="mt-4 w-full aspect-video bg-muted rounded-lg overflow-hidden border border-border flex items-center justify-center relative group">
                 <img
                   src={previewCoverUrl}
                   alt={t('coverPreviewAlt')}
@@ -527,8 +527,8 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
           </h2>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">{t('story')} <span className="text-red-500">*</span></label>
-            <p className="text-xs text-zinc-500 mb-2">{t('storyDesc')}</p>
+            <label className="text-sm font-medium text-muted-foreground">{t('story')} <span className="text-red-500">*</span></label>
+            <p className="text-xs text-muted-foreground mb-2">{t('storyDesc')}</p>
             <Controller
               name="story"
               control={control}
@@ -546,8 +546,8 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-300">{t('highlights')} <span className="text-red-500">*</span></label>
-              <span className="text-xs text-zinc-500">{t('highlightsDesc')}</span>
+              <label className="text-sm font-medium text-muted-foreground">{t('highlights')} <span className="text-red-500">*</span></label>
+              <span className="text-xs text-muted-foreground">{t('highlightsDesc')}</span>
             </div>
             {highlightFields.map((field, index) => (
               <div key={field.id} className="flex gap-2 items-start">
@@ -561,14 +561,14 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
                   {errors.highlights?.[index]?.value && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.highlights[index]?.value?.message}</p>}
                 </div>
                 {highlightFields.length > 1 && (
-                  <button type="button" onClick={() => removeHighlight(index)} className="p-3 text-zinc-500 hover:text-red-500 transition-colors">
+                  <button type="button" onClick={() => removeHighlight(index)} className="p-3 text-muted-foreground hover:text-red-500 transition-colors">
                     <Trash2 className="w-5 h-5" />
                   </button>
                 )}
               </div>
             ))}
             {highlightFields.length < 5 && (
-              <Button type="button" variant="outline" size="sm" onClick={() => appendHighlight({ value: "" })} className="w-full border-dashed border-zinc-700 hover:border-primary hover:text-primary">
+              <Button type="button" variant="outline" size="sm" onClick={() => appendHighlight({ value: "" })} className="w-full border-dashed border-border hover:border-primary hover:text-primary">
                 <Plus className="w-4 h-4 mr-2" /> {t('addHighlight')}
               </Button>
             )}
@@ -577,7 +577,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-300">{t('scenarios')} <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium text-muted-foreground">{t('scenarios')} <span className="text-red-500">*</span></label>
             </div>
             {scenarioFields.map((field, index) => (
               <div key={field.id} className="flex gap-2 items-start">
@@ -590,13 +590,13 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
                   {errors.scenarios?.[index]?.value && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.scenarios[index]?.value?.message}</p>}
                 </div>
                 {scenarioFields.length > 1 && (
-                  <button type="button" onClick={() => removeScenario(index)} className="p-3 text-zinc-500 hover:text-red-500 transition-colors">
+                  <button type="button" onClick={() => removeScenario(index)} className="p-3 text-muted-foreground hover:text-red-500 transition-colors">
                     <Trash2 className="w-5 h-5" />
                   </button>
                 )}
               </div>
             ))}
-            <Button type="button" variant="outline" size="sm" onClick={() => appendScenario({ value: "" })} className="w-full border-dashed border-zinc-700 hover:border-primary hover:text-primary">
+            <Button type="button" variant="outline" size="sm" onClick={() => appendScenario({ value: "" })} className="w-full border-dashed border-border hover:border-primary hover:text-primary">
               <Plus className="w-4 h-4 mr-2" /> {t('addScenario')}
             </Button>
             {errors.scenarios && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.scenarios.message}</p>}
@@ -611,11 +611,11 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
           </h2>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">{t('screenshotsLabel')} <span className="text-red-500">*</span></label>
-            <p className="text-xs text-zinc-500 mb-2">{t('screenshotsDesc')}</p>
+            <label className="text-sm font-medium text-muted-foreground">{t('screenshotsLabel')} <span className="text-red-500">*</span></label>
+            <p className="text-xs text-muted-foreground mb-2">{t('screenshotsDesc')}</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {previewScreenshots.map((url, index) => (
-                <div key={index} className="relative group aspect-video bg-zinc-900 rounded-lg overflow-hidden border border-border">
+                <div key={index} className="relative group aspect-video bg-muted rounded-lg overflow-hidden border border-border">
                   <img src={url} alt={`Screenshot ${index + 1}`} className="w-full h-full object-cover" />
                   <button
                     type="button"
@@ -627,9 +627,9 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
                 </div>
               ))}
               {previewScreenshots.length < 5 && (
-                <label className="flex flex-col items-center justify-center aspect-video border-2 border-zinc-700 border-dashed rounded-lg cursor-pointer bg-zinc-900/50 hover:bg-zinc-800 transition-colors">
-                  <Plus className="w-8 h-8 mb-2 text-zinc-500" />
-                  <span className="text-xs text-zinc-500">{t('addScreenshot')}</span>
+                <label className="flex flex-col items-center justify-center aspect-video border-2 border-border border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80 transition-colors">
+                  <Plus className="w-8 h-8 mb-2 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">{t('addScreenshot')}</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -653,7 +653,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">{t('demoUrl')}</label>
+              <label className="text-sm font-medium text-muted-foreground">{t('demoUrl')}</label>
               <input
                 {...register("demoUrl")}
                 className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
@@ -663,7 +663,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">{t('repoUrl')}</label>
+              <label className="text-sm font-medium text-muted-foreground">{t('repoUrl')}</label>
               <input
                 {...register("repoUrl")}
                 className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
@@ -683,7 +683,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-300">{t('team')} <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium text-muted-foreground">{t('team')} <span className="text-red-500">*</span></label>
             </div>
             {teamFields.map((field, index) => (
               <div key={field.id} className="flex gap-2 items-start">
@@ -696,20 +696,20 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
                   {errors.team?.[index]?.value && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.team[index]?.value?.message}</p>}
                 </div>
                 {teamFields.length > 1 && (
-                  <button type="button" onClick={() => removeTeam(index)} className="p-3 text-zinc-500 hover:text-red-500 transition-colors">
+                  <button type="button" onClick={() => removeTeam(index)} className="p-3 text-muted-foreground hover:text-red-500 transition-colors">
                     <Trash2 className="w-5 h-5" />
                   </button>
                 )}
               </div>
             ))}
-            <Button type="button" variant="outline" size="sm" onClick={() => appendTeam({ value: "" })} className="w-full border-dashed border-zinc-700 hover:border-primary hover:text-primary">
+            <Button type="button" variant="outline" size="sm" onClick={() => appendTeam({ value: "" })} className="w-full border-dashed border-border hover:border-primary hover:text-primary">
               <Plus className="w-4 h-4 mr-2" /> {t('addTeamMember')}
             </Button>
             {errors.team && <p className="text-red-500 text-xs flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.team.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">{t('teamIntro')}</label>
+            <label className="text-sm font-medium text-muted-foreground">{t('teamIntro')}</label>
             <textarea
               {...register("teamIntro")}
               rows={4}
@@ -720,7 +720,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">{t('contactPhone')}</label>
+              <label className="text-sm font-medium text-muted-foreground">{t('contactPhone')}</label>
               <input
                 {...register("contactPhone")}
                 className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"
@@ -728,7 +728,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">{t('contactEmail')}</label>
+              <label className="text-sm font-medium text-muted-foreground">{t('contactEmail')}</label>
               <input
                 {...register("contactEmail")}
                 className="w-full px-4 py-3 rounded-lg border-b-2 border-input bg-muted text-foreground focus:border-primary focus:outline-none transition-colors placeholder:text-muted-foreground"

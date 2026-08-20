@@ -156,7 +156,7 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
             ? 'bg-green-500/15 text-green-400 border-green-500/25'
             : variant === 'outline'
               ? 'text-muted-foreground border-border bg-secondary hover:text-foreground hover:bg-accent'
-              : 'text-zinc-500 border-transparent hover:text-white hover:bg-white/5'
+              : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-muted'
         )}
       >
         <Calendar className="w-3 h-3" />
@@ -165,7 +165,7 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
         {value && (
           <span
             onClick={(e) => { e.stopPropagation(); onChange('') }}
-            className="ml-0.5 w-4 h-4 flex items-center justify-center rounded-full hover:bg-white/10 transition-all"
+            className="ml-0.5 w-4 h-4 flex items-center justify-center rounded-full hover:bg-muted transition-all"
           >
             <X className="w-3 h-3" />
           </span>
@@ -175,15 +175,14 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
       {/* 日历弹窗 */}
       {isOpen && (
         <div
-          className="absolute right-0 top-full mt-2 z-50 w-[300px] rounded-2xl border border-white/10 p-4 shadow-2xl animate-dropdown-pop"
-          style={{ background: '#111318' }}
+          className="absolute right-0 top-full mt-2 z-50 w-[300px] rounded-2xl border border-border bg-card p-4 shadow-2xl animate-dropdown-pop"
         >
           {/* 导航：日视图按月翻页 / 选月按年翻页 / 选年按区间翻页 */}
           <div className="flex items-center justify-between mb-3">
             <button
               type="button"
               onClick={goToPrev}
-              className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-all"
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -192,8 +191,8 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
               onClick={handleTitleClick}
               disabled={panel === 'year'}
               className={cn(
-                'text-sm font-semibold text-zinc-200 px-2 py-1 rounded-lg transition-all',
-                panel !== 'year' && 'hover:bg-white/10 cursor-pointer'
+                'text-sm font-semibold text-foreground px-2 py-1 rounded-lg transition-all',
+                panel !== 'year' && 'hover:bg-muted cursor-pointer'
               )}
             >
               {titleText}
@@ -201,7 +200,7 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
             <button
               type="button"
               onClick={goToNext}
-              className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-all"
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -212,7 +211,7 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
               {/* 星期表头 */}
               <div className="grid grid-cols-7 gap-1 mb-1">
                 {weekdays.map((wd) => (
-                  <span key={wd} className="text-center text-xs text-zinc-500 py-1 select-none">
+                  <span key={wd} className="text-center text-xs text-muted-foreground py-1 select-none">
                     {wd}
                   </span>
                 ))}
@@ -230,10 +229,10 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
                       onClick={() => handleSelect(date)}
                       className={cn(
                         'h-8 rounded-lg text-sm transition-all',
-                        inMonth ? 'text-zinc-200' : 'text-zinc-600',
+                        inMonth ? 'text-foreground' : 'text-muted-foreground',
                         isSelected
                           ? 'bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold shadow-[0_0_12px_rgba(50,240,140,0.25)]'
-                          : 'hover:bg-white/10',
+                          : 'hover:bg-muted',
                         isToday && !isSelected && 'border border-green-500/40'
                       )}
                     >
@@ -260,7 +259,7 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
                       'h-12 rounded-lg text-sm transition-all',
                       isSelected
                         ? 'bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold shadow-[0_0_12px_rgba(50,240,140,0.25)]'
-                        : 'text-zinc-200 hover:bg-white/10',
+                        : 'text-foreground hover:bg-muted',
                       isCurrent && !isSelected && 'border border-green-500/40'
                     )}
                   >
@@ -286,7 +285,7 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
                       'h-12 rounded-lg text-sm transition-all',
                       isSelected
                         ? 'bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold shadow-[0_0_12px_rgba(50,240,140,0.25)]'
-                        : 'text-zinc-200 hover:bg-white/10',
+                        : 'text-foreground hover:bg-muted',
                       isCurrent && !isSelected && 'border border-green-500/40'
                     )}
                   >
@@ -298,7 +297,7 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
           )}
 
           {/* 底部操作 */}
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
             <button
               type="button"
               onClick={() => handleSelect(todayIso)}
@@ -310,7 +309,7 @@ export function DatePicker({ value, onChange, placeholder = '日期', className,
               <button
                 type="button"
                 onClick={() => { onChange(''); setIsOpen(false) }}
-                className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
                 {locale === 'zh' ? '清除' : locale === 'ja' ? 'クリア' : 'Clear'}
               </button>

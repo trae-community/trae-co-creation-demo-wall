@@ -37,8 +37,8 @@ const ToolbarButton = ({
     onClick={onClick}
     title={title}
     className={cn(
-      "p-1.5 rounded-md transition-colors text-zinc-400 hover:text-white hover:bg-white/10",
-      active && "bg-white/10 text-white"
+      "p-1.5 rounded-md transition-colors text-muted-foreground hover:text-foreground hover:bg-muted",
+      active && "bg-muted text-foreground"
     )}
   >
     {children}
@@ -76,7 +76,7 @@ export function RichTextEditor({ value, onChange, placeholder, hasError, maxLeng
     content: value || '',
     editorProps: {
       attributes: {
-        class: 'prose prose-invert prose-sm max-w-none focus:outline-none min-h-[200px] px-4 py-3 text-zinc-200 leading-relaxed',
+        class: 'prose prose-invert prose-sm max-w-none focus:outline-none min-h-[200px] px-4 py-3 text-foreground leading-relaxed',
       },
     },
     onUpdate({ editor }) {
@@ -136,13 +136,13 @@ export function RichTextEditor({ value, onChange, placeholder, hasError, maxLeng
     <div
       className={cn(
         "rounded-lg border overflow-hidden transition-colors",
-        hasError ? "border-red-500/60" : "border-zinc-700",
+        hasError ? "border-red-500/60" : "border-border",
         "focus-within:border-green-500/50"
       )}
-      style={{ background: 'rgba(24, 24, 27, 0.5)' }}
+      style={{ background: 'transparent' }}
     >
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-zinc-700/60">
+      <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-border/60">
         <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="加粗 (Ctrl+B)">
           <Bold className="w-4 h-4" />
         </ToolbarButton>
@@ -156,7 +156,7 @@ export function RichTextEditor({ value, onChange, placeholder, hasError, maxLeng
           <Strikethrough className="w-4 h-4" />
         </ToolbarButton>
 
-        <div className="w-px h-4 bg-zinc-700 mx-1" />
+        <div className="w-px h-4 bg-border mx-1" />
 
         <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive('heading', { level: 2 })} title="二级标题">
           <Heading2 className="w-4 h-4" />
@@ -165,7 +165,7 @@ export function RichTextEditor({ value, onChange, placeholder, hasError, maxLeng
           <Heading3 className="w-4 h-4" />
         </ToolbarButton>
 
-        <div className="w-px h-4 bg-zinc-700 mx-1" />
+        <div className="w-px h-4 bg-border mx-1" />
 
         <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')} title="无序列表">
           <List className="w-4 h-4" />
@@ -174,7 +174,7 @@ export function RichTextEditor({ value, onChange, placeholder, hasError, maxLeng
           <ListOrdered className="w-4 h-4" />
         </ToolbarButton>
 
-        <div className="w-px h-4 bg-zinc-700 mx-1" />
+        <div className="w-px h-4 bg-border mx-1" />
 
         <ToolbarButton onClick={handleSetLink} active={editor.isActive('link')} title="插入链接">
           <LinkIcon className="w-4 h-4" />
@@ -189,10 +189,10 @@ export function RichTextEditor({ value, onChange, placeholder, hasError, maxLeng
       
       {/* Character count */}
       {maxLength && (
-        <div className="px-4 py-2 border-t border-zinc-700/60 text-right">
+        <div className="px-4 py-2 border-t border-border/60 text-right">
           <span className={cn(
             "text-xs",
-            charCount > maxLength ? "text-red-500" : "text-zinc-500"
+            charCount > maxLength ? "text-red-500" : "text-muted-foreground"
           )}>
             {charCount}/{maxLength}
           </span>

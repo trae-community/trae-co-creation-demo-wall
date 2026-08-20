@@ -132,15 +132,15 @@ export function MyPosters() {
                 {Array.isArray(poster.tags) && poster.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-4">
                     {poster.tags.slice(0, 3).map((tag, idx) => (
-                      <span key={`${tag}-${idx}`} className="text-[10px] px-2 py-0.5 rounded-full border bg-white/5 text-zinc-600 border-white/10">{tag}</span>
+                      <span key={`${tag}-${idx}`} className="text-[10px] px-2 py-0.5 rounded-full border bg-muted text-muted-foreground border-border">{tag}</span>
                     ))}
                   </div>
                 )}
                 {/* Footer: time + delete — 与作品卡片统一样式 */}
-                <div className="flex min-w-0 items-center justify-between gap-3 pt-3.5 border-t border-white/5 mt-auto">
+                <div className="flex min-w-0 items-center justify-between gap-3 pt-3.5 border-t border-border mt-auto">
                   <div className="flex min-w-0 items-center gap-1">
                     <Clock className="w-2.5 h-2.5 shrink-0" />
-                    <span className="text-[10px] text-zinc-600">
+                    <span className="text-[10px] text-muted-foreground">
                       {new Date(poster.createdAt).getFullYear()}/{String(new Date(poster.createdAt).getMonth() + 1).padStart(2, '0')}/{String(new Date(poster.createdAt).getDate()).padStart(2, '0')}
                     </span>
                   </div>

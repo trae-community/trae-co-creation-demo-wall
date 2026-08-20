@@ -36,31 +36,31 @@ export function Step2VisualAssets({
     <div className="space-y-8">
       {/* Cover Image */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-300 flex items-center gap-1.5">
-          <ImageIcon className="w-4 h-4 text-zinc-400" />
+        <label className="text-sm font-medium text-foreground flex items-center gap-1.5">
+          <ImageIcon className="w-4 h-4 text-muted-foreground" />
           {t('coverImageLabel')} <span className="text-red-500">*</span>
         </label>
 
         {!previewCoverUrl ? (
           <label
             htmlFor="cover-upload"
-            className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer bg-zinc-900/50 transition-colors ${
-              errors.coverUrl ? 'border-red-500/60' : 'border-zinc-700 hover:border-zinc-500'
+            className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer bg-muted transition-colors ${
+              errors.coverUrl ? 'border-red-500/60' : 'border-border hover:border-muted-foreground/50'
             }`}
           >
             {uploadingCover ? (
               <div className="flex flex-col items-center gap-2">
                 <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm text-zinc-400">{t('uploading')}</span>
+                <span className="text-sm text-muted-foreground">{t('uploading')}</span>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center gap-2 p-6 text-center">
-                <UploadCloud className="w-10 h-10 text-zinc-500" />
-                <p className="text-sm text-zinc-400">
+                <UploadCloud className="w-10 h-10 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
                   <span className="font-semibold text-primary">{t('uploadClick')}</span>{' '}
                   {t('uploadDrag')}
                 </p>
-                <p className="text-xs text-zinc-500">{t('uploadFormat')}</p>
+                <p className="text-xs text-muted-foreground">{t('uploadFormat')}</p>
               </div>
             )}
             <input
@@ -73,7 +73,7 @@ export function Step2VisualAssets({
             />
           </label>
         ) : (
-          <div className="relative w-full aspect-video bg-zinc-900 rounded-xl overflow-hidden border border-zinc-700 group">
+          <div className="relative w-full aspect-video bg-muted rounded-xl overflow-hidden border border-border group">
             <img
               src={previewCoverUrl}
               alt={t('coverPreviewAlt')}
@@ -107,20 +107,20 @@ export function Step2VisualAssets({
       {/* Screenshots */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-gray-300">
+          <label className="text-sm font-medium text-foreground">
             {t('screenshotsLabel')} <span className="text-red-500">*</span>
           </label>
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-muted-foreground">
             {previewScreenshots.length}/5
           </span>
         </div>
-        <p className="text-xs text-zinc-500">{t('screenshotsDesc')}</p>
+        <p className="text-xs text-muted-foreground">{t('screenshotsDesc')}</p>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {previewScreenshots.map((url, index) => (
             <div
               key={index}
-              className="relative group aspect-video bg-zinc-900 rounded-xl overflow-hidden border border-zinc-700"
+              className="relative group aspect-video bg-muted rounded-xl overflow-hidden border border-border"
             >
               <img
                 src={url}
@@ -140,13 +140,13 @@ export function Step2VisualAssets({
           ))}
 
           {previewScreenshots.length < 5 && (
-            <label className="flex flex-col items-center justify-center aspect-video border-2 border-zinc-700 border-dashed rounded-xl cursor-pointer bg-zinc-900/50 hover:border-zinc-500 transition-colors">
+            <label className="flex flex-col items-center justify-center aspect-video border-2 border-border border-dashed rounded-xl cursor-pointer bg-muted hover:border-muted-foreground/50 transition-colors">
               {uploadingScreenshots ? (
                 <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <Plus className="w-7 h-7 text-zinc-500 mb-1" />
-                  <span className="text-xs text-zinc-500">{t('addScreenshot')}</span>
+                  <Plus className="w-7 h-7 text-muted-foreground mb-1" />
+                  <span className="text-xs text-muted-foreground">{t('addScreenshot')}</span>
                 </>
               )}
               <input

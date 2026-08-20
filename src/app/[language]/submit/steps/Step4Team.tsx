@@ -27,8 +27,8 @@ export function Step4Team({ form }: Step4Props) {
     <div className="space-y-8">
       {/* Team Members */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-300 flex items-center gap-1.5">
-          <Users className="w-4 h-4 text-zinc-400" />
+        <label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+          <Users className="w-4 h-4 text-muted-foreground" />
           {t('team')} <span className="text-red-500">*</span>
         </label>
 
@@ -49,14 +49,14 @@ export function Step4Team({ form }: Step4Props) {
                       {errors.team[index]?.value?.message}
                     </p>
                   ) : <span />}
-                  <span className="text-xs text-zinc-500">{form.watch(`team.${index}.value`)?.length || 0}/20</span>
+                  <span className="text-xs text-muted-foreground">{form.watch(`team.${index}.value`)?.length || 0}/20</span>
                 </div>
               </div>
               {teamFields.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeTeam(index)}
-                  className="p-3 text-zinc-500 hover:text-red-500 transition-colors mt-0.5"
+                  className="p-3 text-muted-foreground hover:text-red-500 transition-colors mt-0.5"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -70,7 +70,7 @@ export function Step4Team({ form }: Step4Props) {
           variant="outline"
           size="sm"
           onClick={() => appendTeam({ value: '' })}
-          className="w-full border-dashed border-zinc-700 hover:border-primary hover:text-primary"
+          className="w-full border-dashed border-border hover:border-primary hover:text-primary"
         >
           <Plus className="w-4 h-4 mr-2" />
           {t('addTeamMember')}
@@ -86,7 +86,7 @@ export function Step4Team({ form }: Step4Props) {
 
       {/* Team Intro */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-300">
+        <label className="text-sm font-medium text-muted-foreground">
           {t('teamIntro')} <span className="text-red-500">*</span>
         </label>
         <textarea
@@ -103,14 +103,14 @@ export function Step4Team({ form }: Step4Props) {
               {errors.teamIntro.message}
             </p>
           ) : <span />}
-          <span className="text-xs text-zinc-500">{form.watch('teamIntro')?.length || 0}/500</span>
+          <span className="text-xs text-muted-foreground">{form.watch('teamIntro')?.length || 0}/500</span>
         </div>
       </div>
 
       {/* Contact Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-300">{t('contactPhone')}</label>
+          <label className="text-sm font-medium text-muted-foreground">{t('contactPhone')}</label>
           <input
             {...register('contactPhone')}
             className={inputClass}
@@ -118,11 +118,11 @@ export function Step4Team({ form }: Step4Props) {
             type="tel"
             maxLength={20}
           />
-          <span className="text-xs text-zinc-500 block text-right">{form.watch('contactPhone')?.length || 0}/20</span>
+          <span className="text-xs text-muted-foreground block text-right">{form.watch('contactPhone')?.length || 0}/20</span>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-300">{t('contactEmail')}</label>
+          <label className="text-sm font-medium text-muted-foreground">{t('contactEmail')}</label>
           <input
             {...register('contactEmail')}
             className={inputClass}
@@ -137,7 +137,7 @@ export function Step4Team({ form }: Step4Props) {
                 {errors.contactEmail.message}
               </p>
             ) : <span />}
-            <span className="text-xs text-zinc-500">{form.watch('contactEmail')?.length || 0}/100</span>
+            <span className="text-xs text-muted-foreground">{form.watch('contactEmail')?.length || 0}/100</span>
           </div>
         </div>
       </div>

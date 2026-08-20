@@ -81,14 +81,14 @@ export function SignUpForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="username" className="text-gray-300">
+        <Label htmlFor="username" className="text-foreground">
           用户名
         </Label>
         <Input
           id="username"
           type="text"
           placeholder="您的用户名"
-          className="bg-[#1E1E22] border-white/10 text-white"
+          className="border-input bg-muted text-foreground"
           {...register("username")}
         />
         {errors.username && (
@@ -97,14 +97,14 @@ export function SignUpForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-gray-300">
+        <Label htmlFor="email" className="text-foreground">
           邮箱
         </Label>
         <Input
           id="email"
           type="email"
           placeholder="your@email.com"
-          className="bg-[#1E1E22] border-white/10 text-white"
+          className="border-input bg-muted text-foreground"
           {...register("email")}
         />
         {errors.email && (
@@ -113,14 +113,14 @@ export function SignUpForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-gray-300">
+        <Label htmlFor="password" className="text-foreground">
           密码
         </Label>
         <Input
           id="password"
           type="password"
           placeholder="••••••••"
-          className="bg-[#1E1E22] border-white/10 text-white"
+          className="border-input bg-muted text-foreground"
           {...register("password")}
         />
         {errors.password && (
@@ -129,14 +129,14 @@ export function SignUpForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword" className="text-gray-300">
+        <Label htmlFor="confirmPassword" className="text-foreground">
           确认密码
         </Label>
         <Input
           id="confirmPassword"
           type="password"
           placeholder="••••••••"
-          className="bg-[#1E1E22] border-white/10 text-white"
+          className="border-input bg-muted text-foreground"
           {...register("confirmPassword")}
         />
         {errors.confirmPassword && (

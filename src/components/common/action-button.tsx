@@ -14,11 +14,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       primary: 
         "bg-primary text-black hover:bg-primary/90 shadow-[0_0_20px_rgba(50,240,140,0.5)] hover:shadow-[0_0_30px_rgba(50,240,140,0.7)] border border-transparent font-bold btn-glow",
       secondary: 
-        "bg-white/5 text-white border border-white/10 hover:bg-white/10 backdrop-blur-sm",
+        "bg-muted text-foreground border border-border hover:bg-muted/80 backdrop-blur-sm",
       outline: 
-        "border border-white/20 text-white bg-transparent hover:bg-white/10",
+        "border border-border text-foreground bg-transparent hover:bg-muted",
       ghost: 
-        "hover:bg-white/10 text-zinc-300 hover:text-white",
+        "hover:bg-muted text-muted-foreground hover:text-foreground",
       link: 
         "text-primary underline-offset-4 hover:underline",
     };

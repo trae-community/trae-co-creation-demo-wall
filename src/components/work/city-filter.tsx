@@ -47,7 +47,7 @@ const Pill = ({
       "px-3.5 py-1.5 rounded-full text-sm whitespace-nowrap border transition-all duration-200 shrink-0 active:scale-95",
       active
         ? "bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold border-transparent shadow-[0_0_12px_rgba(50,240,140,0.25)]"
-        : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
+        : "bg-muted text-muted-foreground border-border hover:bg-muted/80 hover:text-foreground"
     )}
   >
     {children}
@@ -116,7 +116,7 @@ export function CityFilter({ filters, onFilterChange, auditStatusOptions, showRe
     selected: string[];
   }) => (
     <div className="flex items-start gap-3 pb-0.5">
-      <span className="text-xs text-zinc-500 font-medium w-10 shrink-0 select-none mt-2">{label}</span>
+      <span className="text-xs text-muted-foreground font-medium w-10 shrink-0 select-none mt-2">{label}</span>
       <div className="flex flex-wrap gap-2">
         <Pill active={selected.length === 0} onClick={() => handleClear(type)}>
           {t('all')}
@@ -147,9 +147,9 @@ export function CityFilter({ filters, onFilterChange, auditStatusOptions, showRe
       {/* Mobile: Collapsible Filter Button */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="lg:hidden flex items-center justify-between w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all"
+        className="lg:hidden flex items-center justify-between w-full px-4 py-2.5 rounded-xl border border-border bg-muted hover:bg-muted/80 transition-all"
       >
-        <span className="flex items-center gap-2 text-sm font-medium text-zinc-300">
+        <span className="flex items-center gap-2 text-sm font-medium text-foreground">
           <Filter className="w-4 h-4" />
           {t('filters') || '筛选'}
           {activeFilterCount > 0 && (
@@ -158,7 +158,7 @@ export function CityFilter({ filters, onFilterChange, auditStatusOptions, showRe
             </span>
           )}
         </span>
-        {isExpanded ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+        {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
       </button>
 
       {/* Desktop: Always visible / Mobile: Collapsible */}
@@ -180,7 +180,7 @@ export function CityFilter({ filters, onFilterChange, auditStatusOptions, showRe
             <span className="w-10 shrink-0 select-none" />
             <button
               onClick={handleReset}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm whitespace-nowrap border transition-all duration-200 bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm whitespace-nowrap border transition-all duration-200 bg-muted text-muted-foreground border-border hover:bg-muted/80 hover:text-foreground"
             >
               <X className="w-3.5 h-3.5" />
               {t('reset') || '重置筛选'}

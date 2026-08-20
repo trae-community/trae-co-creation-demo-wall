@@ -34,11 +34,11 @@ export function Step3Content({ form }: Step3Props) {
     <div className="space-y-8">
       {/* Story */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-300 flex items-center gap-1.5">
-          <FileText className="w-4 h-4 text-zinc-400" />
+        <label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+          <FileText className="w-4 h-4 text-muted-foreground" />
           {t('story')} <span className="text-red-500">*</span>
         </label>
-        <p className="text-xs text-zinc-500">{t('storyDesc')}</p>
+        <p className="text-xs text-muted-foreground">{t('storyDesc')}</p>
         <Controller
           name="story"
           control={control}
@@ -59,17 +59,17 @@ export function Step3Content({ form }: Step3Props) {
               {errors.story.message}
             </p>
           ) : <span />}
-          <span className="text-xs text-zinc-500">最多 2000 字</span>
+          <span className="text-xs text-muted-foreground">最多 2000 字</span>
         </div>
       </div>
 
       {/* Highlights */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-gray-300">
+          <label className="text-sm font-medium text-muted-foreground">
             {t('highlights')} <span className="text-red-500">*</span>
           </label>
-          <span className="text-xs text-zinc-500">{t('highlightsDesc')}</span>
+          <span className="text-xs text-muted-foreground">{t('highlightsDesc')}</span>
         </div>
 
         <div className="space-y-3">
@@ -89,14 +89,14 @@ export function Step3Content({ form }: Step3Props) {
                       {errors.highlights[index]?.value?.message}
                     </p>
                   ) : <span />}
-                  <span className="text-xs text-zinc-500">{form.watch(`highlights.${index}.value`)?.length || 0}/30</span>
+                  <span className="text-xs text-muted-foreground">{form.watch(`highlights.${index}.value`)?.length || 0}/30</span>
                 </div>
               </div>
               {highlightFields.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeHighlight(index)}
-                  className="p-3 text-zinc-500 hover:text-red-500 transition-colors mt-0.5"
+                  className="p-3 text-muted-foreground hover:text-red-500 transition-colors mt-0.5"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -111,7 +111,7 @@ export function Step3Content({ form }: Step3Props) {
             variant="outline"
             size="sm"
             onClick={() => appendHighlight({ value: '' })}
-            className="w-full border-dashed border-zinc-700 hover:border-primary hover:text-primary"
+            className="w-full border-dashed border-border hover:border-primary hover:text-primary"
           >
             <Plus className="w-4 h-4 mr-2" />
             {t('addHighlight')}
@@ -128,7 +128,7 @@ export function Step3Content({ form }: Step3Props) {
 
       {/* Scenarios */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-300">
+        <label className="text-sm font-medium text-muted-foreground">
           {t('scenarios')} <span className="text-red-500">*</span>
         </label>
 
@@ -149,14 +149,14 @@ export function Step3Content({ form }: Step3Props) {
                       {errors.scenarios[index]?.value?.message}
                     </p>
                   ) : <span />}
-                  <span className="text-xs text-zinc-500">{form.watch(`scenarios.${index}.value`)?.length || 0}/100</span>
+                  <span className="text-xs text-muted-foreground">{form.watch(`scenarios.${index}.value`)?.length || 0}/100</span>
                 </div>
               </div>
               {scenarioFields.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeScenario(index)}
-                  className="p-3 text-zinc-500 hover:text-red-500 transition-colors mt-0.5"
+                  className="p-3 text-muted-foreground hover:text-red-500 transition-colors mt-0.5"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -170,7 +170,7 @@ export function Step3Content({ form }: Step3Props) {
           variant="outline"
           size="sm"
           onClick={() => appendScenario({ value: '' })}
-          className="w-full border-dashed border-zinc-700 hover:border-primary hover:text-primary"
+          className="w-full border-dashed border-border hover:border-primary hover:text-primary"
         >
           <Plus className="w-4 h-4 mr-2" />
           {t('addScenario')}
@@ -186,14 +186,14 @@ export function Step3Content({ form }: Step3Props) {
 
       {/* Links */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-300 flex items-center gap-1.5">
-          <LinkIcon className="w-4 h-4 text-zinc-400" />
+        <label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+          <LinkIcon className="w-4 h-4 text-muted-foreground" />
           {t('externalLinks')}
         </label>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">
+            <label className="text-sm font-medium text-muted-foreground">
               {t('demoUrl')}
             </label>
             <input
@@ -211,7 +211,7 @@ export function Step3Content({ form }: Step3Props) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">{t('repoUrl')}</label>
+            <label className="text-sm font-medium text-muted-foreground">{t('repoUrl')}</label>
             <input
               {...register('repoUrl')}
               className={inputClass}

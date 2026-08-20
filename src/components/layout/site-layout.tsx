@@ -96,11 +96,11 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       <header className={cn(
         "fixed left-0 right-0 z-50 transition-all duration-300",
         scrolled
-          ? "top-2 mx-4 rounded-2xl bg-background/80 backdrop-blur-xl border border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
-          : "top-0 bg-background backdrop-blur-xl border-b border-white/5"
+          ? "top-2 mx-4 rounded-2xl bg-background/80 backdrop-blur-xl border border-border shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+          : "top-0 bg-background backdrop-blur-xl border-b border-border"
       )}>
         <div className="container mx-auto px-4 h-12 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-lg font-bold text-white tracking-tight group">
+          <Link href="/" className="flex items-center gap-2 text-lg font-bold text-foreground tracking-tight group">
             <Image src={logo} alt="logo" className="w-8 h-8" />
             <span className="hidden sm:inline truncate">TRAE DEMO WALL</span>
           </Link>
@@ -113,7 +113,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                 pathname === "/"
                   ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
               )}
             >
               <Home className="w-3.5 h-3.5" />
@@ -125,7 +125,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                 pathname === "/rankings"
                   ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
               )}
             >
               <Trophy className="w-3.5 h-3.5" />
@@ -138,7 +138,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                 pathname === "/submit"
                   ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
               )}
             >
               <PlusCircle className="w-3.5 h-3.5" />
@@ -150,7 +150,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                 pathname === "/poster-maker"
                   ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
               )}
             >
               <Palette className="w-3.5 h-3.5" />
@@ -165,7 +165,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                   "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                   pathname && pathname.startsWith("/console")
                     ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    : "text-zinc-400 hover:text-white hover:bg-white/5"
                 )}
               >
                 <LayoutDashboard className="w-3.5 h-3.5" />
@@ -180,15 +180,15 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                   "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                   pathname === "/profile"
                     ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    : "text-zinc-400 hover:text-white hover:bg-white/5"
                 )}
               >
                 <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0">
                   {avatarUrl ? (
                     <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
-                      <UserRound className="w-3.5 h-3.5 text-zinc-500" />
+                    <div className="w-full h-full bg-muted flex items-center justify-center">
+                      <UserRound className="w-3.5 h-3.5 text-muted-foreground" />
                     </div>
                   )}
                 </div>
@@ -203,7 +203,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                   "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300",
                   pathname === "/sign-in"
                     ? "bg-green-500/10 text-green-500 shadow-lg shadow-green-500/20 border border-green-500/20"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    : "text-zinc-400 hover:text-white hover:bg-white/5"
                 )}
               >
                 <LogIn className="w-3.5 h-3.5" />
@@ -214,13 +214,13 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             <div className="relative" ref={langMenuRef}>
               <button
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/5"
+                className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 text-zinc-400 hover:text-white hover:bg-white/5"
               >
                 <Languages className="w-3.5 h-3.5" />
                 {currentOption.label}
               </button>
               {langMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-40 bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden py-1 z-50">
+                <div className="absolute right-0 top-full mt-2 w-40 bg-background/95 backdrop-blur-xl border border-border rounded-xl shadow-2xl overflow-hidden py-1 z-50">
                   {LOCALE_OPTIONS.map((option) => (
                     <button
                       key={option.code}
@@ -229,7 +229,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                         "flex items-center justify-between w-full px-4 py-2.5 text-sm transition-colors",
                         option.code === locale
                           ? "text-green-500 bg-green-500/10"
-                          : "text-gray-300 hover:text-white hover:bg-white/5"
+                          : "text-zinc-400 hover:text-white hover:bg-white/5"
                       )}
                     >
                       <span className="flex items-center gap-2.5">
@@ -248,7 +248,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           <div className="flex lg:hidden items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -257,7 +257,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-white/5 bg-background/95 backdrop-blur-xl">
+          <div className="lg:hidden border-t border-border bg-background/95 backdrop-blur-xl">
             <nav className="container mx-auto px-4 py-4 space-y-1">
               <Link
                 href="/"
@@ -266,7 +266,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                   pathname === "/"
                     ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    : "text-zinc-400 hover:text-white hover:bg-white/5"
                 )}
               >
                 <Home className="w-4 h-4" />
@@ -279,7 +279,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                   pathname === "/rankings"
                     ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    : "text-zinc-400 hover:text-white hover:bg-white/5"
                 )}
               >
                 <Trophy className="w-4 h-4" />
@@ -292,7 +292,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                   pathname === "/submit"
                     ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    : "text-zinc-400 hover:text-white hover:bg-white/5"
                 )}
               >
                 <PlusCircle className="w-4 h-4" />
@@ -305,7 +305,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                   pathname === "/poster-maker"
                     ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    : "text-zinc-400 hover:text-white hover:bg-white/5"
                 )}
               >
                 <Palette className="w-4 h-4" />
@@ -320,7 +320,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                     "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                     pathname && pathname.startsWith("/console")
                       ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                      : "text-zinc-400 hover:text-white hover:bg-white/5"
                   )}
                 >
                   <LayoutDashboard className="w-4 h-4" />
@@ -336,14 +336,14 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                     "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                     pathname === "/profile"
                       ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                      : "text-zinc-400 hover:text-white hover:bg-white/5"
                   )}
                 >
-                  <div className="w-6 h-6 rounded-full overflow-hidden bg-zinc-800 flex items-center justify-center flex-shrink-0">
+                  <div className="w-6 h-6 rounded-full overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                     ) : (
-                      <UserRound className="w-4 h-4 text-zinc-500" />
+                      <UserRound className="w-4 h-4 text-muted-foreground" />
                     )}
                   </div>
                   {tProfile('menu')}
@@ -358,7 +358,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                     "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                     pathname === "/sign-in"
                       ? "bg-green-500/10 text-green-500 border border-green-500/20"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                      : "text-zinc-400 hover:text-white hover:bg-white/5"
                   )}
                 >
                   <LogIn className="w-4 h-4" />
@@ -366,8 +366,8 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 </Link>
               )}
 
-              <div className="pt-2 border-t border-white/5">
-                <p className="px-4 py-2 text-xs text-gray-500">{t('language') || 'Language'}</p>
+              <div className="pt-2 border-t border-border">
+                <p className="px-4 py-2 text-xs text-muted-foreground">{t('language') || 'Language'}</p>
                 {LOCALE_OPTIONS.map((option) => (
                   <button
                     key={option.code}
@@ -379,7 +379,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                       "flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm transition-all",
                       option.code === locale
                         ? "text-green-500 bg-green-500/10 border border-green-500/20"
-                        : "text-gray-300 hover:text-white hover:bg-white/5"
+                        : "text-zinc-400 hover:text-white hover:bg-white/5"
                     )}
                   >
                     <span className="flex items-center gap-2.5">
@@ -408,7 +408,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           {/* 版权 + 备案 */}
           <div className="flex flex-wrap items-center justify-center gap-2.5 text-xs text-zinc-500">
             <span>{tFooter('rights')}</span>
-            <span className="w-1 h-1 rounded-full bg-zinc-700 hidden sm:block" />
+            <span className="w-1 h-1 rounded-full bg-border hidden sm:block" />
             <a
               href="https://beian.miit.gov.cn/"
               target="_blank"

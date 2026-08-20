@@ -77,8 +77,7 @@ export function WorkCard({ work }: WorkCardProps) {
   return (
     <Link
       href={detailHref}
-      className="group flex h-full flex-col rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(50,240,140,0.2)] hover:border-green-500/35"
-      style={{ background: '#111318' }}
+      className="group flex h-full flex-col rounded-2xl overflow-hidden border border-border bg-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_32px_rgba(50,240,140,0.2)] hover:border-green-500/35"
     >
       {/* Cover — 4:3 ratio */}
       <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
@@ -124,7 +123,7 @@ export function WorkCard({ work }: WorkCardProps) {
         {/* Category pill — bottom right */}
         {work.category && (
           <div className="absolute bottom-3 right-3">
-            <span className="px-2 py-0.5 rounded-md text-xs text-zinc-300 border border-white/10 backdrop-blur-sm"
+            <span className="px-2 py-0.5 rounded-md text-xs text-foreground border border-border backdrop-blur-sm"
               style={{ background: 'rgba(0,0,0,0.6)' }}>
               {work.category}
             </span>
@@ -135,10 +134,10 @@ export function WorkCard({ work }: WorkCardProps) {
       {/* Content */}
       <div className="flex min-w-0 flex-1 flex-col p-5">
         <div className="min-w-0">
-          <h3 className="font-bold text-white text-base mb-1.5 line-clamp-1 group-hover:text-green-400 transition-colors [overflow-wrap:anywhere]">
+          <h3 className="font-bold text-card-foreground text-base mb-1.5 line-clamp-1 group-hover:text-green-400 transition-colors [overflow-wrap:anywhere]">
             {work.name}
           </h3>
-          <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2 mb-4 [overflow-wrap:anywhere]">
+          <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2 mb-4 [overflow-wrap:anywhere]">
             {work.intro}
           </p>
         </div>
@@ -154,7 +153,7 @@ export function WorkCard({ work }: WorkCardProps) {
                   className={`text-[10px] px-2 py-0.5 rounded-full border ${
                     isSpecial
                       ? "bg-green-500/10 text-green-500 border-green-500/20"
-                      : "bg-white/5 text-zinc-600 border-white/10"
+                      : "bg-muted text-muted-foreground border-border"
                   }`}
                 >
                   {tag}
@@ -165,7 +164,7 @@ export function WorkCard({ work }: WorkCardProps) {
         )}
 
         {/* Footer: author + time + stats */}
-        <div className="flex min-w-0 items-center justify-between gap-3 pt-3.5 border-t border-white/5 mt-auto">
+        <div className="flex min-w-0 items-center justify-between gap-3 pt-3.5 border-t border-border mt-auto">
           {/* Author / team */}
           <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
             {isTeam ? (
@@ -174,22 +173,22 @@ export function WorkCard({ work }: WorkCardProps) {
                   {teamMembers.slice(0, 3).map((member, i) => (
                     <div
                       key={i}
-                      className="w-6 h-6 rounded-full border border-zinc-900 bg-zinc-700 flex items-center justify-center text-[9px] font-bold text-zinc-300"
+                      className="w-6 h-6 rounded-full border border-border bg-muted flex items-center justify-center text-[9px] font-bold text-foreground"
                     >
                       {member.charAt(0)}
                     </div>
                   ))}
                 </div>
                 <div className="min-w-0">
-                  <div className="text-xs text-zinc-300 font-medium leading-none truncate">
+                  <div className="text-xs text-foreground font-medium leading-none truncate">
                     {teamMembers.length}{t('people') || '人团队'}
                   </div>
-                  <div className="text-[10px] text-zinc-600 mt-0.5 flex min-w-0 items-center gap-1">
+                  <div className="text-[10px] text-muted-foreground mt-0.5 flex min-w-0 items-center gap-1">
                     {work.city && (
                       <>
                         <MapPin className="w-2.5 h-2.5 shrink-0" />
                         <span className="truncate">{work.city}</span>
-                        <span className="text-zinc-700">·</span>
+                        <span className="text-muted-foreground">·</span>
                       </>
                     )}
                     <Clock className="w-2.5 h-2.5 shrink-0" />
@@ -202,13 +201,13 @@ export function WorkCard({ work }: WorkCardProps) {
                 <button
                   type="button"
                   onClick={handleAuthorClick}
-                  className="w-6 h-6 rounded-full overflow-hidden border border-zinc-600 hover:border-primary transition-colors shrink-0 bg-zinc-700"
+                  className="w-6 h-6 rounded-full overflow-hidden border border-border hover:border-primary transition-colors shrink-0 bg-muted"
                   aria-label={`查看作者 ${work.author?.name || ''}`}
                 >
                   {work.author?.avatar ? (
                     <img src={work.author.avatar} alt={work.author.name} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="flex items-center justify-center w-full h-full text-[10px] font-bold text-zinc-300">
+                    <span className="flex items-center justify-center w-full h-full text-[10px] font-bold text-foreground">
                       {work.author?.name?.charAt(0) || '?'}
                     </span>
                   )}
@@ -217,17 +216,17 @@ export function WorkCard({ work }: WorkCardProps) {
                   <button
                     type="button"
                     onClick={handleAuthorClick}
-                    className="max-w-[80px] text-left text-xs text-zinc-300 font-medium leading-none line-clamp-1 [overflow-wrap:anywhere] hover:text-primary transition-colors"
+                    className="max-w-[80px] text-left text-xs text-foreground font-medium leading-none line-clamp-1 [overflow-wrap:anywhere] hover:text-primary transition-colors"
                     title={work.author?.name || teamMembers[0] || '-'}
                   >
                     {work.author?.name || teamMembers[0] || '-'}
                   </button>
-                  <div className="text-[10px] text-zinc-600 mt-0.5 flex min-w-0 items-center gap-1">
+                  <div className="text-[10px] text-muted-foreground mt-0.5 flex min-w-0 items-center gap-1">
                     {work.city && (
                       <>
                         <MapPin className="w-2.5 h-2.5 shrink-0" />
                         <span className="truncate">{work.city}</span>
-                        <span className="text-zinc-700">·</span>
+                        <span className="text-muted-foreground">·</span>
                       </>
                     )}
                     <Clock className="w-2.5 h-2.5 shrink-0" />

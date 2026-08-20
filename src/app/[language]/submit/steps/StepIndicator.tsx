@@ -42,7 +42,7 @@ export function StepIndicator({ current, onStepClick }: StepIndicatorProps) {
                   "w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2",
                   done && "bg-green-500 border-green-500 text-black",
                   active && "border-green-500 text-green-400 bg-transparent shadow-[0_0_16px_rgba(50,240,140,0.3)]",
-                  !done && !active && "border-zinc-700 text-zinc-600 bg-transparent"
+                  !done && !active && "border-border text-muted-foreground bg-transparent"
                 )}
               >
                 {done ? <Check className="w-4 h-4" /> : step.n}
@@ -51,8 +51,8 @@ export function StepIndicator({ current, onStepClick }: StepIndicatorProps) {
                 className={cn(
                   "text-[11px] font-medium whitespace-nowrap",
                   active && "text-green-400",
-                  done && "text-zinc-400",
-                  !done && !active && "text-zinc-600"
+                  done && "text-muted-foreground",
+                  !done && !active && "text-muted-foreground"
                 )}
               >
                 {step.label}
@@ -65,7 +65,7 @@ export function StepIndicator({ current, onStepClick }: StepIndicatorProps) {
                 <div
                   className={cn(
                     "h-0.5 w-full transition-all duration-500",
-                    step.n < current ? "bg-green-500" : "bg-zinc-700"
+                    step.n < current ? "bg-green-500" : "bg-border"
                   )}
                 />
               </div>

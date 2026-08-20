@@ -938,7 +938,7 @@ export function WorksManagement({
         
         {works.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-16 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg bg-card/30">
-            <Inbox className="w-12 h-12 text-zinc-600 mb-3" />
+            <Inbox className="w-12 h-12 text-muted-foreground mb-3" />
             <span>暂无作品</span>
           </div>
         )}

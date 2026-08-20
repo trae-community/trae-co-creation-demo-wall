@@ -249,7 +249,7 @@ export function PostersManagement() {
 
         {/* 审核状态筛选 + 重置（pill 样式与 CityFilter 一致） */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-zinc-500 font-medium w-10 shrink-0 select-none">审核</span>
+          <span className="text-xs text-muted-foreground font-medium w-10 shrink-0 select-none">审核</span>
           {AUDIT_STATUS_OPTIONS.map(opt => (
             <button
               key={opt.value}
@@ -258,7 +258,7 @@ export function PostersManagement() {
                 "px-3.5 py-1.5 rounded-full text-sm whitespace-nowrap border transition-all duration-200 shrink-0 active:scale-95",
                 auditFilter === opt.value
                   ? "bg-gradient-to-r from-[#32F08C] to-[#17D479] text-black font-bold border-transparent shadow-[0_0_12px_rgba(50,240,140,0.25)]"
-                  : "bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white"
+                  : "bg-muted text-muted-foreground border-border hover:bg-muted/80 hover:text-foreground"
               )}
             >
               {opt.label}
@@ -386,7 +386,7 @@ export function PostersManagement() {
 
         {posters.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-16 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg bg-card/30">
-            <Inbox className="w-12 h-12 text-zinc-600 mb-3" />
+            <Inbox className="w-12 h-12 text-muted-foreground mb-3" />
             <span>暂无海报</span>
           </div>
         )}

@@ -49,7 +49,7 @@ export function Step1BasicInfo({
     <div className="space-y-6">
       {/* Project Name */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-300">
+        <label className="text-sm font-medium text-muted-foreground">
           {t('projectName')} <span className="text-red-500">*</span>
         </label>
         <input
@@ -65,13 +65,13 @@ export function Step1BasicInfo({
               {errors.name.message}
             </p>
           ) : <span />}
-          <span className="text-xs text-zinc-500">{form.watch('name')?.length || 0}/50</span>
+          <span className="text-xs text-muted-foreground">{form.watch('name')?.length || 0}/50</span>
         </div>
       </div>
 
       {/* Intro */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-300">
+        <label className="text-sm font-medium text-muted-foreground">
           {t('intro')} <span className="text-red-500">*</span>
         </label>
         <input
@@ -87,14 +87,14 @@ export function Step1BasicInfo({
               {errors.intro.message}
             </p>
           ) : <span />}
-          <span className="text-xs text-zinc-500">{form.watch('intro')?.length || 0}/100</span>
+          <span className="text-xs text-muted-foreground">{form.watch('intro')?.length || 0}/100</span>
         </div>
       </div>
 
       {/* Province + City */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-300">
+          <label className="text-sm font-medium text-muted-foreground">
             {t('country')} <span className="text-red-500">*</span>
           </label>
           <Select
@@ -117,7 +117,7 @@ export function Step1BasicInfo({
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-300">
+          <label className="text-sm font-medium text-muted-foreground">
             {t('city')} <span className="text-red-500">*</span>
           </label>
           <Select
@@ -140,7 +140,7 @@ export function Step1BasicInfo({
       
       {/* Category */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-300">
+        <label className="text-sm font-medium text-muted-foreground">
           {t('category')} <span className="text-red-500">*</span>
         </label>
         <Select
@@ -161,7 +161,7 @@ export function Step1BasicInfo({
 
       {/* Dev Status */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-300">
+        <label className="text-sm font-medium text-muted-foreground">
           {t('devStatus')} <span className="text-red-500">*</span>
         </label>
         <Select
@@ -182,8 +182,8 @@ export function Step1BasicInfo({
 
       {/* Tags */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-300 flex items-center gap-1.5">
-          <Tag className="w-4 h-4 text-zinc-400" />
+        <label className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+          <Tag className="w-4 h-4 text-muted-foreground" />
           作品来源 <span className="text-red-500">*</span>
         </label>
         <div className="flex flex-wrap gap-2">
@@ -197,7 +197,7 @@ export function Step1BasicInfo({
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
                   isSelected
                     ? 'bg-primary text-black border-primary'
-                    : 'bg-zinc-900/50 text-zinc-400 border-zinc-700 hover:border-zinc-500'
+                    : 'bg-muted text-muted-foreground border-border hover:border-primary/50'
                 }`}
               >
                 {tag.name}

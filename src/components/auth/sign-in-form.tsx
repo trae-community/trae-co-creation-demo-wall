@@ -58,14 +58,14 @@ export function SignInForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-gray-300">
+        <Label htmlFor="email" className="text-foreground">
           邮箱
         </Label>
         <Input
           id="email"
           type="email"
           placeholder="your@email.com"
-          className="bg-[#1E1E22] border-white/10 text-white"
+          className="border-input bg-muted text-foreground"
           {...register("email")}
         />
         {errors.email && (
@@ -74,14 +74,14 @@ export function SignInForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-gray-300">
+        <Label htmlFor="password" className="text-foreground">
           密码
         </Label>
         <Input
           id="password"
           type="password"
           placeholder="••••••••"
-          className="bg-[#1E1E22] border-white/10 text-white"
+          className="border-input bg-muted text-foreground"
           {...register("password")}
         />
         {errors.password && (
