@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { writeOperationLog } from "@/lib/audit-log";
 
 const toSafeString = (value: unknown, maxLength = 255): string => {
   if (typeof value !== "string") return "";
@@ -173,6 +174,16 @@ export async function PUT(req: NextRequest) {
     const payload = await buildProfilePayload(updatedUser, {
       country: locationCountry,
       city: locationCity,
+    });
+
+    await writeOperationLog({
+      operatorId: authUser.userId,
+      module: "profile",
+      action: "update",
+      targetType: "sys_user",
+      targetId: authUser.userId,
+      payload: { username },
+      request: req,
     });
 
     return NextResponse.json(payload);

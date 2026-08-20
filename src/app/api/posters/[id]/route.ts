@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser, isAdmin } from '@/lib/auth';
+import { writeOperationLog } from '@/lib/audit-log';
 
 // Helper to sanitize BigInt
 const sanitize = (data: unknown) => {
@@ -57,7 +58,7 @@ export async function GET(
  * 删除海报（管理员可删任意海报，本人可删自己的海报）
  */
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -78,6 +79,16 @@ export async function DELETE(
     }
 
     await prisma.workPoster.delete({ where: { id } });
+
+    await writeOperationLog({
+      operatorId: user.userId,
+      module: 'poster',
+      action: 'delete',
+      targetType: 'work_poster',
+      targetId: idStr,
+      payload: { byAdmin: isAdmin(user) },
+      request: req,
+    });
 
     return NextResponse.json({ success: true });
   } catch {
@@ -126,6 +137,15 @@ export async function PATCH(
         where: { id },
         data: { auditStatus: body.auditStatus },
       });
+      await writeOperationLog({
+        operatorId: user.userId,
+        module: 'poster',
+        action: 'audit',
+        targetType: 'work_poster',
+        targetId: idStr,
+        payload: { auditStatus: body.auditStatus },
+        request: req,
+      });
       return NextResponse.json(sanitize(updated));
     }
 
@@ -157,6 +177,16 @@ export async function PATCH(
     const updated = await prisma.workPoster.update({
       where: { id },
       data: updateData,
+    });
+
+    await writeOperationLog({
+      operatorId: user.userId,
+      module: 'poster',
+      action: 'update',
+      targetType: 'work_poster',
+      targetId: idStr,
+      payload: { fields: Object.keys(updateData), downgraded: existing.auditStatus === 1 && updateData.auditStatus === 0 },
+      request: req,
     });
 
     return NextResponse.json({ ...sanitize(updated), downgraded: existing.auditStatus === 1 && updateData.auditStatus === 0 });

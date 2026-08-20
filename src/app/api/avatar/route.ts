@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { cos, COS_BUCKET, COS_REGION } from '@/lib/cos';
+import { writeOperationLog } from '@/lib/audit-log';
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,6 +53,16 @@ export async function POST(request: NextRequest) {
     await prisma.sysUser.update({
       where: { id: user.userId },
       data: { avatarUrl },
+    });
+
+    await writeOperationLog({
+      operatorId: user.userId,
+      module: 'profile',
+      action: 'update_avatar',
+      targetType: 'sys_user',
+      targetId: user.userId,
+      payload: { avatarUrl },
+      request,
     });
 
     return NextResponse.json({ success: true, url: avatarUrl });

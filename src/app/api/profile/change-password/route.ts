@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { hash, compare } from "bcryptjs";
+import { writeAuthLog } from "@/lib/audit-log";
 
 export async function POST(req: NextRequest) {
   try {
@@ -64,6 +65,13 @@ export async function POST(req: NextRequest) {
     // Verify old password
     const isValidOldPassword = await compare(oldPassword, user.passwordHash);
     if (!isValidOldPassword) {
+      await writeAuthLog({
+        userId: authUser.userId,
+        authType: "change_password",
+        authStatus: "failed",
+        metadata: { reason: "invalid_old_password" },
+        request: req,
+      });
       return NextResponse.json(
         { error: "原密码错误" },
         { status: 400 }
@@ -79,6 +87,13 @@ export async function POST(req: NextRequest) {
       data: {
         passwordHash: newPasswordHash,
       },
+    });
+
+    await writeAuthLog({
+      userId: authUser.userId,
+      authType: "change_password",
+      authStatus: "success",
+      request: req,
     });
 
     return NextResponse.json({

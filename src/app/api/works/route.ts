@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { getAuthUser } from '@/lib/auth'
+import { writeOperationLog } from '@/lib/audit-log'
 import { sanitizeRichText, stripHtmlTags } from '@/lib/rich-text'
 import { z } from 'zod'
 
@@ -368,6 +369,16 @@ export async function PUT(req: Request) {
           contactEmail: data.contactEmail || null,
         },
       })
+    })
+
+    await writeOperationLog({
+      operatorId: user.userId,
+      module: 'work',
+      action: 'update',
+      targetType: 'work_base',
+      targetId: id,
+      payload: { title: data.name },
+      request: req,
     })
 
     return NextResponse.json({ success: true })
