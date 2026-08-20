@@ -55,6 +55,37 @@ docker compose up -d --build
 
 打开浏览器访问 `http://your-server-ip`（nginx 对外暴露端口 80）。
 
+## 更新部署
+
+代码更新后重新部署时，**必须加 `--force-recreate`**，否则数据库初始化不会重跑：
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build --force-recreate
+```
+
+> ⚠️ 原理说明：`app-init` 是一次性初始化容器（`restart: "no"`），`app` 通过 `service_completed_successfully` 等待它。Docker Compose 判断条件时依据的是容器**上一次的退出状态**——如果 `app-init` 旧容器已存在且退出码为 0，Compose 认为条件已满足，直接启动 `app`，不会重跑初始化。`--force-recreate` 强制重建所有容器，确保每次更新都会重新执行 `prisma db push` + `seed`。
+
+### 更新流程做了什么
+
+| 步骤 | 行为 |
+|------|------|
+| `prisma db push` | 按 schema 差异**增量同步**表结构（只加表、加字段），不删数据 |
+| `seed` | 幂等执行：角色、字典等基础数据存在即跳过；root 用户**已存在则完全跳过**（不覆盖用户名和密码） |
+| 数据卷 | PostgreSQL / Redis 数据在命名卷（`postgres-data` / `redis-data`）中，容器重建不影响 |
+
+### 数据安全说明
+
+- ✅ `--force-recreate` 只销毁重建**容器**（进程），不碰数据卷，业务数据全部保留
+- ✅ 唯一删数据的方式是 `docker compose down -v`（`-v` 删除数据卷），禁止在生产使用
+- ✅ 数据库迁移已**禁止破坏性变更**：`entrypoint.sh` 中的 `prisma db push` 不使用 `--accept-data-loss`，schema 中的删列 / 改字段类型操作会导致迁移失败并阻断部署，需人工备份确认后处理
+
+### 更新失败排查
+
+```bash
+docker compose logs app-init   # 查看迁移 / seed 是否报错
+docker compose logs app        # 应用启动日志
+```
+
 ## 数据迁移（从 Supabase / 旧环境）
 
 如果从 Vercel + Supabase 迁移：

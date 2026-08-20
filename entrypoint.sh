@@ -13,7 +13,8 @@ if [ "${RUN_DB_INIT:-true}" = "true" ]; then
   echo "✅ 数据库连接成功！\n"
 
   echo "步骤 1/2: 运行数据库迁移 (prisma db push)..."
-  node node_modules/prisma/build/index.js db push --accept-data-loss
+  # 禁止破坏性变更：不使用 --accept-data-loss，schema 中的删列/改类型会导致迁移失败并阻断部署，需人工确认后处理
+  node node_modules/prisma/build/index.js db push
   echo "✅ 数据库迁移完成！\n"
 
   echo "步骤 2/2: 初始化种子数据 (npm run seed)..."
