@@ -434,6 +434,13 @@
     "qrCode": "QRコード",
     "posterPreview": "ポスタープレビュー",
     "notFound": "ポスターが存在しないか削除されました",
-    "notApproved": "このポスターはまだ審査中です"
+    "notApproved": "このポスターはまだ審査中です",
+    "editPoster": "編集",
+    "editHint": "変更後は再審査が必要です",
+    "clickToReplace": "クリックしてカバーを変更",
+    "cancel": "キャンセル",
+    "saving": "保存中...",
+    "save": "保存",
+    "editFailed": "編集に失敗しました"
   }
 }

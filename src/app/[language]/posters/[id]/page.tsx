@@ -3,14 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
+import { useSession } from 'next-auth/react';
 import { Link } from '@/lib/language/navigation';
-import { ArrowLeft, ExternalLink, Download, Calendar, Loader2 } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Download, Calendar, Loader2, Pencil } from 'lucide-react';
 import { PosterImage } from '@/components/work/poster-image';
+import { PosterEditDialog } from '@/components/work/poster-edit-dialog';
 import { buildPosterDataUrl, downloadPosterPng } from '@/lib/poster-svg';
 import { Button } from '@/components/ui/button';
 
 interface PosterDetail {
   id: string;
+  userId: string;
   nickname: string;
   description: string | null;
   imageUrl: string;
@@ -29,6 +32,8 @@ export default function PosterDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchPoster = async () => {
@@ -175,21 +180,46 @@ export default function PosterDetailPage() {
             </div>
           </div>
 
-          {/* 下载按钮（统一使用 Button 组件） */}
-          <Button
-            onClick={handleDownload}
-            disabled={isDownloading}
-            className="w-full h-11 rounded-md"
-          >
-            {isDownloading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Download className="w-4 h-4" />
+          {/* 下载 + 编辑按钮 */}
+          <div className="flex gap-3">
+            <Button
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className="flex-1 h-11 rounded-md"
+            >
+              {isDownloading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4" />
+              )}
+              {t('downloadPoster')}
+            </Button>
+            {session?.user?.id && poster && String(session.user.id) === String(poster.userId) && (
+              <Button
+                variant="outline"
+                className="h-11 rounded-md"
+                onClick={() => setIsEditDialogOpen(true)}
+              >
+                <Pencil className="w-4 h-4" />
+                {t('editPoster')}
+              </Button>
             )}
-            {t('downloadPoster')}
-          </Button>
+          </div>
         </div>
       </div>
+
+      {/* 编辑弹窗 */}
+      <PosterEditDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        poster={poster}
+        onSuccess={() => {
+          // 重新加载海报详情
+          fetch(`/api/posters/${id}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => { if (data) setPoster(data); });
+        }}
+      />
     </div>
   );
 }

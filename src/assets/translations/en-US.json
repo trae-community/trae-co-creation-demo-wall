@@ -419,6 +419,13 @@
     "qrCode": "QR Code",
     "posterPreview": "Poster Preview",
     "notFound": "Poster not found or deleted",
-    "notApproved": "This poster has not been approved yet"
+    "notApproved": "This poster has not been approved yet",
+    "editPoster": "Edit",
+    "editHint": "Changes require re-review",
+    "clickToReplace": "Click to replace cover",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save": "Save",
+    "editFailed": "Edit failed, please retry"
   }
 }

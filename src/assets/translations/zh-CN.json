@@ -417,6 +417,13 @@
     "qrCode": "二维码",
     "posterPreview": "海报预览",
     "notFound": "海报不存在或已删除",
-    "notApproved": "该海报尚未通过审核"
+    "notApproved": "该海报尚未通过审核",
+    "editPoster": "编辑",
+    "editHint": "修改内容后需重新审核",
+    "clickToReplace": "点击更换封面",
+    "cancel": "取消",
+    "saving": "保存中...",
+    "save": "保存",
+    "editFailed": "编辑失败，请重试"
   }
 }

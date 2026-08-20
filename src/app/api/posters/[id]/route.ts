@@ -87,7 +87,9 @@ export async function DELETE(
 
 /**
  * PATCH /api/posters/[id]
- * 更新海报审核状态（仅管理员）
+ * - 管理员：更新审核状态（auditStatus）
+ * - 管理员 / 创建者：更新内容字段（nickname, description, imageUrl, demoUrl）
+ *   编辑已通过的海报会自动降级为待审核
  */
 export async function PATCH(
   req: NextRequest,
@@ -95,25 +97,69 @@ export async function PATCH(
 ) {
   try {
     const user = await getAuthUser();
-    if (!user || !isAdmin(user)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id: idStr } = await params;
     const id = BigInt(idStr);
     const body = await req.json();
-    const { auditStatus } = body;
 
-    if (typeof auditStatus !== 'number' || ![0, 1, 2].includes(auditStatus)) {
-      return NextResponse.json({ error: 'Invalid audit status' }, { status: 400 });
+    // 查询现有海报（用于权限校验和审核降级判断）
+    const existing = await prisma.workPoster.findUnique({
+      where: { id },
+      select: { userId: true, auditStatus: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: 'Poster not found' }, { status: 404 });
+    }
+
+    const adminMode = isAdmin(user);
+    const isOwner = user.userId === existing.userId;
+
+    // ── 管理员更新审核状态 ──
+    if (typeof body.auditStatus === 'number' && adminMode) {
+      if (![0, 1, 2].includes(body.auditStatus)) {
+        return NextResponse.json({ error: 'Invalid audit status' }, { status: 400 });
+      }
+      const updated = await prisma.workPoster.update({
+        where: { id },
+        data: { auditStatus: body.auditStatus },
+      });
+      return NextResponse.json(sanitize(updated));
+    }
+
+    // ── 内容编辑（管理员或创建者） ──
+    if (!adminMode && !isOwner) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const updateData: Record<string, unknown> = {};
+    if (body.nickname !== undefined) updateData.nickname = String(body.nickname).slice(0, 100);
+    if (body.description !== undefined) updateData.description = body.description ? String(body.description).slice(0, 500) : null;
+    if (body.imageUrl !== undefined) updateData.imageUrl = String(body.imageUrl).slice(0, 255);
+    if (body.demoUrl !== undefined) {
+      try { new URL(body.demoUrl); } catch {
+        return NextResponse.json({ error: 'Invalid demo URL' }, { status: 400 });
+      }
+      updateData.demoUrl = String(body.demoUrl).slice(0, 255);
+    }
+
+    // 编辑已通过的海报 → 自动降级为待审核
+    if (existing.auditStatus === 1 && Object.keys(updateData).length > 0) {
+      updateData.auditStatus = 0;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
     }
 
     const updated = await prisma.workPoster.update({
       where: { id },
-      data: { auditStatus },
+      data: updateData,
     });
 
-    return NextResponse.json(sanitize(updated));
+    return NextResponse.json({ ...sanitize(updated), downgraded: existing.auditStatus === 1 && updateData.auditStatus === 0 });
   } catch {
     return NextResponse.json({ error: 'Failed to update poster' }, { status: 500 });
   }

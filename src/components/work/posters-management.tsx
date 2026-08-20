@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
-import { Trash2, Eye, Calendar, User, ExternalLink, Search, Inbox, ShieldCheck, Clock, History } from 'lucide-react'
+import { Trash2, Eye, Calendar, User, ExternalLink, Search, Inbox, ShieldCheck, Clock, History, Pencil } from 'lucide-react'
 
 import { CrudFeedback } from '@/components/crud/crud-feedback'
 import { CrudPagination } from '@/components/crud/crud-pagination'
@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { PosterImage } from '@/components/work/poster-image'
+import { PosterEditDialog } from '@/components/work/poster-edit-dialog'
 import { cn } from '@/lib/utils'
 
 interface PosterAdminItem {
@@ -79,6 +80,8 @@ export function PostersManagement() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [posterToDelete, setPosterToDelete] = useState<PosterAdminItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [editingPoster, setEditingPoster] = useState<PosterAdminItem | null>(null)
 
   const { feedback, showFeedback } = useFeedback()
 
@@ -345,6 +348,15 @@ export function PostersManagement() {
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="h-8 w-8 hover:text-amber-500 hover:bg-amber-500/10"
+                        onClick={() => { setEditingPoster(poster); setIsEditDialogOpen(true) }}
+                        title="编辑海报"
+                      >
+                        <Pencil size={16} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         className="h-8 w-8 hover:text-blue-500 hover:bg-blue-500/10"
                         onClick={() => handleOpenAuditDialog(poster)}
                         title="审核海报"
@@ -464,6 +476,14 @@ export function PostersManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 编辑弹窗 */}
+      <PosterEditDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        poster={editingPoster}
+        onSuccess={() => { fetchPosters(); setEditingPoster(null) }}
+      />
 
       {/* 删除弹窗（与作品管理删除交互一致） */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
