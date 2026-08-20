@@ -67,9 +67,24 @@ docker-compose -f docker-compose.prod.yml up -d --build --force-recreate
 docker compose -f docker-compose.prod.yml up -d --build --force-recreate
 ```
 
+### compose 文件选择
+
+| 文件 | 适用环境 | app 副本数 | 说明 |
+|------|---------|-----------|------|
+| `docker-compose.prod.yml` | 高配服务器（≥ 4C16G） | 4 | 含 db-dev，资源限额较高 |
+| `docker-compose.2c8g.yml` | 小规格服务器（2C8G，**生产实际使用**） | 2 | 无 db-dev，资源限额收紧 |
+
+两个文件使用同一个 `postgres-data` 卷（Compose 项目名取目录名，与文件名无关），**互相切换不丢数据**。小规格服务器更新命令：
+
+```bash
+docker-compose -f docker-compose.2c8g.yml up -d --build --force-recreate
+```
+
 > ⚠️ 命令选择：`docker compose`（空格，V2 插件）与 `docker-compose`（连字符，V1）不兼容。若执行时报 `unknown shorthand flag: 'f'`，说明环境只有 V1，改用连字符写法即可。
 
 > ⚠️ 原理说明：`app-init` 是一次性初始化容器（`restart: "no"`），`app` 通过 `service_completed_successfully` 等待它。Docker Compose 判断条件时依据的是容器**上一次的退出状态**——如果 `app-init` 旧容器已存在且退出码为 0，Compose 认为条件已满足，直接启动 `app`，不会重跑初始化。`--force-recreate` 强制重建所有容器，确保每次更新都会重新执行 `prisma db push` + `seed`。
+
+> ⚠️ 端口占用：若 nginx-lb 启动失败报 `failed to bind host port 0.0.0.0:80/tcp: address already in use`，说明旧部署的 nginx 容器仍在占用 80 端口（`--force-recreate` 只管当前项目的容器）。用 `docker ps --format "table {{.Names}}\t{{.Ports}}" | grep :80` 找到旧容器并 `docker stop && docker rm`，再重新 `up -d`。
 
 ### 更新流程做了什么
 
