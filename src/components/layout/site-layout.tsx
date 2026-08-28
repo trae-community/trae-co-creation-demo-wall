@@ -91,16 +91,16 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const currentOption = LOCALE_OPTIONS.find(o => o.code === locale) ?? LOCALE_OPTIONS[0];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background font-sans text-foreground relative z-0 overflow-x-clip">
+    <div className="min-h-screen flex flex-col bg-background font-sans text-foreground relative z-0">
       <ParticlesBackground />
       <header className={cn(
-        "fixed left-0 right-0 z-50 transition-all duration-300",
+        "sticky top-0 z-50 border-b transition-all duration-300",
         scrolled
-          ? "top-2 mx-4 rounded-2xl bg-background/80 backdrop-blur-xl border border-border shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
-          : "top-0 bg-background backdrop-blur-xl border-b border-border"
+          ? "border-white/10 bg-background/80 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+          : "border-white/5 bg-background/50 backdrop-blur-xl supports-[backdrop-filter]:bg-background/20"
       )}>
-        <div className="container mx-auto px-4 h-12 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-lg font-bold text-foreground tracking-tight group">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 text-lg font-bold text-white tracking-tight group">
             <Image src={logo} alt="logo" className="w-8 h-8" />
             <span className="hidden sm:inline truncate">TRAE DEMO WALL</span>
           </Link>
@@ -395,7 +395,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         )}
       </header>
 
-      <main className="flex-1 container mx-auto px-4 pt-20 pb-8">
+      <main className="flex-1 container mx-auto px-4 py-8">
         {children}
       </main>
 

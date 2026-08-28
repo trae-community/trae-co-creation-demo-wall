@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { WorkCard } from "@/components/work/work-card";
 import { PosterImage } from "@/components/work/poster-image";
 import { CityFilter, FilterState } from "@/components/work/city-filter";
-import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight, SearchX, X, ImageIcon, LayoutGrid } from "lucide-react";
+import { Search, Clock, ThumbsUp, Eye, ChevronLeft, ChevronRight, SearchX, X, ArrowUp, ImageIcon, LayoutGrid } from "lucide-react";
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from "@/lib/utils";
 import { HeroBanner } from "@/components/common/hero-banner";
@@ -125,10 +125,8 @@ export default function Page() {
   ];
 
   return (
-    <>
-      {/* Banner 移出 space-y 包裹层，以便抵住顶栏并铺满视口宽度 */}
-      <HeroBanner onBrowseWorks={() => { setActiveTab('works'); setTimeout(() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }), 50); }} />
-      <div className="mt-8 space-y-8">
+      <div className="space-y-8">
+      <HeroBanner />
         {/* ── 作品/海报 Tab 切换 ── */}
         <div className="flex items-center justify-center">
           <div className="inline-flex items-center rounded-xl border border-border bg-muted p-1 gap-0.5">
@@ -163,7 +161,7 @@ export default function Page() {
         <>
         {/* ── FILTER TOOLBAR ── */}
       {/* scroll-mt 预留 sticky 顶栏高度，避免跳转后筛选栏被遮挡 */}
-      <div id="projects" className="scroll-mt-20 space-y-4">
+      <div id="projects" className="scroll-mt-16 space-y-4">
         {/* Row 1: Search (left) + Sort (right) */}
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           {/* Search — takes up remaining space */}
@@ -365,7 +363,6 @@ export default function Page() {
         )}
 
       </div>
-    </>
   );
 }
 
