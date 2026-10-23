@@ -84,7 +84,11 @@ import logo from '@/assets/logo.svg';
 ### 占位图
 - **位置**: `public/images/work-placeholder.svg`
 - **用途**: 作品封面加载失败时的占位显示
-- **访问方式**: `/images/work-placeholder.svg`
+- **访问方式**: `workAssets.placeholder`（`/images/work-placeholder.svg`）
+
+### 分享海报静态资源
+- **位置**: `public/posters/`（模板 SVG、默认封面 JPG）
+- **代码**: `src/lib/poster/assets.ts`（`posterAssets`）
 
 ---
 

@@ -5,6 +5,7 @@ import { MapPin, Award, Eye, ThumbsUp, Clock, ArrowRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/language/navigation';
+import { workAssets } from '@/lib/work';
 
 interface WorkCardProps {
   work: Work;
@@ -91,7 +92,7 @@ export function WorkCard({ work }: WorkCardProps) {
             const img = e.target as HTMLImageElement;
             if (img.dataset.fallback) return; // 防止兑底图也失败时死循环
             img.dataset.fallback = '1';
-            img.src = '/images/work-placeholder.svg';
+            img.src = workAssets.placeholder;
           }}
         />
 

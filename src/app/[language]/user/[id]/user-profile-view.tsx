@@ -5,6 +5,7 @@ import { useParams, usePathname, useSearchParams, useRouter } from 'next/navigat
 import { useLocale, useTranslations } from 'next-intl'
 import { User, Sparkles, Pencil, Eye, ThumbsUp, ArrowLeft } from 'lucide-react'
 import { Link } from '@/lib/language/navigation'
+import { workAssets } from '@/lib/work'
 
 interface PublicWork {
   id: string
@@ -220,7 +221,7 @@ export function UserProfileView() {
                         const img = e.target as HTMLImageElement;
                         if (img.dataset.fallback) return; // 防止兑底图也失败时死循环
                         img.dataset.fallback = '1';
-                        img.src = '/images/work-placeholder.svg';
+                        img.src = workAssets.placeholder;
                       }}
                     />
                   ) : (
