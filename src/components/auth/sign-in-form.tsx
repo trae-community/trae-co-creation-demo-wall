@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,8 @@ type SignInFormData = z.infer<typeof signInSchema>;
 
 export function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -46,7 +48,7 @@ export function SignInForm() {
         return;
       }
 
-      router.push("/");
+      router.push(callbackUrl.startsWith("/") ? callbackUrl : "/");
       router.refresh();
     } catch {
       setError("登录失败，请重试");

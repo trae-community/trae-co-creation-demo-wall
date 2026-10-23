@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { Suspense, useState, useRef, useEffect } from "react";
+import { CodeBlindBoxLauncher } from '@/components/code-blind-box';
 import { cn } from "@/lib/utils";
 import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X, Trophy, Github, Code2, Globe, MessagesSquare, MessageSquarePlus, Palette } from "lucide-react";
 import { ParticlesBackground } from "./particles-background";
@@ -400,6 +401,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       </main>
 
       <BackToTop />
+
+      <Suspense fallback={null}>
+        <CodeBlindBoxLauncher />
+      </Suspense>
 
       <footer className="relative border-t border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
         {/* 顶部渐变装饰线 — 科技感点缀 */}
