@@ -87,3 +87,46 @@ export async function resetBlindBoxDraw(userId: bigint): Promise<BlindBoxSession
   await prisma.codeBlindBoxDraw.deleteMany({ where: { userId } });
   return blindBoxRowToSession(null);
 }
+
+const blindBoxAdminInclude = {
+  user: { select: { id: true, username: true, email: true } },
+  work: { select: { id: true, title: true } },
+} as const;
+
+function buildBlindBoxAdminListWhere(query?: string) {
+  const q = query?.trim();
+  if (!q) return undefined;
+
+  const or: object[] = [
+    { user: { username: { contains: q, mode: 'insensitive' } } },
+    { user: { email: { contains: q, mode: 'insensitive' } } },
+  ];
+  if (/^\d+$/.test(q)) {
+    or.push({ userId: BigInt(q) });
+  }
+  return { OR: or };
+}
+
+/** 控制台：盲盒抽取记录列表（对应 code_blind_box_draw 表） */
+export async function listBlindBoxDrawsForAdmin(params: {
+  page: number;
+  pageSize: number;
+  query?: string;
+}) {
+  const { page, pageSize, query } = params;
+  const where = buildBlindBoxAdminListWhere(query);
+  const skip = (page - 1) * pageSize;
+
+  const [rows, total] = await Promise.all([
+    prisma.codeBlindBoxDraw.findMany({
+      where,
+      include: blindBoxAdminInclude,
+      orderBy: { drawnAt1: 'desc' },
+      skip,
+      take: pageSize,
+    }),
+    prisma.codeBlindBoxDraw.count({ where }),
+  ]);
+
+  return { rows, total };
+}

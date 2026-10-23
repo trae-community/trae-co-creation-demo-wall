@@ -66,3 +66,7 @@ export function hasAnyRole(user: AuthUser | null, requiredRoles: string[]): bool
 export function isAdmin(user: AuthUser | null): boolean {
   return hasAnyRole(user, ['admin', 'root']);
 }
+
+export function isRoot(user: AuthUser | null): boolean {
+  return hasAnyRole(user, ['root']);
+}

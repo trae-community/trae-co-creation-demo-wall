@@ -84,6 +84,7 @@ export default function ConsoleLayout({
         children: [
           { name: '作品管理', href: '/console/works' },
           { name: '海报管理', href: '/console/posters' },
+          { name: '盲盒管理', href: '/console/code-blind-box' },
           { name: '城市数据', href: '/console/cities' },
         ]
       },
