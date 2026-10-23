@@ -11,9 +11,7 @@ import {
   blindBoxAssets,
   emptyBlindBoxSession,
   fetchBlindBoxSession,
-  isCodeBlindBoxDevTools,
   isCodeBlindBoxEnabled,
-  resetBlindBoxSession,
 } from '@/lib/code-blind-box';
 import type { BlindBoxSession } from '@/lib/code-blind-box/types';
 import { TraeBaoMascot } from './trae-bao-mascot';
@@ -36,7 +34,6 @@ function usePageReady() {
 
 export function CodeBlindBoxEntry() {
   const enabled = isCodeBlindBoxEnabled();
-  const showReset = isCodeBlindBoxDevTools();
   const pageReady = usePageReady();
   const pathname = usePathname();
   const locale = useLocale();
@@ -49,7 +46,6 @@ export function CodeBlindBoxEntry() {
   const [loginPromptOpen, setLoginPromptOpen] = useState(false);
   const [session, setSession] = useState<BlindBoxSession>(() => emptyBlindBoxSession());
   const [sessionLoaded, setSessionLoaded] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
   const openedFromQueryRef = useRef(false);
 
   const isConsole = pathname?.includes('/console');
@@ -66,14 +62,21 @@ export function CodeBlindBoxEntry() {
         ? 'progress'
         : 'invite';
 
-  const loadSession = useCallback(async () => {
-    if (status !== 'authenticated') return;
+  const loadSession = useCallback(async (): Promise<BlindBoxSession> => {
+    if (status !== 'authenticated') {
+      const empty = emptyBlindBoxSession();
+      setSession(empty);
+      return empty;
+    }
     try {
       const data = await fetchBlindBoxSession();
-      if (!data) return;
-      setSession(data);
+      const next = data ?? emptyBlindBoxSession();
+      setSession(next);
+      return next;
     } catch {
-      /* ignore */
+      const empty = emptyBlindBoxSession();
+      setSession(empty);
+      return empty;
     }
   }, [status]);
 
@@ -91,16 +94,27 @@ export function CodeBlindBoxEntry() {
   }, [pageReady, status, loadSession]);
 
   useEffect(() => {
+    if (status !== 'authenticated') return;
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        void loadSession();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [status, loadSession]);
+
+  useEffect(() => {
     if (searchParams.get('blindBox') !== '1' || status === 'loading' || openedFromQueryRef.current) {
       return;
     }
     openedFromQueryRef.current = true;
     if (status === 'authenticated') {
-      setModalOpen(true);
+      void loadSession().then(() => setModalOpen(true));
     } else {
       setLoginPromptOpen(true);
     }
-  }, [searchParams, status]);
+  }, [searchParams, status, loadSession]);
 
   if (!enabled || isConsole || !pageReady || !sessionLoaded) return null;
 
@@ -116,21 +130,7 @@ export function CodeBlindBoxEntry() {
       setLoginPromptOpen(true);
       return;
     }
-    setModalOpen(true);
-  };
-
-  const handleReset = async () => {
-    if (status !== 'authenticated') return;
-    setIsResetting(true);
-    try {
-      const data = await resetBlindBoxSession();
-      if (data) {
-        setSession(data);
-        setModalOpen(false);
-      }
-    } finally {
-      setIsResetting(false);
-    }
+    void loadSession().then(() => setModalOpen(true));
   };
 
   const showFabBubble =
@@ -198,18 +198,6 @@ export function CodeBlindBoxEntry() {
             <TraeBaoMascot variant={fabState === 'selected' && isAuthenticated ? 'selected' : 'invite'} />
           </div>
         </button>
-
-        {showReset && status === 'authenticated' && (
-          <button
-            type="button"
-            onClick={handleReset}
-            disabled={isResetting}
-            className="text-[10px] px-2 py-1 rounded-md border border-dashed border-zinc-500/50 text-zinc-400 hover:text-zinc-200 hover:border-zinc-300 transition-colors"
-            title={t('resetHint')}
-          >
-            {isResetting ? t('resetting') : t('reset')}
-          </button>
-        )}
       </div>
 
       <CodeBlindBoxLoginPrompt

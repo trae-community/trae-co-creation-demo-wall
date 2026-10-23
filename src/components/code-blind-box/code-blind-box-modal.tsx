@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BlindBoxDialog, BlindBoxDialogClose, BlindBoxDialogContent } from './blind-box-dialog';
@@ -102,15 +102,24 @@ export function CodeBlindBoxModal({
     setPhaseLocked(false);
   }, []);
 
+  const wasOpenRef = useRef(false);
   useEffect(() => {
-    if (!open) return;
+    const justOpened = open && !wasOpenRef.current;
+    wasOpenRef.current = open;
+    if (!justOpened) return;
     applyOpenState(session);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, session, applyOpenState]);
 
   const allFlipped = flipped.size === 3;
-  const uiPhase = isConfirming && lockViewPhase ? lockViewPhase : phase;
+  const displayPhase =
+    phase === 'flipping' && allFlipped && activeDraw
+      ? activeDraw.slot === 2
+        ? 'after-second'
+        : 'after-first'
+      : phase;
+  const uiPhase = isConfirming && lockViewPhase ? lockViewPhase : displayPhase;
   const isReadonly = uiPhase === 'readonly';
+  const isFlippingCards = uiPhase === 'flipping' && !allFlipped;
   const displayDraw = chosenDraw ?? activeDraw;
   const currentGroup = activeDraw?.slot ?? Math.max(session.options.length, 1);
   const remainingDraws = Math.max(0, 2 - session.options.length);
@@ -125,8 +134,8 @@ export function CodeBlindBoxModal({
 
   useEffect(() => {
     if (phase !== 'flipping' || !allFlipped || !activeDraw) return;
-    if (activeDraw.slot === 1) setPhase('after-first');
-    if (activeDraw.slot === 2) setPhase('after-second');
+    const next = activeDraw.slot === 2 ? 'after-second' : 'after-first';
+    setPhase(next);
   }, [phase, allFlipped, activeDraw]);
 
   useEffect(() => {
@@ -297,10 +306,8 @@ export function CodeBlindBoxModal({
     : isChoosingView
       ? t('chooseTitle')
       : t('title');
-  const showGenErrorSubtitle = inlineError === 'draw' && uiPhase === 'flipping';
-  const subtitleAccent =
-    (uiPhase === 'flipping' && !phaseLocked && !showGenErrorSubtitle) ||
-    (uiPhase === 'flipping' && session.options.length === 1 && !showGenErrorSubtitle);
+  const showGenErrorSubtitle = inlineError === 'draw' && isFlippingCards;
+  const subtitleAccent = isFlippingCards && !showGenErrorSubtitle;
 
   const headerSubtitle = isConfirming
     ? t('lockingSubtitle', { n: pendingConfirmSlot ?? pickSlot ?? currentGroup })
@@ -310,14 +317,12 @@ export function CodeBlindBoxModal({
         ? t('genErrorSubtitle')
         : isChoosingView
           ? t('chooseSubtitle')
-          : uiPhase === 'flipping' && !phaseLocked
+          : isFlippingCards
             ? t('flipHint')
-            : uiPhase === 'flipping' && session.options.length === 1
-              ? t('statusSecondFlip')
-              : t('statusSubtitle', {
-                  current: currentGroup,
-                  remaining: remainingDraws,
-                });
+            : t('statusSubtitle', {
+                current: currentGroup,
+                remaining: remainingDraws,
+              });
 
   const footerHint = isReadonly
     ? copyOk
@@ -333,7 +338,7 @@ export function CodeBlindBoxModal({
             ? t('drawErrorInline')
             : isChoosingView
               ? t('compareFooterHint')
-              : uiPhase === 'flipping' && !allFlipped
+              : isFlippingCards
                 ? t('flipGuide')
                 : uiPhase === 'after-first' || uiPhase === 'after-second'
                   ? t('lockRule')
@@ -448,10 +453,6 @@ export function CodeBlindBoxModal({
                   />
                 </div>
               </>
-            ) : isDrawing ? (
-              <BlindBoxActionButton size="lg" className="pointer-events-none cursor-wait">
-                {t('generating')}
-              </BlindBoxActionButton>
             ) : inlineError === 'confirm' ? (
               <BlindBoxActionButton size="lg" onClick={retryConfirm}>
                 {t('retryConfirm')}
@@ -478,9 +479,13 @@ export function CodeBlindBoxModal({
                   {t('done')}
                 </BlindBoxActionButton>
               </div>
-            ) : uiPhase === 'flipping' && !allFlipped ? (
-              <BlindBoxActionButton variant="disabled" size="lg">
-                {t('flipAllFirst')}
+            ) : isFlippingCards ? (
+              <BlindBoxActionButton
+                variant="disabled"
+                size="lg"
+                className={isDrawing ? 'cursor-wait' : undefined}
+              >
+                {isDrawing ? t('generating') : t('flipAllFirst')}
               </BlindBoxActionButton>
             ) : uiPhase === 'after-first' ? (
               <div className="flex flex-wrap justify-center gap-3">

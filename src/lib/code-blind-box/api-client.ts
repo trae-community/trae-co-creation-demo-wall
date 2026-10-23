@@ -4,7 +4,7 @@ import type { BlindBoxSession } from '@/lib/code-blind-box/types';
 const API_PATH = '/api/code-blind-box';
 
 export async function fetchBlindBoxSession(): Promise<BlindBoxSession | null> {
-  const res = await fetch(API_PATH);
+  const res = await fetch(API_PATH, { cache: 'no-store' });
   if (!res.ok) return null;
   const data = await res.json().catch(() => null);
   return data ? normalizeBlindBoxSession(data) : null;
@@ -30,11 +30,4 @@ export async function confirmBlindBoxChoice(
     return { ok: false, session: data ? normalizeBlindBoxSession(data) : undefined };
   }
   return { ok: true, session: normalizeBlindBoxSession(data) };
-}
-
-export async function resetBlindBoxSession(): Promise<BlindBoxSession | null> {
-  const res = await fetch(API_PATH, { method: 'DELETE' });
-  if (!res.ok) return null;
-  const data = await res.json().catch(() => null);
-  return data ? normalizeBlindBoxSession(data) : null;
 }
