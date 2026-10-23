@@ -86,7 +86,8 @@ model SysUser {
   works         WorkBase[]
   workPosters   WorkPoster[]
   grantedHonors WorkHonor[]       @relation("GrantedBy")
-  likes         WorkLike[]
+  likes            WorkLike[]
+  codeBlindBoxDraw CodeBlindBoxDraw?
 
   @@map("sys_user")
 }
@@ -152,8 +153,9 @@ model WorkBase {
   images        WorkImage[]
   likes         WorkLike[]
   statistic     WorkStatistic?
-  tags          WorkTagRelation[]
-  team          WorkTeam?
+  tags             WorkTagRelation[]
+  team             WorkTeam?
+  codeBlindBoxDraw CodeBlindBoxDraw?
 
   @@index([userId])
   @@index([countryCode])
@@ -440,4 +442,25 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_token")
+}
+
+/// 1024 代码盲盒抽卡记录（每人最多两套，确认时二选一）
+model CodeBlindBoxDraw {
+  id             BigInt    @id @default(autoincrement())
+  userId         BigInt    @unique @map("user_id")
+  themeWord1     String    @map("theme_word_1") @db.VarChar(100)
+  functionWord1  String    @map("function_word_1") @db.VarChar(100)
+  styleWord1     String    @map("style_word_1") @db.VarChar(100)
+  drawnAt1       DateTime  @default(now()) @map("drawn_at_1") @db.Timestamptz(6)
+  themeWord2     String?   @map("theme_word_2") @db.VarChar(100)
+  functionWord2  String?   @map("function_word_2") @db.VarChar(100)
+  styleWord2     String?   @map("style_word_2") @db.VarChar(100)
+  drawnAt2       DateTime? @map("drawn_at_2") @db.Timestamptz(6)
+  /// 最终确认选用第几套：1 或 2
+  chosenSlot     Int?      @map("chosen_slot")
+  workId         BigInt?   @unique @map("work_id")
+  user           SysUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  work           WorkBase? @relation(fields: [workId], references: [id], onDelete: SetNull)
+
+  @@map("code_blind_box_draw")
 }
