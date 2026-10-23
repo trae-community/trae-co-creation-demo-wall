@@ -10,6 +10,7 @@ import { Work } from "@/lib/types";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useWorksStore } from '@/lib/works-store';
 import { cn } from '@/lib/utils';
+import { posterAssets } from '@/lib/poster';
 
 const toStringList = (value: unknown): string[] => {
   if (Array.isArray(value)) {
@@ -325,7 +326,7 @@ export function WorkDetailView() {
     const POSTER_H = 425.2;
     let template = '';
     try {
-      const res = await fetch('/images/poster-template.svg');
+      const res = await fetch(posterAssets.template);
       if (res.ok) template = await res.text();
     } catch (err) {
       console.error('Poster template load failed:', err);
@@ -345,7 +346,7 @@ export function WorkDetailView() {
       } catch {
         const fallbackIdx = ((Number(id) || 0) % 4) + 1;
         try {
-          coverDataUrl = await fetchCoverAsDataUrl(`/images/poster-default-${fallbackIdx}.jpg`);
+          coverDataUrl = await fetchCoverAsDataUrl(posterAssets.defaultCover(fallbackIdx));
         } catch {
           coverDataUrl = '';
         }
@@ -362,7 +363,8 @@ export function WorkDetailView() {
         (_m, groupHead, groupClose) => groupHead + bgLayer + groupClose
       );
     }
-    const fontStack = "'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', Arial, sans-serif";
+    const fontStack =
+      "c, t, 'JetBrains Mono', 'Source Han Sans CN', 'PingFang SC', 'Microsoft YaHei', sans-serif";
     // 标题区（模板蓝色标题条 y 292.25~310.1 为静态设计元素，白字单行压在条内）
     const titleSvg =
       `<text x="24.6" y="304.8" fill="#ffffff" font-size="10" font-weight="800" font-family="${fontStack}">${safe(title)}</text>`;

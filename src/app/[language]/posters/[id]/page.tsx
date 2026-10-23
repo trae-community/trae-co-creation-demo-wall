@@ -8,7 +8,7 @@ import { Link } from '@/lib/language/navigation';
 import { ArrowLeft, ExternalLink, Download, Calendar, Loader2, Pencil } from 'lucide-react';
 import { PosterImage } from '@/components/work/poster-image';
 import { PosterEditDialog } from '@/components/work/poster-edit-dialog';
-import { buildPosterDataUrl, downloadPosterPng } from '@/lib/poster-svg';
+import { buildPosterDataUrl, downloadPosterPng } from '@/lib/poster';
 import { Button } from '@/components/ui/button';
 
 interface PosterDetail {

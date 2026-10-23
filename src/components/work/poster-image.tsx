@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import { buildPosterDataUrl, POSTER_W, POSTER_H } from '@/lib/poster-svg';
+import { buildPosterDataUrl, POSTER_H, POSTER_W } from '@/lib/poster';
 import { cn } from '@/lib/utils';
 
 interface PosterImageProps {
@@ -15,13 +15,45 @@ interface PosterImageProps {
   qrText?: string;
   fallbackTitle?: string;
   anonymousLabel?: string;
+  /**
+   * cover：列表缩略图，浏览器直链 COS，避免 cover-proxy + SVG 合成
+   * composed：详情/制作页完整海报（默认）
+   */
+  variant?: 'cover' | 'composed';
 }
 
-/**
- * 最终海报渲染组件：封面 + 昵称 + 简介 + 二维码合成竖版海报。
- * 渲染失败时降级为原始封面图，保证展示不空白。
- */
-export function PosterImage({
+function PosterCoverImage({
+  nickname,
+  imageUrl,
+  className,
+}: Pick<PosterImageProps, 'nickname' | 'imageUrl' | 'className'>) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed || !imageUrl) {
+    return (
+      <div
+        className={cn('flex items-center justify-center bg-muted text-muted-foreground text-xs', className)}
+        style={{ aspectRatio: `${POSTER_W} / ${POSTER_H}` }}
+      >
+        {nickname}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={imageUrl}
+      alt={nickname}
+      loading="lazy"
+      decoding="async"
+      className={cn('w-full h-full object-cover', className)}
+      style={{ aspectRatio: `${POSTER_W} / ${POSTER_H}` }}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+function PosterComposedImage({
   nickname,
   description,
   imageUrl,
@@ -30,7 +62,7 @@ export function PosterImage({
   qrText,
   fallbackTitle,
   anonymousLabel,
-}: PosterImageProps) {
+}: Omit<PosterImageProps, 'variant'>) {
   const [dataUrl, setDataUrl] = useState('');
   const [failed, setFailed] = useState(false);
 
@@ -60,7 +92,6 @@ export function PosterImage({
   }, [nickname, description, imageUrl, demoUrl, qrText, fallbackTitle, anonymousLabel]);
 
   if (failed) {
-    // 降级：直接展示原始封面
     return (
       <img src={imageUrl} alt={nickname} className={cn('w-full h-full object-cover', className)} />
     );
@@ -85,4 +116,14 @@ export function PosterImage({
       style={{ aspectRatio: `${POSTER_W} / ${POSTER_H}` }}
     />
   );
+}
+
+/**
+ * 海报展示：列表用 cover，详情/管理预览用 composed 完整合成。
+ */
+export function PosterImage({ variant = 'composed', ...props }: PosterImageProps) {
+  if (variant === 'cover') {
+    return <PosterCoverImage nickname={props.nickname} imageUrl={props.imageUrl} className={props.className} />;
+  }
+  return <PosterComposedImage {...props} />;
 }

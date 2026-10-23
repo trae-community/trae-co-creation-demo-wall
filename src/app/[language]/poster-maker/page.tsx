@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Upload, Download, Send, Loader2, Image as ImageIcon, Link2, User, FileText, Tag, Printer, ShieldCheck, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from '@/lib/language/navigation';
-import { buildPosterDataUrl } from '@/lib/poster-svg';
+import { buildPosterDataUrl } from '@/lib/poster';
 import { Button } from '@/components/ui/button';
 
 interface TagOption {

@@ -26,7 +26,7 @@ export default function PostersPage() {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<'newest' | 'oldest'>('newest');
   const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 12;
+  const pageSize = 8;
 
   useEffect(() => {
     const fetchPosters = async () => {
