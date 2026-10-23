@@ -1,4 +1,4 @@
-/** 1024 代码盲盒活动开关（前端可见项需 NEXT_PUBLIC_ 前缀） */
+/** 1024 代码盲盒活动开关（前端需 NEXT_PUBLIC_，构建时打入包内） */
 
 export const CODE_BLIND_BOX_MAX_DRAWS = 2;
 
@@ -6,18 +6,5 @@ export function isCodeBlindBoxEnabled(): boolean {
   const flag =
     process.env.NEXT_PUBLIC_CODE_BLIND_BOX_ENABLED ??
     process.env.CODE_BLIND_BOX_ENABLED;
-  if (flag === 'false' || flag === '0') return false;
-  if (flag === 'true' || flag === '1') {
-    return !isPastEndDate();
-  }
-  if (process.env.NODE_ENV === 'development') return !isPastEndDate();
-  return false;
-}
-
-function isPastEndDate(): boolean {
-  const endAt = process.env.NEXT_PUBLIC_CODE_BLIND_BOX_END_AT;
-  if (!endAt) return false;
-  const end = new Date(endAt);
-  if (Number.isNaN(end.getTime())) return false;
-  return Date.now() > end.getTime();
+  return flag === 'true' || flag === '1';
 }
