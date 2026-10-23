@@ -503,9 +503,6 @@
     "confirmErrorInline": "確定に失敗しました。お題は未ロックです。選択は保持されています。",
     "retryDraw": "再抽選",
     "retryConfirm": "確定を再試行",
-    "reset": "抽選をリセット（開発）",
-    "resetting": "リセット中…",
-    "resetHint": "開発専用：このアカウントの記録を削除",
     "prompt": "<style>{styleWord}</style>な雰囲気で、<theme>{themeWord}</theme>についての<function>{functionWord}</function>を作る",
     "promptPlain": "{styleWord}な雰囲気で、{themeWord}についての{functionWord}を作る"
   }

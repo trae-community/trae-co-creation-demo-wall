@@ -485,9 +485,6 @@
     "confirmErrorInline": "确认失败，命题尚未锁定；本次选择已保留。",
     "retryDraw": "重新抽取",
     "retryConfirm": "重试确认",
-    "reset": "重置抽卡（开发）",
-    "resetting": "重置中…",
-    "resetHint": "仅开发环境：清空当前账号的盲盒记录",
     "prompt": "用<style>{styleWord}</style>的方式，做一个关于<theme>{themeWord}</theme>的<function>{functionWord}</function>",
     "promptPlain": "用{styleWord}的方式，做一个关于{themeWord}的{functionWord}"
   }

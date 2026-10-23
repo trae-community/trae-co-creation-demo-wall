@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
-import { isCodeBlindBoxDevTools, isCodeBlindBoxEnabled } from '@/lib/code-blind-box/config';
+import { isCodeBlindBoxEnabled } from '@/lib/code-blind-box/config';
 import {
   confirmBlindBoxSlot,
   drawBlindBoxSet,
   getBlindBoxSession,
-  resetBlindBoxDraw,
 } from '@/lib/code-blind-box/repository';
 import type { BlindBoxSession } from '@/lib/code-blind-box/types';
 
@@ -77,26 +76,5 @@ export async function PATCH(req: NextRequest) {
   } catch (error) {
     console.error('[API] code-blind-box confirm failed:', error);
     return NextResponse.json({ error: '确认失败，请重试' }, { status: 500 });
-  }
-}
-
-/** 开发测试：清空当前用户抽卡记录 */
-export async function DELETE() {
-  if (!isCodeBlindBoxEnabled()) return featureDisabled();
-  if (!isCodeBlindBoxDevTools()) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-
-  const user = await getAuthUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  try {
-    const session = await resetBlindBoxDraw(user.userId);
-    return sessionResponse(session);
-  } catch (error) {
-    console.error('[API] code-blind-box reset failed:', error);
-    return NextResponse.json({ error: '重置失败' }, { status: 500 });
   }
 }

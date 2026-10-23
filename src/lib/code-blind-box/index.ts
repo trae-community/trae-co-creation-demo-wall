@@ -3,9 +3,8 @@ export {
   confirmBlindBoxChoice,
   drawBlindBoxSet,
   fetchBlindBoxSession,
-  resetBlindBoxSession,
 } from './api-client';
-export { CODE_BLIND_BOX_MAX_DRAWS, isCodeBlindBoxDevTools, isCodeBlindBoxEnabled } from './config';
+export { CODE_BLIND_BOX_MAX_DRAWS, isCodeBlindBoxEnabled } from './config';
 export {
   blindBoxFooterHintClass,
   blindBoxShellClass,

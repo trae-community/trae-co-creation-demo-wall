@@ -14,11 +14,6 @@ export function isCodeBlindBoxEnabled(): boolean {
   return false;
 }
 
-/** 开发环境显示重置按钮，便于联调 */
-export function isCodeBlindBoxDevTools(): boolean {
-  return process.env.NODE_ENV === 'development';
-}
-
 function isPastEndDate(): boolean {
   const endAt = process.env.NEXT_PUBLIC_CODE_BLIND_BOX_END_AT;
   if (!endAt) return false;

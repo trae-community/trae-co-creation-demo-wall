@@ -488,9 +488,6 @@
     "confirmErrorInline": "Confirm failed — prompt not locked; your selection is kept.",
     "retryDraw": "Draw again",
     "retryConfirm": "Retry confirm",
-    "reset": "Reset draws (dev)",
-    "resetting": "Resetting…",
-    "resetHint": "Dev only: clear this account's blind-box record",
     "prompt": "Build a <function>{functionWord}</function> about <theme>{themeWord}</theme> in <style>{styleWord}</style> style",
     "promptPlain": "Build a {functionWord} about {themeWord} in {styleWord} style"
   }
