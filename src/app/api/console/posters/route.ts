@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser, isAdmin } from '@/lib/auth';
+import { writeOperationLog } from '@/lib/audit-log';
 
 // Helper to sanitize BigInt
 const sanitize = (data: unknown) => {
@@ -70,5 +71,74 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('[API] Failed to fetch console posters:', error);
     return NextResponse.json({ error: '获取海报列表失败' }, { status: 500 });
+  }
+}
+
+/**
+ * PUT /api/console/posters
+ * 管理员更新海报审核状态（支持单条 id 或批量 ids）
+ */
+export async function PUT(req: NextRequest) {
+  try {
+    const user = await getAuthUser();
+    if (!user || !isAdmin(user)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const body = await req.json();
+    const { id, ids, auditStatus } = body;
+
+    if (auditStatus === undefined || ![0, 1, 2].includes(Number(auditStatus))) {
+      return NextResponse.json({ error: '审核状态无效，可选值：0(待审)/1(通过)/2(拒绝)' }, { status: 400 });
+    }
+
+    const batchIds = Array.isArray(ids)
+      ? [...new Set(ids.map((value: unknown) => String(value)).filter(Boolean))]
+      : [];
+    const targetIds = batchIds.length > 0 ? batchIds : id ? [String(id)] : [];
+
+    if (targetIds.length === 0) {
+      return NextResponse.json({ error: 'Poster ID is required' }, { status: 400 });
+    }
+
+    const posterIds = targetIds.map((value: string) => BigInt(value));
+    const newStatus = Number(auditStatus);
+
+    const existing = await prisma.workPoster.findMany({
+      where: { id: { in: posterIds } },
+      select: { id: true },
+    });
+
+    if (existing.length !== posterIds.length) {
+      return NextResponse.json({ error: 'Some posters were not found' }, { status: 404 });
+    }
+
+    await prisma.workPoster.updateMany({
+      where: { id: { in: posterIds } },
+      data: { auditStatus: newStatus },
+    });
+
+    const isBatch = targetIds.length > 1;
+    await Promise.all(
+      targetIds.map((targetId) =>
+        writeOperationLog({
+          operatorId: user.userId,
+          module: 'poster',
+          action: 'audit',
+          targetType: 'work_poster',
+          targetId,
+          payload: { auditStatus: newStatus, batch: isBatch },
+          request: req,
+        })
+      )
+    );
+
+    return NextResponse.json({
+      success: true,
+      updatedCount: targetIds.length,
+    });
+  } catch (error) {
+    console.error('[API] Failed to batch audit posters:', error);
+    return NextResponse.json({ error: '更新审核状态失败' }, { status: 500 });
   }
 }

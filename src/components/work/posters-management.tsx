@@ -14,6 +14,8 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -74,9 +76,10 @@ export function PostersManagement() {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [viewingPoster, setViewingPoster] = useState<PosterAdminItem | null>(null)
   const [isAuditDialogOpen, setIsAuditDialogOpen] = useState(false)
-  const [auditingPoster, setAuditingPoster] = useState<PosterAdminItem | null>(null)
+  const [auditTargetIds, setAuditTargetIds] = useState<string[]>([])
   const [selectedAuditStatus, setSelectedAuditStatus] = useState('1')
   const [isSavingAudit, setIsSavingAudit] = useState(false)
+  const [selectedPosterIds, setSelectedPosterIds] = useState<string[]>([])
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [posterToDelete, setPosterToDelete] = useState<PosterAdminItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -130,26 +133,67 @@ export function PostersManagement() {
   }
 
   const handleOpenAuditDialog = (poster: PosterAdminItem) => {
-    setAuditingPoster(poster)
-    setSelectedAuditStatus(poster.auditStatus === 2 ? '2' : '1')
+    setAuditTargetIds([poster.id])
+    setSelectedAuditStatus(String(poster.auditStatus))
+    setIsAuditDialogOpen(true)
+  }
+
+  const handleTogglePosterSelection = (posterId: string, checked: boolean) => {
+    setSelectedPosterIds(prev =>
+      checked ? [...prev, posterId] : prev.filter(id => id !== posterId)
+    )
+  }
+
+  const handleToggleSelectAllPosters = (checked: boolean) => {
+    if (checked) {
+      setSelectedPosterIds(posters.map(poster => poster.id))
+      return
+    }
+    setSelectedPosterIds([])
+  }
+
+  const handleOpenBulkAuditDialog = () => {
+    if (selectedPosterIds.length === 0) {
+      showFeedback('error', '请先选择要审核的海报')
+      return
+    }
+    setAuditTargetIds(selectedPosterIds)
+    setSelectedAuditStatus('0')
     setIsAuditDialogOpen(true)
   }
 
   const handleSaveAudit = async () => {
-    if (!auditingPoster) return
+    if (auditTargetIds.length === 0) return
+    const updatedCount = auditTargetIds.length
     try {
       setIsSavingAudit(true)
-      const res = await fetch(`/api/posters/${auditingPoster.id}`, {
-        method: 'PATCH',
+      const isBatchAudit = updatedCount > 1
+      const res = await fetch('/api/console/posters', {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ auditStatus: Number(selectedAuditStatus) }),
+        body: JSON.stringify({
+          ...(isBatchAudit ? { ids: auditTargetIds } : { id: auditTargetIds[0] }),
+          auditStatus: Number(selectedAuditStatus),
+        }),
       })
       if (res.ok) {
         setIsAuditDialogOpen(false)
+        setAuditTargetIds([])
+        setSelectedPosterIds([])
         fetchPosters()
-        showFeedback('success', selectedAuditStatus === '1' ? '海报审核已通过' : '海报已拒绝')
+        showFeedback(
+          'success',
+          isBatchAudit
+            ? `已批量更新 ${updatedCount} 个海报的审核状态`
+            : selectedAuditStatus === '1'
+              ? '海报审核已通过'
+              : selectedAuditStatus === '2'
+                ? '海报已拒绝'
+                : '海报审核状态已更新'
+        )
       } else {
-        showFeedback('error', '更新审核状态失败')
+        const errorData = await res.json().catch(() => ({}))
+        showFeedback('error', errorData.error || '更新审核状态失败')
       }
     } catch (error) {
       console.error('Failed to save audit status:', error)
@@ -190,6 +234,11 @@ export function PostersManagement() {
   const current = Math.min(currentPage, totalPages)
   const startIndex = (current - 1) * pageSize
   const endIndex = Math.min(startIndex + pageSize, totalItems)
+  const isAllCurrentPageSelected = posters.length > 0 && posters.every(poster => selectedPosterIds.includes(poster.id))
+  const isPartiallySelected = posters.some(poster => selectedPosterIds.includes(poster.id)) && !isAllCurrentPageSelected
+  const auditTargetPoster = auditTargetIds.length === 1
+    ? posters.find(poster => poster.id === auditTargetIds[0])
+    : null
 
   return (
     <div className="space-y-6 relative min-h-[500px]">
@@ -280,8 +329,53 @@ export function PostersManagement() {
 
       {/* 海报列表（与作品管理同款 Card 行） */}
       <div className="space-y-4">
+        {posters.length > 0 && (
+          <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <Checkbox
+                id="select-all-posters"
+                checked={isAllCurrentPageSelected ? true : isPartiallySelected ? 'indeterminate' : false}
+                onCheckedChange={(checked) => handleToggleSelectAllPosters(checked === true)}
+              />
+              <Label htmlFor="select-all-posters" className="cursor-pointer">
+                本页全选
+              </Label>
+              <span className="text-sm text-muted-foreground">
+                已选择 {selectedPosterIds.length} 个海报
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedPosterIds([])}
+                disabled={selectedPosterIds.length === 0}
+              >
+                清空选择
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleOpenBulkAuditDialog}
+                disabled={selectedPosterIds.length === 0}
+              >
+                批量审核
+              </Button>
+            </div>
+          </div>
+        )}
+
         {posters.map(poster => (
           <Card key={poster.id} className="overflow-hidden border border-border bg-card hover:bg-card/80 transition-colors">
+            <div className="flex">
+              <div className="flex items-start border-r border-border/50 p-4">
+                <Checkbox
+                  id={`poster-select-${poster.id}`}
+                  checked={selectedPosterIds.includes(poster.id)}
+                  onCheckedChange={(checked) => handleTogglePosterSelection(poster.id, checked === true)}
+                  aria-label={`选择海报 ${poster.nickname}`}
+                />
+              </div>
             <div className="flex flex-1 flex-col sm:flex-row">
               {/* 封面缩略图 */}
               <div className="w-full sm:w-48 h-40 sm:h-auto bg-muted shrink-0 relative">
@@ -392,6 +486,7 @@ export function PostersManagement() {
                 </div>
               </div>
             </div>
+            </div>
           </Card>
         ))}
 
@@ -454,7 +549,11 @@ export function PostersManagement() {
           <DialogHeader>
             <DialogTitle>审核海报</DialogTitle>
             <DialogDescription>
-              海报「{auditingPoster?.nickname}」的审核状态
+              {auditTargetIds.length > 1
+                ? `批量更新 ${auditTargetIds.length} 个海报的审核状态。审核通过后海报将展示在橱窗。`
+                : auditTargetPoster
+                  ? `更改海报「${auditTargetPoster.nickname}」的审核状态。审核通过后海报将展示在橱窗。`
+                  : '更改已选海报的审核状态。审核通过后海报将展示在橱窗。'}
             </DialogDescription>
           </DialogHeader>
           <div className="py-2">
@@ -463,6 +562,7 @@ export function PostersManagement() {
                 <SelectValue placeholder="选择审核状态" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="0">待审核</SelectItem>
                 <SelectItem value="1">通过</SelectItem>
                 <SelectItem value="2">拒绝</SelectItem>
               </SelectContent>
