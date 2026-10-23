@@ -5,10 +5,13 @@
  * 供海报制作页实时预览、橱窗列表、详情页、个人主页复用。
  */
 
+import { posterAssets } from '@/lib/poster/assets';
+
 export const POSTER_W = 283.46;
 export const POSTER_H = 425.2;
 
-const FONT_STACK = "'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', Arial, sans-serif";
+const FONT_STACK =
+  "c, t, 'JetBrains Mono', 'Source Han Sans CN', 'PingFang SC', 'Microsoft YaHei', sans-serif";
 
 const escapeXml = (value: string) =>
   value
@@ -18,29 +21,23 @@ const escapeXml = (value: string) =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 
-// 模块级缓存：模板与封面代理结果，避免列表页重复请求
 let templateCache: string | null = null;
 const coverCache = new Map<string, string>();
 
 export interface PosterComposeOptions {
   nickname: string;
   description?: string | null;
-  /** 封面 data URL（base64），为空时渲染深色底 */
   coverDataUrl?: string;
   demoUrl: string;
-  /** 昵称为空时的兜底标题 */
   fallbackTitle?: string;
-  /** 二维码下方 @作者 为空时的兜底文案 */
   anonymousLabel?: string;
-  /** 二维码区提示文案 */
   qrText?: string;
 }
 
-/** 加载海报模板（带缓存） */
 export async function fetchPosterTemplate(): Promise<string> {
   if (templateCache) return templateCache;
   try {
-    const res = await fetch('/images/poster-template.svg');
+    const res = await fetch(posterAssets.template);
     if (res.ok) {
       templateCache = await res.text();
       return templateCache;
@@ -51,7 +48,6 @@ export async function fetchPosterTemplate(): Promise<string> {
   return '';
 }
 
-/** 通过服务端代理获取封面 base64（带缓存，规避 CORS） */
 export async function fetchCoverDataUrl(imageUrl: string): Promise<string> {
   if (!imageUrl) return '';
   const cached = coverCache.get(imageUrl);
@@ -70,7 +66,6 @@ export async function fetchCoverDataUrl(imageUrl: string): Promise<string> {
   return '';
 }
 
-/** 生成二维码 SVG 片段（剥离 xmlns/viewBox，由外层重新提供） */
 export async function generateQrSvg(url: string): Promise<{ svg: string; viewBox: string }> {
   try {
     const QRCode = (await import('qrcode')).default;
@@ -90,11 +85,20 @@ export async function generateQrSvg(url: string): Promise<{ svg: string; viewBox
   }
 }
 
-/** 将内容注入模板，返回完整 SVG 字符串 */
-export function composePosterSvg(template: string, options: PosterComposeOptions, qr: { svg: string; viewBox: string }): string {
-  const { nickname, description, coverDataUrl, fallbackTitle = '我的作品', anonymousLabel = '匿名用户', qrText = '扫码浏览作品' } = options;
+export function composePosterSvg(
+  template: string,
+  options: PosterComposeOptions,
+  qr: { svg: string; viewBox: string }
+): string {
+  const {
+    nickname,
+    description,
+    coverDataUrl,
+    fallbackTitle = '我的作品',
+    anonymousLabel = '匿名用户',
+    qrText = '扫码浏览作品',
+  } = options;
 
-  // 背景层：封面铺满裁剪分组末尾；无封面时深色底
   const bgLayer = coverDataUrl
     ? `<image width="${POSTER_W}" height="${POSTER_H}" preserveAspectRatio="xMidYMid slice" href="${coverDataUrl}" xlink:href="${coverDataUrl}"/>`
     : `<rect width="${POSTER_W}" height="${POSTER_H}" fill="#1a1d23"/>`;
@@ -109,11 +113,9 @@ export function composePosterSvg(template: string, options: PosterComposeOptions
     base = `<svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_W}" height="${POSTER_H}" viewBox="0 0 ${POSTER_W} ${POSTER_H}">${bgLayer}</svg>`;
   }
 
-  // 标题（截断到 21 字，白字压在蓝色标题条内）
   const title = (nickname || fallbackTitle).slice(0, 21);
   const titleSvg = `<text x="24.6" y="304.8" fill="#ffffff" font-size="10" font-weight="800" font-family="${FONT_STACK}">${escapeXml(title)}</text>`;
 
-  // 简介（最多 3 行 × 29 字）
   const intro = description || '';
   const introLines: string[] = [];
   for (let i = 0; i < intro.length && introLines.length < 3; i += 29) {
@@ -126,7 +128,6 @@ export function composePosterSvg(template: string, options: PosterComposeOptions
     )
     .join('\n  ');
 
-  // 二维码白卡（右下）+ 左侧两行文案
   const authorLine = (nickname || anonymousLabel).slice(0, 15);
   const qrCardSvg = qr.svg
     ? `
@@ -141,8 +142,10 @@ export function composePosterSvg(template: string, options: PosterComposeOptions
   return base.replace('</svg>', `\n  ${titleSvg}\n  ${introSvg}\n  ${qrCardSvg}\n</svg>`);
 }
 
-/** 一站式生成最终海报 Data URL（客户端使用） */
-export async function buildPosterDataUrl(imageUrl: string, options: PosterComposeOptions): Promise<string> {
+export async function buildPosterDataUrl(
+  imageUrl: string,
+  options: PosterComposeOptions
+): Promise<string> {
   const [template, coverDataUrl, qr] = await Promise.all([
     fetchPosterTemplate(),
     fetchCoverDataUrl(imageUrl),
@@ -152,7 +155,6 @@ export async function buildPosterDataUrl(imageUrl: string, options: PosterCompos
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-/** 将海报 Data URL 渲染到 canvas 并下载为 PNG（1134×1701，2:3 竖版） */
 export async function downloadPosterPng(dataUrl: string, filename: string): Promise<void> {
   const img = new Image();
   img.crossOrigin = 'anonymous';
@@ -169,7 +171,7 @@ export async function downloadPosterPng(dataUrl: string, filename: string): Prom
   if (!ctx) throw new Error('Canvas not supported');
 
   ctx.drawImage(img, 0, 0, 1134, 1701);
-  const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
+  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Failed to export poster');
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
