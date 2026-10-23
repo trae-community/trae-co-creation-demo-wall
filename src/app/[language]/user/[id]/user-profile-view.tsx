@@ -47,18 +47,20 @@ export function UserProfileView() {
     return query ? `${pathname}?${query}` : pathname
   })()
 
-  // Back button: use `from` param if available, otherwise fallback
-  const backHref = (() => {
-    const from = searchParams.get('from')
-    if (from && from.startsWith('/')) return from
-    return `/${locale}`
-  })()
-
   const backLabel = (() => {
     const from = searchParams.get('from')
     if (from && from.includes('/rankings')) return t('backRankings')
     return t('back')
   })()
+
+  const handleBack = () => {
+    const from = searchParams.get('from')
+    if (from && from.startsWith('/')) {
+      router.push(from)
+      return
+    }
+    router.back()
+  }
 
   const [profile, setProfile] = useState<PublicProfile | null>(null)
   const [works, setWorks] = useState<PublicWork[]>([])
@@ -133,7 +135,7 @@ export function UserProfileView() {
       {/* ── Back Button ── */}
       <button
         type="button"
-        onClick={() => router.push(backHref)}
+        onClick={handleBack}
         className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
