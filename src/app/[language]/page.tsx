@@ -368,24 +368,61 @@ export default function Page() {
 
 /* 海报 Tab 内容组件 */
 function PostersTab() {
+  const t = useTranslations('Home');
   const tPosters = useTranslations('Posters');
   const [posters, setPosters] = useState<{id: string; nickname: string; description: string | null; imageUrl: string; demoUrl: string; tags: string[] | null; createdAt: string}[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 8;
+  const prevPageRef = useRef(page);
 
   useEffect(() => {
-    fetch('/api/posters?page=1&pageSize=8')
+    if (page !== prevPageRef.current) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      prevPageRef.current = page;
+    }
+  }, [page]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+    fetch(`/api/posters?page=${page}&pageSize=${pageSize}`)
       .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (data) setPosters(data.items || []);
+        if (cancelled || !data) return;
+        setPosters(data.items || []);
+        setTotalItems(data.total ?? 0);
+        setTotalPages(data.totalPages ?? 1);
       })
       .catch(() => {})
-      .finally(() => setIsLoading(false));
-  }, []);
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [page]);
 
-  if (isLoading) {
+  const getPageNumbers = () => {
+    if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (page <= 3) return [1, 2, 3, 4, null, totalPages];
+    if (page >= totalPages - 2) return [1, null, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    return [1, null, page - 1, page, page + 1, null, totalPages];
+  };
+
+  const getMobilePageNumbers = () => {
+    if (totalPages <= 3) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (page === 1) return [1, 2, null, totalPages];
+    if (page === totalPages) return [1, null, totalPages - 1, totalPages];
+    return [1, null, page, null, totalPages];
+  };
+
+  if (isLoading && posters.length === 0) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {Array.from({ length: 4 }).map((_, i) => (
+        {Array.from({ length: pageSize }).map((_, i) => (
           <div key={i} className="rounded-2xl overflow-hidden border border-border bg-card">
             <div className="animate-pulse bg-muted" style={{ aspectRatio: '283.46/425.2' }} />
             <div className="p-4 space-y-2">
@@ -397,7 +434,7 @@ function PostersTab() {
     );
   }
 
-  if (posters.length === 0) {
+  if (!isLoading && posters.length === 0) {
     return (
       <div className="text-center py-20 rounded-2xl border border-dashed border-border bg-card">
         <p className="text-muted-foreground text-sm">{tPosters('noPosters')}</p>
@@ -407,7 +444,10 @@ function PostersTab() {
 
   return (
     <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className={cn(
+        "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 transition-opacity duration-200",
+        isLoading && "opacity-60"
+      )}>
         {posters.map((poster) => (
           <Link
             key={poster.id}
@@ -451,6 +491,81 @@ function PostersTab() {
           </Link>
         ))}
       </div>
+
+      {!isLoading && totalItems > 0 && (
+        <div className="flex items-center justify-between pt-2 mt-2">
+          <p className="text-sm text-muted-foreground">
+            {t('resultCount') || '共'}{' '}
+            <span className="text-foreground font-medium">{totalItems}</span>{' '}
+            {tPosters('resultCountUnit')}
+          </p>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground border border-border hover:border-primary/50 hover:text-foreground transition-all disabled:opacity-30 bg-muted"
+                aria-label={t('prevPage')}
+                title={t('prevPage')}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              <div className="hidden sm:flex items-center gap-1">
+                {getPageNumbers().map((p, i) =>
+                  p === null ? (
+                    <span key={`ellipsis-${i}`} className="text-muted-foreground/50 px-1 text-sm">…</span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={cn(
+                        "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all",
+                        p === page
+                          ? "text-black font-bold bg-green-400"
+                          : "text-muted-foreground border border-border hover:border-primary/50 hover:text-foreground bg-muted"
+                      )}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
+              </div>
+
+              <div className="flex sm:hidden items-center gap-1">
+                {getMobilePageNumbers().map((p, i) =>
+                  p === null ? (
+                    <span key={`ellipsis-${i}`} className="text-muted-foreground/50 px-1 text-sm">…</span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={cn(
+                        "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all",
+                        p === page
+                          ? "text-black font-bold bg-green-400"
+                          : "text-muted-foreground border border-border hover:border-primary/50 hover:text-foreground bg-muted"
+                      )}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
+              </div>
+
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground border border-border hover:border-primary/50 hover:text-foreground transition-all disabled:opacity-30 bg-muted"
+                aria-label={t('nextPage')}
+                title={t('nextPage')}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
