@@ -445,6 +445,7 @@
     "fabSelectedTitle": "你的 1024 代码盲盒已选定",
     "fabSelectedSubtitle": "点击查看最终命题 ↗",
     "fabAria": "打开 1024 代码盲盒",
+    "fabDragHint": "上下拖动可调整位置，点击打开盲盒",
     "selectedBadge": "已锁定",
     "statusSubtitle": "已生成第 {current} 组 · 还可再抽 {remaining} 组",
     "statusSecondFlip": "点击卡片，揭晓第 02 组词组",

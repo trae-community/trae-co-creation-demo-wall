@@ -463,6 +463,7 @@
     "fabSelectedTitle": "1024 コードブラインドボックスが確定しました",
     "fabSelectedSubtitle": "タップして最終お題を見る ↗",
     "fabAria": "1024 コードブラインドボックスを開く",
+    "fabDragHint": "上下にドラッグで位置を調整、タップで開く",
     "selectedBadge": "ロック済",
     "statusSubtitle": "第 {current} 組生成済み · あと {remaining} 組引けます",
     "statusSecondFlip": "カードをめくって第 02 組を公開",

@@ -17,6 +17,7 @@ import type { BlindBoxSession } from '@/lib/code-blind-box/types';
 import { TraeBaoMascot } from './trae-bao-mascot';
 import { CodeBlindBoxLoginPrompt } from './code-blind-box-login-prompt';
 import { CodeBlindBoxModal } from './code-blind-box-modal';
+import { useBlindBoxFabDrag } from './use-blind-box-fab-drag';
 
 type FabWidgetState = 'guest' | 'invite' | 'progress' | 'selected';
 
@@ -47,6 +48,7 @@ export function CodeBlindBoxEntry() {
   const [session, setSession] = useState<BlindBoxSession>(() => emptyBlindBoxSession());
   const [sessionLoaded, setSessionLoaded] = useState(false);
   const openedFromQueryRef = useRef(false);
+  const fabDrag = useBlindBoxFabDrag();
 
   const isConsole = pathname?.includes('/console');
   const hasConfirmed = session.confirmed;
@@ -142,13 +144,28 @@ export function CodeBlindBoxEntry() {
   return (
     <>
       <div
-        className="fixed bottom-20 right-0 z-[90] flex flex-col items-end gap-2 pr-6 sm:bottom-24 sm:pr-10 md:pr-14"
+        className="fixed right-0 z-[90] flex flex-col items-end gap-2 pr-6 sm:pr-10 md:pr-14 touch-none select-none"
+        style={{ bottom: fabDrag.bottomPx }}
+        title={t('fabDragHint')}
       >
-        <button
-          type="button"
-          onClick={handleFabClick}
-          className="group flex w-[228px] max-w-[calc(100vw-3rem)] flex-col items-stretch overflow-visible text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32f08c] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-xl"
+        <div
+          role="button"
+          tabIndex={0}
           aria-label={t('fabAria')}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleFabClick();
+            }
+          }}
+          onPointerDown={fabDrag.onPointerDown}
+          onPointerMove={fabDrag.onPointerMove}
+          onPointerUp={(e) => {
+            const dragged = fabDrag.onPointerUp(e);
+            if (!dragged) handleFabClick();
+          }}
+          onPointerCancel={fabDrag.onPointerCancel}
+          className="group flex w-max min-w-[188px] max-w-[min(320px,calc(100vw-3rem))] cursor-grab flex-col items-stretch overflow-visible text-left active:cursor-grabbing focus:outline-none focus-visible:ring-2 focus-visible:ring-[#32f08c] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-xl"
         >
           {showFabBubble && (
             <div
@@ -156,20 +173,16 @@ export function CodeBlindBoxEntry() {
               aria-hidden
             >
               <div
-                className="relative box-border h-[64px] min-w-[188px] w-max max-w-[min(280px,calc(100vw-3rem))] overflow-visible rounded-xl bg-[#f8f9f5] font-[family-name:var(--font-chinese,var(--font-sans))] shadow-[0_8px_20px_-2px_rgba(0,0,0,0.14)]"
+                className="relative box-border min-w-[188px] max-w-[min(300px,calc(100vw-3rem))] rounded-xl bg-[#f8f9f5] px-3 pt-2.5 pb-3.5 font-[family-name:var(--font-chinese,var(--font-sans))] shadow-[0_8px_20px_-2px_rgba(0,0,0,0.14)]"
               >
-                <p
-                  className="absolute left-3 top-3 max-w-[calc(100%-24px)] whitespace-nowrap text-[14px] font-bold leading-5 text-[#1f221b]"
-                >
+                <p className="text-[14px] font-bold leading-snug text-[#1f221b] [overflow-wrap:anywhere]">
                   {fabState === 'guest'
                     ? t('fabGuestBubbleTitle')
                     : fabState === 'selected'
                       ? t('fabSelectedTitle')
                       : t('fabBubbleTitle')}
                 </p>
-                <p
-                  className="absolute left-3 top-9 max-w-[calc(100%-24px)] whitespace-nowrap text-xs font-normal leading-5 text-[#69736c]"
-                >
+                <p className="mt-1 text-xs font-normal leading-snug text-[#69736c] [overflow-wrap:anywhere]">
                   {fabState === 'guest'
                     ? t('fabGuestBubbleSubtitle')
                     : fabState === 'selected'
@@ -183,7 +196,8 @@ export function CodeBlindBoxEntry() {
                   alt=""
                   width={24}
                   height={16}
-                  className="pointer-events-none absolute right-[6px] top-[61px] h-4 w-6"
+                  className="pointer-events-none absolute right-[6px] top-[calc(100%-3px)] h-4 w-6 shrink-0"
+                  unoptimized
                 />
               </div>
             </div>
@@ -191,13 +205,13 @@ export function CodeBlindBoxEntry() {
 
           <div
             className={cn(
-              'flex w-full justify-start pl-[62px] transition-transform duration-300 group-hover:scale-[1.02] group-active:scale-[0.98]',
+              'blind-box-fab-scale flex w-full justify-start pl-[62px] transition-transform duration-300 group-hover:scale-[1.02] group-active:scale-[0.98]',
               showFabBubble && '-mt-2'
             )}
           >
             <TraeBaoMascot variant={fabState === 'selected' && isAuthenticated ? 'selected' : 'invite'} />
           </div>
-        </button>
+        </div>
       </div>
 
       <CodeBlindBoxLoginPrompt

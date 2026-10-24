@@ -448,6 +448,7 @@
     "fabSelectedTitle": "Your 1024 Code Blind Box is locked in",
     "fabSelectedSubtitle": "Tap to view your final prompt ↗",
     "fabAria": "Open 1024 Code Blind Box",
+    "fabDragHint": "Drag up or down to reposition; click to open",
     "selectedBadge": "Locked",
     "statusSubtitle": "Set {current} ready · {remaining} more draw(s) left",
     "statusSecondFlip": "Flip cards to reveal set 02",

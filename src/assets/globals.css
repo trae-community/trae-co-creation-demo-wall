@@ -239,6 +239,12 @@
 .animate-blind-box-reveal-pop { animation: blind-box-reveal-pop 0.6s ease-out; }
 .animate-blind-box-flash { animation: blind-box-flash 1s ease-out forwards; }
 
+/* 盲盒挂件：随视口高度略缩小（浏览器放大时可视区域变矮） */
+.blind-box-fab-scale {
+  transform: scale(clamp(0.72, calc(100dvh / 820), 1));
+  transform-origin: bottom right;
+}
+
 @keyframes firework-burst {
   0% { transform: translate(0, 0) scale(0.4); opacity: 1; }
   70% { opacity: 1; }
