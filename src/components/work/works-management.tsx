@@ -13,7 +13,7 @@ import { CrudPagination } from '@/components/crud/crud-pagination'
 import { CityFilter, FilterState } from '@/components/work/city-filter'
 import { useFeedback } from '@/lib/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
-import { useParams } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 import { Link } from '@/lib/language/navigation'
 import { Button } from '@/components/ui/button'
 import {
@@ -96,6 +96,11 @@ interface WorkItem {
     contactEmail: string | null
   } | null
   lastAuditReason?: string | null
+  likeRisk?: {
+    newAccountLikeCount: number
+    newAccountRatio: number
+    suspicious: boolean
+  } | null
 }
 
 interface DictItem {
@@ -150,6 +155,7 @@ export function WorksManagement({
 }: WorksManagementProps) {
   const params = useParams()
   const lang = (params?.lang as string) || 'zh-CN'
+  const pathname = usePathname()
   const router = useRouter()
   const locale = useLocale()
   
@@ -208,6 +214,8 @@ export function WorksManagement({
   const [likesWork, setLikesWork] = useState<WorkItem | null>(null)
   const [likeUsers, setLikeUsers] = useState<LikeUserItem[]>([])
   const [likeUsersTotal, setLikeUsersTotal] = useState(0)
+  const [likesPage, setLikesPage] = useState(1)
+  const [likesPageSize, setLikesPageSize] = useState(50)
   const [isLoadingLikes, setIsLoadingLikes] = useState(false)
   // 封禁点赞用户确认弹窗
   const [banLikeTarget, setBanLikeTarget] = useState<LikeUserItem | null>(null)
@@ -278,6 +286,7 @@ export function WorksManagement({
       }
       if (filters.categories.length) params.append('category', filters.categories[0])
       if (filters.countries.length) params.append('country', filters.countries[0])
+      if (filters.cities.length) params.append('city', filters.cities[0])
       if (filters.honors.length) params.append('honor', filters.honors[0])
       if (filters.auditStatuses.length) params.append('auditStatus', filters.auditStatuses[0])
       if (selectedDate) params.append('date', selectedDate)
@@ -484,29 +493,43 @@ export function WorksManagement({
     setIsAuditDialogOpen(true)
   }
 
+  const fetchLikeUsers = useCallback(
+    async (workId: string, page: number, pageSize: number) => {
+      try {
+        setIsLoadingLikes(true)
+        const res = await fetch(
+          `/api/console/works/${workId}/likes?page=${page}&pageSize=${pageSize}`
+        )
+        if (res.ok) {
+          const data = await res.json()
+          setLikeUsers(data.items || [])
+          setLikeUsersTotal(data.total || 0)
+        } else {
+          showFeedback('error', '点赞用户列表加载失败')
+        }
+      } catch (error) {
+        console.error('Failed to fetch like users:', error)
+        showFeedback('error', '点赞用户列表加载失败')
+      } finally {
+        setIsLoadingLikes(false)
+      }
+    },
+    [showFeedback]
+  )
+
   // 打开点赞用户弹窗，拉取该作品的点赞用户列表
-  const handleOpenLikesDialog = async (work: WorkItem) => {
+  const handleOpenLikesDialog = (work: WorkItem) => {
     setLikesWork(work)
     setLikeUsers([])
     setLikeUsersTotal(0)
+    setLikesPage(1)
     setIsLikesDialogOpen(true)
-    try {
-      setIsLoadingLikes(true)
-      const res = await fetch(`/api/console/works/${work.id}/likes?page=1&pageSize=100`)
-      if (res.ok) {
-        const data = await res.json()
-        setLikeUsers(data.items || [])
-        setLikeUsersTotal(data.total || 0)
-      } else {
-        showFeedback('error', '点赞用户列表加载失败')
-      }
-    } catch (error) {
-      console.error('Failed to fetch like users:', error)
-      showFeedback('error', '点赞用户列表加载失败')
-    } finally {
-      setIsLoadingLikes(false)
-    }
   }
+
+  useEffect(() => {
+    if (!isLikesDialogOpen || !likesWork) return
+    fetchLikeUsers(likesWork.id, likesPage, likesPageSize)
+  }, [isLikesDialogOpen, likesWork, likesPage, likesPageSize, fetchLikeUsers])
 
   // 快捷封禁点赞用户（针对批量小号刷赞场景）
   const handleBanLikeUser = (item: LikeUserItem) => {
@@ -625,10 +648,13 @@ export function WorksManagement({
   const currentViewImageIndex = viewingImages.length > 0 ? Math.min(viewImageIndex, viewingImages.length - 1) : 0
 
   // 点赞用户中近 7 天注册的新账号数量（用于排查批量新用户刷点赞）
-  const newAccountLikes = likeUsers.filter(item => {
+  const newAccountLikesOnPage = likeUsers.filter(item => {
     if (!item.user?.createdAt) return false
     return Date.now() - new Date(item.user.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000
   }).length
+  const likesTotalPages = Math.max(1, Math.ceil(likeUsersTotal / likesPageSize))
+  const likesStartIndex = likeUsersTotal === 0 ? 0 : (likesPage - 1) * likesPageSize + 1
+  const likesEndIndex = Math.min(likesPage * likesPageSize, likeUsersTotal)
 
   return (
     <div className="space-y-6 relative min-h-[500px]">
@@ -819,6 +845,17 @@ export function WorksManagement({
                           </>
                         )}
                       </div>
+                      {work.likeRisk?.suspicious && (
+                        <div className="mt-2">
+                          <Badge
+                            variant="outline"
+                            className="text-xs border-yellow-500 text-yellow-600 bg-yellow-500/10"
+                            title={`近 7 天新注册账号点赞 ${work.likeRisk.newAccountLikeCount} 个，占比 ${Math.round(work.likeRisk.newAccountRatio * 100)}%`}
+                          >
+                            点赞异常：新号占比偏高
+                          </Badge>
+                        </div>
+                      )}
                     </div>
                     
                     {/* Action Buttons */}
@@ -1383,9 +1420,9 @@ export function WorksManagement({
           </DialogHeader>
 
           <div className="space-y-3 py-2">
-            {newAccountLikes > 0 && (
+            {newAccountLikesOnPage > 0 && (
               <div className="rounded-md border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-400">
-                ⚠ 其中 {newAccountLikes} 位点赞用户为近 7 天注册的新账号，请留意是否存在批量刷点赞行为
+                ⚠ 本页有 {newAccountLikesOnPage} 位点赞用户为近 7 天注册的新账号，请留意是否存在批量刷点赞行为
               </div>
             )}
 
@@ -1401,16 +1438,37 @@ export function WorksManagement({
                     : false
                   return (
                     <div key={item.id} className="flex items-center gap-3 rounded-md border border-border/60 bg-secondary/20 px-3 py-2">
-                      {item.user?.avatarUrl ? (
-                        <img src={item.user.avatarUrl} alt={item.user.username} className="h-8 w-8 rounded-full object-cover shrink-0" />
+                      {item.user ? (
+                        <Link
+                          href={`/user/${item.user.id}?from=${encodeURIComponent(pathname || '')}`}
+                          className="shrink-0 rounded-full hover:ring-2 hover:ring-primary/40 transition-all"
+                          title="查看主页"
+                        >
+                          {item.user.avatarUrl ? (
+                            <img src={item.user.avatarUrl} alt={item.user.username} className="h-8 w-8 rounded-full object-cover" />
+                          ) : (
+                            <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
+                              {item.user.username?.charAt(0)?.toUpperCase() || '?'}
+                            </div>
+                          )}
+                        </Link>
                       ) : (
                         <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-sm font-semibold">
-                          {item.user?.username?.charAt(0)?.toUpperCase() || '?'}
+                          ?
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium truncate">{item.user?.username || '未知用户'}</span>
+                          {item.user ? (
+                            <Link
+                              href={`/user/${item.user.id}?from=${encodeURIComponent(pathname || '')}`}
+                              className="text-sm font-medium truncate hover:text-primary transition-colors"
+                            >
+                              {item.user.username}
+                            </Link>
+                          ) : (
+                            <span className="text-sm font-medium truncate">未知用户</span>
+                          )}
                           {isNewAccount && (
                             <Badge variant="outline" className="text-xs border-yellow-500 text-yellow-500 bg-yellow-500/10">新账号</Badge>
                           )}
@@ -1435,14 +1493,28 @@ export function WorksManagement({
                     </div>
                   )
                 })}
-                {likeUsersTotal > likeUsers.length && (
-                  <div className="text-xs text-muted-foreground text-center pt-1">
-                    仅展示最近 {likeUsers.length} 条点赞记录
-                  </div>
-                )}
               </div>
             )}
           </div>
+
+          {likeUsersTotal > 0 && (
+            <CrudPagination
+              totalItems={likeUsersTotal}
+              startIndex={likesStartIndex}
+              endIndex={likesEndIndex}
+              current={likesPage}
+              totalPages={likesTotalPages}
+              onPrev={() => setLikesPage(p => Math.max(1, p - 1))}
+              onNext={() => setLikesPage(p => Math.min(likesTotalPages, p + 1))}
+              onPageChange={setLikesPage}
+              pageSize={likesPageSize}
+              onPageSizeChange={(size) => {
+                setLikesPageSize(size)
+                setLikesPage(1)
+              }}
+              pageSizes={[20, 50, 100, 200]}
+            />
+          )}
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsLikesDialogOpen(false)}>关闭</Button>

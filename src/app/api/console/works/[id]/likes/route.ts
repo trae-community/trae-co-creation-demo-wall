@@ -27,7 +27,7 @@ export async function GET(
 
     const { searchParams } = new URL(req.url)
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
-    const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '20')))
+    const pageSize = Math.min(500, Math.max(1, parseInt(searchParams.get('pageSize') || '50', 10)))
     const skip = (page - 1) * pageSize
 
     const work = await prisma.workBase.findUnique({
@@ -74,6 +74,8 @@ export async function GET(
     return NextResponse.json({
       items: serialized,
       total,
+      page,
+      pageSize,
       workTitle: work.title,
     })
   } catch (error) {
