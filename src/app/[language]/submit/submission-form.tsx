@@ -37,6 +37,7 @@ export function SubmissionForm() {
   // ── Wizard state ──
   const [currentStep, setCurrentStep] = useState<StepNumber>(1)
   const [isNavigating, setIsNavigating] = useState(false)
+  const [showStepError, setShowStepError] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [submittedWorkId, setSubmittedWorkId] = useState<string | null>(null)
 
@@ -80,7 +81,13 @@ export function SubmissionForm() {
     },
   })
 
-  const { handleSubmit, watch, setValue, trigger, formState: { isSubmitting } } = form
+  const {
+    handleSubmit,
+    watch,
+    setValue,
+    trigger,
+    formState: { isSubmitting, isDirty },
+  } = form
 
   const selectedCountry = watch('country')
   const screenshots = watch('screenshots') || []
@@ -154,6 +161,16 @@ export function SubmissionForm() {
     fetchLocations()
   }, [locale])
 
+  useEffect(() => {
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!isDirty || isSubmitted) return
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [isDirty, isSubmitted])
+
   // ── Upload helpers ──
   const uploadFile = async (file: File): Promise<string> => {
     const formData = new FormData()
@@ -217,26 +234,41 @@ export function SubmissionForm() {
   }
 
   // ── Navigation ──
+  const validateStep = async (step: StepNumber) => {
+    const valid = await trigger(STEP_FIELDS[step] as Parameters<typeof trigger>[0])
+    setShowStepError(!valid)
+    return valid
+  }
+
   const handleNext = async () => {
     setIsNavigating(true)
-    const valid = await trigger(STEP_FIELDS[currentStep] as Parameters<typeof trigger>[0])
-    
-    // Log validation errors for debugging if not valid
-    if (!valid) {
-      console.log('Validation failed for Step', currentStep);
-      console.log('Errors:', form.formState.errors);
-    }
-    
+    const valid = await validateStep(currentStep)
     setIsNavigating(false)
-    if (valid) setCurrentStep(s => Math.min(s + 1, 4) as StepNumber)
+    if (valid) {
+      setShowStepError(false)
+      setCurrentStep(s => Math.min(s + 1, 4) as StepNumber)
+    }
   }
 
   const handleBack = () => {
+    setShowStepError(false)
     setCurrentStep(s => Math.max(s - 1, 1) as StepNumber)
   }
 
-  const handleStepClick = (n: StepNumber) => {
-    setCurrentStep(n)
+  const handleStepClick = async (n: StepNumber) => {
+    if (n === currentStep) return
+    if (n < currentStep) {
+      setShowStepError(false)
+      setCurrentStep(n)
+      return
+    }
+    setIsNavigating(true)
+    const valid = await validateStep(currentStep)
+    setIsNavigating(false)
+    if (valid) {
+      setShowStepError(false)
+      setCurrentStep(n)
+    }
   }
 
   // ── Submit (only allowed from Step 4) ──
@@ -313,6 +345,15 @@ export function SubmissionForm() {
       >
         {/* Step indicator */}
         <StepIndicator current={currentStep} onStepClick={handleStepClick} />
+
+        {showStepError && (
+          <div
+            role="alert"
+            className="mb-6 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          >
+            {t('stepValidationBanner')}
+          </div>
+        )}
 
         {/* Step panels — always mounted, hidden via class to preserve state */}
         <div className="min-h-[400px]">

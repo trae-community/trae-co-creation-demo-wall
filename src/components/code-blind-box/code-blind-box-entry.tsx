@@ -21,6 +21,8 @@ import { useBlindBoxFabDrag } from './use-blind-box-fab-drag';
 
 type FabWidgetState = 'guest' | 'invite' | 'progress' | 'selected';
 
+const FAB_DRAG_HINT_STORAGE_KEY = 'dw-code-blind-box-fab-drag-hint-v1';
+
 function usePageReady() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
@@ -49,6 +51,26 @@ export function CodeBlindBoxEntry() {
   const [sessionLoaded, setSessionLoaded] = useState(false);
   const openedFromQueryRef = useRef(false);
   const fabDrag = useBlindBoxFabDrag();
+  const [showFirstDragHint, setShowFirstDragHint] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem(FAB_DRAG_HINT_STORAGE_KEY)) {
+        setShowFirstDragHint(true);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const dismissDragHint = useCallback(() => {
+    try {
+      localStorage.setItem(FAB_DRAG_HINT_STORAGE_KEY, '1');
+    } catch {
+      /* ignore */
+    }
+    setShowFirstDragHint(false);
+  }, []);
 
   const isConsole = pathname?.includes('/console');
   const hasConfirmed = session.confirmed;
@@ -128,6 +150,7 @@ export function CodeBlindBoxEntry() {
   };
 
   const handleFabClick = () => {
+    dismissDragHint();
     if (!isAuthenticated) {
       setLoginPromptOpen(true);
       return;
@@ -158,7 +181,10 @@ export function CodeBlindBoxEntry() {
               handleFabClick();
             }
           }}
-          onPointerDown={fabDrag.onPointerDown}
+          onPointerDown={(e) => {
+            dismissDragHint();
+            fabDrag.onPointerDown(e);
+          }}
           onPointerMove={fabDrag.onPointerMove}
           onPointerUp={(e) => {
             const dragged = fabDrag.onPointerUp(e);
@@ -191,6 +217,11 @@ export function CodeBlindBoxEntry() {
                         ? t('fabBubbleProgressSubtitle', { count: progressSetCount })
                         : t('fabBubbleSubtitle')}
                 </p>
+                {showFirstDragHint && (
+                  <p className="mt-2 text-[11px] font-medium leading-snug text-[#17D479] border-t border-[#e8ebe4] pt-2 [overflow-wrap:anywhere]">
+                    {t('fabDragHint')}
+                  </p>
+                )}
                 <Image
                   src={blindBoxAssets.bubbleTail}
                   alt=""

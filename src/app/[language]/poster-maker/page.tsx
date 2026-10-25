@@ -281,6 +281,21 @@ export default function PosterMakerPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* ─── 左侧表单（提交页同款卡片容器） ─── */}
         <div className="bg-card p-6 sm:p-8 rounded-2xl shadow-lg border border-border space-y-6">
+          {Object.keys(errors).length > 0 && (
+            <div
+              role="alert"
+              className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+            >
+              <p className="font-medium mb-1">{t('formErrorSummary')}</p>
+              <ul className="list-disc pl-5 space-y-0.5">
+                {Object.entries(errors).map(([key, message]) =>
+                  message ? (
+                    <li key={key}>{message}</li>
+                  ) : null
+                )}
+              </ul>
+            </div>
+          )}
           {/* 昵称 */}
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-foreground/80 mb-2">
