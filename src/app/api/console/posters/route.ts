@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getAuthUser, isAdmin } from '@/lib/auth';
 import { writeOperationLog } from '@/lib/audit-log';
 import { createdAtDayRange } from '@/lib/created-at-day-range';
+import { notifyPosterAuditResult } from '@/lib/user-notifications';
 
 // Helper to sanitize BigInt
 const sanitize = (data: unknown) => {
@@ -105,12 +106,16 @@ export async function PUT(req: NextRequest) {
 
     const existing = await prisma.workPoster.findMany({
       where: { id: { in: posterIds } },
-      select: { id: true },
+      select: { id: true, auditStatus: true },
     });
 
     if (existing.length !== posterIds.length) {
       return NextResponse.json({ error: 'Some posters were not found' }, { status: 404 });
     }
+
+    const prevByPosterId = new Map(
+      existing.map((row) => [row.id.toString(), row.auditStatus])
+    );
 
     await prisma.workPoster.updateMany({
       where: { id: { in: posterIds } },
@@ -131,6 +136,16 @@ export async function PUT(req: NextRequest) {
         })
       )
     );
+
+    try {
+      await notifyPosterAuditResult({
+        posterIds,
+        newStatus,
+        prevByPosterId,
+      });
+    } catch (notifyError) {
+      console.error('[API] poster audit notifications failed', notifyError);
+    }
 
     return NextResponse.json({
       success: true,

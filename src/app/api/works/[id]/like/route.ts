@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { writeOperationLog } from "@/lib/audit-log";
+import { notifyWorkLiked } from "@/lib/user-notifications";
 
 /**
  * POST /api/works/[id]/like
@@ -26,7 +27,7 @@ export async function POST(
 
     const work = await prisma.workBase.findUnique({
       where: { id: workId },
-      select: { id: true },
+      select: { id: true, userId: true, title: true },
     });
     if (!work) {
       return NextResponse.json({ error: "Work not found" }, { status: 404 });
@@ -81,6 +82,17 @@ export async function POST(
       targetId: workId,
       request: req,
     });
+
+    try {
+      await notifyWorkLiked({
+        workId,
+        ownerUserId: work.userId,
+        likerUserId: user.userId,
+        workTitle: work.title || '',
+      });
+    } catch (notifyError) {
+      console.error('[API] work like notification failed', notifyError);
+    }
 
     return NextResponse.json({ liked: true });
   } catch (e) {

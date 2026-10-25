@@ -88,6 +88,7 @@ model SysUser {
   grantedHonors WorkHonor[]       @relation("GrantedBy")
   likes            WorkLike[]
   codeBlindBoxDraw CodeBlindBoxDraw?
+  notifications    SysUserNotification[]
 
   @@map("sys_user")
 }
@@ -332,6 +333,27 @@ model WorkLike {
   @@index([workId])
   @@index([userId])
   @@map("work_like")
+}
+
+/// 用户站内通知
+model SysUserNotification {
+  /// 主键
+  id        BigInt    @id @default(autoincrement())
+  /// 接收用户 ID
+  userId    BigInt    @map("user_id")
+  /// 通知类型（work_audit_approved / work_audit_rejected / poster_audit_* / work_liked）
+  type      String    @db.VarChar(64)
+  /// 扩展数据（作品/海报/点赞者等）
+  payload   Json      @default("{}")
+  /// 已读时间（null 表示未读）
+  readAt    DateTime? @map("read_at") @db.Timestamptz(6)
+  /// 创建时间
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  user      SysUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("sys_user_notification")
 }
 
 model SysAuthLog {

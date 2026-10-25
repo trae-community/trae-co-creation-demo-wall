@@ -18,12 +18,13 @@ prisma/
 
 **用途：** ⭐ **核心文件，数据库结构的唯一权威来源**
 
-包含 18 张表的定义、字段约束与关联关系：
+包含 19 张表的定义、字段约束与关联关系：
 
 - 系统用户模块（sys_user, sys_role, sys_user_role）
 - 系统字典模块（sys_dict, sys_dict_item）
 - 作品模块（work_base, work_detail, work_image, work_tag, work_like, work_statistic, work_honor）
 - 审计日志模块（sys_auth_log, sys_operation_log）
+- 站内通知（sys_user_notification）
 - NextAuth 会话模块（account, session, verification_token）
 
 **约束：**
@@ -94,6 +95,13 @@ npm run seed
 | `seed-data/` | 历史种子数据导出备份 |
 
 仅作开发参考与变更审计，不参与运行时流程（Docker 初始化走 `prisma db push`，无需迁移历史）。
+
+**补充 SQL（可选手动执行）：**
+
+| 目录 | 说明 |
+|------|------|
+| `docs/database/migrations/20261025100000_pg_trgm_search/` | 作品/用户模糊搜索 GIN 索引（`pg_trgm`） |
+| `docs/database/migrations/20261025120000_sys_user_notification/` | 站内通知表（`schema.prisma` 已含模型，`db push` 亦可） |
 
 ---
 

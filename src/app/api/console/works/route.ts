@@ -6,6 +6,10 @@ import { getAuthUser, isAdmin } from '@/lib/auth';
 import { writeOperationLog } from '@/lib/audit-log';
 import { createdAtDayRange } from '@/lib/created-at-day-range';
 import { getWorkLikeRiskByWorkIds } from '@/lib/auth-log-queries';
+import {
+  notifyWorkAuditBatch,
+  notifyWorkAuditResult,
+} from '@/lib/user-notifications';
 
 // Helper to sanitize object
 const sanitize = (data: any) => {
@@ -492,6 +496,23 @@ export async function PUT(req: NextRequest) {
         )
       );
 
+      try {
+        const prevByWorkId = new Map(
+          currentStats.map((stat) => [
+            stat.workId.toString(),
+            stat.auditStatus,
+          ])
+        );
+        await notifyWorkAuditBatch({
+          workIds,
+          newStatus,
+          prevByWorkId,
+          auditReason,
+        });
+      } catch (notifyError) {
+        console.error('[API] batch work audit notifications failed', notifyError);
+      }
+
       return NextResponse.json({
         success: true,
         updatedCount: batchIds.length
@@ -587,6 +608,17 @@ export async function PUT(req: NextRequest) {
         },
         request: req
       });
+
+      try {
+        await notifyWorkAuditResult({
+          workId: BigInt(id),
+          newStatus,
+          prevStatus: currentStat?.auditStatus ?? null,
+          auditReason,
+        });
+      } catch (notifyError) {
+        console.error('[API] work audit notification failed', notifyError);
+      }
     }
 
     // If tagIds is provided, update tags
