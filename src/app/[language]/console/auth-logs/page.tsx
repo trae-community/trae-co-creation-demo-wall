@@ -7,7 +7,10 @@ import { ShieldCheck, AlertTriangle, Ban } from 'lucide-react'
 import { CrudFeedback } from '@/components/crud/crud-feedback'
 import { CrudFilterBar } from '@/components/crud/crud-filter-bar'
 import { CrudPagination } from '@/components/crud/crud-pagination'
-import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
+import { useTranslations } from 'next-intl'
+import { hrefWithFrom } from '@/lib/navigation-from'
+import { usePathname } from '@/lib/language/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -62,6 +65,8 @@ type AuthLogFilter = 'all' | 'sign_in' | 'sign_up'
 type ViewMode = 'logs' | 'ip-stats'
 
 export default function AuthLogsPage() {
+  const tConsole = useTranslations('Console')
+  const pathname = usePathname()
   const searchParams = useSearchParams()
   const router = useRouter()
   const [viewMode, setViewMode] = useState<ViewMode>('logs')
@@ -202,6 +207,14 @@ export default function AuthLogsPage() {
     setFilterMode('sign_up')
   }
 
+  const hasActiveFilters =
+    Boolean(searchTerm) ||
+    filterMode !== 'all' ||
+    Boolean(startDate) ||
+    Boolean(endDate) ||
+    Boolean(filterUserId) ||
+    Boolean(filterIp)
+
   const clearLogFilters = () => {
     setSearchTerm('')
     setFilterMode('all')
@@ -265,7 +278,6 @@ export default function AuthLogsPage() {
 
   return (
     <div className="space-y-6 relative min-h-[500px]">
-      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
 
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center">
@@ -326,20 +338,24 @@ export default function AuthLogsPage() {
             ]}
             onFilterChange={(value) => setFilterMode(value as AuthLogFilter)}
             filterPlaceholder="筛选行为"
+            hasActiveFilters={hasActiveFilters}
+            onReset={clearLogFilters}
+            resetLabel={tConsole('filterReset')}
+            activeFilterLabel={tConsole('filterActive')}
             extraFilters={
               <>
                 <div className="flex items-center gap-1">
                   <DatePicker
                     value={startDate}
                     onChange={setStartDate}
-                    placeholder="开始日期"
+                    placeholder={tConsole('dateStart')}
                     variant="outline"
                   />
                   <span className="text-muted-foreground">~</span>
                   <DatePicker
                     value={endDate}
                     onChange={setEndDate}
-                    placeholder="结束日期"
+                    placeholder={tConsole('dateEnd')}
                     variant="outline"
                   />
                 </div>
@@ -360,6 +376,10 @@ export default function AuthLogsPage() {
           />
 
           <div className="space-y-4">
+            {isLoading && pagedItems.length === 0 ? (
+              <ListRowSkeleton rows={6} />
+            ) : (
+              <>
             {pagedItems.map((item) => (
               <Card key={item.id} className="overflow-hidden border-border bg-card/50">
                 <div className="p-4 flex items-start justify-between gap-4">
@@ -371,7 +391,7 @@ export default function AuthLogsPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         {item.user?.id ? (
                           <Link
-                            href={`/user/${item.user.id}`}
+                            href={hrefWithFrom(`/user/${item.user.id}`, pathname)}
                             className="font-semibold hover:text-primary transition-colors"
                           >
                             {item.user.username}
@@ -414,10 +434,12 @@ export default function AuthLogsPage() {
                 </div>
               </Card>
             ))}
-            {pagedItems.length === 0 && (
+            {pagedItems.length === 0 && !isLoading && (
               <div className="text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
                 暂无认证日志
               </div>
+            )}
+              </>
             )}
           </div>
 
@@ -468,6 +490,10 @@ export default function AuthLogsPage() {
           </div>
 
           <div className="space-y-3">
+            {isLoading && ipStats.length === 0 ? (
+              <ListRowSkeleton rows={5} />
+            ) : (
+              <>
             {ipStats.map((stat) => (
               <Card key={stat.ipAddress} className="border-border bg-card/50 p-4">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
@@ -492,7 +518,7 @@ export default function AuthLogsPage() {
                       {stat.userIds.map((uid, i) => (
                         <Link
                           key={uid}
-                          href={`/user/${uid}`}
+                          href={hrefWithFrom(`/user/${uid}`, pathname)}
                           className="text-sm text-muted-foreground hover:text-primary"
                         >
                           {stat.usernames[i] || uid}
@@ -512,10 +538,12 @@ export default function AuthLogsPage() {
                 </div>
               </Card>
             ))}
-            {ipStats.length === 0 && (
+            {ipStats.length === 0 && !isLoading && (
               <div className="text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
                 当前条件下暂无可疑 IP
               </div>
+            )}
+              </>
             )}
           </div>
         </>

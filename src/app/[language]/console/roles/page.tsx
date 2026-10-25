@@ -9,7 +9,8 @@ import { CrudPagination } from '@/components/crud/crud-pagination'
 import { useFeedback } from '@/lib/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
 import { Card } from '@/components/ui/card'
-import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
+import { useTranslations } from 'next-intl'
 
 // Types
 interface RoleItem {
@@ -37,6 +38,7 @@ const BUILTIN_ROLE_INFO: Record<string, string[]> = {
 }
 
 export default function RolesPage() {
+  const tConsole = useTranslations('Console')
   const [isLoading, setIsLoading] = useState(false)
   const [roles, setRoles] = useState<RoleItem[]>([])
   const [totalItems, setTotalItems] = useState(0)
@@ -88,9 +90,14 @@ export default function RolesPage() {
   const startIndex = (current - 1) * pageSize
   const endIndex = Math.min(startIndex + pageSize, totalItems)
 
+  const hasActiveFilters = Boolean(searchTerm)
+  const resetFilters = () => {
+    setSearchTerm('')
+    setCurrentPage(1)
+  }
+
   return (
     <div className="space-y-6 relative min-h-[500px]">
-      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
       
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
@@ -121,9 +128,17 @@ export default function RolesPage() {
         filterOptions={[]} 
         onFilterChange={() => {}}
         filterPlaceholder="筛选角色"
+        hasActiveFilters={hasActiveFilters}
+        onReset={resetFilters}
+        resetLabel={tConsole('filterReset')}
+        activeFilterLabel={tConsole('filterActive')}
       />
 
       <div className="space-y-4">
+        {isLoading && roles.length === 0 ? (
+          <ListRowSkeleton rows={5} />
+        ) : (
+          <>
         {roles.map(role => (
           <Card key={role.id} className="overflow-hidden border-border bg-card/50">
             <div className="p-4 flex items-center justify-between gap-4">
@@ -165,10 +180,12 @@ export default function RolesPage() {
           </Card>
         ))}
         
-        {roles.length === 0 && (
+        {roles.length === 0 && !isLoading && (
           <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
             暂无匹配的角色
           </div>
+        )}
+          </>
         )}
       </div>
 

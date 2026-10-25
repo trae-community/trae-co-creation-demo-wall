@@ -1,11 +1,13 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Calendar, Gift, Mail, RotateCcw, Search, User } from 'lucide-react'
+import { Calendar, Gift, Mail, RotateCcw, User } from 'lucide-react'
 
 import { CrudFeedback } from '@/components/crud/crud-feedback'
 import { CrudPagination } from '@/components/crud/crud-pagination'
-import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
+import { useTranslations } from 'next-intl'
+import { CrudFilterBar } from '@/components/crud/crud-filter-bar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -48,6 +50,7 @@ function formatWordSet(set: Pick<WordSetRow, 'theme' | 'function' | 'style'>) {
 }
 
 export default function CodeBlindBoxConsolePage() {
+  const tConsole = useTranslations('Console')
   const [isLoading, setIsLoading] = useState(false)
   const [items, setItems] = useState<BlindBoxDrawItem[]>([])
   const [totalItems, setTotalItems] = useState(0)
@@ -119,9 +122,14 @@ export default function CodeBlindBoxConsolePage() {
     }
   }, [resetTarget, fetchDraws, showFeedback])
 
+  const hasActiveFilters = Boolean(searchTerm)
+  const resetFilters = () => {
+    setSearchTerm('')
+    setCurrentPage(1)
+  }
+
   return (
     <div className="space-y-6 relative min-h-[500px]">
-      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
 
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
@@ -131,20 +139,25 @@ export default function CodeBlindBoxConsolePage() {
         </div>
       </div>
 
-      <div className="p-4 rounded-xl border border-border bg-card">
-        <div className="relative flex-1 max-w-md w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <input
-            type="text"
-            placeholder="搜索用户 ID、用户名、邮箱..."
-            className="w-full pl-10 pr-4 py-2 rounded-lg text-sm bg-secondary border border-border focus:outline-none focus:ring-1 focus:ring-primary/40"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
+      <CrudFilterBar
+        searchPlaceholder="搜索用户 ID、用户名、邮箱..."
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        filterValue="all"
+        filterOptions={[]}
+        onFilterChange={() => {}}
+        filterPlaceholder="筛选"
+        hasActiveFilters={hasActiveFilters}
+        onReset={resetFilters}
+        resetLabel={tConsole('filterReset')}
+        activeFilterLabel={tConsole('filterActive')}
+      />
 
       <div className="space-y-4">
+        {isLoading && items.length === 0 ? (
+          <ListRowSkeleton rows={6} />
+        ) : (
+          <>
         {items.map((item) => (
           <Card
             key={item.id}
@@ -235,6 +248,8 @@ export default function CodeBlindBoxConsolePage() {
           <div className="text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
             暂无盲盒抽取记录
           </div>
+        )}
+          </>
         )}
       </div>
 

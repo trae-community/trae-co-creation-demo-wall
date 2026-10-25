@@ -321,7 +321,7 @@ export default function ConsoleLayout({
       </aside>
 
       <main className="flex-1 min-w-0">
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 min-w-0 max-w-full">
           {children}
         </div>
       </main>

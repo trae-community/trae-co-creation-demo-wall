@@ -30,7 +30,8 @@ import {
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
-import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
+import { useTranslations } from 'next-intl'
 import { DatePicker } from '@/components/ui/date-picker'
 
 interface WorkTag {
@@ -51,6 +52,7 @@ const tagSchema = z.object({
 })
 
 export default function TagsPage() {
+  const tConsole = useTranslations('Console')
   const [isLoading, setIsLoading] = useState(false)
   const [tags, setTags] = useState<WorkTag[]>([])
   const [totalItems, setTotalItems] = useState(0)
@@ -63,6 +65,13 @@ export default function TagsPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [deletingTagId, setDeletingTagId] = useState<number | null>(null)
   const { feedback, showFeedback } = useFeedback()
+
+  const hasActiveFilters = Boolean(searchTerm) || filterMode !== 'all'
+  const resetFilters = () => {
+    setSearchTerm('')
+    setFilterMode('all')
+    setCurrentPage(1)
+  }
 
   const tagForm = useForm<z.infer<typeof tagSchema>>({
     resolver: zodResolver(tagSchema),
@@ -259,7 +268,6 @@ export default function TagsPage() {
 
   return (
     <div className="space-y-6 relative min-h-[500px]">
-      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
         <div>
@@ -284,9 +292,17 @@ export default function TagsPage() {
         ]}
         onFilterChange={(val) => setFilterMode(val as TagFilter)}
         filterPlaceholder="筛选标签"
+        hasActiveFilters={hasActiveFilters}
+        onReset={resetFilters}
+        resetLabel={tConsole('filterReset')}
+        activeFilterLabel={tConsole('filterActive')}
       />
 
       <div className="space-y-4">
+        {isLoading && pagedTags.length === 0 ? (
+          <ListRowSkeleton rows={6} />
+        ) : (
+          <>
         {pagedTags.map(tag => (
           <Card key={tag.id} className="overflow-hidden border-border bg-card/50">
             <div className="p-4 flex items-center justify-between">
@@ -333,10 +349,12 @@ export default function TagsPage() {
             </div>
           </Card>
         ))}
-        {pagedTags.length === 0 && (
+        {pagedTags.length === 0 && !isLoading && (
           <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
             暂无标签，点击右上角添加
           </div>
+        )}
+          </>
         )}
       </div>
 

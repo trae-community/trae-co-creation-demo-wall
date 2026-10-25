@@ -30,7 +30,8 @@ import {
 } from "@/components/ui/select"
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
-import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
+import { useTranslations } from 'next-intl'
 
 // Types
 interface DictItem {
@@ -75,6 +76,7 @@ const itemSchema = z.object({
 })
 
 export default function DictionariesPage() {
+  const tConsole = useTranslations('Console')
   const [isLoading, setIsLoading] = useState(false)
   const [dicts, setDicts] = useState<Dict[]>([])
   const [totalItems, setTotalItems] = useState(0)
@@ -356,9 +358,15 @@ export default function DictionariesPage() {
   const endIndex = Math.min(startIndex + pageSize, totalItems)
   const pagedDicts = filteredDicts
 
+  const hasActiveFilters = Boolean(searchTerm) || filterMode !== 'all'
+  const resetFilters = () => {
+    setSearchTerm('')
+    setFilterMode('all')
+    setCurrentPage(1)
+  }
+
   return (
     <div className="space-y-6 relative min-h-[500px]">
-      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
         <div>
@@ -383,10 +391,18 @@ export default function DictionariesPage() {
         ]}
         onFilterChange={(val) => setFilterMode(val as DictFilter)}
         filterPlaceholder="筛选字典"
+        hasActiveFilters={hasActiveFilters}
+        onReset={resetFilters}
+        resetLabel={tConsole('filterReset')}
+        activeFilterLabel={tConsole('filterActive')}
       />
 
       {/* Dictionary List */}
       <div className="space-y-4">
+        {isLoading && pagedDicts.length === 0 ? (
+          <ListRowSkeleton rows={6} />
+        ) : (
+          <>
         {pagedDicts.map((dict) => (
           <Card key={dict.id} className="overflow-hidden border-border bg-card/50">
             {/* Dict Header */}
@@ -484,10 +500,12 @@ export default function DictionariesPage() {
             )}
           </Card>
         ))}
-        {pagedDicts.length === 0 && (
+        {pagedDicts.length === 0 && !isLoading && (
           <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
             暂无字典数据
           </div>
+        )}
+          </>
         )}
       </div>
 

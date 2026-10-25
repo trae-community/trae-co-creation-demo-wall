@@ -12,7 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
+import { cn } from '@/lib/utils'
 import { CrudFeedback } from '@/components/crud/crud-feedback'
 import { useFeedback } from '@/lib/use-feedback'
 import { Card } from '@/components/ui/card'
@@ -99,6 +100,7 @@ const cardMeta = [
 export default function ConsolePage() {
   const [windowDays, setWindowDays] = useState<OverviewWindow>(7)
   const [isLoading, setIsLoading] = useState(false)
+  const [overviewReady, setOverviewReady] = useState(false)
   const [data, setData] = useState<OverviewData>(defaultData)
   const [purgeDialogOpen, setPurgeDialogOpen] = useState(false)
   const [isPurging, setIsPurging] = useState(false)
@@ -146,6 +148,7 @@ export default function ConsolePage() {
       showFeedback('error', '概览数据加载失败')
     } finally {
       setIsLoading(false)
+      setOverviewReady(true)
     }
   }, [windowDays, showFeedback])
 
@@ -210,10 +213,29 @@ export default function ConsolePage() {
     }
   }
 
+  const showOverviewSkeleton = isLoading && !overviewReady
+
   return (
-    <div className="space-y-6 relative min-h-[500px]">
-      <LoadingOverlay isLoading={isLoading} />
+    <div className="space-y-6 relative min-h-[500px] min-w-0 max-w-full">
       <CrudFeedback feedback={feedback} />
+
+      {showOverviewSkeleton ? (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <ListRowSkeleton rows={2} />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-36 rounded-xl border border-border bg-card animate-pulse" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="min-h-96 rounded-xl border border-border bg-card animate-pulse" />
+            <div className="min-h-96 rounded-xl border border-border bg-card animate-pulse" />
+          </div>
+        </div>
+      ) : (
+        <div className={cn('space-y-6', isLoading && 'opacity-70 pointer-events-none')}>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Link
@@ -275,46 +297,6 @@ export default function ConsolePage() {
           </div>
         </Card>
       )}
-
-      <Dialog open={purgeDialogOpen} onOpenChange={setPurgeDialogOpen}>
-        <DialogContent className="bg-card border-border">
-          <DialogHeader>
-            <DialogTitle>确认剔除封禁用户赞？</DialogTitle>
-            <DialogDescription>
-              执行前已根据当前数据刷新预览。将删除{' '}
-              {purgePreview?.likesFromBannedUsers ?? maintenance?.likesFromBannedUsers ?? 0}{' '}
-              条点赞，并重算 {purgePreview?.affectedWorkCount ?? maintenance?.affectedWorkCount ?? 0}{' '}
-              个作品的点赞数。此操作不可撤销，仅超级管理员可执行。
-            </DialogDescription>
-          </DialogHeader>
-          {purgePreviewLoading && (
-            <p className="text-sm text-muted-foreground">正在刷新预览…</p>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="purge-reason">操作原因（必填，将写入操作日志）</Label>
-            <Textarea
-              id="purge-reason"
-              value={purgeReason}
-              onChange={(e) => setPurgeReason(e.target.value)}
-              placeholder="例如：封禁用户后清理无效点赞并重算"
-              rows={3}
-              className="resize-none"
-            />
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setPurgeDialogOpen(false)} disabled={isPurging}>
-              取消
-            </Button>
-            <Button
-              type="button"
-              onClick={handlePurgeBannedLikes}
-              disabled={isPurging || purgeReason.trim().length < 2 || purgePreviewLoading}
-            >
-              {isPurging ? '处理中…' : '确认执行'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statEntries.map((stat, index) => (
@@ -478,6 +460,48 @@ export default function ConsolePage() {
           )}
         </div>
       </Card>
+        </div>
+      )}
+
+      <Dialog open={purgeDialogOpen} onOpenChange={setPurgeDialogOpen}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle>确认剔除封禁用户赞？</DialogTitle>
+            <DialogDescription>
+              执行前已根据当前数据刷新预览。将删除{' '}
+              {purgePreview?.likesFromBannedUsers ?? maintenance?.likesFromBannedUsers ?? 0}{' '}
+              条点赞，并重算 {purgePreview?.affectedWorkCount ?? maintenance?.affectedWorkCount ?? 0}{' '}
+              个作品的点赞数。此操作不可撤销，仅超级管理员可执行。
+            </DialogDescription>
+          </DialogHeader>
+          {purgePreviewLoading && (
+            <p className="text-sm text-muted-foreground">正在刷新预览…</p>
+          )}
+          <div className="space-y-2">
+            <Label htmlFor="purge-reason">操作原因（必填，将写入操作日志）</Label>
+            <Textarea
+              id="purge-reason"
+              value={purgeReason}
+              onChange={(e) => setPurgeReason(e.target.value)}
+              placeholder="例如：封禁用户后清理无效点赞并重算"
+              rows={3}
+              className="resize-none"
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setPurgeDialogOpen(false)} disabled={isPurging}>
+              取消
+            </Button>
+            <Button
+              type="button"
+              onClick={handlePurgeBannedLikes}
+              disabled={isPurging || purgeReason.trim().length < 2 || purgePreviewLoading}
+            >
+              {isPurging ? '处理中…' : '确认执行'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
