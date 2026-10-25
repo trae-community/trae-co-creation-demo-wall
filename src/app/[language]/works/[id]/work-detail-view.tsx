@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { RemoteImage } from '@/components/common/remote-image';
 import { workAssets } from '@/lib/work';
 import { posterAssets } from '@/lib/poster';
+import { sanitizeRichTextForDisplay } from '@/lib/rich-text';
 
 const toStringList = (value: unknown): string[] => {
   if (Array.isArray(value)) {
@@ -697,7 +698,9 @@ export function WorkDetailView() {
             </h2>
             <div
               className="prose prose-invert max-w-none leading-relaxed prose-headings:text-card-foreground prose-p:text-muted-foreground prose-strong:text-card-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-li:text-muted-foreground prose-blockquote:text-muted-foreground prose-code:text-primary"
-              dangerouslySetInnerHTML={{ __html: work.story || '<p>-</p>' }}
+              dangerouslySetInnerHTML={{
+                __html: sanitizeRichTextForDisplay(work.story || '<p>-</p>'),
+              }}
             />
           </section>
 

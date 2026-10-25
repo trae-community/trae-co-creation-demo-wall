@@ -66,7 +66,7 @@ export function Step2VisualAssets({
             <input
               id="cover-upload"
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp,image/gif"
               className="hidden"
               onChange={handleImageUpload}
               disabled={uploadingCover}
@@ -151,7 +151,7 @@ export function Step2VisualAssets({
               )}
               <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp,image/gif"
                 multiple
                 className="hidden"
                 onChange={handleScreenshotUpload}

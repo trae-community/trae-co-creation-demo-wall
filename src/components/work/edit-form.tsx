@@ -485,7 +485,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
                       <input
                         id="dropzone-file"
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
                         className="hidden"
                         onChange={handleImageUpload}
                       />
@@ -632,7 +632,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
                   <span className="text-xs text-muted-foreground">{t('addScreenshot')}</span>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     multiple
                     className="hidden"
                     onChange={handleScreenshotUpload}

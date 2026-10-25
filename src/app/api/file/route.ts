@@ -1,20 +1,24 @@
 import { NextResponse } from "next/server";
 import { cos, COS_BUCKET, COS_REGION } from "@/lib/cos";
 import { v4 as uuidv4 } from "uuid";
-import { getAuthUser } from "@/lib/auth";
+import { isAuthResponse, requireAuthUser } from "@/lib/api-auth";
+import { UPLOAD_IMAGE_MIME, validateUploadImage } from "@/lib/upload-image";
+
+const WORK_UPLOAD_MAX_BYTES = 5 * 1024 * 1024;
+const WORK_UPLOAD_MIME = [
+  UPLOAD_IMAGE_MIME.jpeg,
+  UPLOAD_IMAGE_MIME.png,
+  UPLOAD_IMAGE_MIME.webp,
+  UPLOAD_IMAGE_MIME.gif,
+];
 
 export async function POST(request: Request) {
   try {
-    // 0. Authentication check
-    const user = await getAuthUser();
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+    const user = await requireAuthUser();
+    if (isAuthResponse(user)) {
+      return user;
     }
 
-    // 1. Parse FormData
     const formData = await request.formData();
     const file = formData.get("file") as File;
 
@@ -25,30 +29,24 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Validate file
-    if (file.size > 5 * 1024 * 1024) {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const validated = validateUploadImage(buffer, {
+      maxBytes: WORK_UPLOAD_MAX_BYTES,
+      allowedMime: WORK_UPLOAD_MIME,
+      declaredMime: file.type,
+    });
+
+    if (!validated.ok) {
       return NextResponse.json(
-        { success: false, error: "File size exceeds 5MB limit" },
+        { success: false, error: validated.error },
         { status: 400 }
       );
     }
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json(
-        { success: false, error: "Invalid file type. Only JPG, PNG, WEBP, and GIF are allowed." },
-        { status: 400 }
-      );
-    }
-
-    // 3. Generate unique filename
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${uuidv4()}.${fileExt}`;
+    const { detected } = validated;
+    const fileName = `${uuidv4()}.${detected.ext}`;
     const dateStr = new Date().toISOString().split('T')[0];
     const filePath = `uploads/${dateStr}/${fileName}`;
-
-    // 4. Upload to Tencent COS
-    const buffer = Buffer.from(await file.arrayBuffer());
 
     await new Promise((resolve, reject) => {
       cos.putObject({
@@ -56,14 +54,13 @@ export async function POST(request: Request) {
         Region: COS_REGION,
         Key: filePath,
         Body: buffer,
-        ContentType: file.type,
+        ContentType: detected.mime,
       }, (err, data) => {
         if (err) reject(err);
         else resolve(data);
       });
     });
 
-    // 5. Generate public URL
     const publicUrl = `https://${COS_BUCKET}.cos.${COS_REGION}.myqcloud.com/${filePath}`;
 
     return NextResponse.json({
@@ -83,13 +80,9 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    // 0. Authentication check
-    const user = await getAuthUser();
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+    const user = await requireAuthUser();
+    if (isAuthResponse(user)) {
+      return user;
     }
 
     const body = await request.json();

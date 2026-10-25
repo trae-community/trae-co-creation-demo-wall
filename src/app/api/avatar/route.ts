@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/lib/auth';
+import { isAuthResponse, requireAuthUser } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { cos, COS_BUCKET, COS_REGION } from '@/lib/cos';
 import { writeOperationLog } from '@/lib/audit-log';
+import { UPLOAD_IMAGE_MIME, validateUploadImage } from '@/lib/upload-image';
+
+const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
+const AVATAR_MAX_SIDE = 1024;
+const AVATAR_MIME = [UPLOAD_IMAGE_MIME.jpeg, UPLOAD_IMAGE_MIME.png, UPLOAD_IMAGE_MIME.webp];
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthUser();
-    if (!user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    const user = await requireAuthUser();
+    if (isAuthResponse(user)) {
+      return user;
     }
 
     const formData = await request.formData();
@@ -18,22 +23,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'No file provided' }, { status: 400 });
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      return NextResponse.json({ success: false, error: 'File too large (max 2MB)' }, { status: 400 });
-    }
-
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid file type. Only JPG, PNG, WEBP, and SVG are allowed.' },
-        { status: 400 }
-      );
-    }
-
     const buffer = Buffer.from(await file.arrayBuffer());
-    const ext = file.name.split('.').pop();
-    const fileName = `avatars/${user.userId}-${Date.now()}.${ext}`;
+    const validated = validateUploadImage(buffer, {
+      maxBytes: AVATAR_MAX_BYTES,
+      allowedMime: AVATAR_MIME,
+      maxWidth: AVATAR_MAX_SIDE,
+      maxHeight: AVATAR_MAX_SIDE,
+      declaredMime: file.type,
+    });
+
+    if (!validated.ok) {
+      return NextResponse.json({ success: false, error: validated.error }, { status: 400 });
+    }
+
+    const { detected } = validated;
+    const fileName = `avatars/${user.userId}-${Date.now()}.${detected.ext}`;
 
     await new Promise((resolve, reject) => {
       cos.putObject({
@@ -41,7 +45,7 @@ export async function POST(request: NextRequest) {
         Region: COS_REGION,
         Key: fileName,
         Body: buffer,
-        ContentType: file.type,
+        ContentType: detected.mime,
       }, (err, data) => {
         if (err) reject(err);
         else resolve(data);
