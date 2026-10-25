@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
         skip: (page - 1) * pageSize,
         take: pageSize,
         include: {
-          user: { select: { username: true, email: true, avatarUrl: true } },
+          user: { select: { id: true, username: true, email: true, avatarUrl: true } },
         },
       }),
     ]);

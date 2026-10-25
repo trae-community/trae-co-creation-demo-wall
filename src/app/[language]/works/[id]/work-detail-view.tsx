@@ -5,6 +5,7 @@ import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp, Mai
 import { Button } from "@/components/common/action-button";
 import { useEffect, useState, useRef } from "react";
 import { useLocale, useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import { Link } from '@/lib/language/navigation';
 import { Work } from "@/lib/types";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -55,6 +56,7 @@ export function WorkDetailView() {
   const [isShareGenerating, setIsShareGenerating] = useState(false);
   const [shareActionDone, setShareActionDone] = useState<'copied' | ''>('');
   const [likeAnimating, setLikeAnimating] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
   const viewRecorded = useRef(false);
   const touchStartX = useRef(0);
   const screenshotCarouselRef = useRef<HTMLDivElement>(null);
@@ -177,37 +179,53 @@ export function WorkDetailView() {
   };
 
   const handleLike = async () => {
-    // 乐观更新：立即切换 UI
+    if (isLiking) return;
+
     const prevLiked = liked;
     const prevCount = likesCount;
     setLiked(!prevLiked);
     setLikesCount(prevLiked ? prevCount - 1 : prevCount + 1);
     setLikeAnimating(true);
     setTimeout(() => setLikeAnimating(false), 600);
+    setIsLiking(true);
 
     try {
       const res = await fetch(`/api/works/${id}/like`, { method: 'POST' });
-      
+
       if (res.status === 401) {
-        // 未登录，回滚并跳转
         setLiked(prevLiked);
         setLikesCount(prevCount);
-        router.push(`/${locale}/sign-in`);
+        const returnPath =
+          typeof window !== 'undefined'
+            ? `${window.location.pathname}${window.location.search}`
+            : `/${locale}/works/${id}`;
+        toast.message(t('likeLoginRequired'));
+        router.push(
+          `/${locale}/sign-in?callbackUrl=${encodeURIComponent(returnPath)}`
+        );
         return;
       }
-      
+
       if (!res.ok) {
         setLiked(prevLiked);
         setLikesCount(prevCount);
+        toast.error(t('likeFailed'));
         return;
       }
-      
+
       const data = await res.json();
       setLiked(data.liked);
-      setLikesCount(data.liked ? prevCount + (prevLiked ? 0 : 1) : prevCount - (prevLiked ? 1 : 0));
+      setLikesCount(
+        data.liked
+          ? prevCount + (prevLiked ? 0 : 1)
+          : prevCount - (prevLiked ? 1 : 0)
+      );
     } catch {
       setLiked(prevLiked);
       setLikesCount(prevCount);
+      toast.error(t('likeFailed'));
+    } finally {
+      setIsLiking(false);
     }
   };
 
@@ -645,6 +663,8 @@ export function WorkDetailView() {
             <div className="flex gap-3">
               <Button
                 onClick={handleLike}
+                disabled={isLiking}
+                aria-busy={isLiking}
                 className={`gap-2 transition-all duration-300 px-6 py-2.5 rounded-md font-medium ${
                   liked
                     ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-[0_0_20px_rgba(50,240,140,0.4)] border-transparent scale-105"

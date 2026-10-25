@@ -2,14 +2,17 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useLocale } from 'next-intl'
-import { Trash2, Eye, Calendar, User, ExternalLink, Search, Inbox, ShieldCheck, Clock, History, Pencil } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
+import { Trash2, Eye, Calendar, User, ExternalLink, Search, ShieldCheck, Clock, History, Pencil } from 'lucide-react'
 
 import { CrudFeedback } from '@/components/crud/crud-feedback'
 import { CrudPagination } from '@/components/crud/crud-pagination'
 import { useFeedback } from '@/lib/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
-import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { ConsoleFilterCard } from '@/components/crud/console-filter-card'
+import { ListEmptyState } from '@/components/common/list-empty-state'
+import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
+import { Link, usePathname } from '@/lib/language/navigation'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -45,6 +48,7 @@ interface PosterAdminItem {
   tags: string[] | null
   createdAt: string
   user: {
+    id: string
     username: string
     email: string
     avatarUrl: string | null
@@ -61,6 +65,8 @@ const AUDIT_STATUS_OPTIONS = [
 export function PostersManagement() {
   const router = useRouter()
   const locale = useLocale()
+  const pathname = usePathname()
+  const tConsole = useTranslations('Console')
 
   const [isLoading, setIsLoading] = useState(false)
   const [posters, setPosters] = useState<PosterAdminItem[]>([])
@@ -240,9 +246,18 @@ export function PostersManagement() {
     ? posters.find(poster => poster.id === auditTargetIds[0])
     : null
 
+  const postersFiltersActive =
+    Boolean(searchTerm) || Boolean(auditFilter) || Boolean(selectedDate) || sortBy !== 'newest'
+
+  const resetPostersFilters = () => {
+    setSearchTerm('')
+    setAuditFilter('')
+    setSelectedDate('')
+    setSortBy('newest')
+  }
+
   return (
     <div className="space-y-6 relative min-h-[500px]">
-      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
 
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
@@ -252,9 +267,12 @@ export function PostersManagement() {
         </div>
       </div>
 
-      {/* Search + Filter（与作品管理同款卡片） */}
-      <div className="p-4 rounded-xl border border-border bg-card space-y-3">
-        {/* Search + Sort tabs + Date picker */}
+      <ConsoleFilterCard
+        hasActiveFilters={postersFiltersActive}
+        onReset={resetPostersFilters}
+        activeLabel={tConsole('filterActive')}
+        resetLabel={tConsole('filterReset')}
+      >
         <div className="flex flex-col sm:flex-row gap-3 items-center">
           <div className="relative flex-1 max-w-md w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -316,19 +334,14 @@ export function PostersManagement() {
               {opt.label}
             </button>
           ))}
-          {(searchTerm || auditFilter || selectedDate || sortBy !== 'newest') && (
-            <button
-              onClick={() => { setSearchTerm(''); setAuditFilter(''); setSelectedDate(''); setSortBy('newest') }}
-              className="ml-auto text-xs text-muted-foreground hover:text-foreground border border-border rounded-full px-3 py-1.5 transition-colors"
-            >
-              重置筛选
-            </button>
-          )}
         </div>
-      </div>
+      </ConsoleFilterCard>
 
-      {/* 海报列表（与作品管理同款 Card 行） */}
       <div className="space-y-4">
+        {isLoading && posters.length === 0 ? (
+          <ListRowSkeleton rows={6} />
+        ) : (
+          <>
         {posters.length > 0 && (
           <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
@@ -409,7 +422,12 @@ export function PostersManagement() {
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                         <div className="flex items-center gap-1" title="提交者">
                           <User size={14} />
-                          <span>{poster.user.username}</span>
+                          <Link
+                            href={`/user/${poster.user.id}?from=${encodeURIComponent(pathname)}`}
+                            className="hover:text-primary transition-colors"
+                          >
+                            {poster.user.username}
+                          </Link>
                         </div>
                         <span className="text-border">|</span>
                         <div className="flex items-center gap-1" title="创建时间">
@@ -427,6 +445,7 @@ export function PostersManagement() {
                         className="h-8 w-8 hover:text-green-400 hover:bg-green-500/10"
                         onClick={() => router.push(`/${locale}/posters/${poster.id}`)}
                         title="查看详情页"
+                        aria-label="查看详情页"
                       >
                         <ExternalLink size={16} />
                       </Button>
@@ -436,6 +455,7 @@ export function PostersManagement() {
                         className="h-8 w-8 hover:text-indigo-500 hover:bg-indigo-500/10"
                         onClick={() => handleView(poster)}
                         title="查看海报"
+                        aria-label="查看海报"
                       >
                         <Eye size={16} />
                       </Button>
@@ -445,6 +465,7 @@ export function PostersManagement() {
                         className="h-8 w-8 hover:text-amber-500 hover:bg-amber-500/10"
                         onClick={() => { setEditingPoster(poster); setIsEditDialogOpen(true) }}
                         title="编辑海报"
+                        aria-label="编辑海报"
                       >
                         <Pencil size={16} />
                       </Button>
@@ -454,6 +475,7 @@ export function PostersManagement() {
                         className="h-8 w-8 hover:text-blue-500 hover:bg-blue-500/10"
                         onClick={() => handleOpenAuditDialog(poster)}
                         title="审核海报"
+                        aria-label="审核海报"
                       >
                         <ShieldCheck size={16} />
                       </Button>
@@ -463,6 +485,7 @@ export function PostersManagement() {
                         className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                         onClick={() => handleOpenDeleteDialog(poster)}
                         title="删除海报"
+                        aria-label="删除海报"
                       >
                         <Trash2 size={16} />
                       </Button>
@@ -491,10 +514,9 @@ export function PostersManagement() {
         ))}
 
         {posters.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center py-16 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg bg-card/30">
-            <Inbox className="w-12 h-12 text-muted-foreground mb-3" />
-            <span>暂无海报</span>
-          </div>
+          <ListEmptyState title={tConsole('empty.noPosters')} />
+        )}
+          </>
         )}
       </div>
 

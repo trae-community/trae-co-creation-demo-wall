@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useLocale } from 'next-intl'
-import { Edit, Trash2, Eye, ThumbsUp, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search, Inbox, Ban, Clock } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
+import { Edit, Trash2, Eye, ThumbsUp, Calendar, User, MapPin, Tag, Code, Award, ShieldCheck, Users, Phone, Mail, ExternalLink, ChevronLeft, ChevronRight, Search, Ban, Clock } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -37,7 +37,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { EditForm } from '@/components/work/edit-form'
-import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { ConsoleFilterCard } from '@/components/crud/console-filter-card'
+import { ListEmptyState } from '@/components/common/list-empty-state'
+import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
 import { DatePicker } from '@/components/ui/date-picker'
 import { cn } from '@/lib/utils'
 
@@ -158,6 +160,7 @@ export function WorksManagement({
   const pathname = usePathname()
   const router = useRouter()
   const locale = useLocale()
+  const tConsole = useTranslations('Console')
   
   const [isLoading, setIsLoading] = useState(false)
   const [works, setWorks] = useState<WorkItem[]>([])
@@ -656,9 +659,33 @@ export function WorksManagement({
   const likesStartIndex = likeUsersTotal === 0 ? 0 : (likesPage - 1) * likesPageSize + 1
   const likesEndIndex = Math.min(likesPage * likesPageSize, likeUsersTotal)
 
+  const worksFiltersActive =
+    Boolean(searchTerm) ||
+    Boolean(selectedDate) ||
+    sortBy !== 'time' ||
+    filters.cities.length > 0 ||
+    filters.categories.length > 0 ||
+    filters.tags.length > 0 ||
+    filters.countries.length > 0 ||
+    filters.honors.length > 0 ||
+    filters.auditStatuses.length > 0
+
+  const resetWorksFilters = () => {
+    setSearchTerm('')
+    setSelectedDate('')
+    setSortBy('time')
+    setFilters({
+      cities: [],
+      categories: [],
+      tags: [],
+      countries: [],
+      honors: [],
+      auditStatuses: [],
+    })
+  }
+
   return (
     <div className="space-y-6 relative min-h-[500px]">
-      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
       
       {scope === 'admin' && (
@@ -671,8 +698,12 @@ export function WorksManagement({
       )}
 
       {/* Search + Filter */}
-      <div className="p-4 rounded-xl border border-border bg-card space-y-3">
-        {/* Search + Date picker */}
+      <ConsoleFilterCard
+        hasActiveFilters={worksFiltersActive}
+        onReset={resetWorksFilters}
+        activeLabel={tConsole('filterActive')}
+        resetLabel={tConsole('filterReset')}
+      >
         <div className="flex flex-col sm:flex-row gap-3 items-center">
           <div className="relative flex-1 max-w-md w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -727,11 +758,15 @@ export function WorksManagement({
           auditStatusOptions={auditStatuses.map(s => ({ label: s.itemLabel, value: s.itemValue }))}
           showReset
           searchTerm={searchTerm}
-          onReset={() => { setSearchTerm(''); setSelectedDate(''); setSortBy('time') }}
+          onReset={resetWorksFilters}
         />
-      </div>
+      </ConsoleFilterCard>
 
       <div className="space-y-4">
+        {isLoading && works.length === 0 ? (
+          <ListRowSkeleton rows={6} />
+        ) : (
+          <>
         {showBulkAuditControls && works.length > 0 && (
           <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
@@ -861,36 +896,36 @@ export function WorksManagement({
                     {/* Action Buttons */}
                     <div className="flex items-center gap-1 shrink-0">
                       {/* Jump to detail page */}
-                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-green-400 hover:bg-green-500/10" onClick={() => router.push(`/${locale}/works/${work.id}`)} title="查看详情页">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-green-400 hover:bg-green-500/10" onClick={() => router.push(`/${locale}/works/${work.id}`)} title="查看详情页" aria-label="查看详情页">
                         <ExternalLink size={16} />
                       </Button>
                       {allowedActions.includes('view') && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-indigo-500 hover:bg-indigo-500/10" onClick={() => handleView(work)} title="查看作品">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-indigo-500 hover:bg-indigo-500/10" onClick={() => handleView(work)} title="查看作品" aria-label="查看作品">
                           <Eye size={16} />
                         </Button>
                       )}
                       {allowedActions.includes('audit') && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-blue-500 hover:bg-blue-500/10" onClick={() => handleOpenAuditDialog(work)} title="审核作品">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-blue-500 hover:bg-blue-500/10" onClick={() => handleOpenAuditDialog(work)} title="审核作品" aria-label="审核作品">
                           <ShieldCheck size={16} />
                         </Button>
                       )}
                       {scope === 'admin' && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-pink-500 hover:bg-pink-500/10" onClick={() => handleOpenLikesDialog(work)} title="查看点赞用户">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-pink-500 hover:bg-pink-500/10" onClick={() => handleOpenLikesDialog(work)} title="查看点赞用户" aria-label="查看点赞用户">
                           <ThumbsUp size={16} />
                         </Button>
                       )}
                       {allowedActions.includes('edit') && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(work)} title="编辑作品">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(work)} title="编辑作品" aria-label="编辑作品">
                           <Edit size={16} />
                         </Button>
                       )}
                       {allowedActions.includes('tag') && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenTagDialog(work)} title="关联标签">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenTagDialog(work)} title="关联标签" aria-label="关联标签">
                           <Tag size={16} />
                         </Button>
                       )}
                       {allowedActions.includes('honor') && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenHonorDialog(work)} title="授予荣誉">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenHonorDialog(work)} title="授予荣誉" aria-label="授予荣誉">
                           <Award size={16} />
                         </Button>
                       )}
@@ -902,6 +937,7 @@ export function WorksManagement({
                           onClick={() => handleOpenDeleteDialog(work)}
                           disabled={deletingWorkId === work.id}
                           title="删除作品"
+                          aria-label="删除作品"
                         >
                           <Trash2 size={16} />
                         </Button>
@@ -974,10 +1010,9 @@ export function WorksManagement({
         ))}
         
         {works.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center py-16 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg bg-card/30">
-            <Inbox className="w-12 h-12 text-muted-foreground mb-3" />
-            <span>暂无作品</span>
-          </div>
+          <ListEmptyState title={tConsole('empty.noWorks')} />
+        )}
+          </>
         )}
       </div>
 
