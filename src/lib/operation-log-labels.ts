@@ -50,6 +50,7 @@ const ACTION_ZH: Record<string, string> = {
   auto_audit: '自动审核',
   update_avatar: '更新头像',
   reset_draw: '重置抽卡',
+  purge_banned_likes: '剔除封禁用户赞',
 }
 
 const ACTION_EN: Record<string, string> = {
@@ -66,6 +67,7 @@ const ACTION_EN: Record<string, string> = {
   auto_audit: 'Auto audit',
   update_avatar: 'Update avatar',
   reset_draw: 'Reset draw',
+  purge_banned_likes: 'Purge likes from banned users',
 }
 
 const ACTION_JA: Record<string, string> = {
@@ -82,6 +84,7 @@ const ACTION_JA: Record<string, string> = {
   auto_audit: '自動審査',
   update_avatar: 'アバター更新',
   reset_draw: '抽選リセット',
+  purge_banned_likes: 'BANユーザーのいいねを削除',
 }
 
 const MODULE_BY_LOCALE: Record<string, Record<string, string>> = {
