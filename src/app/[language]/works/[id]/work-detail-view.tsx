@@ -16,6 +16,7 @@ import { RemoteImage } from '@/components/common/remote-image';
 import { workAssets } from '@/lib/work';
 import { posterAssets } from '@/lib/poster';
 import { sanitizeRichTextForDisplay } from '@/lib/rich-text';
+import { usePrefersReducedMotion } from '@/lib/use-reduced-motion';
 
 const toStringList = (value: unknown): string[] => {
   if (Array.isArray(value)) {
@@ -61,6 +62,9 @@ export function WorkDetailView() {
   const [shareActionDone, setShareActionDone] = useState<'copied' | ''>('');
   const [likeAnimating, setLikeAnimating] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
+  const [storyExpanded, setStoryExpanded] = useState(false);
+  const [introExpanded, setIntroExpanded] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const viewRecorded = useRef(false);
   const touchStartX = useRef(0);
   const screenshotCarouselRef = useRef<HTMLDivElement>(null);
@@ -141,6 +145,7 @@ export function WorkDetailView() {
 
   useEffect(() => {
     setActiveScreenshotIndex(0);
+    setStoryExpanded(false);
   }, [work?.id]);
 
   const teamMembers = toStringList(work?.team);
@@ -189,8 +194,10 @@ export function WorkDetailView() {
     const prevCount = likesCount;
     setLiked(!prevLiked);
     setLikesCount(prevLiked ? prevCount - 1 : prevCount + 1);
-    setLikeAnimating(true);
-    setTimeout(() => setLikeAnimating(false), 600);
+    if (!prefersReducedMotion) {
+      setLikeAnimating(true);
+      setTimeout(() => setLikeAnimating(false), 600);
+    }
     setIsLiking(true);
 
     try {
@@ -589,8 +596,38 @@ export function WorkDetailView() {
     setPreviewImageIndex((prev) => (prev + 1) % previewImages.length);
   };
 
+  const storyHtml = sanitizeRichTextForDisplay(work.story || '<p>-</p>');
+  const storyPlainLength = (work.story || '').replace(/<[^>]+>/g, '').trim().length;
+  const storyIsLong = storyPlainLength > 500;
+  const proseClass =
+    'prose prose-sm md:prose-base prose-invert max-w-none leading-relaxed prose-headings:text-card-foreground prose-p:text-muted-foreground prose-strong:text-card-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-li:text-muted-foreground prose-blockquote:text-muted-foreground prose-code:text-primary';
+
+  const sectionLinks = [
+    screenshotList.length > 0 ? { id: 'work-screenshots', label: t('screenshots') } : null,
+    { id: 'work-story', label: t('story') },
+    featureLines.length > 0 ? { id: 'work-features', label: t('features') } : null,
+    scenarioLines.length > 0 ? { id: 'work-scenarios', label: t('scenarios') } : null,
+  ].filter((item): item is { id: string; label: string } => Boolean(item));
+
+  const scrollToSection = (sectionId: string) => {
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const sectionCardClass = 'bg-card p-5 md:p-6 rounded-2xl shadow-sm border border-border scroll-mt-28';
+  const sidebarActionBtnClass =
+    'w-full inline-flex items-center justify-center gap-2 rounded-full h-11';
+
+  const likeButtonClass = (layout: 'hero' | 'sidebar') =>
+    cn(
+      'inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-300',
+      layout === 'hero' ? 'px-5' : cn(sidebarActionBtnClass, 'hidden lg:inline-flex'),
+      liked
+        ? 'bg-gradient-to-r from-green-500 to-green-600 text-white border-transparent shadow-[0_0_18px_rgba(50,240,140,0.35)] hover:from-green-500 hover:to-green-600'
+        : 'bg-muted/60 text-foreground border border-border hover:bg-muted hover:border-green-500/40 shadow-none'
+    );
+
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-6 pb-8">
       <button
         type="button"
         onClick={() => router.push(returnToListHref)}
@@ -630,13 +667,31 @@ export function WorkDetailView() {
             ))}
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-card-foreground mb-2">{work.name}</h1>
-          <p className="text-muted-foreground text-base leading-relaxed">{work.intro}</p>
+          {work.intro && (
+            <div className="space-y-2">
+              <p
+                className={cn(
+                  'text-muted-foreground text-sm md:text-base leading-relaxed',
+                  !introExpanded && work.intro.length > 120 && 'line-clamp-3'
+                )}
+              >
+                {work.intro}
+              </p>
+              {work.intro.length > 120 && (
+                <button
+                  type="button"
+                  className="text-sm text-primary hover:underline"
+                  onClick={() => setIntroExpanded((v) => !v)}
+                >
+                  {introExpanded ? t('storyReadLess') : t('storyReadMore')}
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* 元数据栏 - 分两行 */}
-        <div className="flex flex-wrap items-center justify-between p-6 gap-4">
-            <div className="flex flex-col gap-4">
-              {/* 第一行：标签 */}
+        <div className="flex flex-wrap items-start justify-between gap-4 p-5 md:p-6">
+            <div className="flex flex-col gap-3 min-w-0 flex-1">
               <div className="flex flex-wrap gap-2">
                 <span className="bg-green-500/10 text-green-400 text-xs font-medium px-2.5 py-1 rounded-full border border-green-500/20">
                   {work.category}
@@ -647,41 +702,37 @@ export function WorkDetailView() {
                   </span>
                 ))}
               </div>
-              {/* 第二行：信息 */}
-              <div className="flex flex-wrap gap-6 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Users className="w-4 h-4 text-muted-foreground" />
+              <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 shrink-0" />
                   <span className="font-medium">{withColon(t('teamMembers'))}</span>
                   <span className="text-foreground">{teamMembers.length > 0 ? teamMembers.length : '-'}</span>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 shrink-0" />
                   <span className="font-medium">{withColon(t('submitTime'))}</span>
                   <span className="text-foreground">{new Date(work.createdAt).toLocaleDateString()}</span>
                 </div>
                 {(work.country || work.city) && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin className="w-4 h-4 text-muted-foreground" />
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 shrink-0" />
                     <span className="text-foreground">{[work.country, work.city].filter(Boolean).join(' / ')}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 shrink-0 lg:hidden">
               <Button
+                variant="ghost"
                 onClick={handleLike}
                 disabled={isLiking}
                 aria-busy={isLiking}
-                className={`gap-2 transition-all duration-300 px-6 py-2.5 rounded-md font-medium ${
-                  liked
-                    ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-[0_0_20px_rgba(50,240,140,0.4)] border-transparent scale-105"
-                    : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-border backdrop-blur-md hover:border-green-500/50 hover:shadow-[0_0_15px_rgba(50,240,140,0.1)]"
-                }`}
+                className={likeButtonClass('hero')}
               >
-                <ThumbsUp className={`w-4 h-4 transition-transform ${liked ? "fill-current" : ""} ${likeAnimating ? "scale-125" : "scale-100"}`} />
-                {liked ? t('liked') : t('likeProject')}
-                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-xs font-mono ${liked ? "bg-white/20" : "bg-white/10 text-muted-foreground group-hover:text-foreground"}`}>
+                <ThumbsUp className={`w-4 h-4 shrink-0 transition-transform ${liked ? 'fill-current' : ''} ${likeAnimating ? 'scale-125' : 'scale-100'}`} />
+                <span>{liked ? t('liked') : t('likeProject')}</span>
+                <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-mono tabular-nums ${liked ? 'bg-white/20' : 'bg-background/80 text-muted-foreground'}`}>
                   {likesCount}
                 </span>
               </Button>
@@ -689,61 +740,34 @@ export function WorkDetailView() {
           </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 space-y-8">
-          <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
-            <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-primary rounded-full"></span>
-              {t('story')}
-            </h2>
-            <div
-              className="prose prose-invert max-w-none leading-relaxed prose-headings:text-card-foreground prose-p:text-muted-foreground prose-strong:text-card-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-li:text-muted-foreground prose-blockquote:text-muted-foreground prose-code:text-primary"
-              dangerouslySetInnerHTML={{
-                __html: sanitizeRichTextForDisplay(work.story || '<p>-</p>'),
-              }}
-            />
-          </section>
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_17.5rem] gap-6 lg:gap-8 items-start">
+        <div className="min-w-0 space-y-5">
+          {sectionLinks.length > 1 && (
+            <nav
+              aria-label={t('onPageNav')}
+              className="sticky top-16 z-20 -mx-1 px-1 py-2 rounded-xl bg-background/90 backdrop-blur-md border border-border/60 lg:static lg:mx-0 lg:px-0 lg:py-0 lg:bg-transparent lg:border-0 lg:backdrop-blur-none"
+            >
+              <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-thin">
+                {sectionLinks.map((link) => (
+                  <button
+                    key={link.id}
+                    type="button"
+                    onClick={() => scrollToSection(link.id)}
+                    className="shrink-0 text-xs md:text-sm px-3 py-1.5 rounded-full border border-border bg-card text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+                  >
+                    {link.label}
+                  </button>
+                ))}
+              </div>
+            </nav>
+          )}
 
-          <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
-            <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-primary rounded-full"></span>
-              {t('features')}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {featureLines.map((feature, index) => (
-                <div key={index} className="flex items-start gap-3 bg-muted p-4 rounded-xl border border-border">
-                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-primary text-xs font-bold">{index + 1}</span>
-                  </div>
-                  <span className="text-muted-foreground">{feature}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
-            <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-primary rounded-full"></span>
-              {t('scenarios')}
-            </h2>
-            <div className="grid grid-cols-1 gap-3">
-              {scenarioLines.map((scenario, index) => (
-                <div key={`${scenario}-${index}`} className="flex items-start gap-4 bg-muted p-4 rounded-xl border border-border">
-                  <div className="mt-1.5">
-                    <div className="w-2 h-2 rounded-full bg-primary/60 ring-4 ring-primary/10"></div>
-                  </div>
-                  <p className="text-muted-foreground leading-relaxed">{scenario}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="bg-card p-8 rounded-2xl shadow-sm border border-border">
-            <h2 className="text-xl font-bold text-card-foreground mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-primary rounded-full"></span>
+          {screenshotList.length > 0 && (
+          <section id="work-screenshots" className={sectionCardClass}>
+            <h2 className="text-lg font-bold text-card-foreground mb-3 flex items-center gap-2">
+              <span className="w-1 h-5 bg-primary rounded-full" />
               {t('screenshots')}
             </h2>
-            {screenshotList.length > 0 ? (
               <div className="space-y-4">
                 <div
                   ref={screenshotCarouselRef}
@@ -838,18 +862,102 @@ export function WorkDetailView() {
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="text-muted-foreground">-</div>
+          </section>
+          )}
+
+          <section id="work-story" className={sectionCardClass}>
+            <h2 className="text-lg font-bold text-card-foreground mb-3 flex items-center gap-2">
+              <span className="w-1 h-5 bg-primary rounded-full" />
+              {t('story')}
+            </h2>
+            <div className="relative">
+              <div
+                className={cn(
+                  proseClass,
+                  'max-w-prose',
+                  storyIsLong && !storyExpanded && 'max-h-[min(22rem,55vh)] overflow-hidden'
+                )}
+                dangerouslySetInnerHTML={{ __html: storyHtml }}
+              />
+              {storyIsLong && !storyExpanded && (
+                <div
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-card to-transparent"
+                  aria-hidden
+                />
+              )}
+            </div>
+            {storyIsLong && (
+              <button
+                type="button"
+                onClick={() => setStoryExpanded((v) => !v)}
+                className="mt-3 text-sm font-medium text-primary hover:underline"
+              >
+                {storyExpanded ? t('storyReadLess') : t('storyReadMore')}
+              </button>
             )}
           </section>
 
+          {featureLines.length > 0 && (
+            <section id="work-features" className={sectionCardClass}>
+              <details open={featureLines.length <= 4} className="group">
+                <summary className="text-lg font-bold text-card-foreground mb-0 flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  <span className="w-1 h-5 bg-primary rounded-full shrink-0" />
+                  <span className="flex-1">{t('features')}</span>
+                  <span className="text-xs font-normal text-muted-foreground">{featureLines.length}</span>
+                </summary>
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {featureLines.map((feature, index) => (
+                    <div key={index} className="flex items-start gap-3 bg-muted/80 p-3 rounded-xl border border-border text-sm">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-primary text-xs font-bold">{index + 1}</span>
+                      </div>
+                      <span className="text-muted-foreground">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            </section>
+          )}
+
+          {scenarioLines.length > 0 && (
+            <section id="work-scenarios" className={sectionCardClass}>
+              <details open={scenarioLines.length <= 4} className="group">
+                <summary className="text-lg font-bold text-card-foreground mb-0 flex items-center gap-2 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  <span className="w-1 h-5 bg-primary rounded-full shrink-0" />
+                  <span className="flex-1">{t('scenarios')}</span>
+                  <span className="text-xs font-normal text-muted-foreground">{scenarioLines.length}</span>
+                </summary>
+                <div className="mt-4 space-y-2">
+                  {scenarioLines.map((scenario, index) => (
+                    <div key={`${scenario}-${index}`} className="flex items-start gap-3 bg-muted/80 p-3 rounded-xl border border-border text-sm">
+                      <div className="mt-1.5 w-2 h-2 rounded-full bg-primary/60 ring-4 ring-primary/10 shrink-0" />
+                      <p className="text-muted-foreground leading-relaxed">{scenario}</p>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            </section>
+          )}
         </div>
 
-        <div className="space-y-6">
-          <div className="bg-card p-6 rounded-2xl border border-border flex flex-col gap-3">
+        <aside className="space-y-4 lg:sticky lg:top-20">
+          <div className="bg-card p-5 rounded-2xl border border-border flex flex-col gap-3">
+            <Button
+              variant="ghost"
+              onClick={handleLike}
+              disabled={isLiking}
+              aria-busy={isLiking}
+              className={likeButtonClass('sidebar')}
+            >
+              <ThumbsUp className={`w-4 h-4 shrink-0 ${liked ? 'fill-current' : ''} ${likeAnimating ? 'scale-125' : ''}`} />
+              <span>{liked ? t('liked') : t('likeProject')}</span>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-mono tabular-nums ${liked ? 'bg-white/20' : 'bg-background/80 text-muted-foreground'}`}>
+                {likesCount}
+              </span>
+            </Button>
             {demoUrl && (
               <a href={demoUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
-                <Button className="w-full gap-2 font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40">
+                <Button className={cn(sidebarActionBtnClass, 'font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40')}>
                   <ExternalLink className="w-4 h-4" />
                   {t('tryDemo')}
                 </Button>
@@ -858,7 +966,7 @@ export function WorkDetailView() {
 
             {repoUrl && (
               <a href={repoUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
-                <Button variant="secondary" className="w-full gap-2 bg-muted hover:bg-muted/80 border-border text-foreground">
+                <Button variant="secondary" className={cn(sidebarActionBtnClass, 'bg-muted hover:bg-muted/80 border-border text-foreground')}>
                   <Github className="w-4 h-4" />
                   {t('codeRepo')}
                 </Button>
@@ -868,7 +976,7 @@ export function WorkDetailView() {
             <Button
               variant="outline"
               onClick={handleShare}
-              className="w-full gap-2 border-border hover:bg-muted hover:text-foreground hover:border-border/70 text-muted-foreground"
+              className={cn(sidebarActionBtnClass, 'border-border hover:bg-muted hover:text-foreground hover:border-border/70 text-muted-foreground')}
             >
               <Share2 className="w-4 h-4" />
               {t('shareCard')}
@@ -940,13 +1048,17 @@ export function WorkDetailView() {
             </div>
             </div>
           </div>
-        </div>
+
+          <WorkLikersSection
+            workId={id}
+            enabled={Boolean(work)}
+            className="mt-0 p-4 md:p-5"
+          />
+        </aside>
       </div>
 
-      <WorkLikersSection workId={id} enabled={Boolean(work)} />
-
       {/* 底部提示 */}
-      <div className="mt-8 pt-6 border-t border-border/50">
+      <div className="mt-4 pt-6 border-t border-border/50">
         <p className="text-center text-xs text-muted-foreground">{t('aboutProjectDesc')}</p>
       </div>
 

@@ -46,6 +46,7 @@ export function SubmissionForm() {
   const [previewScreenshots, setPreviewScreenshots] = useState<string[]>([])
   const [uploadingCover, setUploadingCover] = useState(false)
   const [uploadingScreenshots, setUploadingScreenshots] = useState(false)
+  const [failedCoverFile, setFailedCoverFile] = useState<File | null>(null)
 
   // ── Dictionary data ──
   const [availableTags, setAvailableTags] = useState<WorkTag[]>([])
@@ -181,29 +182,28 @@ export function SubmissionForm() {
     throw new Error(result.error || 'Upload failed')
   }
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const uploadCoverFile = async (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
       toast.error(t('uploadSizeError'))
       return
     }
     try {
       setUploadingCover(true)
+      setFailedCoverFile(null)
       const url = await uploadFile(file)
       setPreviewCoverUrl(url)
       setValue('coverUrl', url, { shouldValidate: true })
     } catch (err) {
       console.error('Cover upload failed:', err)
+      setFailedCoverFile(file)
       toast.error(t('uploadError') || 'Upload failed')
     } finally {
       setUploadingCover(false)
     }
   }
 
-  const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files) return
+  const uploadScreenshotFiles = async (files: File[]) => {
+    if (files.length === 0) return
     if (files.length + screenshots.length > 5) {
       toast.error(t('uploadLimitError'))
       return
@@ -211,7 +211,7 @@ export function SubmissionForm() {
     try {
       setUploadingScreenshots(true)
       const urls = await Promise.all(
-        Array.from(files).map(async f => {
+        files.map(async (f) => {
           if (f.size > 5 * 1024 * 1024) throw new Error(t('uploadSizeError'))
           return uploadFile(f)
         })
@@ -225,6 +225,19 @@ export function SubmissionForm() {
     } finally {
       setUploadingScreenshots(false)
     }
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) await uploadCoverFile(file)
+    e.target.value = ''
+  }
+
+  const handleScreenshotUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files?.length) return
+    await uploadScreenshotFiles(Array.from(files))
+    e.target.value = ''
   }
 
   const removeScreenshot = (index: number) => {
@@ -376,12 +389,17 @@ export function SubmissionForm() {
               previewCoverUrl={previewCoverUrl}
               setPreviewCoverUrl={setPreviewCoverUrl}
               previewScreenshots={previewScreenshots}
-              setPreviewScreenshots={setPreviewScreenshots}
               uploadingCover={uploadingCover}
               uploadingScreenshots={uploadingScreenshots}
+              uploadCoverFile={uploadCoverFile}
+              uploadScreenshotFiles={uploadScreenshotFiles}
               handleImageUpload={handleImageUpload}
               handleScreenshotUpload={handleScreenshotUpload}
               removeScreenshot={removeScreenshot}
+              failedCoverFile={failedCoverFile}
+              onRetryCover={() => {
+                if (failedCoverFile) void uploadCoverFile(failedCoverFile)
+              }}
             />
           </div>
 

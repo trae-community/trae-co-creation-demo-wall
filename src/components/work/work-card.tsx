@@ -2,11 +2,15 @@
 
 import { Work } from "@/lib/types";
 import { MapPin, Award, Eye, ThumbsUp, Clock, ArrowRight } from "lucide-react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/language/navigation';
 import { workAssets } from '@/lib/work';
 import { RemoteImage } from '@/components/common/remote-image';
+import { hrefWithFrom } from '@/lib/navigation-from';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface WorkCardProps {
   work: Work;
@@ -45,9 +49,14 @@ const normalizeTeamMembers = (team: unknown): string[] => {
 
 export function WorkCard({ work }: WorkCardProps) {
   const t = useTranslations('Card');
+  const tWork = useTranslations('Work');
+  const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(work.likes ?? 0);
+  const [isLiking, setIsLiking] = useState(false);
   const teamMembers = normalizeTeamMembers(work.team);
   const isTeam = teamMembers.length > 1;
   const hasHonors = (work.honors || []).length > 0;
@@ -56,24 +65,61 @@ export function WorkCard({ work }: WorkCardProps) {
     if (!date) return '';
     const d = new Date(date);
     if (isNaN(d.getTime())) return '';
-    return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+    return d.toLocaleDateString(locale);
   };
   const currentListHref = (() => {
     const query = searchParams.toString();
     return query ? `${pathname}?${query}` : pathname;
   })();
-  const detailHref = `/works/${work.id}?from=${encodeURIComponent(currentListHref)}`;
+  const detailHref = hrefWithFrom(`/works/${work.id}`, currentListHref);
 
   // Show at most 3 tags, prioritise "special" ones
   const specialTags = work.tags.filter(tag => ["已上线", "开源", "持续更新"].includes(tag));
   const otherTags = work.tags.filter(tag => !["已上线", "开源", "持续更新"].includes(tag));
   const displayTags = [...specialTags, ...otherTags].slice(0, 3);
-  const authorHref = `/user/${work.author.id}`;
+  const authorHref = hrefWithFrom(`/user/${work.author.id}`, currentListHref);
 
   const handleAuthorClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
     router.push(authorHref);
+  };
+
+  const handleLikeClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (isLiking) return;
+    const prevLiked = liked;
+    const prevCount = likesCount;
+    setLiked(!prevLiked);
+    setLikesCount(prevLiked ? prevCount - 1 : prevCount + 1);
+    setIsLiking(true);
+    try {
+      const res = await fetch(`/api/works/${work.id}/like`, { method: 'POST' });
+      if (res.status === 401) {
+        setLiked(prevLiked);
+        setLikesCount(prevCount);
+        toast.message(tWork('likeLoginRequired'));
+        const returnPath = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+        router.push(`/${locale}/sign-in?callbackUrl=${encodeURIComponent(returnPath)}`);
+        return;
+      }
+      if (!res.ok) {
+        setLiked(prevLiked);
+        setLikesCount(prevCount);
+        toast.error(tWork('likeFailed'));
+        return;
+      }
+      const data = await res.json();
+      setLiked(Boolean(data.liked));
+      if (typeof data.likeCount === 'number') setLikesCount(data.likeCount);
+    } catch {
+      setLiked(prevLiked);
+      setLikesCount(prevCount);
+      toast.error(tWork('likeFailed'));
+    } finally {
+      setIsLiking(false);
+    }
   };
 
   return (
@@ -247,10 +293,22 @@ export function WorkCard({ work }: WorkCardProps) {
               <Eye className="w-3.5 h-3.5" />
               {work.views >= 1000 ? `${(work.views / 1000).toFixed(1)}k` : work.views}
             </span>
-            <span className="flex items-center gap-1 text-[11px] font-semibold text-green-400/80">
-              <ThumbsUp className="w-3.5 h-3.5" />
-              {work.likes}
-            </span>
+            <button
+              type="button"
+              disabled={isLiking}
+              onClick={handleLikeClick}
+              aria-label={liked ? tWork('liked') : tWork('likeProject')}
+              aria-pressed={liked}
+              className={cn(
+                'flex items-center gap-1 text-[11px] font-semibold rounded-full px-1.5 py-0.5 border transition-colors',
+                liked
+                  ? 'text-green-300 border-green-500/40 bg-green-500/15'
+                  : 'text-green-400/80 border-transparent hover:border-green-500/30'
+              )}
+            >
+              <ThumbsUp className={cn('w-3.5 h-3.5', liked && 'fill-current')} />
+              {likesCount}
+            </button>
           </div>
         </div>
       </div>

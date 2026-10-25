@@ -12,6 +12,10 @@ import { HeroBanner } from "@/components/common/hero-banner";
 import { useWorks } from "@/lib/use-works";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Link } from '@/lib/language/navigation';
+import { WorkGridSkeleton } from '@/components/common/list-row-skeleton';
+import { usePrefersReducedMotion } from '@/lib/use-reduced-motion';
+import { hrefWithFrom } from '@/lib/navigation-from';
+import { usePathname } from '@/lib/language/navigation';
 
 export default function Page() {
   const t = useTranslations('Home');
@@ -37,6 +41,16 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState<'works' | 'posters'>('works');
   const pageSize = 12;
   const hasMountedRef = useRef(false);
+  const reduceMotion = usePrefersReducedMotion();
+
+  const clearAllFilters = () => {
+    setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [] });
+    setSearchQuery('');
+    setSelectedDate('');
+    setDebouncedSearch('');
+    setSortBy('time');
+    setPage(1);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
@@ -84,7 +98,7 @@ export default function Page() {
     router.replace(`/${locale}${newUrl}`, { scroll: false });
   }, [filters, debouncedSearch, sortBy, selectedDate, page, router, locale]);
 
-  const { data, isLoading } = useWorks({
+  const { data, isLoading, isFetching } = useWorks({
     page,
     pageSize,
     search: debouncedSearch,
@@ -225,61 +239,57 @@ export default function Page() {
           onFilterChange={setFilters}
           showReset
           searchTerm={searchQuery}
-          onReset={() => setSearchQuery('')}
+          onReset={clearAllFilters}
         />
       </div>
 
       {/* ── WORK GRID ── */}
       {isLoading && works.length === 0 ? (
-        /* Skeleton */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-2xl overflow-hidden border border-border bg-card">
-              <div className="animate-pulse bg-muted" style={{ aspectRatio: '4/3' }} />
-              <div className="p-5 space-y-3">
-                <div className="animate-pulse h-4 bg-muted rounded-md w-3/4" />
-                <div className="animate-pulse h-3 bg-muted rounded-md w-full" />
-                <div className="animate-pulse h-3 bg-muted rounded-md w-5/6" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <WorkGridSkeleton count={8} />
       ) : works.length > 0 ? (
         <div className={cn(
-          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 transition-all duration-200",
-          isLoading && "opacity-60",
-          sortTransitioning && "opacity-40 scale-[0.98]"
+          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 transition-opacity duration-200",
+          isFetching && works.length > 0 && "opacity-70 pointer-events-none",
+          sortTransitioning && !reduceMotion && "opacity-40 scale-[0.98]"
         )}>
           {works.map((work, index) => (
             <div
               key={work.id}
-              style={{ animation: `cardFadeUp 0.4s ease-out ${index * 50}ms both` }}
+              className={reduceMotion ? undefined : 'card-fade-up'}
+              style={
+                reduceMotion
+                  ? undefined
+                  : { animation: `cardFadeUp 0.4s ease-out ${index * 50}ms both` }
+              }
             >
-              <WorkCard key={work.id} work={work} />
+              <WorkCard work={work} />
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-20 rounded-2xl border border-dashed border-border bg-card flex flex-col items-center justify-center">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+        <div className="text-center py-20 rounded-2xl border border-dashed border-border bg-card flex flex-col items-center justify-center gap-3">
+          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
             <SearchX className="w-8 h-8 text-muted-foreground" />
           </div>
-          <p className="text-muted-foreground text-sm mb-4">{t('noResults')}</p>
+          <p className="text-muted-foreground text-sm">{t('noResults')}</p>
           <button
-            onClick={() => {
-              setFilters({ cities: [], categories: [], tags: [], countries: [], honors: [], auditStatuses: [] });
-              setSearchQuery("");
-              setSelectedDate("");
-            }}
-            className="px-4 py-2 rounded-md text-sm font-medium text-green-400 border border-green-500/30 bg-green-500/10 hover:bg-green-500/20 transition-colors"
+            type="button"
+            onClick={clearAllFilters}
+            className="px-4 py-2 rounded-full text-sm font-medium text-green-400 border border-green-500/30 bg-green-500/10 hover:bg-green-500/20 transition-colors"
           >
             {t('clearFilters')}
           </button>
+          <Link
+            href="/submit"
+            className="text-sm text-primary hover:underline"
+          >
+            {t('goSubmit')}
+          </Link>
         </div>
       )}
 
       {/* ── PAGINATION ── */}
-      {!isLoading && totalItems > 0 && (
+      {totalItems > 0 && (
         <div className="flex items-center justify-between pt-2">
           <p className="text-sm text-muted-foreground">
             {t('resultCount') || '共'}{' '}
@@ -306,7 +316,10 @@ export default function Page() {
                   ) : (
                     <button
                       key={p}
+                      type="button"
                       onClick={() => setPage(p)}
+                      aria-label={t('pageNumber', { page: p })}
+                      aria-current={p === page ? 'page' : undefined}
                       className={cn(
                         "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all",
                         p === page
@@ -328,7 +341,10 @@ export default function Page() {
                   ) : (
                     <button
                       key={p}
+                      type="button"
                       onClick={() => setPage(p)}
+                      aria-label={t('pageNumber', { page: p })}
+                      aria-current={p === page ? 'page' : undefined}
                       className={cn(
                         "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium transition-all",
                         p === page
@@ -370,6 +386,7 @@ export default function Page() {
 function PostersTab() {
   const t = useTranslations('Home');
   const tPosters = useTranslations('Posters');
+  const pathname = usePathname();
   const [posters, setPosters] = useState<{id: string; nickname: string; description: string | null; imageUrl: string; demoUrl: string; tags: string[] | null; createdAt: string}[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -451,7 +468,7 @@ function PostersTab() {
         {posters.map((poster) => (
           <Link
             key={poster.id}
-            href={`/posters/${poster.id}`}
+            href={hrefWithFrom(`/posters/${poster.id}`, pathname)}
             className="group rounded-2xl overflow-hidden bg-card border border-border hover:border-green-500/40 hover:shadow-lg transition-all duration-300"
           >
             {/* 最终合成海报（封面 + 昵称 + 简介 + 二维码） */}
@@ -493,11 +510,11 @@ function PostersTab() {
       </div>
 
       {!isLoading && totalItems > 0 && (
-        <div className="flex items-center justify-between pt-2 mt-2">
-          <p className="text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 mt-2 min-w-0">
+          <p className="text-sm text-muted-foreground min-w-0">
             {t('resultCount') || '共'}{' '}
             <span className="text-foreground font-medium">{totalItems}</span>{' '}
-            {tPosters('resultCountUnit')}
+            {tPosters('resultCountUnit', { defaultMessage: '张海报' })}
           </p>
           {totalPages > 1 && (
             <div className="flex items-center gap-2">
