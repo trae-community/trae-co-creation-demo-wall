@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser, isAdmin } from '@/lib/auth';
 import { writeOperationLog } from '@/lib/audit-log';
+import { createdAtDayRange } from '@/lib/created-at-day-range';
 
 // Helper to sanitize BigInt
 const sanitize = (data: unknown) => {
@@ -39,11 +40,9 @@ export async function GET(req: NextRequest) {
         { description: { contains: query, mode: 'insensitive' } },
       ];
     }
-    // 按日期筛选（与作品管理一致）
-    if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      const start = new Date(`${date}T00:00:00.000Z`);
-      const end = new Date(`${date}T23:59:59.999Z`);
-      where.createdAt = { gte: start, lte: end };
+    const dayRange = date ? createdAtDayRange(date) : null;
+    if (dayRange) {
+      where.createdAt = { gte: dayRange.start, lte: dayRange.end };
     }
 
     const orderBy = sort === 'oldest' ? { createdAt: 'asc' as const } : { createdAt: 'desc' as const };

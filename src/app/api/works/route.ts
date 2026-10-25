@@ -5,6 +5,7 @@ import { getAuthUser } from '@/lib/auth'
 import { writeOperationLog } from '@/lib/audit-log'
 import { sanitizeRichText, stripHtmlTags } from '@/lib/rich-text'
 import { z } from 'zod'
+import { createdAtDayRange } from '@/lib/created-at-day-range'
 
 const updateSchema = z.object({
   name: z.string().min(2).max(50),
@@ -119,15 +120,11 @@ export async function GET(req: Request) {
       });
     }
 
-    // 按日期筛选（当天 00:00:00 ~ 23:59:59）
-    if (date) {
-      const start = new Date(`${date}T00:00:00.000Z`);
-      const end = new Date(`${date}T23:59:59.999Z`);
-      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-        whereFilters.push({
-          createdAt: { gte: start, lte: end }
-        });
-      }
+    const dayRange = date ? createdAtDayRange(date) : null;
+    if (dayRange) {
+      whereFilters.push({
+        createdAt: { gte: dayRange.start, lte: dayRange.end },
+      });
     }
 
     const where: Prisma.WorkBaseWhereInput = { AND: whereFilters };

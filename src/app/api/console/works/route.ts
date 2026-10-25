@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
 import { getAuthUser, isAdmin } from '@/lib/auth';
 import { writeOperationLog } from '@/lib/audit-log';
+import { createdAtDayRange } from '@/lib/created-at-day-range';
+import { getWorkLikeRiskByWorkIds } from '@/lib/auth-log-queries';
 
 // Helper to sanitize object
 const sanitize = (data: any) => {
@@ -58,8 +60,10 @@ export async function GET(req: NextRequest) {
     const userId = searchParams.get('userId');
     const categoryCode = searchParams.get('category');
     const countryCode = searchParams.get('country');
+    const cityCode = searchParams.get('city');
     const honorCode = searchParams.get('honor');
     const auditStatus = searchParams.get('auditStatus');
+    const date = searchParams.get('date');
     const sort = searchParams.get('sort') || 'newest'; // newest, likes, views
 
     // 构建过滤条件
@@ -88,6 +92,9 @@ export async function GET(req: NextRequest) {
     if (countryCode) {
       whereFilters.push({ countryCode });
     }
+    if (cityCode) {
+      whereFilters.push({ cityCode });
+    }
     if (honorCode) {
       whereFilters.push({
         honors: {
@@ -100,6 +107,12 @@ export async function GET(req: NextRequest) {
     if (auditStatus !== null && auditStatus !== '') {
       whereFilters.push({
         statistic: { auditStatus: Number(auditStatus) }
+      });
+    }
+    const dayRange = date ? createdAtDayRange(date) : null;
+    if (dayRange) {
+      whereFilters.push({
+        createdAt: { gte: dayRange.start, lte: dayRange.end },
       });
     }
 
@@ -221,11 +234,23 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    const likeRiskMap = await getWorkLikeRiskByWorkIds(works.map(w => w.id));
+
     // Attach lastAuditReason to each work
-    const enrichedWorks = works.map(work => ({
-      ...work,
-      lastAuditReason: auditReasonMap[work.id.toString()] || null,
-    }));
+    const enrichedWorks = works.map(work => {
+      const risk = likeRiskMap.get(work.id.toString());
+      return {
+        ...work,
+        lastAuditReason: auditReasonMap[work.id.toString()] || null,
+        likeRisk: risk
+          ? {
+              newAccountLikeCount: risk.newAccountLikeCount,
+              newAccountRatio: risk.newAccountRatio,
+              suspicious: risk.suspicious,
+            }
+          : null,
+      };
+    });
 
     return NextResponse.json({
       items: sanitize(enrichedWorks),
