@@ -1,5 +1,6 @@
-/** 操作日志 module / action 的中文展示（与 writeOperationLog 的 module 字段一致） */
-export const OPERATION_MODULE_LABELS: Record<string, string> = {
+/** 操作日志 module / action 展示（与 writeOperationLog 的 module 字段一致） */
+
+const MODULE_ZH: Record<string, string> = {
   work: '作品互动',
   works: '作品管理',
   users: '用户管理',
@@ -11,7 +12,31 @@ export const OPERATION_MODULE_LABELS: Record<string, string> = {
   code_blind_box: '盲盒管理',
 }
 
-export const OPERATION_ACTION_LABELS: Record<string, string> = {
+const MODULE_EN: Record<string, string> = {
+  work: 'Work engagement',
+  works: 'Works admin',
+  users: 'Users',
+  dictionary: 'Dictionaries',
+  tags: 'Tags',
+  submit: 'Submission',
+  poster: 'Posters',
+  profile: 'Profile',
+  code_blind_box: 'Blind box',
+}
+
+const MODULE_JA: Record<string, string> = {
+  work: '作品インタラクション',
+  works: '作品管理',
+  users: 'ユーザー管理',
+  dictionary: '辞書',
+  tags: 'タグ',
+  submit: '作品投稿',
+  poster: 'ポスター',
+  profile: 'プロフィール',
+  code_blind_box: 'ブラインドボックス',
+}
+
+const ACTION_ZH: Record<string, string> = {
   create: '创建',
   update: '更新',
   delete: '删除',
@@ -27,17 +52,97 @@ export const OPERATION_ACTION_LABELS: Record<string, string> = {
   reset_draw: '重置抽卡',
 }
 
-export function getOperationModuleLabel(module: string): string {
-  return OPERATION_MODULE_LABELS[module] ?? '其他模块'
+const ACTION_EN: Record<string, string> = {
+  create: 'Create',
+  update: 'Update',
+  delete: 'Delete',
+  like: 'Like',
+  unlike: 'Unlike',
+  view: 'View',
+  audit: 'Audit',
+  ban: 'Ban',
+  unban: 'Unban',
+  create_work: 'Submit work',
+  auto_audit: 'Auto audit',
+  update_avatar: 'Update avatar',
+  reset_draw: 'Reset draw',
 }
 
-export function getOperationActionLabel(action: string): string {
-  return OPERATION_ACTION_LABELS[action] ?? '其他操作'
+const ACTION_JA: Record<string, string> = {
+  create: '作成',
+  update: '更新',
+  delete: '削除',
+  like: 'いいね',
+  unlike: 'いいね取消',
+  view: '閲覧',
+  audit: '審査',
+  ban: 'BAN',
+  unban: 'BAN解除',
+  create_work: '作品投稿',
+  auto_audit: '自動審査',
+  update_avatar: 'アバター更新',
+  reset_draw: '抽選リセット',
 }
 
-/** 下拉排序：按中文名 */
-export function sortOperationModules(modules: string[]): string[] {
+const MODULE_BY_LOCALE: Record<string, Record<string, string>> = {
+  'zh-CN': MODULE_ZH,
+  'zh': MODULE_ZH,
+  'en-US': MODULE_EN,
+  en: MODULE_EN,
+  'ja-JP': MODULE_JA,
+  ja: MODULE_JA,
+}
+
+const ACTION_BY_LOCALE: Record<string, Record<string, string>> = {
+  'zh-CN': ACTION_ZH,
+  zh: ACTION_ZH,
+  'en-US': ACTION_EN,
+  en: ACTION_EN,
+  'ja-JP': ACTION_JA,
+  ja: ACTION_JA,
+}
+
+const FALLBACK_MODULE: Record<string, string> = {
+  'zh-CN': '其他模块',
+  'en-US': 'Other module',
+  'ja-JP': 'その他',
+}
+
+const FALLBACK_ACTION: Record<string, string> = {
+  'zh-CN': '其他操作',
+  'en-US': 'Other action',
+  'ja-JP': 'その他',
+}
+
+function normalizeLocale(locale?: string): string {
+  if (!locale) return 'zh-CN'
+  if (locale in MODULE_BY_LOCALE) return locale
+  if (locale.startsWith('en')) return 'en-US'
+  if (locale.startsWith('ja')) return 'ja-JP'
+  if (locale.startsWith('zh')) return 'zh-CN'
+  return 'zh-CN'
+}
+
+export const OPERATION_MODULE_LABELS = MODULE_ZH
+export const OPERATION_ACTION_LABELS = ACTION_ZH
+
+export function getOperationModuleLabel(module: string, locale?: string): string {
+  const loc = normalizeLocale(locale)
+  const map = MODULE_BY_LOCALE[loc] ?? MODULE_ZH
+  const fallback = FALLBACK_MODULE[loc] ?? FALLBACK_MODULE['zh-CN']
+  return map[module] ?? fallback
+}
+
+export function getOperationActionLabel(action: string, locale?: string): string {
+  const loc = normalizeLocale(locale)
+  const map = ACTION_BY_LOCALE[loc] ?? ACTION_ZH
+  const fallback = FALLBACK_ACTION[loc] ?? FALLBACK_ACTION['zh-CN']
+  return map[action] ?? fallback
+}
+
+export function sortOperationModules(modules: string[], locale?: string): string[] {
+  const loc = normalizeLocale(locale)
   return [...modules].sort((a, b) =>
-    getOperationModuleLabel(a).localeCompare(getOperationModuleLabel(b), 'zh-CN')
+    getOperationModuleLabel(a, loc).localeCompare(getOperationModuleLabel(b, loc), loc)
   )
 }

@@ -6,8 +6,10 @@ import { auth } from '@/lib/auth-nextauth';
 
 const handleI18nRouting = createMiddleware(routing);
 
+const localeSegment = routing.locales.join('|');
+
 const isProtectedRoute = (pathname: string) => {
-  return /^\/(zh-CN|en-US)\/(submit|console|profile)/.test(pathname);
+  return new RegExp(`^/(${localeSegment})/(submit|console|profile)`).test(pathname);
 };
 
 const isApiRoute = (pathname: string) => pathname.startsWith('/api');
