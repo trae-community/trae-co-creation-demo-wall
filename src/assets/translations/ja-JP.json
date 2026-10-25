@@ -483,6 +483,12 @@
     "retry": "再試行",
     "home": "ホーム"
   },
+  "NotFound": {
+    "title": "ページが見つかりません",
+    "description": "リンクが無効か、URL が間違っている可能性があります。ホームから再度お試しください。",
+    "home": "ホーム",
+    "browse": "ランキングを見る"
+  },
   "Console": {
     "filterActive": "フィルター適用中",
     "filterReset": "フィルターをリセット",

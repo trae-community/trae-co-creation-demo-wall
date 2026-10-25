@@ -468,6 +468,12 @@
     "retry": "Try again",
     "home": "Home"
   },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "This link may be broken or the URL may be incorrect. Head back home to keep exploring.",
+    "home": "Home",
+    "browse": "View rankings"
+  },
   "Console": {
     "filterActive": "Filtered",
     "filterReset": "Reset filters",
