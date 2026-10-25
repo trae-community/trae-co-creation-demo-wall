@@ -103,6 +103,8 @@
     "demoUrl": "Demo Link",
     "repoUrl": "Code Repository (Optional)",
     "submitButton": "Submit Work",
+    "stepValidationBanner": "Fix the errors on this step before continuing or switching steps.",
+    "fieldErrorsSummary": "Please check the following:",
     "successTitle": "Submission Successful!",
     "successMessage": "Your project has been submitted for review. You can view it on the home page once approved.",
     "editSuccessTitle": "Update Successful!",
@@ -170,6 +172,9 @@
     "submitTime": "Submitted:",
     "liked": "Liked",
     "likeProject": "Like this project",
+    "likeLoginRequired": "Sign in to like this work",
+    "likeFailed": "Could not like. Please try again.",
+    "cannotLikeOwnWork": "You cannot like your own work",
     "story": "Creation Story",
     "features": "Key Features",
     "scenarios": "Use Cases",
@@ -351,6 +356,7 @@
     "noTrendingData": "No new works in the past 7 days. Submit yours now!"
   },
   "PosterMaker": {
+    "formErrorSummary": "Please check the following:",
     "title": "Poster Maker",
     "subtitle": "Create your shareable poster in seconds — scan QR to experience the demo",
     "nicknameLabel": "Nickname",
@@ -430,6 +436,47 @@
     "saving": "Saving...",
     "save": "Save",
     "editFailed": "Edit failed, please retry"
+  },
+  "ErrorPage": {
+    "title": "Something went wrong",
+    "description": "Please try again or return to the home page.",
+    "retry": "Try again",
+    "home": "Home"
+  },
+  "Console": {
+    "filterActive": "Filtered",
+    "filterReset": "Reset filters",
+    "menuTitle": "Console menu",
+    "mobileTitle": "Console",
+    "dateStart": "Start date",
+    "dateEnd": "End date",
+    "dateSingle": "Date",
+    "registerStart": "Registered from",
+    "registerEnd": "Registered to",
+    "nav": {
+      "overview": "Overview",
+      "usersPermissions": "Users & roles",
+      "users": "Users",
+      "roles": "Roles",
+      "contentManagement": "Content",
+      "works": "Works",
+      "posters": "Posters",
+      "codeBlindBox": "Blind box",
+      "cities": "Cities",
+      "systemConfig": "System",
+      "dictionaries": "Dictionaries",
+      "tags": "Tags",
+      "logAudit": "Audit logs",
+      "authLogs": "Auth logs",
+      "operationLogs": "Operation logs"
+    },
+    "empty": {
+      "noOperationLogs": "No operation logs",
+      "noAuthLogs": "No auth logs",
+      "noUsers": "No users",
+      "noWorks": "No works",
+      "noPosters": "No posters"
+    }
   },
   "CodeBlindBox": {
     "title": "1024 Code Blind Box",

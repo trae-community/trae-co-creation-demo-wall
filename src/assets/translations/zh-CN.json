@@ -101,6 +101,8 @@
     "demoUrl": "Demo 链接",
     "repoUrl": "代码仓库 (选填)",
     "submitButton": "提交作品",
+    "stepValidationBanner": "请先修正当前步骤中的错误，再继续或切换步骤。",
+    "fieldErrorsSummary": "请检查以下问题：",
     "successTitle": "提交成功！",
     "successMessage": "你的作品已提交审核，通过后将在首页展示。",
     "editSuccessTitle": "更新成功！",
@@ -168,6 +170,9 @@
     "submitTime": "提交时间:",
     "liked": "已点赞",
     "likeProject": "为作品点赞",
+    "likeLoginRequired": "登录后即可点赞",
+    "likeFailed": "点赞失败，请稍后重试",
+    "cannotLikeOwnWork": "不能为自己的作品点赞",
     "story": "创作故事",
     "features": "功能亮点",
     "scenarios": "使用场景",
@@ -349,6 +354,7 @@
     "noTrendingData": "近 7 天暂无新作品，快去提交第一个作品吧！"
   },
   "PosterMaker": {
+    "formErrorSummary": "请检查以下问题：",
     "title": "海报制作",
     "subtitle": "快速生成你的专属分享海报，扫码即可体验Demo",
     "nicknameLabel": "昵称",
@@ -427,6 +433,47 @@
     "saving": "保存中...",
     "save": "保存",
     "editFailed": "编辑失败，请重试"
+  },
+  "ErrorPage": {
+    "title": "页面出现问题",
+    "description": "请稍后重试，或返回首页。",
+    "retry": "重试",
+    "home": "返回首页"
+  },
+  "Console": {
+    "filterActive": "已筛选",
+    "filterReset": "重置筛选",
+    "menuTitle": "控制台菜单",
+    "mobileTitle": "控制台",
+    "dateStart": "开始日期",
+    "dateEnd": "结束日期",
+    "dateSingle": "日期",
+    "registerStart": "注册起",
+    "registerEnd": "注册止",
+    "nav": {
+      "overview": "概览",
+      "usersPermissions": "用户与权限",
+      "users": "用户管理",
+      "roles": "角色管理",
+      "contentManagement": "内容管理",
+      "works": "作品管理",
+      "posters": "海报管理",
+      "codeBlindBox": "盲盒管理",
+      "cities": "城市数据",
+      "systemConfig": "系统配置",
+      "dictionaries": "字典管理",
+      "tags": "标签管理",
+      "logAudit": "日志审计",
+      "authLogs": "登录注册日志",
+      "operationLogs": "操作日志"
+    },
+    "empty": {
+      "noOperationLogs": "暂无操作日志",
+      "noAuthLogs": "暂无认证日志",
+      "noUsers": "暂无用户",
+      "noWorks": "暂无作品",
+      "noPosters": "暂无海报"
+    }
   },
   "CodeBlindBox": {
     "title": "1024 代码盲盒",

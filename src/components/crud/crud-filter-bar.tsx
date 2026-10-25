@@ -26,6 +26,10 @@ interface CrudFilterBarProps {
   filterPlaceholder?: string
   /** 额外筛选控件（如模块下拉、日期范围），与筛选下拉同行展示 */
   extraFilters?: ReactNode
+  hasActiveFilters?: boolean
+  onReset?: () => void
+  resetLabel?: string
+  activeFilterLabel?: string
 }
 
 export function CrudFilterBar({
@@ -37,9 +41,24 @@ export function CrudFilterBar({
   onFilterChange,
   filterPlaceholder = '筛选条件',
   extraFilters,
+  hasActiveFilters,
+  onReset,
+  resetLabel = '重置筛选',
+  activeFilterLabel = '已筛选',
 }: CrudFilterBarProps) {
   return (
-    <div className="p-4 rounded-xl border border-border bg-card flex flex-col sm:flex-row gap-4 items-center justify-between">
+    <div className="p-4 rounded-xl border border-border bg-card flex flex-col gap-3">
+      {hasActiveFilters && (
+        <div className="flex items-center justify-between gap-2 text-sm">
+          <span className="text-muted-foreground">{activeFilterLabel}</span>
+          {onReset && (
+            <button type="button" onClick={onReset} className="text-primary hover:underline">
+              {resetLabel}
+            </button>
+          )}
+        </div>
+      )}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
       <div className="relative flex-1 max-w-md w-full">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
@@ -65,6 +84,7 @@ export function CrudFilterBar({
           </Select>
         )}
         {extraFilters}
+      </div>
       </div>
     </div>
   )

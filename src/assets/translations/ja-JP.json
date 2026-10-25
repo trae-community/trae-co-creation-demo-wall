@@ -107,6 +107,8 @@
     "demoUrl": "デモリンク",
     "repoUrl": "コードリポジトリ（任意）",
     "submitButton": "作品データを生成してエクスポート",
+    "stepValidationBanner": "次へ進む前に、このステップのエラーを修正してください。",
+    "fieldErrorsSummary": "次の項目を確認してください：",
     "successTitle": "送信完了！",
     "successMessage": "プロジェクトが審査のために送信されました。承認後、ホームページに表示されます。",
     "editSuccessTitle": "更新完了！",
@@ -183,6 +185,9 @@
     "submitTime": "投稿日:",
     "liked": "いいね済み",
     "likeProject": "いいね",
+    "likeLoginRequired": "いいねするにはログインしてください",
+    "likeFailed": "いいねに失敗しました。しばらくしてから再試行してください",
+    "cannotLikeOwnWork": "自分の作品にはいいねできません",
     "loginToLike": "いいねするにはログインしてください",
     "likeFailed": "いいねに失敗しました。しばらくして再試行してください",
     "story": "制作ストーリー",
@@ -366,6 +371,7 @@
     "noTrendingData": "過去7日間に新しい作品がありません。最初の作品を提出しよう！"
   },
   "PosterMaker": {
+    "formErrorSummary": "次の項目を確認してください：",
     "title": "ポスター作成",
     "subtitle": "あなただけのシェアポスターをすぐに作成 — QRをスキャンしてデモを体験",
     "nicknameLabel": "ニックネーム",
@@ -445,6 +451,47 @@
     "saving": "保存中...",
     "save": "保存",
     "editFailed": "編集に失敗しました"
+  },
+  "ErrorPage": {
+    "title": "問題が発生しました",
+    "description": "しばらくしてから再試行するか、ホームに戻ってください。",
+    "retry": "再試行",
+    "home": "ホーム"
+  },
+  "Console": {
+    "filterActive": "フィルター適用中",
+    "filterReset": "フィルターをリセット",
+    "menuTitle": "コンソールメニュー",
+    "mobileTitle": "コンソール",
+    "dateStart": "開始日",
+    "dateEnd": "終了日",
+    "dateSingle": "日付",
+    "registerStart": "登録開始",
+    "registerEnd": "登録終了",
+    "nav": {
+      "overview": "概要",
+      "usersPermissions": "ユーザーと権限",
+      "users": "ユーザー管理",
+      "roles": "ロール管理",
+      "contentManagement": "コンテンツ",
+      "works": "作品管理",
+      "posters": "ポスター管理",
+      "codeBlindBox": "ブラインドボックス",
+      "cities": "都市データ",
+      "systemConfig": "システム設定",
+      "dictionaries": "辞書管理",
+      "tags": "タグ管理",
+      "logAudit": "ログ監査",
+      "authLogs": "認証ログ",
+      "operationLogs": "操作ログ"
+    },
+    "empty": {
+      "noOperationLogs": "操作ログはありません",
+      "noAuthLogs": "認証ログはありません",
+      "noUsers": "ユーザーがいません",
+      "noWorks": "作品がありません",
+      "noPosters": "ポスターがありません"
+    }
   },
   "CodeBlindBox": {
     "title": "1024 コードブラインドボックス",
