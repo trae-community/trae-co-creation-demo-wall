@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Loader2 } from 'lucide-react'
 import { Work } from '@/lib/types'
 import { WorkCard } from '@/components/work/work-card'
 import { CrudPagination } from '@/components/crud/crud-pagination'
+import { WorkGridSkeleton } from '@/components/common/list-row-skeleton'
+import { Link } from '@/lib/language/navigation'
 
 interface LikedWorksProps {
   userId: string
@@ -13,6 +14,7 @@ interface LikedWorksProps {
 
 export function LikedWorks({ userId }: LikedWorksProps) {
   const t = useTranslations('Profile')
+  const tHome = useTranslations('Home')
   const [works, setWorks] = useState<Work[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
@@ -49,11 +51,7 @@ export function LikedWorks({ userId }: LikedWorksProps) {
   const endIndex = Math.min(current * pageSize, totalItems)
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-6 h-6 animate-spin text-primary" />
-      </div>
-    )
+    return <WorkGridSkeleton count={6} />
   }
 
   return (
@@ -65,8 +63,14 @@ export function LikedWorks({ userId }: LikedWorksProps) {
           ))}
         </div>
       ) : (
-        <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
-          {t('noLikedWorks')}
+        <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg space-y-4">
+          <p>{t('noLikedWorks')}</p>
+          <Link
+            href="/"
+            className="inline-flex px-4 py-2 rounded-md text-sm font-medium text-green-400 border border-green-500/30 bg-green-500/10 hover:bg-green-500/20 transition-colors"
+          >
+            {tHome('browseWork')}
+          </Link>
         </div>
       )}
 

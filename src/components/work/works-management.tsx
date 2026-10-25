@@ -10,11 +10,20 @@ import * as z from 'zod'
 
 import { CrudFeedback } from '@/components/crud/crud-feedback'
 import { CrudPagination } from '@/components/crud/crud-pagination'
+import {
+  consoleListCardBodyClass,
+  consoleListCardMediaRowClass,
+  consoleListCardMetaRowClass,
+  consoleListCardOuterRowClass,
+  consoleMetaBadgeClass,
+} from '@/components/crud/console-list-card-layout'
+import { cn } from '@/lib/utils'
 import { CityFilter, FilterState } from '@/components/work/city-filter'
 import { useFeedback } from '@/lib/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
 import { useParams, usePathname, useSearchParams } from 'next/navigation'
 import { Link } from '@/lib/language/navigation'
+import { hrefWithFrom } from '@/lib/navigation-from'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -42,7 +51,6 @@ import { ListEmptyState } from '@/components/common/list-empty-state'
 import { RemoteImage } from '@/components/common/remote-image'
 import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
 import { DatePicker } from '@/components/ui/date-picker'
-import { cn } from '@/lib/utils'
 import { sanitizeRichTextForDisplay } from '@/lib/rich-text'
 import {
   BATCH_AUDIT_CONFIRM_PHRASE,
@@ -718,7 +726,7 @@ export function WorksManagement({
   }
 
   return (
-    <div className="space-y-6 relative min-h-[500px]">
+    <div className="space-y-6 relative min-h-[500px] min-w-0 max-w-full">
       <CrudFeedback feedback={feedback} />
       
       {scope === 'admin' && (
@@ -837,8 +845,8 @@ export function WorksManagement({
         )}
 
         {works.map(work => (
-          <Card key={work.id} className="overflow-hidden border border-border bg-card hover:bg-card/80 transition-colors">
-            <div className="flex">
+          <Card key={work.id} className="overflow-hidden border border-border bg-card hover:bg-card/80 transition-colors max-w-full">
+            <div className={consoleListCardOuterRowClass}>
               {showBulkAuditControls && (
                 <div className="flex items-start border-r border-border/50 p-4">
                   <Checkbox
@@ -850,7 +858,7 @@ export function WorksManagement({
                 </div>
               )}
 
-              <div className="flex flex-1 flex-col sm:flex-row">
+              <div className={consoleListCardMediaRowClass}>
               {/* Cover Image */}
               <div className="w-full sm:w-48 h-32 sm:h-auto bg-muted shrink-0 relative group">
                 {work.coverUrl ? (
@@ -883,17 +891,17 @@ export function WorksManagement({
               </div>
               
               {/* Content */}
-              <div className="flex-1 p-4 flex flex-col justify-between gap-4">
-                <div>
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
+              <div className={consoleListCardBodyClass}>
+                <div className="min-w-0">
+                  <div className="flex items-start justify-between gap-2 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <h3 className="font-semibold text-lg line-clamp-1 hover:text-primary cursor-pointer transition-colors" title={work.title} onClick={() => allowedActions.includes('view') && handleView(work)}>
                         {work.title}
                       </h3>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                        <div className="flex items-center gap-1" title="作者">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground mt-1">
+                        <div className="flex items-center gap-1 min-w-0" title="作者">
                           <User size={14} />
-                          <Link href={`/user/${work.userId}`} onClick={(e) => e.stopPropagation()} className="hover:text-primary transition-colors">{work.user.username}</Link>
+                          <Link href={hrefWithFrom(`/user/${work.userId}`, pathname)} onClick={(e) => e.stopPropagation()} className="hover:text-primary transition-colors">{work.user.username}</Link>
                         </div>
                         <span className="text-border">|</span>
                         <div className="flex items-center gap-1" title="创建时间">
@@ -931,7 +939,7 @@ export function WorksManagement({
                     {/* Action Buttons */}
                     <div className="flex items-center gap-1 shrink-0">
                       {/* Jump to detail page */}
-                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-green-400 hover:bg-green-500/10" onClick={() => router.push(`/${locale}/works/${work.id}`)} title="查看详情页" aria-label="查看详情页">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-green-400 hover:bg-green-500/10" onClick={() => router.push(hrefWithFrom(`/${locale}/works/${work.id}`, pathname))} title="查看详情页" aria-label="查看详情页">
                         <ExternalLink size={16} />
                       </Button>
                       {allowedActions.includes('view') && (
@@ -996,10 +1004,10 @@ export function WorksManagement({
                 </div>
 
                 {/* Metadata Tags */}
-                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border/50">
+                <div className={consoleListCardMetaRowClass}>
                   {/* Development Status */}
                   {work.devStatusCode && (
-                    <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary">
+                    <Badge variant="outline" className={cn('bg-primary/5 border-primary/20 text-primary', consoleMetaBadgeClass)}>
                       <Code size={12} className="mr-1" />
                       {getLabel(work.devStatusCode, devStatuses)}
                     </Badge>
@@ -1007,7 +1015,7 @@ export function WorksManagement({
                   
                   {/* Category */}
                   {work.categoryCode && (
-                    <Badge variant="outline">
+                    <Badge variant="outline" className={consoleMetaBadgeClass}>
                       <Tag size={12} className="mr-1" />
                       {getLabel(work.categoryCode, categories)}
                     </Badge>
@@ -1015,7 +1023,7 @@ export function WorksManagement({
 
                   {/* Location */}
                   {(work.countryCode || work.cityCode) && (
-                    <Badge variant="secondary" className="text-muted-foreground">
+                    <Badge variant="secondary" className={cn('text-muted-foreground', consoleMetaBadgeClass)}>
                       <MapPin size={12} className="mr-1" />
                       {work.countryCode ? getLabel(work.countryCode, countries) : ''}
                       {work.countryCode && work.cityCode ? ' · ' : ''}
@@ -1025,14 +1033,14 @@ export function WorksManagement({
 
                   {/* Tags */}
                   {work.tags && work.tags.map(t => (
-                    <Badge key={t.tag.id} variant="secondary" className="text-xs bg-secondary/50">
+                    <Badge key={t.tag.id} variant="secondary" className={cn('text-xs bg-secondary/50', consoleMetaBadgeClass)}>
                       #{t.tag.name}
                     </Badge>
                   ))}
 
                   {/* Honors */}
                   {work.honors && work.honors.map(h => (
-                    <Badge key={h.id} variant="outline" className="text-xs border-yellow-500 text-yellow-500 bg-yellow-500/10">
+                    <Badge key={h.id} variant="outline" className={cn('text-xs border-yellow-500 text-yellow-500 bg-yellow-500/10', consoleMetaBadgeClass)}>
                       <Award size={10} className="mr-1" />
                       {h.dictItem?.itemLabel || '未知荣誉'}
                     </Badge>
@@ -1166,6 +1174,7 @@ export function WorksManagement({
                             variant="secondary"
                             size="icon"
                             className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                            aria-label={tConsole('carouselPrev')}
                             onClick={() => setViewImageIndex(prev => (prev - 1 + viewingImages.length) % viewingImages.length)}
                           >
                             <ChevronLeft size={16} />
@@ -1175,6 +1184,7 @@ export function WorksManagement({
                             variant="secondary"
                             size="icon"
                             className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                            aria-label={tConsole('carouselNext')}
                             onClick={() => setViewImageIndex(prev => (prev + 1) % viewingImages.length)}
                           >
                             <ChevronRight size={16} />

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Link } from '@/lib/language/navigation';
+import { Link, usePathname } from '@/lib/language/navigation';
+import { hrefWithFrom } from '@/lib/navigation-from';
 import { ChevronLeft, ChevronRight, SearchX, QrCode, Clock, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PosterImage } from '@/components/work/poster-image';
@@ -20,6 +21,7 @@ interface PosterItem {
 export default function PostersPage() {
   const t = useTranslations('Posters');
   const locale = useLocale();
+  const pathname = usePathname();
 
   const [posters, setPosters] = useState<PosterItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -100,7 +102,7 @@ export default function PostersPage() {
             {posters.map((poster) => (
               <Link
                 key={poster.id}
-                href={`/posters/${poster.id}`}
+                href={hrefWithFrom(`/posters/${poster.id}`, pathname)}
                 className="group rounded-2xl overflow-hidden bg-card border border-border hover:border-green-500/40 hover:shadow-lg transition-all duration-300"
               >
                 {/* 最终合成海报（封面 + 昵称 + 简介 + 二维码） */}

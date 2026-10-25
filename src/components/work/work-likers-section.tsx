@@ -22,9 +22,10 @@ type LikeItem = {
 interface WorkLikersSectionProps {
   workId: string;
   enabled: boolean;
+  className?: string;
 }
 
-export function WorkLikersSection({ workId, enabled }: WorkLikersSectionProps) {
+export function WorkLikersSection({ workId, enabled, className }: WorkLikersSectionProps) {
   const t = useTranslations('Work');
   const [items, setItems] = useState<LikeItem[]>([]);
   const [total, setTotal] = useState(0);
@@ -47,7 +48,7 @@ export function WorkLikersSection({ workId, enabled }: WorkLikersSectionProps) {
   if (!enabled) return null;
 
   return (
-    <section className="rounded-2xl border border-border bg-card/50 p-6 mt-8">
+    <section className={cn('rounded-2xl border border-border bg-card/50 p-6 mt-8', className)}>
       <h3 className="text-lg font-semibold text-foreground mb-1">
         {t('likersTitle')}
       </h3>

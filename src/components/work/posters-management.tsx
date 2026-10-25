@@ -12,7 +12,16 @@ import { CRUD_QUERY_PARAMS } from '@/lib/crud'
 import { ConsoleFilterCard } from '@/components/crud/console-filter-card'
 import { ListEmptyState } from '@/components/common/list-empty-state'
 import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
+import {
+  consoleListCardBodyClass,
+  consoleListCardMediaRowClass,
+  consoleListCardMetaRowClass,
+  consoleListCardOuterRowClass,
+  consoleMetaBadgeClass,
+} from '@/components/crud/console-list-card-layout'
+import { cn } from '@/lib/utils'
 import { Link, usePathname } from '@/lib/language/navigation'
+import { hrefWithFrom } from '@/lib/navigation-from'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -36,7 +45,6 @@ import {
 } from '@/components/ui/select'
 import { PosterImage } from '@/components/work/poster-image'
 import { PosterEditDialog } from '@/components/work/poster-edit-dialog'
-import { cn } from '@/lib/utils'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import {
@@ -286,7 +294,7 @@ export function PostersManagement() {
   }
 
   return (
-    <div className="space-y-6 relative min-h-[500px]">
+    <div className="space-y-6 relative min-h-[500px] min-w-0 max-w-full">
       <CrudFeedback feedback={feedback} />
 
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
@@ -408,8 +416,8 @@ export function PostersManagement() {
         )}
 
         {posters.map(poster => (
-          <Card key={poster.id} className="overflow-hidden border border-border bg-card hover:bg-card/80 transition-colors">
-            <div className="flex">
+          <Card key={poster.id} className="overflow-hidden border border-border bg-card hover:bg-card/80 transition-colors max-w-full">
+            <div className={consoleListCardOuterRowClass}>
               <div className="flex items-start border-r border-border/50 p-4">
                 <Checkbox
                   id={`poster-select-${poster.id}`}
@@ -418,7 +426,7 @@ export function PostersManagement() {
                   aria-label={`选择海报 ${poster.nickname}`}
                 />
               </div>
-            <div className="flex flex-1 flex-col sm:flex-row">
+            <div className={consoleListCardMediaRowClass}>
               {/* 封面缩略图 */}
               <div className="w-full sm:w-48 h-40 sm:h-auto bg-muted shrink-0 relative">
                 <img
@@ -437,10 +445,10 @@ export function PostersManagement() {
               </div>
 
               {/* Content */}
-              <div className="flex-1 p-4 flex flex-col justify-between gap-4">
-                <div>
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
+              <div className={consoleListCardBodyClass}>
+                <div className="min-w-0">
+                  <div className="flex items-start justify-between gap-2 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <h3
                         className="font-semibold text-lg line-clamp-1 hover:text-primary cursor-pointer transition-colors"
                         title={poster.nickname}
@@ -448,8 +456,8 @@ export function PostersManagement() {
                       >
                         {poster.nickname}
                       </h3>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                        <div className="flex items-center gap-1" title="提交者">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground mt-1">
+                        <div className="flex items-center gap-1 min-w-0" title="提交者">
                           <User size={14} />
                           <Link
                             href={`/user/${poster.user.id}?from=${encodeURIComponent(pathname)}`}
@@ -472,7 +480,7 @@ export function PostersManagement() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 hover:text-green-400 hover:bg-green-500/10"
-                        onClick={() => router.push(`/${locale}/posters/${poster.id}`)}
+                        onClick={() => router.push(hrefWithFrom(`/${locale}/posters/${poster.id}`, pathname))}
                         title="查看详情页"
                         aria-label="查看详情页"
                       >
@@ -529,9 +537,9 @@ export function PostersManagement() {
                 </div>
 
                 {/* Metadata Tags */}
-                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border/50">
+                <div className={consoleListCardMetaRowClass}>
                   {Array.isArray(poster.tags) && poster.tags.map((tag, idx) => (
-                    <Badge key={`${tag}-${idx}`} variant="secondary" className="text-xs bg-secondary/50">
+                    <Badge key={`${tag}-${idx}`} variant="secondary" className={cn('text-xs bg-secondary/50', consoleMetaBadgeClass)}>
                       #{tag}
                     </Badge>
                   ))}

@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { Upload, Download, Send, Loader2, Image as ImageIcon, Link2, User, FileText, Tag, Printer, ShieldCheck, ArrowRight } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Upload, Download, Send, Loader2, Image as ImageIcon, Link2, User, FileText, Tag, Printer, ShieldCheck, ArrowRight, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from '@/lib/language/navigation';
 import { buildPosterDataUrl } from '@/lib/poster';
@@ -31,6 +31,7 @@ export default function PosterMakerPage() {
   const t = useTranslations('PosterMaker');
   const locale = useLocale();
   const router = useRouter();
+  const pathname = usePathname();
   const { status } = useSession();
 
   // Form state
@@ -41,6 +42,7 @@ export default function PosterMakerPage() {
   const [availableTags, setAvailableTags] = useState<TagOption[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [failedImageFile, setFailedImageFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
@@ -54,9 +56,10 @@ export default function PosterMakerPage() {
   // Auth guard
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push(`/${locale}/sign-in`);
+      const returnPath = pathname || `/${locale}/poster-maker`;
+      router.push(`/${locale}/sign-in?callbackUrl=${encodeURIComponent(returnPath)}`);
     }
-  }, [status, router, locale]);
+  }, [status, router, locale, pathname]);
 
   // 加载可选标签
   useEffect(() => {
@@ -109,6 +112,7 @@ export default function PosterMakerPage() {
 
     setIsUploading(true);
     setErrors(prev => ({ ...prev, image: '' }));
+    setFailedImageFile(null);
 
     try {
       const formData = new FormData();
@@ -118,10 +122,13 @@ export default function PosterMakerPage() {
 
       if (data.success && data.url) {
         setImageUrl(data.url);
+        setFailedImageFile(null);
       } else {
+        setFailedImageFile(file);
         setErrors(prev => ({ ...prev, image: t('uploadFailed') }));
       }
     } catch {
+      setFailedImageFile(file);
       setErrors(prev => ({ ...prev, image: t('uploadFailed') }));
     } finally {
       setIsUploading(false);
@@ -358,7 +365,7 @@ export default function PosterMakerPage() {
               ) : imageUrl ? (
                 <div className="relative">
                   <img src={imageUrl} alt="Preview" className="max-h-40 mx-auto rounded-lg" />
-                  <p className="mt-2 text-xs text-green-400">已上传 ✓</p>
+                  <p className="mt-2 text-xs text-green-400">{t('imageUploaded')}</p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-2 py-4">
@@ -380,6 +387,18 @@ export default function PosterMakerPage() {
               />
             </div>
             {errors.image && <p className="mt-1 text-xs text-red-400">{errors.image}</p>}
+            {failedImageFile && !imageUrl && !isUploading && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => handleImageUpload(failedImageFile)}
+              >
+                <RotateCcw className="w-3.5 h-3.5 mr-1" />
+                {t('uploadRetry')}
+              </Button>
+            )}
           </div>
 
           {/* Demo URL */}

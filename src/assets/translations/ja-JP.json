@@ -28,6 +28,8 @@
     "sortViews": "人気",
     "noResults": "条件に一致するプロジェクトが見つかりません",
     "clearFilters": "フィルターをクリア",
+    "goSubmit": "作品を投稿する",
+    "pageNumber": "{page} ページ",
     "paginationInfo": "{total}件中 {start}-{end}件を表示",
     "prevPage": "前へ",
     "nextPage": "次へ",
@@ -175,6 +177,7 @@
     "nextStep": "次へ",
     "prevStep": "戻る",
     "uploadError": "アップロードに失敗しました",
+    "uploadRetry": "再アップロード",
     "uploading": "アップロード中…"
   },
   "Work": {
@@ -225,6 +228,9 @@
     "copied": "コピー完了",
     "systemShare": "システム共有",
     "clickToPreview": "クリックして拡大表示",
+    "storyReadMore": "続きを読む",
+    "storyReadLess": "閉じる",
+    "onPageNav": "ページ内ナビ",
     "phone": "電話",
     "email": "メール"
   },
@@ -410,6 +416,8 @@
     "uploadHint": "JPG/PNG/WEBP、最大5MB",
     "fileTooLarge": "ファイルサイズが5MBを超えています",
     "uploadFailed": "アップロードに失敗しました。再試行してください",
+    "imageUploaded": "アップロード済み ✓",
+    "uploadRetry": "再アップロード",
     "demoUrlLabel": "デモURL",
     "demoUrlPlaceholder": "https://your-demo-url.com",
     "demoUrlHint": "このURLからQRコードが生成されます",
@@ -490,10 +498,13 @@
     "browse": "ランキングを見る"
   },
   "Console": {
+    "loading": "読み込み中…",
     "filterActive": "フィルター適用中",
     "filterReset": "フィルターをリセット",
     "menuTitle": "コンソールメニュー",
     "mobileTitle": "コンソール",
+    "carouselPrev": "前のスクリーンショット",
+    "carouselNext": "次のスクリーンショット",
     "dateStart": "開始日",
     "dateEnd": "終了日",
     "dateSingle": "日付",

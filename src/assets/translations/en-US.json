@@ -27,6 +27,8 @@
     "sortViews": "Views",
     "noResults": "No projects found matching your criteria",
     "clearFilters": "Clear all filters",
+    "goSubmit": "Nothing here? Submit your work",
+    "pageNumber": "Page {page}",
     "paginationInfo": "Showing {start}-{end} of {total} works",
     "prevPage": "Previous",
     "nextPage": "Next",
@@ -162,6 +164,7 @@
     "nextStep": "Next",
     "prevStep": "Back",
     "uploadError": "Upload failed, please retry",
+    "uploadRetry": "Retry upload",
     "uploading": "Uploading…"
   },
   "Work": {
@@ -210,6 +213,9 @@
     "copied": "Copied",
     "systemShare": "System Share",
     "clickToPreview": "Click to preview",
+    "storyReadMore": "Read more",
+    "storyReadLess": "Show less",
+    "onPageNav": "On this page",
     "phone": "Phone",
     "email": "Email"
   },
@@ -395,6 +401,8 @@
     "uploadHint": "JPG/PNG/WEBP, max 5MB",
     "fileTooLarge": "File size exceeds 5MB limit",
     "uploadFailed": "Upload failed, please retry",
+    "imageUploaded": "Uploaded ✓",
+    "uploadRetry": "Retry upload",
     "demoUrlLabel": "Demo URL",
     "demoUrlPlaceholder": "https://your-demo-url.com",
     "demoUrlHint": "This URL will generate a QR code for scanning",
@@ -475,10 +483,13 @@
     "browse": "View rankings"
   },
   "Console": {
+    "loading": "Loading…",
     "filterActive": "Filtered",
     "filterReset": "Reset filters",
     "menuTitle": "Console menu",
     "mobileTitle": "Console",
+    "carouselPrev": "Previous screenshot",
+    "carouselNext": "Next screenshot",
     "dateStart": "Start date",
     "dateEnd": "End date",
     "dateSingle": "Date",

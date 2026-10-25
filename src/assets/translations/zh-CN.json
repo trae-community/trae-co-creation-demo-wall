@@ -27,6 +27,8 @@
     "sortViews": "热门",
     "noResults": "没有找到符合条件的项目",
     "clearFilters": "清除筛选条件",
+    "goSubmit": "还没有？去投稿",
+    "pageNumber": "第 {page} 页",
     "paginationInfo": "显示 {start}-{end}，共 {total} 个作品",
     "prevPage": "上一页",
     "nextPage": "下一页",
@@ -160,6 +162,7 @@
     "nextStep": "下一步",
     "prevStep": "上一步",
     "uploadError": "上传失败，请重试",
+    "uploadRetry": "重试上传",
     "uploading": "上传中…"
   },
   "Work": {
@@ -208,6 +211,9 @@
     "copied": "已复制",
     "systemShare": "系统分享",
     "clickToPreview": "点击查看大图",
+    "storyReadMore": "展开全文",
+    "storyReadLess": "收起",
+    "onPageNav": "本页导航",
     "phone": "电话",
     "email": "邮箱"
   },
@@ -393,6 +399,8 @@
     "uploadHint": "支持 JPG/PNG/WEBP，最大 5MB",
     "fileTooLarge": "文件大小超过 5MB 限制",
     "uploadFailed": "上传失败，请重试",
+    "imageUploaded": "已上传 ✓",
+    "uploadRetry": "重试上传",
     "demoUrlLabel": "作品 Demo 链接",
     "demoUrlPlaceholder": "https://your-demo-url.com",
     "demoUrlHint": "此链接将生成二维码，扫码可直接体验你的作品",
@@ -439,6 +447,7 @@
     "subtitle": "欣赏创作者们的精彩海报，扫码体验他们的作品",
     "loadError": "海报加载失败",
     "noPosters": "暂无海报",
+    "resultCountUnit": "张海报",
     "scanToExperience": "扫码体验",
     "sortNewest": "最新",
     "sortOldest": "最早",
@@ -472,10 +481,13 @@
     "browse": "去看看排行榜"
   },
   "Console": {
+    "loading": "加载中…",
     "filterActive": "已筛选",
     "filterReset": "重置筛选",
     "menuTitle": "控制台菜单",
     "mobileTitle": "控制台",
+    "carouselPrev": "上一张截图",
+    "carouselNext": "下一张截图",
     "dateStart": "开始日期",
     "dateEnd": "结束日期",
     "dateSingle": "日期",
