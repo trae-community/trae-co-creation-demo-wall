@@ -26,8 +26,11 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { LoadingOverlay } from '@/components/common/loading-overlay'
 import { Link } from '@/lib/language/navigation'
+import { ConsoleFilterCard } from '@/components/crud/console-filter-card'
+import { ListEmptyState } from '@/components/common/list-empty-state'
+import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
+import { useTranslations } from 'next-intl'
 import {
   Select,
   SelectContent,
@@ -71,6 +74,7 @@ const userSchema = z.object({
 type UserFormValues = z.infer<typeof userSchema>
 
 export default function UsersPage() {
+  const tConsole = useTranslations('Console')
   const [isLoading, setIsLoading] = useState(false)
   const [users, setUsers] = useState<UserItem[]>([])
   const [totalItems, setTotalItems] = useState(0)
@@ -300,6 +304,21 @@ export default function UsersPage() {
   const startIndex = (current - 1) * pageSize
   const endIndex = Math.min(startIndex + pageSize, totalItems)
 
+  const hasActiveFilters =
+    Boolean(searchTerm) ||
+    filterRoleCode !== 'all' ||
+    filterBanned !== 'all' ||
+    Boolean(registerStart) ||
+    Boolean(registerEnd)
+
+  const resetFilters = () => {
+    setSearchTerm('')
+    setFilterRoleCode('all')
+    setFilterBanned('all')
+    setRegisterStart('')
+    setRegisterEnd('')
+  }
+
   return (
     <div className="space-y-6">
       <CrudFeedback feedback={feedback} />
@@ -315,8 +334,12 @@ export default function UsersPage() {
         </Button>
       </div>
 
-      <div className="p-4 rounded-xl border border-border bg-card space-y-3">
-        {/* Search */}
+      <ConsoleFilterCard
+        hasActiveFilters={hasActiveFilters}
+        onReset={resetFilters}
+        activeLabel={tConsole('filterActive')}
+        resetLabel={tConsole('filterReset')}
+      >
         <div className="flex flex-col sm:flex-row gap-3 items-center">
           <div className="relative flex-1 max-w-md w-full">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -356,31 +379,18 @@ export default function UsersPage() {
                 <SelectItem value="yes">已封禁</SelectItem>
               </SelectContent>
             </Select>
-            <DatePicker value={registerStart} onChange={setRegisterStart} placeholder="注册起" className="shrink-0" />
+            <DatePicker value={registerStart} onChange={setRegisterStart} placeholder={tConsole('registerStart')} className="shrink-0" />
             <span className="text-muted-foreground text-sm">~</span>
-            <DatePicker value={registerEnd} onChange={setRegisterEnd} placeholder="注册止" className="shrink-0" />
+            <DatePicker value={registerEnd} onChange={setRegisterEnd} placeholder={tConsole('registerEnd')} className="shrink-0" />
           </div>
-
-          {(searchTerm || filterRoleCode !== 'all' || filterBanned !== 'all' || registerStart || registerEnd) && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setSearchTerm('')
-                setFilterRoleCode('all')
-                setFilterBanned('all')
-                setRegisterStart('')
-                setRegisterEnd('')
-              }}
-              className="shrink-0"
-            >
-              重置筛选
-            </Button>
-          )}
         </div>
-      </div>
+      </ConsoleFilterCard>
 
       <div className="space-y-4">
+        {isLoading && users.length === 0 ? (
+          <ListRowSkeleton rows={6} />
+        ) : (
+          <>
         {users.map(user => (
           <Card key={user.id} className="overflow-hidden border-border bg-card/50">
             <div className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -440,11 +450,11 @@ export default function UsersPage() {
 
               <div className="flex items-center gap-2 self-end sm:self-center">
                 <Link href={`/console/auth-logs?userId=${user.id}`}>
-                  <Button variant="ghost" size="sm" title="认证日志">
+                  <Button variant="ghost" size="sm" title="认证日志" aria-label="认证日志">
                     <ScrollText size={16} />
                   </Button>
                 </Link>
-                <Button variant="ghost" size="sm" onClick={() => handleOpenRoleDialog(user)} title="分配角色">
+                <Button variant="ghost" size="sm" onClick={() => handleOpenRoleDialog(user)} title="分配角色" aria-label="分配角色">
                   <Shield size={16} />
                 </Button>
                 {user.banned ? (
@@ -453,6 +463,7 @@ export default function UsersPage() {
                     size="sm"
                     onClick={() => handleToggleBan(user)}
                     title="解封用户"
+                    aria-label="解封用户"
                     className="hover:text-green-500 hover:bg-green-500/10"
                   >
                     <CircleCheck size={16} />
@@ -463,6 +474,7 @@ export default function UsersPage() {
                     size="sm"
                     onClick={() => handleToggleBan(user)}
                     title="封禁用户"
+                    aria-label="封禁用户"
                     className="hover:text-red-500 hover:bg-red-500/10"
                   >
                     <Ban size={16} />
@@ -474,9 +486,9 @@ export default function UsersPage() {
         ))}
         
         {users.length === 0 && (
-          <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
-            暂无用户，点击右上角添加
-          </div>
+          <ListEmptyState title={tConsole('empty.noUsers')} description="点击右上角「新建用户」添加" />
+        )}
+          </>
         )}
       </div>
 
