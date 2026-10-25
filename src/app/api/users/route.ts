@@ -5,6 +5,8 @@ import { CRUD_QUERY_PARAMS } from '@/lib/crud';
 import { getAuthUser, isAdmin } from '@/lib/auth';
 import { writeOperationLog } from '@/lib/audit-log';
 import { getBannedUserIds } from '@/lib/ban';
+import { createdAtDayRange } from '@/lib/created-at-day-range';
+import { getLastSignInsByUserIds } from '@/lib/auth-log-queries';
 
 // Helper to sanitize user object (remove sensitive data)
 const sanitizeUser = (user: any) => {
@@ -32,7 +34,13 @@ export async function GET(req: NextRequest) {
     const pageSize = Number(searchParams.get(CRUD_QUERY_PARAMS.pageSize) || '10');
     const query = searchParams.get(CRUD_QUERY_PARAMS.query) || '';
     const roleCode = searchParams.get('roleCode') || ''; // 按角色编码筛选
-    
+    const bannedFilter = searchParams.get('banned') || 'all'; // all | yes | no
+    const registerDate = searchParams.get('date') || '';
+    const registerStart = searchParams.get('registerStart') || '';
+    const registerEnd = searchParams.get('registerEnd') || '';
+
+    const bannedIds = await getBannedUserIds();
+
     // 构建过滤条件
     const whereFilters: Prisma.SysUserWhereInput[] = [];
     if (query.trim()) {
@@ -56,6 +64,44 @@ export async function GET(req: NextRequest) {
           }
         }
       });
+    }
+
+    if (bannedFilter === 'yes') {
+      const ids = [...bannedIds].map(id => BigInt(id));
+      if (ids.length === 0) {
+        return NextResponse.json({
+          items: [],
+          total: 0,
+          page: Math.max(page, 1),
+          pageSize: Math.max(pageSize, 1),
+        });
+      }
+      whereFilters.push({ id: { in: ids } });
+    } else if (bannedFilter === 'no') {
+      const ids = [...bannedIds].map(id => BigInt(id));
+      if (ids.length > 0) {
+        whereFilters.push({ id: { notIn: ids } });
+      }
+    }
+
+    const singleDay = registerDate ? createdAtDayRange(registerDate) : null;
+    if (singleDay) {
+      whereFilters.push({
+        createdAt: { gte: singleDay.start, lte: singleDay.end },
+      });
+    } else if (registerStart || registerEnd) {
+      const createdAt: Prisma.DateTimeFilter = {};
+      if (registerStart) {
+        const start = createdAtDayRange(registerStart);
+        if (start) createdAt.gte = start.start;
+      }
+      if (registerEnd) {
+        const end = createdAtDayRange(registerEnd);
+        if (end) createdAt.lte = end.end;
+      }
+      if (Object.keys(createdAt).length > 0) {
+        whereFilters.push({ createdAt });
+      }
     }
 
     const whereClause = whereFilters.length ? { AND: whereFilters } : undefined;
@@ -89,11 +135,18 @@ export async function GET(req: NextRequest) {
       })
     ]);
 
-    // 附带封禁状态（黑名单存于字典表）
-    const bannedIds = await getBannedUserIds();
+    const lastSignIns = await getLastSignInsByUserIds(users.map(u => u.id));
 
     return NextResponse.json({
-      items: users.map(u => ({ ...sanitizeUser(u), banned: bannedIds.has(u.id.toString()) })),
+      items: users.map(u => {
+        const last = lastSignIns.get(u.id.toString());
+        return {
+          ...sanitizeUser(u),
+          banned: bannedIds.has(u.id.toString()),
+          lastSignInIp: last?.ip ?? null,
+          lastSignInAt: last?.at?.toISOString() ?? null,
+        };
+      }),
       total,
       page: Math.max(page, 1),
       pageSize: Math.max(pageSize, 1)

@@ -1,7 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Plus, User, Mail, Phone, Calendar, Shield, Filter, Ban, CircleCheck } from 'lucide-react'
+import { Plus, User, Mail, Phone, Calendar, Shield, Filter, Ban, CircleCheck, ScrollText, Globe } from 'lucide-react'
+import { DatePicker } from '@/components/ui/date-picker'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -54,6 +55,8 @@ interface UserItem {
   updatedAt: string
   roles: { role: Role }[]
   banned: boolean
+  lastSignInIp?: string | null
+  lastSignInAt?: string | null
 }
 
 // Schema
@@ -88,6 +91,9 @@ export default function UsersPage() {
 
   // Filter states
   const [filterRoleCode, setFilterRoleCode] = useState('all')
+  const [filterBanned, setFilterBanned] = useState<'all' | 'yes' | 'no'>('all')
+  const [registerStart, setRegisterStart] = useState('')
+  const [registerEnd, setRegisterEnd] = useState('')
 
   // Ban Dialog states
   const [banTargetUser, setBanTargetUser] = useState<UserItem | null>(null)
@@ -121,6 +127,11 @@ export default function UsersPage() {
       if (filterRoleCode && filterRoleCode !== 'all') {
         params.set('roleCode', filterRoleCode)
       }
+      if (filterBanned !== 'all') {
+        params.set('banned', filterBanned)
+      }
+      if (registerStart) params.set('registerStart', registerStart)
+      if (registerEnd) params.set('registerEnd', registerEnd)
 
       const res = await fetch(`/api/users?${params.toString()}`)
       if (res.ok) {
@@ -136,7 +147,7 @@ export default function UsersPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [currentPage, pageSize, searchTerm, filterRoleCode, showFeedback])
+  }, [currentPage, pageSize, searchTerm, filterRoleCode, filterBanned, registerStart, registerEnd, showFeedback])
 
   // Fetch Roles
   const fetchRoles = useCallback(async () => {
@@ -160,7 +171,7 @@ export default function UsersPage() {
   // Reset page when search or filter changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm, filterRoleCode])
+  }, [searchTerm, filterRoleCode, filterBanned, registerStart, registerEnd])
 
   // Handlers
   const handleCreate = () => {
@@ -320,11 +331,10 @@ export default function UsersPage() {
             />
           </div>
           
-          {/* Role Filter Dropdown */}
-          <div className="flex items-center gap-2">
-            <Filter size={16} className="text-muted-foreground" />
+          <div className="flex flex-wrap items-center gap-2">
+            <Filter size={16} className="text-muted-foreground shrink-0" />
             <Select value={filterRoleCode} onValueChange={(value) => setFilterRoleCode(value)}>
-              <SelectTrigger className="w-[200px] bg-secondary border-border">
+              <SelectTrigger className="w-[140px] bg-secondary border-border">
                 <SelectValue placeholder="全部角色" />
               </SelectTrigger>
               <SelectContent>
@@ -336,15 +346,31 @@ export default function UsersPage() {
                 ))}
               </SelectContent>
             </Select>
+            <Select value={filterBanned} onValueChange={(v) => setFilterBanned(v as 'all' | 'yes' | 'no')}>
+              <SelectTrigger className="w-[120px] bg-secondary border-border">
+                <SelectValue placeholder="封禁状态" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部状态</SelectItem>
+                <SelectItem value="no">正常</SelectItem>
+                <SelectItem value="yes">已封禁</SelectItem>
+              </SelectContent>
+            </Select>
+            <DatePicker value={registerStart} onChange={setRegisterStart} placeholder="注册起" className="shrink-0" />
+            <span className="text-muted-foreground text-sm">~</span>
+            <DatePicker value={registerEnd} onChange={setRegisterEnd} placeholder="注册止" className="shrink-0" />
           </div>
-          
-          {(searchTerm || filterRoleCode !== 'all') && (
+
+          {(searchTerm || filterRoleCode !== 'all' || filterBanned !== 'all' || registerStart || registerEnd) && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => {
                 setSearchTerm('')
                 setFilterRoleCode('all')
+                setFilterBanned('all')
+                setRegisterStart('')
+                setRegisterEnd('')
               }}
               className="shrink-0"
             >
@@ -393,7 +419,14 @@ export default function UsersPage() {
                     )}
                     <div className="flex items-center gap-2">
                       <Calendar size={14} />
-                      <span>{new Date(user.createdAt).toLocaleString('zh-CN')}</span>
+                      <span>注册: {new Date(user.createdAt).toLocaleString('zh-CN')}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Globe size={14} />
+                      <span className="truncate max-w-[220px]" title={user.lastSignInIp || undefined}>
+                        最近登录: {user.lastSignInIp || '-'}
+                        {user.lastSignInAt ? ` · ${new Date(user.lastSignInAt).toLocaleString('zh-CN')}` : ''}
+                      </span>
                     </div>
                   </div>
                   
@@ -406,6 +439,11 @@ export default function UsersPage() {
               </div>
 
               <div className="flex items-center gap-2 self-end sm:self-center">
+                <Link href={`/console/auth-logs?userId=${user.id}`}>
+                  <Button variant="ghost" size="sm" title="认证日志">
+                    <ScrollText size={16} />
+                  </Button>
+                </Link>
                 <Button variant="ghost" size="sm" onClick={() => handleOpenRoleDialog(user)} title="分配角色">
                   <Shield size={16} />
                 </Button>
