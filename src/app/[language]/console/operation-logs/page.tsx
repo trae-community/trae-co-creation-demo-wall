@@ -2,11 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Logs } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
+import { Link, usePathname } from '@/lib/language/navigation'
 
 import { CrudFeedback } from '@/components/crud/crud-feedback'
 import { CrudFilterBar } from '@/components/crud/crud-filter-bar'
 import { CrudPagination } from '@/components/crud/crud-pagination'
-import { LoadingOverlay } from '@/components/common/loading-overlay'
+import { ListEmptyState } from '@/components/common/list-empty-state'
+import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -49,6 +52,9 @@ interface OperationLogItem {
 type OperationFilter = 'all' | 'success' | 'failed'
 
 export default function OperationLogsPage() {
+  const locale = useLocale()
+  const pathname = usePathname()
+  const tConsole = useTranslations('Console')
   const [isLoading, setIsLoading] = useState(false)
   const [items, setItems] = useState<OperationLogItem[]>([])
   const [totalItems, setTotalItems] = useState(0)
@@ -107,13 +113,27 @@ export default function OperationLogsPage() {
   const endIndex = Math.min(startIndex + pageSize, totalItems)
   const pagedItems = useMemo(() => items, [items])
   const sortedModules = useMemo(
-    () => sortOperationModules(availableModules),
-    [availableModules]
+    () => sortOperationModules(availableModules, locale),
+    [availableModules, locale]
   )
+
+  const hasActiveFilters =
+    Boolean(searchTerm) ||
+    filterMode !== 'all' ||
+    moduleFilter !== 'all' ||
+    Boolean(startDate) ||
+    Boolean(endDate)
+
+  const resetFilters = () => {
+    setSearchTerm('')
+    setFilterMode('all')
+    setModuleFilter('all')
+    setStartDate('')
+    setEndDate('')
+  }
 
   return (
     <div className="space-y-6 relative min-h-[500px]">
-      <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
 
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
@@ -135,6 +155,10 @@ export default function OperationLogsPage() {
         ]}
         onFilterChange={(value) => setFilterMode(value as OperationFilter)}
         filterPlaceholder="筛选结果"
+        hasActiveFilters={hasActiveFilters}
+        onReset={resetFilters}
+        resetLabel={tConsole('filterReset')}
+        activeFilterLabel={tConsole('filterActive')}
         extraFilters={
           <>
             <Select value={moduleFilter} onValueChange={setModuleFilter}>
@@ -145,7 +169,7 @@ export default function OperationLogsPage() {
                 <SelectItem value="all">全部模块</SelectItem>
                 {sortedModules.map((m) => (
                   <SelectItem key={m} value={m}>
-                    {getOperationModuleLabel(m)}
+                    {getOperationModuleLabel(m, locale)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -154,34 +178,26 @@ export default function OperationLogsPage() {
               <DatePicker
                 value={startDate}
                 onChange={setStartDate}
-                placeholder="开始日期"
+                placeholder={tConsole('dateStart')}
                 variant="outline"
               />
               <span className="text-muted-foreground">~</span>
               <DatePicker
                 value={endDate}
                 onChange={setEndDate}
-                placeholder="结束日期"
+                placeholder={tConsole('dateEnd')}
                 variant="outline"
               />
             </div>
-            {(moduleFilter !== 'all' || startDate || endDate) && (
-              <button
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => {
-                  setModuleFilter('all')
-                  setStartDate('')
-                  setEndDate('')
-                }}
-              >
-                重置
-              </button>
-            )}
           </>
         }
       />
 
       <div className="space-y-4">
+        {isLoading && pagedItems.length === 0 ? (
+          <ListRowSkeleton rows={6} />
+        ) : (
+          <>
         {pagedItems.map((item) => (
           <Card key={item.id} className="overflow-hidden border-border bg-card/50">
             <div className="p-4 flex items-start justify-between gap-4">
@@ -192,7 +208,8 @@ export default function OperationLogsPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-semibold">
-                      {getOperationModuleLabel(item.module)} · {getOperationActionLabel(item.action)}
+                      {getOperationModuleLabel(item.module, locale)} ·{' '}
+                      {getOperationActionLabel(item.action, locale)}
                     </span>
                     <Badge variant={item.success ? 'default' : 'destructive'}>
                       {item.success ? '成功' : '失败'}
@@ -200,7 +217,18 @@ export default function OperationLogsPage() {
                     {item.requestMethod && <Badge variant="outline">{item.requestMethod}</Badge>}
                   </div>
                   <div className="text-sm text-muted-foreground mt-1 break-all">
-                    操作人: {item.operator?.username || '未知'} ({item.operator?.email || '-'})
+                    操作人:{' '}
+                    {item.operatorId ? (
+                      <Link
+                        href={`/user/${item.operatorId}?from=${encodeURIComponent(pathname)}`}
+                        className="text-primary hover:underline"
+                      >
+                        {item.operator?.username || item.operatorId}
+                      </Link>
+                    ) : (
+                      item.operator?.username || '未知'
+                    )}{' '}
+                    ({item.operator?.email || '-'})
                   </div>
                   <div className="text-xs text-muted-foreground mt-1 break-all">
                     目标: {item.targetType || '-'} / {item.targetId || '-'}
@@ -221,10 +249,10 @@ export default function OperationLogsPage() {
             </div>
           </Card>
         ))}
-        {pagedItems.length === 0 && (
-          <div className="col-span-full text-center py-10 text-muted-foreground text-sm border-2 border-dashed border-border/50 rounded-lg">
-            暂无操作日志
-          </div>
+        {!isLoading && pagedItems.length === 0 && (
+          <ListEmptyState title={tConsole('empty.noOperationLogs')} />
+        )}
+          </>
         )}
       </div>
 

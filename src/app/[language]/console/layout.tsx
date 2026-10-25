@@ -3,17 +3,13 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Link, usePathname, useRouter } from '@/lib/language/navigation'
 import { useSession } from 'next-auth/react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import {
   LayoutDashboard,
   FolderKanban,
   BookOpen,
-  Building2,
-  Tags,
   Users,
-  Shield,
   Logs,
-  ShieldCheck,
   Menu,
   X,
   ChevronDown
@@ -21,11 +17,16 @@ import {
 import { cn } from '@/lib/utils'
 
 type NavItem = {
-  name: string
+  key: string
+  nameKey: string
   href?: string
-  icon?: any
+  icon?: React.ComponentType<{ size?: number | string; className?: string }>
   children?: NavItem[]
+  /** Admin 角色可访问的叶子节点 key */
+  adminLeaf?: boolean
 }
+
+const ADMIN_LEAF_KEYS = new Set(['users', 'works', 'posters', 'tags', 'cities'])
 
 export default function ConsoleLayout({
   children,
@@ -35,10 +36,11 @@ export default function ConsoleLayout({
   const pathname = usePathname()
   const router = useRouter()
   const locale = useLocale()
+  const tNav = useTranslations('Console.nav')
+  const tConsole = useTranslations('Console')
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [expandedGroups, setExpandedGroups] = useState<string[]>([])
 
-  // Fetch user roles from API
   const { data: session, status } = useSession()
   const [roles, setRoles] = useState<string[]>([])
   const [rolesLoaded, setRolesLoaded] = useState(false)
@@ -69,78 +71,84 @@ export default function ConsoleLayout({
 
   const navItems = useMemo(() => {
     const allNavItems: NavItem[] = [
-      { name: '概览', href: '/console', icon: LayoutDashboard },
-      { 
-        name: '用户与权限', 
+      { key: 'overview', nameKey: 'overview', href: '/console', icon: LayoutDashboard },
+      {
+        key: 'users-permissions',
+        nameKey: 'usersPermissions',
         icon: Users,
         children: [
-          { name: '用户管理', href: '/console/users' },
-          { name: '角色管理', href: '/console/roles' },
-        ]
+          { key: 'users', nameKey: 'users', href: '/console/users', adminLeaf: true },
+          { key: 'roles', nameKey: 'roles', href: '/console/roles' },
+        ],
       },
-      { 
-        name: '内容管理',
+      {
+        key: 'content',
+        nameKey: 'contentManagement',
         icon: FolderKanban,
         children: [
-          { name: '作品管理', href: '/console/works' },
-          { name: '海报管理', href: '/console/posters' },
-          { name: '盲盒管理', href: '/console/code-blind-box' },
-          { name: '城市数据', href: '/console/cities' },
-        ]
+          { key: 'works', nameKey: 'works', href: '/console/works', adminLeaf: true },
+          { key: 'posters', nameKey: 'posters', href: '/console/posters', adminLeaf: true },
+          { key: 'code-blind-box', nameKey: 'codeBlindBox', href: '/console/code-blind-box' },
+          { key: 'cities', nameKey: 'cities', href: '/console/cities', adminLeaf: true },
+        ],
       },
-      { 
-        name: '系统配置',
+      {
+        key: 'system',
+        nameKey: 'systemConfig',
         icon: BookOpen,
         children: [
-          { name: '字典管理', href: '/console/dictionaries' },
-          { name: '标签管理', href: '/console/tags' },
-        ]
+          { key: 'dictionaries', nameKey: 'dictionaries', href: '/console/dictionaries' },
+          { key: 'tags', nameKey: 'tags', href: '/console/tags', adminLeaf: true },
+        ],
       },
-      { 
-        name: '日志审计',
+      {
+        key: 'audit',
+        nameKey: 'logAudit',
         icon: Logs,
         children: [
-          { name: '登录注册日志', href: '/console/auth-logs' },
-          { name: '操作日志', href: '/console/operation-logs' },
-        ]
+          { key: 'auth-logs', nameKey: 'authLogs', href: '/console/auth-logs' },
+          { key: 'operation-logs', nameKey: 'operationLogs', href: '/console/operation-logs' },
+        ],
       },
     ]
 
-    const isRoot = roles.includes('root')
-    const isAdmin = roles.includes('admin')
-    const allowedItems = ['用户管理', '作品管理', '海报管理', '标签管理', '城市数据']
-
     const filterNavItems = (items: NavItem[]): NavItem[] => {
-      if (isRoot) return items;
-      if (!isAdmin) return []; // Only Root and Admin have access
+      if (isRoot) return items
+      if (!isAdmin) return []
 
       return items.reduce<NavItem[]>((acc, item) => {
-        // Check if item itself is allowed (leaf node check by name)
-        // Note: Parent nodes like '用户与权限' are not in allowedItems, but we keep them if they have valid children
-        const isItemAllowed = item.name && allowedItems.includes(item.name);
-        
         if (item.children) {
-          const filteredChildren = filterNavItems(item.children);
+          const filteredChildren = filterNavItems(item.children)
           if (filteredChildren.length > 0) {
-            acc.push({ ...item, children: filteredChildren });
+            acc.push({ ...item, children: filteredChildren })
           }
-        } else if (isItemAllowed) {
-          acc.push(item);
+        } else if (item.href) {
+          if (isRoot) {
+            acc.push(item)
+          } else if (item.adminLeaf && ADMIN_LEAF_KEYS.has(item.key)) {
+            acc.push(item)
+          }
         }
-        return acc;
-      }, []);
+        return acc
+      }, [])
     }
 
-    return filterNavItems(allNavItems);
-  }, [roles])
+    return filterNavItems(allNavItems)
+  }, [roles, isRoot, isAdmin])
 
-  // Initialize expanded groups based on active route
   useEffect(() => {
     if (navItems.length > 0) {
       const groupsToExpand: string[] = []
       navItems.forEach(item => {
-        if (item.children && item.children.some(child => child.href === pathname || (child.href && pathname.startsWith(child.href + '/')))) {
-          groupsToExpand.push(item.name)
+        if (
+          item.children &&
+          item.children.some(
+            child =>
+              child.href === pathname ||
+              (child.href && pathname.startsWith(child.href + '/'))
+          )
+        ) {
+          groupsToExpand.push(item.key)
         }
       })
       if (groupsToExpand.length > 0) {
@@ -149,45 +157,39 @@ export default function ConsoleLayout({
     }
   }, [pathname, navItems])
 
-  const toggleGroup = (name: string) => {
-    setExpandedGroups(prev => 
-      prev.includes(name) 
-        ? prev.filter(g => g !== name) 
-        : [...prev, name]
+  const toggleGroup = (key: string) => {
+    setExpandedGroups(prev =>
+      prev.includes(key) ? prev.filter(g => g !== key) : [...prev, key]
     )
   }
 
-  // Helper to flatten items for route checking
   const allowedHrefs = useMemo(() => {
     const getAllAllowedHrefs = (items: NavItem[]): string[] => {
-      const hrefs: string[] = [];
+      const hrefs: string[] = []
       items.forEach(item => {
-        if (item.href) hrefs.push(item.href);
-        if (item.children) hrefs.push(...getAllAllowedHrefs(item.children));
-      });
-      return hrefs;
+        if (item.href) hrefs.push(item.href)
+        if (item.children) hrefs.push(...getAllAllowedHrefs(item.children))
+      })
+      return hrefs
     }
-    return getAllAllowedHrefs(navItems);
+    return getAllAllowedHrefs(navItems)
   }, [navItems])
 
-  // Route protection — wait for roles to be resolved before enforcing
   useEffect(() => {
     if (!rolesResolved) return
 
-    // 未登录时重定向到登录页
     if (!isAuthenticated) {
       router.push(`/${locale}/sign-in`)
       return
     }
 
-    // 已登录但无权限时重定向到首页
     if (!hasAccess) {
       router.push(`/${locale}`)
       return
     }
 
-    const isAllowed = allowedHrefs.some(href =>
-      pathname === href || pathname.startsWith(`${href}/`)
+    const isAllowed = allowedHrefs.some(
+      href => pathname === href || pathname.startsWith(`${href}/`)
     )
 
     if (!isAllowed) {
@@ -200,26 +202,40 @@ export default function ConsoleLayout({
   }, [pathname, hasAccess, allowedHrefs, router, rolesResolved, isAuthenticated, locale])
 
   const renderNavItem = (item: NavItem, depth = 0) => {
+    const label = tNav(item.nameKey as Parameters<typeof tNav>[0])
+
     if (item.children) {
-      const isExpanded = expandedGroups.includes(item.name)
+      const isExpanded = expandedGroups.includes(item.key)
       const isActiveGroup = item.children.some(child => child.href === pathname)
-      
+
       return (
-        <div key={item.name} className="space-y-1">
+        <div key={item.key} className="space-y-1">
           <button
-            onClick={() => toggleGroup(item.name)}
+            type="button"
+            onClick={() => toggleGroup(item.key)}
             className={cn(
-              "w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 group hover:bg-muted hover:text-foreground text-muted-foreground",
-              isActiveGroup ? "text-foreground" : ""
+              'w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 group hover:bg-muted hover:text-foreground text-muted-foreground',
+              isActiveGroup ? 'text-foreground' : ''
             )}
           >
             <div className="flex items-center gap-3">
-              {item.icon && <item.icon size={20} className={cn("transition-colors", isActiveGroup ? "text-primary" : "group-hover:text-foreground")} />}
-              <span className="font-medium">{item.name}</span>
+              {item.icon && (
+                <item.icon
+                  size={20}
+                  className={cn(
+                    'transition-colors',
+                    isActiveGroup ? 'text-primary' : 'group-hover:text-foreground'
+                  )}
+                />
+              )}
+              <span className="font-medium">{label}</span>
             </div>
-            <ChevronDown size={16} className={cn("transition-transform duration-200", isExpanded ? "rotate-180" : "")} />
+            <ChevronDown
+              size={16}
+              className={cn('transition-transform duration-200', isExpanded ? 'rotate-180' : '')}
+            />
           </button>
-          
+
           {isExpanded && (
             <div className="space-y-1 animate-in slide-in-from-top-2 fade-in duration-200">
               {item.children.map(child => renderNavItem(child, depth + 1))}
@@ -237,54 +253,65 @@ export default function ConsoleLayout({
         prefetch={false}
         onClick={() => setIsSidebarOpen(false)}
         className={cn(
-          "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative overflow-hidden",
-          isActive 
-            ? "bg-primary/10 text-primary border border-primary/20" 
-            : "text-muted-foreground hover:bg-muted hover:text-foreground border border-transparent",
-          depth > 0 ? "pl-11" : "" // Indent children
+          'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative overflow-hidden',
+          isActive
+            ? 'bg-primary/10 text-primary border border-primary/20'
+            : 'text-muted-foreground hover:bg-muted hover:text-foreground border border-transparent',
+          depth > 0 ? 'pl-11' : ''
         )}
       >
         {isActive && (
           <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" />
         )}
-        {/* Only show icon if depth is 0 (top level items like Overview), otherwise hide icon for children to keep it clean, or optional */}
-        {depth === 0 && item.icon && <item.icon size={20} className={cn("transition-colors", isActive ? "text-primary" : "group-hover:text-foreground")} />}
-        <span className="font-medium">{item.name}</span>
+        {depth === 0 && item.icon && (
+          <item.icon
+            size={20}
+            className={cn(
+              'transition-colors',
+              isActive ? 'text-primary' : 'group-hover:text-foreground'
+            )}
+          />
+        )}
+        <span className="font-medium">{label}</span>
       </Link>
     )
   }
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 relative">
-      {/* Mobile Sidebar Toggle */}
       <div className="lg:hidden mb-4 flex items-center justify-between">
-        <button 
+        <button
+          type="button"
           onClick={() => setIsSidebarOpen(true)}
           className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors border border-border bg-card"
         >
           <Menu size={20} />
-          <span className="sr-only">打开菜单</span>
+          <span className="sr-only">{tConsole('menuTitle')}</span>
         </button>
-        <div className="text-lg font-semibold">控制台</div>
+        <div className="text-lg font-semibold">{tConsole('mobileTitle')}</div>
       </div>
 
-      {/* Sidebar */}
-      <aside 
+      <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-[60] w-64 bg-card border-r border-border transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto lg:w-64 lg:shrink-0 lg:bg-transparent lg:border-r-0 lg:block",
-          !isSidebarOpen ? "-translate-x-full lg:translate-x-0" : "translate-x-0"
+          'fixed inset-y-0 left-0 z-[60] w-64 bg-card border-r border-border transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto lg:w-64 lg:shrink-0 lg:bg-transparent lg:border-r-0 lg:block',
+          !isSidebarOpen ? '-translate-x-full lg:translate-x-0' : 'translate-x-0'
         )}
       >
         <div className="h-full flex flex-col lg:h-auto lg:sticky lg:top-24 lg:rounded-xl lg:border lg:border-border lg:bg-card lg:overflow-hidden lg:shadow-sm">
           <div className="h-16 flex items-center justify-between px-6 border-b border-border bg-card/50 backdrop-blur-xl lg:hidden">
-            <span className="font-bold text-xl">控制台菜单</span>
-            <button onClick={() => setIsSidebarOpen(false)} className="text-muted-foreground hover:text-foreground">
+            <span className="font-bold text-xl">{tConsole('menuTitle')}</span>
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen(false)}
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="Close menu"
+            >
               <X size={20} />
             </button>
           </div>
 
           <div className="hidden lg:flex h-16 items-center px-6 border-b border-border bg-card/50">
-             <span className="font-bold text-lg">控制台菜单</span>
+            <span className="font-bold text-lg">{tConsole('menuTitle')}</span>
           </div>
 
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto lg:overflow-visible">
@@ -293,18 +320,17 @@ export default function ConsoleLayout({
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 min-w-0">
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           {children}
         </div>
       </main>
 
-      {/* Mobile Overlay */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
+          role="presentation"
         />
       )}
     </div>
