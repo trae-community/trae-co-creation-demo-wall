@@ -246,7 +246,10 @@ export function SubmissionForm() {
     setIsNavigating(false)
     if (valid) {
       setShowStepError(false)
-      setCurrentStep(s => Math.min(s + 1, 4) as StepNumber)
+      // Defer step change so the "Next" click cannot land on the new submit button
+      queueMicrotask(() => {
+        setCurrentStep(s => Math.min(s + 1, 4) as StepNumber)
+      })
     }
   }
 
@@ -267,7 +270,7 @@ export function SubmissionForm() {
     setIsNavigating(false)
     if (valid) {
       setShowStepError(false)
-      setCurrentStep(n)
+      queueMicrotask(() => setCurrentStep(n))
     }
   }
 
@@ -338,8 +341,6 @@ export function SubmissionForm() {
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          if (currentStep !== 4) return
-          handleSubmit(onSubmit)()
         }}
         className="bg-card p-8 md:p-10 rounded-2xl shadow-lg border border-border"
       >
@@ -427,11 +428,12 @@ export function SubmissionForm() {
               </Button>
             ) : (
               <Button
-                type="submit"
+                type="button"
                 variant="primary"
                 size="lg"
                 isLoading={isSubmitting}
                 disabled={isSubmitting}
+                onClick={() => void handleSubmit(onSubmit)()}
               >
                 {t('submitButton')}
               </Button>
