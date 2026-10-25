@@ -6,6 +6,19 @@ import { compare } from 'bcryptjs'
 import { prisma } from './prisma'
 import { writeAuthLog } from './audit-log'
 import { isUserBanned } from './ban'
+import { getAuthSessionOptions, getPasswordSessionStamp } from './auth-session'
+
+async function loadPasswordStamp(userId: string): Promise<number> {
+  try {
+    const row = await prisma.sysUser.findUnique({
+      where: { id: BigInt(userId) },
+      select: { passwordChangedAt: true },
+    })
+    return getPasswordSessionStamp(row?.passwordChangedAt)
+  } catch {
+    return 0
+  }
+}
 
 const authConfig = {
   providers: [
@@ -36,7 +49,6 @@ const authConfig = {
           return null
         }
 
-        // 封禁用户拒绝登录，并记录失败认证日志
         if (await isUserBanned(user.id)) {
           await writeAuthLog({
             userId: user.id,
@@ -61,25 +73,35 @@ const authConfig = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
+      if (user?.id) {
         token.id = user.id
+        token.pwdAt = await loadPasswordStamp(user.id)
       }
-      // Edge Runtime（中间件）无法运行 Prisma，跳过封禁检查；
-      // 封禁生效点：authorize 登录拦截 + API 路由的 getAuthUser 会话校验
+
       if (
         token.id &&
         typeof process !== 'undefined' &&
-        process.env.NEXT_RUNTIME === 'nodejs' &&
-        (await isUserBanned(token.id as string))
+        process.env.NEXT_RUNTIME === 'nodejs'
       ) {
-        // 已被封禁的账号：清空会话中的用户 ID，使其存量会话失效
-        token.id = ''
+        if (await isUserBanned(token.id as string)) {
+          token.id = ''
+          delete token.pwdAt
+          return token
+        }
+
+        const currentPwdAt = await loadPasswordStamp(token.id as string)
+        const tokenPwdAt = typeof token.pwdAt === 'number' ? token.pwdAt : 0
+        if (tokenPwdAt !== currentPwdAt) {
+          token.id = ''
+          delete token.pwdAt
+        }
       }
+
       return token
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string
+        session.user.id = (token.id as string) || ''
       }
       return session
     },
@@ -103,8 +125,10 @@ const authConfig = {
   },
 } satisfies NextAuthConfig
 
+const sessionOptions = getAuthSessionOptions()
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  session: { strategy: 'jwt' },
+  session: sessionOptions,
   ...authConfig,
 })

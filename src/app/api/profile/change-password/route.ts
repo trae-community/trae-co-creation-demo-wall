@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthUser } from "@/lib/auth";
+import { isAuthResponse, requireAuthUser } from "@/lib/api-auth";
 import { prisma } from "@/lib/prisma";
 import { hash, compare } from "bcryptjs";
 import { writeAuthLog } from "@/lib/audit-log";
 
 export async function POST(req: NextRequest) {
   try {
-    const authUser = await getAuthUser();
-    if (!authUser) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authUser = await requireAuthUser();
+    if (isAuthResponse(authUser)) {
+      return authUser;
     }
 
     const body = await req.json();
@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
       where: { id: authUser.userId },
       data: {
         passwordHash: newPasswordHash,
+        passwordChangedAt: new Date(),
       },
     });
 

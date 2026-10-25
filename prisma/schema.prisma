@@ -65,6 +65,8 @@ model SysUser {
   clerk_id      String?           @unique @db.VarChar(255)
   /// 密码哈希
   passwordHash  String?           @map("password_hash") @db.VarChar(255)
+  /// 最近一次改密时间（用于 JWT 失效）
+  passwordChangedAt DateTime?     @map("password_changed_at") @db.Timestamptz(6)
   /// 头像链接
   avatarUrl     String?           @map("avatar_url") @db.VarChar(255)
   /// 个人简介
