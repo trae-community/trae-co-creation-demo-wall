@@ -18,6 +18,8 @@ export async function GET(req: NextRequest) {
     const filter = searchParams.get(CRUD_QUERY_PARAMS.filter) || 'all'
     const startDate = searchParams.get('startDate') || ''
     const endDate = searchParams.get('endDate') || ''
+    const userId = searchParams.get('userId') || ''
+    const ip = searchParams.get('ip')?.trim() || ''
 
     const skip = (page - 1) * pageSize
     const take = pageSize
@@ -40,18 +42,35 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Handle search query
+    if (userId) {
+      try {
+        where.userId = BigInt(userId)
+      } catch {
+        return NextResponse.json({ error: 'Invalid userId' }, { status: 400 })
+      }
+    }
+
+    if (ip) {
+      where.ipAddress = ip
+    }
+
+    // Handle search query（与 userId / ip 精确条件 AND）
     if (query) {
-      where.OR = [
-        { ipAddress: { contains: query, mode: 'insensitive' } },
+      where.AND = [
+        ...(Array.isArray(where.AND) ? where.AND : []),
         {
-          user: {
-            OR: [
-              { username: { contains: query, mode: 'insensitive' } },
-              { email: { contains: query, mode: 'insensitive' } }
-            ]
-          }
-        }
+          OR: [
+            { ipAddress: { contains: query, mode: 'insensitive' } },
+            {
+              user: {
+                OR: [
+                  { username: { contains: query, mode: 'insensitive' } },
+                  { email: { contains: query, mode: 'insensitive' } },
+                ],
+              },
+            },
+          ],
+        },
       ]
     }
 
