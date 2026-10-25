@@ -51,7 +51,7 @@ export function CrudFilterBar({
       </div>
       <div className="flex flex-wrap gap-2 items-center w-full sm:w-auto">
         {filterOptions.length > 0 && (
-          <Select onValueChange={onFilterChange} defaultValue={filterValue}>
+          <Select value={filterValue} onValueChange={onFilterChange}>
             <SelectTrigger className="w-full sm:w-40 bg-card border-border">
               <SelectValue placeholder={filterPlaceholder} />
             </SelectTrigger>

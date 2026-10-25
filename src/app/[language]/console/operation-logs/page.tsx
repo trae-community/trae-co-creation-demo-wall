@@ -19,6 +19,11 @@ import {
 } from '@/components/ui/select'
 import { useFeedback } from '@/lib/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
+import {
+  getOperationActionLabel,
+  getOperationModuleLabel,
+  sortOperationModules,
+} from '@/lib/operation-log-labels'
 
 interface OperationLogItem {
   id: string
@@ -42,34 +47,6 @@ interface OperationLogItem {
 }
 
 type OperationFilter = 'all' | 'success' | 'failed'
-
-// 模块中文映射
-const MODULE_LABELS: Record<string, string> = {
-  work: '作品互动',
-  works: '作品管理',
-  users: '用户管理',
-  dictionary: '字典管理',
-  tags: '标签管理',
-  submit: '作品提交',
-  poster: '海报管理',
-  profile: '个人中心',
-}
-
-// 动作中文映射
-const ACTION_LABELS: Record<string, string> = {
-  create: '创建',
-  update: '更新',
-  delete: '删除',
-  like: '点赞',
-  unlike: '取消点赞',
-  view: '浏览',
-  audit: '审核',
-  ban: '封禁',
-  unban: '解封',
-}
-
-const getModuleLabel = (module: string) => MODULE_LABELS[module] || module
-const getActionLabel = (action: string) => ACTION_LABELS[action] || action
 
 export default function OperationLogsPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -129,6 +106,10 @@ export default function OperationLogsPage() {
   const startIndex = (current - 1) * pageSize
   const endIndex = Math.min(startIndex + pageSize, totalItems)
   const pagedItems = useMemo(() => items, [items])
+  const sortedModules = useMemo(
+    () => sortOperationModules(availableModules),
+    [availableModules]
+  )
 
   return (
     <div className="space-y-6 relative min-h-[500px]">
@@ -162,9 +143,9 @@ export default function OperationLogsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">全部模块</SelectItem>
-                {availableModules.map((m) => (
+                {sortedModules.map((m) => (
                   <SelectItem key={m} value={m}>
-                    {getModuleLabel(m)}
+                    {getOperationModuleLabel(m)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -211,11 +192,8 @@ export default function OperationLogsPage() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-semibold">
-                      {getModuleLabel(item.module)} · {getActionLabel(item.action)}
+                      {getOperationModuleLabel(item.module)} · {getOperationActionLabel(item.action)}
                     </span>
-                    <Badge variant="outline" className="text-xs">
-                      {item.module}/{item.action}
-                    </Badge>
                     <Badge variant={item.success ? 'default' : 'destructive'}>
                       {item.success ? '成功' : '失败'}
                     </Badge>
