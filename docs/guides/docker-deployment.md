@@ -38,10 +38,12 @@ cd trae-co-creation-demo-wall
 cp .env.docker.example .env
 ```
 
-编辑 `.env` 文件，配置：
-- `NEXTAUTH_SECRET`: 生成随机密钥（`openssl rand -base64 32`）
-- `NEXTAUTH_URL`: 你的域名或服务器 IP（默认走 nginx 入口，端口 80）
-- 腾讯云 COS 配置（`COS_SECRET_ID` / `COS_SECRET_KEY` / `COS_BUCKET` / `COS_REGION`）
+编辑 `.env` 文件（仅需 compose 注入项，见 `.env.docker.example`）：
+- `NEXTAUTH_SECRET`：`openssl rand -base64 32`
+- `NEXTAUTH_URL`：对外访问地址（经 Nginx 一般为 `http://你的域名或IP`）
+- `COS_SECRET_ID` / `COS_SECRET_KEY` / `COS_BUCKET` / `COS_REGION`
+
+数据库连接串、Redis、`AUTH_TRUST_HOST`、初始化开关等由 `docker-compose*.yml` 配置，**不要**在宿主机 `.env` 里再写一套 `DATABASE_URL`。
 
 ### 3. 构建并启动
 
@@ -152,8 +154,20 @@ docker compose down -v
 
 1. Nginx 反向代理已内置（如需 HTTPS，挂载证书并修改 `nginx.conf`）
 2. 配置 HTTPS 证书
-3. 设置防火墙规则（开放 80/443）
-4. 配置自动备份（定期 `pg_dump` 导出）
+3. 设置防火墙规则（开放 80/443）；**勿将 `app:3000` 直接暴露公网**，否则客户端可伪造 `X-Forwarded-For`
+4. 在 `.env` 中设置 `TRUST_PROXY=1`，使认证/操作日志中的 IP 来自 Nginx 注入的 `X-Real-IP` / `X-Forwarded-For`（见 `nginx.conf` 的 `proxy_set_header`）
+5. 可选：调整 `AUTH_SESSION_MAX_AGE`、`AUTH_SESSION_UPDATE_AGE`（秒）缩短 JWT 有效期；改密后旧会话会因 `password_changed_at` 自动失效
+6. 配置自动备份（定期 `pg_dump` 导出）
+
+### 客户端 IP 与风控日志
+
+| 环境 | 建议 |
+|------|------|
+| Docker + Nginx（本仓库默认） | `TRUST_PROXY=1` |
+| 本地 `npm run dev` 直连 | 不设置 `TRUST_PROXY`；日志 IP 为空属正常 |
+| Vercel / 其他 LB | 在平台文档确认可信头后设为 `1` |
+
+控制台「登录注册日志 / 可疑 IP」页会提示 IP 是否来自可信反代，仅供运营参考。
 
 ## 故障排查
 
@@ -168,6 +182,6 @@ docker compose logs app-init   # 初始化失败时查看此日志
 
 检查 `.env` 中 `DATABASE_URL` 是否指向 `db:5432`（容器间通信用服务名），宿主机调试请使用 `localhost:5432`。
 
-### Redis 连接失败
+### Redis
 
-检查 `REDIS_URL` 配置是否正确（容器内为 `redis://redis:6379`）。
+Compose 会启动 Redis 服务，但**当前应用代码未连接 Redis**；除非后续接入缓存，无需在宿主机 `.env` 配置 `REDIS_URL`。

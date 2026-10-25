@@ -43,14 +43,11 @@ docker compose up -d db-dev redis
 
 ### 3. 配置环境变量
 
-创建 `.env`（参考 `.env.example`），将连接指向本地开发库：
+创建 `.env`（复制 `.env.example` 并改 COS / NEXTAUTH_SECRET）。最少需要：`DATABASE_URL`、`DIRECT_URL`、`NEXTAUTH_*`、四个 `COS_*`。应用当前**不读** `REDIS_URL`，本地不必写。
 
 ```bash
-DATABASE_URL="postgresql://postgres:postgres@localhost:5433/trae_demo_wall_dev?schema=public"
-DIRECT_URL="postgresql://postgres:postgres@localhost:5433/trae_demo_wall_dev"
-REDIS_URL="redis://localhost:6379"
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="<任意随机字符串>"
+cp .env.example .env
+# 编辑 COS 与 NEXTAUTH_SECRET
 ```
 
 ### 4. 初始化数据库并启动
