@@ -13,7 +13,7 @@ import { CrudPagination } from '@/components/crud/crud-pagination'
 import { CityFilter, FilterState } from '@/components/work/city-filter'
 import { useFeedback } from '@/lib/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
-import { useParams, usePathname } from 'next/navigation'
+import { useParams, usePathname, useSearchParams } from 'next/navigation'
 import { Link } from '@/lib/language/navigation'
 import { Button } from '@/components/ui/button'
 import {
@@ -158,6 +158,7 @@ export function WorksManagement({
   const params = useParams()
   const lang = (params?.lang as string) || 'zh-CN'
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const router = useRouter()
   const locale = useLocale()
   const tConsole = useTranslations('Console')
@@ -312,6 +313,14 @@ export function WorksManagement({
       setIsLoading(false)
     }
   }, [currentPage, pageSize, searchTerm, showFeedback, userId, filters, selectedDate, sortBy])
+
+  useEffect(() => {
+    if (scope !== 'admin') return
+    const status = searchParams.get('auditStatus')
+    if (status === '0' || status === '1' || status === '2') {
+      setFilters((prev) => ({ ...prev, auditStatuses: [status] }))
+    }
+  }, [scope, searchParams])
 
   // Initial fetch
   useEffect(() => {

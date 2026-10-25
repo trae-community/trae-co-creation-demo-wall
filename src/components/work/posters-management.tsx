@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import { Trash2, Eye, Calendar, User, ExternalLink, Search, ShieldCheck, Clock, History, Pencil } from 'lucide-react'
 
@@ -66,6 +66,7 @@ export function PostersManagement() {
   const router = useRouter()
   const locale = useLocale()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const tConsole = useTranslations('Console')
 
   const [isLoading, setIsLoading] = useState(false)
@@ -122,6 +123,13 @@ export function PostersManagement() {
       setIsLoading(false)
     }
   }, [currentPage, pageSize, searchTerm, auditFilter, selectedDate, sortBy, showFeedback])
+
+  useEffect(() => {
+    const status = searchParams.get('auditStatus')
+    if (status === '0' || status === '1' || status === '2') {
+      setAuditFilter(status)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     fetchPosters()
