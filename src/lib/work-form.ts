@@ -31,7 +31,7 @@ export function buildWorkFormSchema(
   t: Translate,
   options: BuildWorkFormSchemaOptions = {}
 ) {
-  const { requireTeamIntro = true } = options;
+  const { requireTeamIntro = false } = options;
 
   return z.object({
     name: z.string().min(2, t('validationNameMin')).max(50, t('validationNameMax')),

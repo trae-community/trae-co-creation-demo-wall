@@ -31,6 +31,9 @@ export function Step4Team({ form }: Step4Props) {
           <Users className="w-4 h-4 text-muted-foreground" />
           {t('team')} <span className="text-red-500">*</span>
         </label>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          {t('teamMembersHint')}
+        </p>
 
         <div className="space-y-3">
           {teamFields.map((field, index) => (
@@ -87,7 +90,7 @@ export function Step4Team({ form }: Step4Props) {
       {/* Team Intro */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-muted-foreground">
-          {t('teamIntro')} <span className="text-red-500">*</span>
+          {t('teamIntroOptional')}
         </label>
         <textarea
           {...register('teamIntro')}

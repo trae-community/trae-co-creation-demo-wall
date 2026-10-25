@@ -684,6 +684,9 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-muted-foreground">{t('team')} <span className="text-red-500">*</span></label>
+              <p className="text-xs text-muted-foreground leading-relaxed mt-1">
+                {t('teamMembersHint')}
+              </p>
             </div>
             {teamFields.map((field, index) => (
               <div key={field.id} className="flex gap-2 items-start">
@@ -709,7 +712,7 @@ export function EditForm({ initialData, onSuccess, onCancel }: { initialData: Ba
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">{t('teamIntro')}</label>
+            <label className="text-sm font-medium text-muted-foreground">{t('teamIntroOptional')}</label>
             <textarea
               {...register("teamIntro")}
               rows={4}

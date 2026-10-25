@@ -24,7 +24,7 @@ const submissionSchema = z.object({
   country: z.string().min(1),
   city: z.string().min(1),
   team: z.string().refine(hasValidTeamMembers, '请至少填写1名团队成员'),
-  teamIntro: z.string().min(1),
+  teamIntro: z.string().max(500).optional().or(z.literal('')),
   contactPhone: z.string().optional(),
   contactEmail: z.string().email().optional().or(z.literal("")),
   coverUrl: z.string().min(1),
