@@ -23,10 +23,12 @@
   - **`works/`**: 客户端作品展示模块。包含作品列表展示页和详情页。
   - **`sign-in/` / `sign-up/`**: 用户登录与注册页面。
   - **`profile/`**: 用户个人中心页面。
+  - **`notifications/`**: 站内消息列表（登录后）；导航栏铃铛展示未读数。
 - **`api/`**: 后端 API 接口层。提供 RESTful 风格的接口，用于前后端数据交互。
   - `auth/`: 认证相关接口。
   - `console/`: 后台管理相关接口。
-  - `works/`: 作品的 CRUD 与统计接口 (如点赞、浏览量统计)。
+  - `works/`: 作品的 CRUD 与统计接口 (如点赞、浏览量统计、`[id]/likes` 公开展示点赞用户)。
+  - `notifications/`: 站内通知列表、未读数、标记已读。
   - `file/`: 文件上传相关的接口。
 
 ### `src/components` (组件层)
@@ -61,7 +63,8 @@
 - **`SysUser` / `SysRole` / `SysUserRole`**: 系统用户、角色及关联表，支撑系统的 RBAC 权限控制。
 - **`WorkBase`**: 作品基础表。仅包含核心元数据（名称、简介、封面、城市等），保持轻量，用于列表快速检索与展示。
 - **`WorkDetail`**: 作品详情表。存储图文故事、亮点、使用场景等大文本字段，通过 `work_id` 与 `WorkBase` 关联。
-- **`WorkImage` / `WorkTeam`**: 独立的图片记录表与团队信息表。
+- **`WorkImage` / `WorkTeam`**: 独立的图片记录表与团队信息表（`members` 为 JSON 字符串数组，投稿表单一行一名成员）。
+- **`SysUserNotification`**: 用户站内通知（审核结果、作品被赞等），`payload` 为 JSON 扩展字段。
 - **`WorkStatistic`**: 作品状态与统计表。分离状态管理与统计数据（如浏览量、点赞量、审核状态），降低高频更新的锁冲突。
 - **`SysDict` / `SysDictItem`**: 系统字典表。用于管理城市、分类、国家等动态字典数据，支持层级关系。
 
