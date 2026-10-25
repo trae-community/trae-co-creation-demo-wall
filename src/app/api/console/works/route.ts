@@ -3,7 +3,9 @@ import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
 import { getAuthUser, isAdmin } from '@/lib/auth';
+import { isAuthResponse, requireAdmin, requireAuthUser } from '@/lib/api-auth';
 import { writeOperationLog } from '@/lib/audit-log';
+import { resolveAuditReason } from '@/lib/audit-reason';
 import { createdAtDayRange } from '@/lib/created-at-day-range';
 import { getWorkLikeRiskByWorkIds } from '@/lib/auth-log-queries';
 import {
@@ -262,9 +264,9 @@ export async function GET(req: NextRequest) {
 // POST: 创建作品
 export async function POST(req: NextRequest) {
   try {
-    const operator = await getAuthUser();
-    if (!isAdmin(operator)) {
-      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    const operator = await requireAdmin();
+    if (isAuthResponse(operator)) {
+      return operator;
     }
     const body = await req.json();
     const { 
@@ -345,9 +347,9 @@ export async function POST(req: NextRequest) {
 // PUT: 更新作品
 export async function PUT(req: NextRequest) {
   try {
-    const operator = await getAuthUser();
-    if (!operator) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const operator = await requireAuthUser();
+    if (isAuthResponse(operator)) {
+      return operator;
     }
 
     const adminMode = isAdmin(operator);
@@ -409,7 +411,12 @@ export async function PUT(req: NextRequest) {
 
       const auditorId = operator.userId;
       const newStatus = Number(auditStatus);
-      const auditReason = body.auditReason || 'Batch audit via console';
+      const reasonResult = resolveAuditReason(newStatus, body.auditReason);
+      if (!reasonResult.ok) {
+        return NextResponse.json({ error: reasonResult.error }, { status: 400 });
+      }
+      const auditReason =
+        reasonResult.value || (newStatus === 1 ? '批量审核通过' : '批量审核更新');
       const workIds = batchIds.map((value: string) => BigInt(value));
       const now = new Date();
 
@@ -544,8 +551,12 @@ export async function PUT(req: NextRequest) {
       });
       
       const newStatus = Number(auditStatus)
-      // Extract audit reason from body or use default
-      const auditReason = body.auditReason || 'Manual update via console'
+      const reasonResult = resolveAuditReason(newStatus, body.auditReason)
+      if (!reasonResult.ok) {
+        return NextResponse.json({ error: reasonResult.error }, { status: 400 })
+      }
+      const auditReason =
+        reasonResult.value || (newStatus === 1 ? '审核通过' : '审核更新')
 
       if (!currentStat) {
         // If no statistic record exists, create one (safety fallback)
@@ -562,7 +573,7 @@ export async function PUT(req: NextRequest) {
         await prisma.$executeRaw`
           INSERT INTO "work_audit_log"
           ("work_id", "auditor_id", "prev_status", "new_status", "reason", "created_at")
-          VALUES (${BigInt(id)}, ${auditorId ?? null}, ${null}, ${newStatus}, ${body.auditReason || 'Initial status creation via console'}, ${new Date()})
+          VALUES (${BigInt(id)}, ${auditorId ?? null}, ${null}, ${newStatus}, ${auditReason}, ${new Date()})
         `
 
       } else {
@@ -762,9 +773,9 @@ export async function PUT(req: NextRequest) {
 // DELETE: 删除作品
 export async function DELETE(req: NextRequest) {
   try {
-    const operator = await getAuthUser();
-    if (!operator) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const operator = await requireAuthUser();
+    if (isAuthResponse(operator)) {
+      return operator;
     }
 
     const adminMode = isAdmin(operator);

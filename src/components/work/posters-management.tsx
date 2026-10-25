@@ -37,6 +37,12 @@ import {
 import { PosterImage } from '@/components/work/poster-image'
 import { PosterEditDialog } from '@/components/work/poster-edit-dialog'
 import { cn } from '@/lib/utils'
+import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
+import {
+  BATCH_AUDIT_CONFIRM_PHRASE,
+  BATCH_AUDIT_TYPED_CONFIRM_MIN,
+} from '@/lib/admin-risk'
 
 interface PosterAdminItem {
   id: string
@@ -85,6 +91,8 @@ export function PostersManagement() {
   const [isAuditDialogOpen, setIsAuditDialogOpen] = useState(false)
   const [auditTargetIds, setAuditTargetIds] = useState<string[]>([])
   const [selectedAuditStatus, setSelectedAuditStatus] = useState('1')
+  const [auditReason, setAuditReason] = useState('')
+  const [auditConfirmText, setAuditConfirmText] = useState('')
   const [isSavingAudit, setIsSavingAudit] = useState(false)
   const [selectedPosterIds, setSelectedPosterIds] = useState<string[]>([])
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -149,6 +157,8 @@ export function PostersManagement() {
   const handleOpenAuditDialog = (poster: PosterAdminItem) => {
     setAuditTargetIds([poster.id])
     setSelectedAuditStatus(String(poster.auditStatus))
+    setAuditReason('')
+    setAuditConfirmText('')
     setIsAuditDialogOpen(true)
   }
 
@@ -173,11 +183,21 @@ export function PostersManagement() {
     }
     setAuditTargetIds(selectedPosterIds)
     setSelectedAuditStatus('0')
+    setAuditReason('')
+    setAuditConfirmText('')
     setIsAuditDialogOpen(true)
   }
 
+  const auditStatusNum = Number(selectedAuditStatus)
+  const auditNeedsRejectReason = auditStatusNum === 2
+  const auditNeedsTypedConfirm = auditTargetIds.length >= BATCH_AUDIT_TYPED_CONFIRM_MIN
+  const auditRejectReasonOk = !auditNeedsRejectReason || auditReason.trim().length >= 2
+  const auditConfirmOk =
+    !auditNeedsTypedConfirm || auditConfirmText.trim() === BATCH_AUDIT_CONFIRM_PHRASE
+  const auditCanSubmit = auditRejectReasonOk && auditConfirmOk
+
   const handleSaveAudit = async () => {
-    if (auditTargetIds.length === 0) return
+    if (auditTargetIds.length === 0 || !auditCanSubmit) return
     const updatedCount = auditTargetIds.length
     try {
       setIsSavingAudit(true)
@@ -188,6 +208,7 @@ export function PostersManagement() {
         body: JSON.stringify({
           ...(isBatchAudit ? { ids: auditTargetIds } : { id: auditTargetIds[0] }),
           auditStatus: Number(selectedAuditStatus),
+          auditReason: auditReason.trim() || undefined,
         }),
       })
       if (res.ok) {
@@ -586,21 +607,46 @@ export function PostersManagement() {
                   : '更改已选海报的审核状态。审核通过后海报将展示在橱窗。'}
             </DialogDescription>
           </DialogHeader>
-          <div className="py-2">
-            <Select value={selectedAuditStatus} onValueChange={setSelectedAuditStatus}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="选择审核状态" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">待审核</SelectItem>
-                <SelectItem value="1">通过</SelectItem>
-                <SelectItem value="2">拒绝</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label>审核状态</Label>
+              <Select value={selectedAuditStatus} onValueChange={setSelectedAuditStatus}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="选择审核状态" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">待审核</SelectItem>
+                  <SelectItem value="1">通过</SelectItem>
+                  <SelectItem value="2">拒绝</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>审核意见{auditNeedsRejectReason ? '（拒绝时必填）' : '（选填）'}</Label>
+              <Textarea
+                value={auditReason}
+                onChange={(e) => setAuditReason(e.target.value)}
+                placeholder={auditNeedsRejectReason ? '请说明拒绝原因' : '请输入审核意见（选填）'}
+                rows={3}
+                className="resize-none"
+              />
+            </div>
+            {auditNeedsTypedConfirm && (
+              <div className="space-y-2">
+                <Label>
+                  请输入「{BATCH_AUDIT_CONFIRM_PHRASE}」以继续（{auditTargetIds.length} 条）
+                </Label>
+                <Input
+                  value={auditConfirmText}
+                  onChange={(e) => setAuditConfirmText(e.target.value)}
+                  autoComplete="off"
+                />
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAuditDialogOpen(false)} disabled={isSavingAudit}>取消</Button>
-            <Button onClick={handleSaveAudit} disabled={isSavingAudit}>
+            <Button onClick={handleSaveAudit} disabled={isSavingAudit || !auditCanSubmit}>
               {isSavingAudit ? '保存中...' : '确认'}
             </Button>
           </DialogFooter>

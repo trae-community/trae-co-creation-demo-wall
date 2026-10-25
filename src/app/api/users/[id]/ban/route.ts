@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getAuthUser, isAdmin } from '@/lib/auth'
+import { isAuthResponse, requireAdmin } from '@/lib/api-auth'
+import { parseOperationReason } from '@/lib/admin-risk'
 import { banUser, unbanUser } from '@/lib/ban'
 import { writeOperationLog } from '@/lib/audit-log'
 
@@ -15,14 +16,23 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const operator = await getAuthUser()
-    if (!isAdmin(operator)) {
-      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 })
+    const operator = await requireAdmin()
+    if (isAuthResponse(operator)) {
+      return operator
     }
 
     const { id } = await params
     const body = await req.json()
     const banned = Boolean(body.banned)
+
+    let banReason = ''
+    if (banned) {
+      const parsed = parseOperationReason(body.reason, { required: true, minLength: 2 })
+      if (!parsed.ok) {
+        return NextResponse.json({ error: parsed.error }, { status: 400 })
+      }
+      banReason = parsed.value
+    }
 
     let userId: bigint
     try {
@@ -62,7 +72,11 @@ export async function POST(
       action: banned ? 'ban' : 'unban',
       targetType: 'sys_user',
       targetId: target.id,
-      payload: { username: target.username, email: target.email },
+      payload: {
+        username: target.username,
+        email: target.email,
+        reason: banReason || undefined,
+      },
       request: req,
     })
 

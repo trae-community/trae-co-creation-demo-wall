@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getAuthUser, isRoot } from '@/lib/auth'
+import { isAuthResponse, requireRoot } from '@/lib/api-auth'
+import { parseOperationReason } from '@/lib/admin-risk'
 import { writeOperationLog } from '@/lib/audit-log'
 import {
   previewPurgeBannedUserLikes,
@@ -8,9 +9,9 @@ import {
 
 /** GET — 预览将剔除的点赞数量（仅 root） */
 export async function GET() {
-  const user = await getAuthUser()
-  if (!user || !isRoot(user)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const user = await requireRoot()
+  if (isAuthResponse(user)) {
+    return user
   }
 
   try {
@@ -24,12 +25,19 @@ export async function GET() {
 
 /** POST — 执行剔除并重算 like_count（仅 root） */
 export async function POST(req: Request) {
-  const user = await getAuthUser()
-  if (!user || !isRoot(user)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const user = await requireRoot()
+  if (isAuthResponse(user)) {
+    return user
   }
 
   try {
+    const body = await req.json().catch(() => ({}))
+    const parsed = parseOperationReason(body.reason, { required: true, minLength: 2 })
+    if (!parsed.ok) {
+      return NextResponse.json({ error: parsed.error }, { status: 400 })
+    }
+
+    const preview = await previewPurgeBannedUserLikes()
     const result = await purgeBannedUserLikes()
 
     await writeOperationLog({
@@ -39,7 +47,11 @@ export async function POST(req: Request) {
       targetType: 'work_like',
       targetId: null,
       request: req,
-      payload: result,
+      payload: {
+        ...result,
+        reason: parsed.value,
+        preview,
+      },
     })
 
     return NextResponse.json({ success: true, ...result })

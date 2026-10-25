@@ -17,6 +17,8 @@ import { CrudFeedback } from '@/components/crud/crud-feedback'
 import { useFeedback } from '@/lib/use-feedback'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 
 type OverviewWindow = 7 | 30
 
@@ -100,7 +102,34 @@ export default function ConsolePage() {
   const [data, setData] = useState<OverviewData>(defaultData)
   const [purgeDialogOpen, setPurgeDialogOpen] = useState(false)
   const [isPurging, setIsPurging] = useState(false)
+  const [purgeReason, setPurgeReason] = useState('')
+  const [purgePreview, setPurgePreview] = useState<MaintenancePreview | null>(null)
+  const [purgePreviewLoading, setPurgePreviewLoading] = useState(false)
   const { feedback, showFeedback } = useFeedback()
+
+  useEffect(() => {
+    if (!purgeDialogOpen) return
+    let cancelled = false
+    setPurgePreviewLoading(true)
+    fetch('/api/console/maintenance/purge-banned-likes')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data) {
+          setPurgePreview({
+            bannedUserCount: data.bannedUserCount ?? 0,
+            likesFromBannedUsers: data.likesFromBannedUsers ?? 0,
+            affectedWorkCount: data.affectedWorkCount ?? 0,
+          })
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setPurgePreviewLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [purgeDialogOpen])
 
   const fetchOverview = useCallback(async () => {
     try {
@@ -149,10 +178,20 @@ export default function ConsolePage() {
   const pendingPosters = data.pendingAudit?.posters ?? 0
   const maintenance = data.maintenancePreview
 
+  const openPurgeDialog = () => {
+    setPurgeReason('')
+    setPurgePreview(maintenance ?? null)
+    setPurgeDialogOpen(true)
+  }
+
   const handlePurgeBannedLikes = async () => {
     try {
       setIsPurging(true)
-      const res = await fetch('/api/console/maintenance/purge-banned-likes', { method: 'POST' })
+      const res = await fetch('/api/console/maintenance/purge-banned-likes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: purgeReason.trim() }),
+      })
       const body = await res.json().catch(() => ({}))
       if (!res.ok) {
         showFeedback('error', body.error || '剔除失败')
@@ -229,7 +268,7 @@ export default function ConsolePage() {
               type="button"
               variant="outline"
               disabled={maintenance.likesFromBannedUsers === 0}
-              onClick={() => setPurgeDialogOpen(true)}
+              onClick={openPurgeDialog}
             >
               剔除封禁用户赞
             </Button>
@@ -242,15 +281,35 @@ export default function ConsolePage() {
           <DialogHeader>
             <DialogTitle>确认剔除封禁用户赞？</DialogTitle>
             <DialogDescription>
-              将删除 {maintenance?.likesFromBannedUsers ?? 0} 条点赞，并重算{' '}
-              {maintenance?.affectedWorkCount ?? 0} 个作品的点赞数。此操作不可撤销。
+              执行前已根据当前数据刷新预览。将删除{' '}
+              {purgePreview?.likesFromBannedUsers ?? maintenance?.likesFromBannedUsers ?? 0}{' '}
+              条点赞，并重算 {purgePreview?.affectedWorkCount ?? maintenance?.affectedWorkCount ?? 0}{' '}
+              个作品的点赞数。此操作不可撤销，仅超级管理员可执行。
             </DialogDescription>
           </DialogHeader>
+          {purgePreviewLoading && (
+            <p className="text-sm text-muted-foreground">正在刷新预览…</p>
+          )}
+          <div className="space-y-2">
+            <Label htmlFor="purge-reason">操作原因（必填，将写入操作日志）</Label>
+            <Textarea
+              id="purge-reason"
+              value={purgeReason}
+              onChange={(e) => setPurgeReason(e.target.value)}
+              placeholder="例如：封禁用户后清理无效点赞并重算"
+              rows={3}
+              className="resize-none"
+            />
+          </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setPurgeDialogOpen(false)} disabled={isPurging}>
               取消
             </Button>
-            <Button type="button" onClick={handlePurgeBannedLikes} disabled={isPurging}>
+            <Button
+              type="button"
+              onClick={handlePurgeBannedLikes}
+              disabled={isPurging || purgeReason.trim().length < 2 || purgePreviewLoading}
+            >
               {isPurging ? '处理中…' : '确认执行'}
             </Button>
           </DialogFooter>

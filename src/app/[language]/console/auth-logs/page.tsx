@@ -13,6 +13,14 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  BATCH_BAN_CONFIRM_PHRASE,
+  BATCH_BAN_ROOT_ONLY_MIN,
+  BATCH_BAN_TYPED_CONFIRM_MIN,
+} from '@/lib/admin-risk'
 import {
   Dialog,
   DialogContent,
@@ -23,7 +31,7 @@ import {
 } from '@/components/ui/dialog'
 import { useFeedback } from '@/lib/use-feedback'
 import { CRUD_QUERY_PARAMS } from '@/lib/crud'
-import { Link } from '@/lib/language/navigation'
+import { Link, useRouter } from '@/lib/language/navigation'
 import { cn } from '@/lib/utils'
 
 interface AuthLogItem {
@@ -55,13 +63,14 @@ type ViewMode = 'logs' | 'ip-stats'
 
 export default function AuthLogsPage() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [viewMode, setViewMode] = useState<ViewMode>('logs')
   const [isLoading, setIsLoading] = useState(false)
   const [items, setItems] = useState<AuthLogItem[]>([])
   const [totalItems, setTotalItems] = useState(0)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterUserId, setFilterUserId] = useState('')
-  const [filterIp, setFilterIp] = useState('')
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get('ip') || '')
+  const [filterUserId, setFilterUserId] = useState(() => searchParams.get('userId') || '')
+  const [filterIp, setFilterIp] = useState(() => searchParams.get('ip') || '')
   const [filterMode, setFilterMode] = useState<AuthLogFilter>('all')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -76,18 +85,33 @@ export default function AuthLogsPage() {
   const [batchBanOpen, setBatchBanOpen] = useState(false)
   const [isBatchBanning, setIsBatchBanning] = useState(false)
   const [batchBanIp, setBatchBanIp] = useState<string | null>(null)
+  const [batchBanReason, setBatchBanReason] = useState('')
+  const [batchBanConfirmText, setBatchBanConfirmText] = useState('')
+  const [isRootOperator, setIsRootOperator] = useState(false)
 
   useEffect(() => {
-    const userId = searchParams.get('userId')
-    const ip = searchParams.get('ip')
-    if (userId) {
-      setFilterUserId(userId)
-      setViewMode('logs')
-    }
+    fetch('/api/profile')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const codes: string[] = (data?.profile?.roles ?? []).map(
+          (r: { roleCode: string }) => r.roleCode
+        )
+        setIsRootOperator(codes.includes('root'))
+      })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    const userId = searchParams.get('userId') || ''
+    const ip = searchParams.get('ip') || ''
+    setFilterUserId(userId)
+    setFilterIp(ip)
     if (ip) {
-      setFilterIp(ip)
       setSearchTerm(ip)
+    }
+    if (userId || ip) {
       setViewMode('logs')
+      setCurrentPage(1)
     }
   }, [searchParams])
 
@@ -102,8 +126,10 @@ export default function AuthLogsPage() {
       })
       if (startDate) params.append('startDate', startDate)
       if (endDate) params.append('endDate', endDate)
-      if (filterUserId) params.append('userId', filterUserId)
-      if (filterIp) params.append('ip', filterIp)
+      const userIdParam = filterUserId || searchParams.get('userId') || ''
+      const ipParam = filterIp || searchParams.get('ip') || ''
+      if (userIdParam) params.append('userId', userIdParam)
+      if (ipParam) params.append('ip', ipParam)
       const res = await fetch(`/api/logs/auth?${params.toString()}`)
       if (!res.ok) {
         showFeedback('error', '认证日志加载失败')
@@ -127,6 +153,7 @@ export default function AuthLogsPage() {
     endDate,
     filterUserId,
     filterIp,
+    searchParams,
     showFeedback,
   ])
 
@@ -182,22 +209,44 @@ export default function AuthLogsPage() {
     setEndDate('')
     setFilterUserId('')
     setFilterIp('')
+    setCurrentPage(1)
+    if (searchParams.get('userId') || searchParams.get('ip')) {
+      router.replace('/console/auth-logs')
+    }
   }
 
   const openBatchBan = (stat: IpSignupStatItem) => {
     setBatchBanIp(stat.ipAddress)
     setSelectedIpUserIds(stat.userIds)
+    setBatchBanReason('')
+    setBatchBanConfirmText('')
     setBatchBanOpen(true)
   }
 
+  const batchBanNeedsTypedConfirm =
+    selectedIpUserIds.length >= BATCH_BAN_TYPED_CONFIRM_MIN
+  const batchBanNeedsRoot = selectedIpUserIds.length >= BATCH_BAN_ROOT_ONLY_MIN
+  const batchBanReasonOk = batchBanReason.trim().length >= 2
+  const batchBanConfirmOk =
+    !batchBanNeedsTypedConfirm || batchBanConfirmText.trim() === BATCH_BAN_CONFIRM_PHRASE
+  const batchBanCanSubmit =
+    batchBanReasonOk &&
+    batchBanConfirmOk &&
+    (!batchBanNeedsRoot || isRootOperator)
+
   const confirmBatchBan = async () => {
-    if (selectedIpUserIds.length === 0) return
+    if (selectedIpUserIds.length === 0 || !batchBanCanSubmit) return
     try {
       setIsBatchBanning(true)
       const res = await fetch('/api/users/batch-ban', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userIds: selectedIpUserIds, banned: true }),
+        body: JSON.stringify({
+          userIds: selectedIpUserIds,
+          banned: true,
+          reason: batchBanReason.trim(),
+          sourceIp: batchBanIp,
+        }),
       })
       if (res.ok) {
         showFeedback('success', `已封禁 ${selectedIpUserIds.length} 个用户`)
@@ -414,6 +463,10 @@ export default function AuthLogsPage() {
             </Button>
           </div>
 
+          <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-200/90">
+            这里按「同一 IP 注册次数」找异常。IP 不准时名单会失真，批量封禁前请再核对用户是否正常。
+          </div>
+
           <div className="space-y-3">
             {ipStats.map((stat) => (
               <Card key={stat.ipAddress} className="border-border bg-card/50 p-4">
@@ -484,12 +537,41 @@ export default function AuthLogsPage() {
               </label>
             ))}
           </div>
+          {batchBanNeedsRoot && !isRootOperator && (
+            <p className="text-sm text-destructive">
+              批量封禁 {BATCH_BAN_ROOT_ONLY_MIN} 人及以上需超级管理员执行。
+            </p>
+          )}
+          <div className="space-y-2">
+            <Label htmlFor="batch-ban-reason">封禁原因（必填，将写入操作日志）</Label>
+            <Textarea
+              id="batch-ban-reason"
+              value={batchBanReason}
+              onChange={(e) => setBatchBanReason(e.target.value)}
+              placeholder="例如：同 IP 批量注册、疑似刷赞关联账号"
+              rows={3}
+              className="resize-none"
+            />
+          </div>
+          {batchBanNeedsTypedConfirm && (
+            <div className="space-y-2">
+              <Label htmlFor="batch-ban-confirm">
+                请输入「{BATCH_BAN_CONFIRM_PHRASE}」以继续（{selectedIpUserIds.length} 人）
+              </Label>
+              <Input
+                id="batch-ban-confirm"
+                value={batchBanConfirmText}
+                onChange={(e) => setBatchBanConfirmText(e.target.value)}
+                autoComplete="off"
+              />
+            </div>
+          )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setBatchBanOpen(false)}>取消</Button>
             <Button
               variant="destructive"
               onClick={confirmBatchBan}
-              disabled={isBatchBanning || selectedIpUserIds.length === 0}
+              disabled={isBatchBanning || selectedIpUserIds.length === 0 || !batchBanCanSubmit}
             >
               {isBatchBanning ? '封禁中...' : '确认封禁'}
             </Button>

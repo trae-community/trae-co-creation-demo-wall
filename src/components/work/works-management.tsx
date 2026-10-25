@@ -43,6 +43,12 @@ import { RemoteImage } from '@/components/common/remote-image'
 import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
 import { DatePicker } from '@/components/ui/date-picker'
 import { cn } from '@/lib/utils'
+import { sanitizeRichTextForDisplay } from '@/lib/rich-text'
+import {
+  BATCH_AUDIT_CONFIRM_PHRASE,
+  BATCH_AUDIT_TYPED_CONFIRM_MIN,
+} from '@/lib/admin-risk'
+import { Input } from '@/components/ui/input'
 
 // Types
 interface TagItem {
@@ -210,6 +216,7 @@ export function WorksManagement({
   const [isAuditDialogOpen, setIsAuditDialogOpen] = useState(false)
   const [selectedAuditStatus, setSelectedAuditStatus] = useState<string>('0')
   const [auditReason, setAuditReason] = useState('')
+  const [auditConfirmText, setAuditConfirmText] = useState('')
   const [isSavingAudit, setIsSavingAudit] = useState(false)
   const [selectedWorkIds, setSelectedWorkIds] = useState<string[]>([])
   const [auditTargetIds, setAuditTargetIds] = useState<string[]>([])
@@ -224,6 +231,7 @@ export function WorksManagement({
   const [isLoadingLikes, setIsLoadingLikes] = useState(false)
   // 封禁点赞用户确认弹窗
   const [banLikeTarget, setBanLikeTarget] = useState<LikeUserItem | null>(null)
+  const [banLikeReason, setBanLikeReason] = useState('')
   const [isBanningLike, setIsBanningLike] = useState(false)
 
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
@@ -503,6 +511,7 @@ export function WorksManagement({
     setSelectedAuditStatus(status)
     // Pre-fill with previous audit reason if exists
     setAuditReason(work.lastAuditReason || '')
+    setAuditConfirmText('')
     setIsAuditDialogOpen(true)
   }
 
@@ -547,6 +556,7 @@ export function WorksManagement({
   // 快捷封禁点赞用户（针对批量小号刷赞场景）
   const handleBanLikeUser = (item: LikeUserItem) => {
     if (!item.user) return
+    setBanLikeReason('')
     setBanLikeTarget(item)
   }
 
@@ -558,7 +568,7 @@ export function WorksManagement({
       const res = await fetch(`/api/users/${banLikeTarget.user.id}/ban`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ banned: true })
+        body: JSON.stringify({ banned: true, reason: banLikeReason.trim() })
       })
       if (res.ok) {
         showFeedback('success', `已封禁用户「${banLikeTarget.user.username}」`)
@@ -602,11 +612,24 @@ export function WorksManagement({
     setAuditTargetIds(selectedWorkIds)
     setSelectedAuditStatus('0')
     setAuditReason('')
+    setAuditConfirmText('')
     setIsAuditDialogOpen(true)
   }
 
+  const auditStatusNum = Number(selectedAuditStatus)
+  const auditNeedsRejectReason = auditStatusNum === 2
+  const auditNeedsTypedConfirm = auditTargetIds.length >= BATCH_AUDIT_TYPED_CONFIRM_MIN
+  const auditRejectReasonOk = !auditNeedsRejectReason || auditReason.trim().length >= 2
+  const auditConfirmOk =
+    !auditNeedsTypedConfirm || auditConfirmText.trim() === BATCH_AUDIT_CONFIRM_PHRASE
+  const auditCanSubmit = auditRejectReasonOk && auditConfirmOk
+
   const onSaveAudit = async () => {
-    if (auditTargetIds.length === 0) return
+    if (auditTargetIds.length === 0 || !auditCanSubmit) return
+    if (auditNeedsRejectReason && auditReason.trim().length < 2) {
+      showFeedback('error', '拒绝审核请填写至少 2 个字符的原因')
+      return
+    }
     try {
       setIsSavingAudit(true)
       const isBatchAudit = auditTargetIds.length > 1
@@ -1184,7 +1207,12 @@ export function WorksManagement({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="rounded-md border border-border p-3">
                   <div className="text-xs text-muted-foreground mb-2">创作故事</div>
-                  <div className="text-sm whitespace-pre-wrap">{viewingWork?.detail?.story || '暂无'}</div>
+                  <div
+                    className="text-sm prose prose-sm dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeRichTextForDisplay(viewingWork?.detail?.story || '<p>暂无</p>'),
+                    }}
+                  />
                 </div>
                 <div className="rounded-md border border-border p-3 space-y-2">
                   <div>
@@ -1453,20 +1481,32 @@ export function WorksManagement({
             </div>
             
             <div className="space-y-2">
-              <Label>审核意见</Label>
+              <Label>审核意见{auditNeedsRejectReason ? '（拒绝时必填）' : '（选填）'}</Label>
               <Textarea 
-                placeholder="请输入审核意见（选填）"
+                placeholder={auditNeedsRejectReason ? '请说明拒绝原因' : '请输入审核意见（选填）'}
                 value={auditReason}
                 onChange={(e) => setAuditReason(e.target.value)}
                 className="resize-none"
                 rows={3}
               />
             </div>
+            {auditNeedsTypedConfirm && (
+              <div className="space-y-2">
+                <Label>
+                  请输入「{BATCH_AUDIT_CONFIRM_PHRASE}」以继续（{auditTargetIds.length} 条）
+                </Label>
+                <Input
+                  value={auditConfirmText}
+                  onChange={(e) => setAuditConfirmText(e.target.value)}
+                  autoComplete="off"
+                />
+              </div>
+            )}
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAuditDialogOpen(false)}>取消</Button>
-            <Button onClick={onSaveAudit} disabled={isSavingAudit}>
+            <Button onClick={onSaveAudit} disabled={isSavingAudit || !auditCanSubmit}>
               {isSavingAudit ? '保存中...' : '保存'}
             </Button>
           </DialogFooter>
@@ -1603,9 +1643,25 @@ export function WorksManagement({
             </DialogDescription>
           </DialogHeader>
 
+          <div className="space-y-2">
+            <Label htmlFor="ban-like-reason">封禁原因（必填，将写入操作日志）</Label>
+            <Textarea
+              id="ban-like-reason"
+              value={banLikeReason}
+              onChange={(e) => setBanLikeReason(e.target.value)}
+              placeholder="例如：疑似刷赞小号"
+              rows={3}
+              className="resize-none"
+            />
+          </div>
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setBanLikeTarget(null)} disabled={isBanningLike}>取消</Button>
-            <Button variant="destructive" onClick={confirmBanLikeUser} disabled={isBanningLike}>
+            <Button
+              variant="destructive"
+              onClick={confirmBanLikeUser}
+              disabled={isBanningLike || banLikeReason.trim().length < 2}
+            >
               {isBanningLike ? '封禁中...' : '确认封禁'}
             </Button>
           </DialogFooter>

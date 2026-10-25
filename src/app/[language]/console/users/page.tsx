@@ -27,6 +27,7 @@ import { RemoteImage } from '@/components/common/remote-image'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Link } from '@/lib/language/navigation'
 import { ConsoleFilterCard } from '@/components/crud/console-filter-card'
 import { ListEmptyState } from '@/components/common/list-empty-state'
@@ -102,6 +103,7 @@ export default function UsersPage() {
 
   // Ban Dialog states
   const [banTargetUser, setBanTargetUser] = useState<UserItem | null>(null)
+  const [banReason, setBanReason] = useState('')
   const [isBanning, setIsBanning] = useState(false)
 
   const { feedback, showFeedback } = useFeedback()
@@ -270,6 +272,7 @@ export default function UsersPage() {
 
   // 打开封禁 / 解封确认弹窗
   const handleToggleBan = (user: UserItem) => {
+    setBanReason('')
     setBanTargetUser(user)
   }
 
@@ -281,7 +284,10 @@ export default function UsersPage() {
       const res = await fetch(`/api/users/${banTargetUser.id}/ban`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ banned: !banTargetUser.banned })
+        body: JSON.stringify({
+          banned: !banTargetUser.banned,
+          ...(banTargetUser.banned ? {} : { reason: banReason.trim() }),
+        })
       })
       if (res.ok) {
         showFeedback('success', banTargetUser.banned ? '用户已解封' : '用户已封禁')
@@ -610,6 +616,20 @@ export default function UsersPage() {
             </DialogDescription>
           </DialogHeader>
 
+          {!banTargetUser?.banned && (
+            <div className="space-y-2">
+              <Label htmlFor="ban-reason">封禁原因（必填，将写入操作日志）</Label>
+              <Textarea
+                id="ban-reason"
+                value={banReason}
+                onChange={(e) => setBanReason(e.target.value)}
+                placeholder="请简要说明封禁依据"
+                rows={3}
+                className="resize-none"
+              />
+            </div>
+          )}
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setBanTargetUser(null)} disabled={isBanning}>取消</Button>
             {banTargetUser?.banned ? (
@@ -617,7 +637,11 @@ export default function UsersPage() {
                 {isBanning ? '解封中...' : '确认解封'}
               </Button>
             ) : (
-              <Button variant="destructive" onClick={confirmToggleBan} disabled={isBanning}>
+              <Button
+                variant="destructive"
+                onClick={confirmToggleBan}
+                disabled={isBanning || banReason.trim().length < 2}
+              >
                 {isBanning ? '封禁中...' : '确认封禁'}
               </Button>
             )}

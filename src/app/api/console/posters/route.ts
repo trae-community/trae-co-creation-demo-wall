@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser, isAdmin } from '@/lib/auth';
+import { isAuthResponse, requireAdmin } from '@/lib/api-auth';
 import { writeOperationLog } from '@/lib/audit-log';
+import { resolveAuditReason } from '@/lib/audit-reason';
 import { createdAtDayRange } from '@/lib/created-at-day-range';
 import { notifyPosterAuditResult } from '@/lib/user-notifications';
 
@@ -80,13 +82,13 @@ export async function GET(req: NextRequest) {
  */
 export async function PUT(req: NextRequest) {
   try {
-    const user = await getAuthUser();
-    if (!user || !isAdmin(user)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const user = await requireAdmin();
+    if (isAuthResponse(user)) {
+      return user;
     }
 
     const body = await req.json();
-    const { id, ids, auditStatus } = body;
+    const { id, ids, auditStatus, auditReason: rawAuditReason } = body;
 
     if (auditStatus === undefined || ![0, 1, 2].includes(Number(auditStatus))) {
       return NextResponse.json({ error: '审核状态无效，可选值：0(待审)/1(通过)/2(拒绝)' }, { status: 400 });
@@ -103,6 +105,12 @@ export async function PUT(req: NextRequest) {
 
     const posterIds = targetIds.map((value: string) => BigInt(value));
     const newStatus = Number(auditStatus);
+    const reasonResult = resolveAuditReason(newStatus, rawAuditReason);
+    if (!reasonResult.ok) {
+      return NextResponse.json({ error: reasonResult.error }, { status: 400 });
+    }
+    const auditReason =
+      reasonResult.value || (newStatus === 1 ? '海报审核通过' : '海报审核更新');
 
     const existing = await prisma.workPoster.findMany({
       where: { id: { in: posterIds } },
@@ -131,7 +139,7 @@ export async function PUT(req: NextRequest) {
           action: 'audit',
           targetType: 'work_poster',
           targetId,
-          payload: { auditStatus: newStatus, batch: isBatch },
+          payload: { auditStatus: newStatus, auditReason, batch: isBatch },
           request: req,
         })
       )

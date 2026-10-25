@@ -27,6 +27,7 @@ import {
   getOperationModuleLabel,
   sortOperationModules,
 } from '@/lib/operation-log-labels'
+import { pickLogReason } from '@/lib/admin-risk'
 
 interface OperationLogItem {
   id: string
@@ -42,6 +43,7 @@ interface OperationLogItem {
   ipAddress: string | null
   userAgent: string | null
   createdAt: string
+  payload?: Record<string, unknown> | null
   operator?: {
     id: string
     username: string
@@ -198,7 +200,9 @@ export default function OperationLogsPage() {
           <ListRowSkeleton rows={6} />
         ) : (
           <>
-        {pagedItems.map((item) => (
+        {pagedItems.map((item) => {
+          const logReason = pickLogReason(item.payload)
+          return (
           <Card key={item.id} className="overflow-hidden border-border bg-card/50">
             <div className="p-4 flex items-start justify-between gap-4">
               <div className="flex items-start gap-4 min-w-0">
@@ -236,6 +240,11 @@ export default function OperationLogsPage() {
                   <div className="text-xs text-muted-foreground mt-1 break-all">
                     路径: {item.requestPath || '-'} · IP: {item.ipAddress || '-'}
                   </div>
+                  {logReason && (
+                    <div className="text-xs text-foreground/80 mt-2 break-all rounded-md bg-muted/40 px-2 py-1.5">
+                      原因: {logReason}
+                    </div>
+                  )}
                   {!item.success && item.errorMessage && (
                     <div className="text-xs text-red-400 mt-1 break-all">
                       错误: {item.errorMessage}
@@ -248,7 +257,7 @@ export default function OperationLogsPage() {
               </div>
             </div>
           </Card>
-        ))}
+        )})}
         {!isLoading && pagedItems.length === 0 && (
           <ListEmptyState title={tConsole('empty.noOperationLogs')} />
         )}
