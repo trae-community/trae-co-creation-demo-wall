@@ -6,7 +6,7 @@
 
 | 路径 | 说明 |
 |------|------|
-| [mascot/](mascot/) | TRAE 宝悬浮入口定稿（未抽 / 已抽状态参考） |
+| [mascot/](mascot/) | TRAE 宝悬浮入口定稿（`invite-final.png` 未抽 / `selected-final.png` 已抽；与 `public/box/trae-bao*.png` 一致） |
 | [blind-box-1024/ui-screens/](blind-box-1024/ui-screens/) | 1024 键帽盲盒抽卡流程 UI 导出（第一组/第二组 reveal、词组对比、挂件、命题已选定等） |
 
 ## 关联文档
