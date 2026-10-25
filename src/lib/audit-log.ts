@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { isTrustProxyEnabled, resolveClientIp } from '@/lib/client-ip'
 
 type IdLike = bigint | number | string | null | undefined
 
@@ -16,19 +17,6 @@ const normalizeId = (value: IdLike) => {
 const getHeaderValue = (headers: Headers, name: string) => {
   const value = headers.get(name)
   return value?.trim() || null
-}
-
-const getClientIp = (headers: Headers) => {
-  const forwardedFor = getHeaderValue(headers, 'x-forwarded-for')
-  if (forwardedFor) {
-    const first = forwardedFor.split(',')[0]?.trim()
-    if (first) return first
-  }
-  return (
-    getHeaderValue(headers, 'x-real-ip') ||
-    getHeaderValue(headers, 'cf-connecting-ip') ||
-    getHeaderValue(headers, 'x-client-ip')
-  )
 }
 
 const toSafeJson = (value: unknown) =>
@@ -59,13 +47,19 @@ const getRequestMeta = (request?: RequestLike) => {
       ? new URL(request.url).pathname
       : null
 
+  const ip = resolveClientIp(request.headers)
+
   return {
-    ipAddress: getClientIp(request.headers),
+    ipAddress: ip.address,
+    ipTrusted: ip.trusted,
+    ipForwardedFor: ip.forwardedFor,
     userAgent: getHeaderValue(request.headers, 'user-agent'),
     requestMethod: request.method || null,
     requestPath
   }
 }
+
+export { isTrustProxyEnabled }
 
 type AuthLogInput = {
   userId?: IdLike
@@ -87,7 +81,12 @@ export async function writeAuthLog(input: AuthLogInput) {
         authStatus: input.authStatus || 'success',
         ipAddress: meta.ipAddress,
         userAgent: meta.userAgent,
-        metadata: input.metadata ? toSafeJson(input.metadata) : undefined
+        metadata: toSafeJson({
+          ...(input.metadata && typeof input.metadata === 'object' ? input.metadata : {}),
+          ...(input.metadata && typeof input.metadata !== 'object' ? { detail: input.metadata } : {}),
+          ipTrustProxy: meta.ipTrusted,
+          ...(meta.ipForwardedFor ? { ipForwardedFor: meta.ipForwardedFor } : {}),
+        })
       }
     })
   } catch (error) {
