@@ -10,6 +10,7 @@ import {
   notifyWorkAuditBatch,
   notifyWorkAuditResult,
 } from '@/lib/user-notifications';
+import { getLatestAuditReasonsByWorkIds } from '@/lib/work-audit-queries';
 
 // Helper to sanitize object
 const sanitize = (data: any) => {
@@ -223,20 +224,10 @@ export async function GET(req: NextRequest) {
       .filter(w => w.statistic && w.statistic.auditStatus !== 1)
       .map(w => w.id);
 
-    const auditReasonMap: Record<string, string> = {};
-    if (nonApprovedWorkIds.length > 0) {
-      const auditLogs = await prisma.workAuditLog.findMany({
-        where: { workId: { in: nonApprovedWorkIds } },
-        orderBy: { createdAt: 'desc' },
-      });
-      // Keep only the latest log per work
-      for (const log of auditLogs) {
-        const wid = log.workId.toString();
-        if (!auditReasonMap[wid] && log.reason) {
-          auditReasonMap[wid] = log.reason;
-        }
-      }
-    }
+    const auditReasonMap =
+      nonApprovedWorkIds.length > 0
+        ? await getLatestAuditReasonsByWorkIds(nonApprovedWorkIds)
+        : new Map<string, string>();
 
     const likeRiskMap = await getWorkLikeRiskByWorkIds(works.map(w => w.id));
 
@@ -245,7 +236,7 @@ export async function GET(req: NextRequest) {
       const risk = likeRiskMap.get(work.id.toString());
       return {
         ...work,
-        lastAuditReason: auditReasonMap[work.id.toString()] || null,
+        lastAuditReason: auditReasonMap.get(work.id.toString()) || null,
         likeRisk: risk
           ? {
               newAccountLikeCount: risk.newAccountLikeCount,

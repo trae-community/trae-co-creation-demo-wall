@@ -6,6 +6,7 @@ import { writeOperationLog } from '@/lib/audit-log'
 import { sanitizeRichText, stripHtmlTags } from '@/lib/rich-text'
 import { z } from 'zod'
 import { createdAtDayRange } from '@/lib/created-at-day-range'
+import { getCachedRawDictionaries } from '@/lib/dict-cache'
 
 const updateSchema = z.object({
   name: z.string().min(2).max(50),
@@ -27,25 +28,6 @@ const updateSchema = z.object({
   demoUrl: z.string().url().optional().or(z.literal('')),
   repoUrl: z.string().url().optional().or(z.literal('')),
 })
-
-async function getRawDictionaries() {
-  const [countryDict, cityDict, categoryDict, honorDict] = await Promise.all([
-    prisma.sysDict.findUnique({ where: { dictCode: 'country' }, include: { items: true } }),
-    prisma.sysDict.findUnique({ where: { dictCode: 'city' }, include: { items: true } }),
-    prisma.sysDict.findUnique({ where: { dictCode: 'category_code' }, include: { items: true } }),
-    prisma.sysDict.findUnique({ where: { dictCode: 'honor_type' }, include: { items: true } }),
-  ])
-
-  const serialize = (obj: unknown) =>
-    JSON.parse(JSON.stringify(obj, (_, v) => (typeof v === 'bigint' ? v.toString() : v)))
-
-  return {
-    countryDict: serialize(countryDict),
-    cityDict: serialize(cityDict),
-    categoryDict: serialize(categoryDict),
-    honorDict: serialize(honorDict),
-  }
-}
 
 export async function GET(req: Request) {
   try {
@@ -137,9 +119,12 @@ export async function GET(req: Request) {
       orderBy = { statistic: { viewCount: 'desc' } };
     }
 
-    const { countryDict, cityDict, categoryDict, honorDict } = await getRawDictionaries();
+    const { countryDict, cityDict, categoryDict, honorDict } =
+      await getCachedRawDictionaries();
 
-    const resolveLabelMap = (items: Array<{ itemValue: string; itemLabel: string; labelI18n: Prisma.JsonValue | null }>) => {
+    const resolveLabelMap = (
+      items: Array<{ itemValue: string; itemLabel: string; labelI18n?: unknown }>
+    ) => {
       return items.reduce<Record<string, string>>((acc, item) => {
         let label = item.itemLabel;
         if (item.labelI18n && typeof item.labelI18n === 'object') {
