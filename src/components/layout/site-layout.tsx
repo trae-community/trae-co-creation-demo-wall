@@ -4,6 +4,7 @@ import React, { Suspense, useState, useRef, useEffect } from "react";
 import { CodeBlindBoxLauncher } from '@/components/code-blind-box';
 import { cn } from "@/lib/utils";
 import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X, Trophy, Github, Code2, Globe, MessagesSquare, MessageSquarePlus, Palette } from "lucide-react";
+import { NotificationBell } from '@/components/notifications/notification-bell';
 import { ParticlesBackground } from "./particles-background";
 import { BackToTop } from "@/components/common/back-to-top";
 import { useSession } from 'next-auth/react';
@@ -175,6 +176,8 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             )}
 
             {isAuthenticated && (
+              <div className="flex items-center gap-1.5 pl-1">
+                <NotificationBell />
               <Link
                 href="/profile"
                 className={cn(
@@ -195,6 +198,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 </div>
                 {tProfile('menu')}
               </Link>
+              </div>
             )}
 
             {!isAuthenticated && (
@@ -247,6 +251,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
           {/* Mobile Menu Button */}
           <div className="flex lg:hidden items-center gap-3">
+            {isAuthenticated && <NotificationBell />}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
@@ -326,6 +331,22 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   {t('console')}
+                </Link>
+              )}
+
+              {isAuthenticated && (
+                <Link
+                  href="/notifications"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                    pathname === "/notifications"
+                      ? "bg-green-500/10 text-green-500 border border-green-500/20"
+                      : "text-zinc-400 hover:text-white hover:bg-white/5"
+                  )}
+                >
+                  <MessagesSquare className="w-4 h-4" />
+                  {t('notifications')}
                 </Link>
               )}
 

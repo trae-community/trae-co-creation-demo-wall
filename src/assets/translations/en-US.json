@@ -8,7 +8,8 @@
     "login": "Login / Register",
     "langSwitch": "EN",
     "langLabel": "Switch Language",
-    "console": "Console"
+    "console": "Console",
+    "notifications": "Notifications"
   },
   "Home": {
     "heroTitle": "Ship Faster with",
@@ -68,9 +69,11 @@
     "teamInfo": "Team Information",
     "team": "Team Members",
     "teamPlaceholder": "Enter team member name",
+    "teamMembersHint": "One name per line. For solo projects, keep the default name. Use “Add Member” for more people.",
     "addTeamMember": "Add Member",
     "teamIntro": "Team Introduction",
-    "teamIntroPlaceholder": "Introduce your team...",
+    "teamIntroOptional": "Team introduction (optional)",
+    "teamIntroPlaceholder": "Optional: describe your team or roles...",
     "contactPhone": "Contact Phone",
     "contactPhonePlaceholder": "Enter contact phone (optional)",
     "contactEmail": "Contact Email",
@@ -185,6 +188,10 @@
     "shareCard": "Share Card",
     "aboutProject": "About This Project",
     "aboutProjectDesc": "This project was submitted at the TRAE Friends@Hangzhou offline event. If you're interested in this project, you can learn more through the code repository or Demo link.",
+    "likersTitle": "Who liked this",
+    "likersSubtitle": "{count} likes",
+    "likersEmpty": "No likes yet",
+    "likersMore": "+{count} more",
     "aboutAuthor": "About the Author",
     "country": "Province",
     "city": "City",
@@ -321,6 +328,24 @@
     "validationPasswordMismatch": "Passwords do not match",
     "editProfile": "Edit Profile",
     "cancelEdit": "Cancel"
+  },
+  "Notifications": {
+    "title": "Notifications",
+    "subtitle": "Audit results and interactions appear here",
+    "bellAria": "Notifications, {count} unread",
+    "empty": "No messages yet",
+    "markAllRead": "Mark all as read",
+    "loginRequired": "Sign in to view your notifications.",
+    "goSignIn": "Sign in",
+    "prev": "Previous",
+    "next": "Next",
+    "unknown": "You have a new message",
+    "workApproved": "Your work \"{title}\" was approved",
+    "workRejected": "Your work \"{title}\" was rejected",
+    "workRejectedWithReason": "Your work \"{title}\" was rejected: {reason}",
+    "posterApproved": "Your poster \"{name}\" was approved",
+    "posterRejected": "Your poster \"{name}\" was rejected",
+    "workLiked": "{user} liked your work \"{title}\""
   },
   "UserProfile": {
     "title": "User Profile",

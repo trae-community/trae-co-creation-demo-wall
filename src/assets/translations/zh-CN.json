@@ -8,7 +8,8 @@
     "login": "登录 / 注册",
     "langSwitch": "EN",
     "langLabel": "切换语言",
-    "console": "控制台"
+    "console": "控制台",
+    "notifications": "站内消息"
   },
   "Home": {
     "heroTitle": "Ship Faster with",
@@ -66,9 +67,11 @@
     "teamInfo": "团队信息",
     "team": "团队成员",
     "teamPlaceholder": "输入团队成员姓名",
+    "teamMembersHint": "每位成员单独一行；单人项目可保留默认姓名。多人协作请点击下方「添加成员」。",
     "addTeamMember": "添加成员",
     "teamIntro": "团队介绍",
-    "teamIntroPlaceholder": "介绍一下你的团队...",
+    "teamIntroOptional": "团队介绍（选填）",
+    "teamIntroPlaceholder": "可选：介绍一下你的团队或分工...",
     "contactPhone": "联系电话",
     "contactPhonePlaceholder": "请输入联系电话（选填）",
     "contactEmail": "联系邮箱",
@@ -183,6 +186,10 @@
     "shareCard": "分享卡片",
     "aboutProject": "关于作品",
     "aboutProjectDesc": "该作品由TRAE Friends线下活动提交。如果您对该项目感兴趣，可以通过代码仓库或Demo链接进一步了解。",
+    "likersTitle": "点赞用户",
+    "likersSubtitle": "共 {count} 人点赞",
+    "likersEmpty": "还没有人点赞",
+    "likersMore": "另有 {count} 人",
     "aboutAuthor": "关于作者",
     "country": "省份",
     "city": "城市",
@@ -319,6 +326,24 @@
     "validationPasswordMismatch": "两次输入的新密码不一致",
     "editProfile": "编辑资料",
     "cancelEdit": "取消编辑"
+  },
+  "Notifications": {
+    "title": "站内消息",
+    "subtitle": "审核结果与作品互动会出现在这里",
+    "bellAria": "站内消息，{count} 条未读",
+    "empty": "暂无消息",
+    "markAllRead": "全部标为已读",
+    "loginRequired": "登录后即可查看站内消息。",
+    "goSignIn": "去登录",
+    "prev": "上一页",
+    "next": "下一页",
+    "unknown": "你有一条新消息",
+    "workApproved": "作品「{title}」已通过审核",
+    "workRejected": "作品「{title}」未通过审核",
+    "workRejectedWithReason": "作品「{title}」未通过审核：{reason}",
+    "posterApproved": "海报「{name}」已通过审核",
+    "posterRejected": "海报「{name}」未通过审核",
+    "workLiked": "{user} 赞了你的作品「{title}」"
   },
   "UserProfile": {
     "title": "用户主页",

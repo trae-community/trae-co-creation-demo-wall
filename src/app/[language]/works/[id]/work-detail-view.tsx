@@ -4,6 +4,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ExternalLink, Github, Users, Calendar, Share2, ThumbsUp, Mail, Award, ChevronLeft, ChevronRight, Download, Link2, Check, MapPin, X, Printer } from "lucide-react";
 import { Button } from "@/components/common/action-button";
 import { useEffect, useState, useRef } from "react";
+import { WorkLikersSection } from "@/components/work/work-likers-section";
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Link } from '@/lib/language/navigation';
@@ -918,6 +919,8 @@ export function WorkDetailView() {
           </div>
         </div>
       </div>
+
+      <WorkLikersSection workId={id} enabled={Boolean(work)} />
 
       {/* 底部提示 */}
       <div className="mt-8 pt-6 border-t border-border/50">
