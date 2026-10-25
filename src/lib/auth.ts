@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth-nextauth";
 import { prisma } from "@/lib/prisma";
+import { isUserBanned } from "@/lib/ban";
 
 export type AuthUser = {
   userId: bigint;
@@ -9,10 +10,9 @@ export type AuthUser = {
 };
 
 /**
- * Get authenticated user from NextAuth session
- * Returns user info with roles from database
+ * 从会话加载用户（不查封禁）。写接口请用 `requireAuthUser` 以区分 401 / USER_BANNED。
  */
-export async function getAuthUser(): Promise<AuthUser | null> {
+export async function fetchAuthUserFromSession(): Promise<AuthUser | null> {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -50,6 +50,21 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     console.error("[Auth] Error fetching user:", error);
     return null;
   }
+}
+
+/**
+ * Get authenticated user from NextAuth session (excludes banned users).
+ * Returns user info with roles from database
+ */
+export async function getAuthUser(): Promise<AuthUser | null> {
+  const user = await fetchAuthUserFromSession();
+  if (!user) {
+    return null;
+  }
+  if (await isUserBanned(user.userId)) {
+    return null;
+  }
+  return user;
 }
 
 /**

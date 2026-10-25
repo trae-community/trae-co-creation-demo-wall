@@ -3,6 +3,7 @@ import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
 import { getAuthUser, isAdmin } from '@/lib/auth';
+import { isAuthResponse, requireAdmin } from '@/lib/api-auth';
 import { writeOperationLog } from '@/lib/audit-log';
 import { getBannedUserIds } from '@/lib/ban';
 import { createdAtDayRange } from '@/lib/created-at-day-range';
@@ -160,9 +161,9 @@ export async function GET(req: NextRequest) {
 // POST: 创建用户
 export async function POST(req: NextRequest) {
   try {
-    const operator = await getAuthUser();
-    if (!isAdmin(operator)) {
-      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    const operator = await requireAdmin();
+    if (isAuthResponse(operator)) {
+      return operator;
     }
     const body = await req.json();
     const { username, email, phone, bio, avatarUrl } = body;
@@ -224,9 +225,9 @@ export async function POST(req: NextRequest) {
 // PUT: 更新用户
 export async function PUT(req: NextRequest) {
   try {
-    const operator = await getAuthUser();
-    if (!isAdmin(operator)) {
-      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    const operator = await requireAdmin();
+    if (isAuthResponse(operator)) {
+      return operator;
     }
     const body = await req.json();
     const { id, username, email, phone, bio, avatarUrl, roleIds } = body;
@@ -313,9 +314,9 @@ export async function PUT(req: NextRequest) {
 // DELETE: 删除用户
 export async function DELETE(req: NextRequest) {
   try {
-    const operator = await getAuthUser();
-    if (!isAdmin(operator)) {
-      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    const operator = await requireAdmin();
+    if (isAuthResponse(operator)) {
+      return operator;
     }
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');

@@ -3,6 +3,7 @@ import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
 import { getAuthUser, isAdmin } from '@/lib/auth';
+import { isAuthResponse, requireAdmin } from '@/lib/api-auth';
 
 // 系统内置角色：固定三个（root/admin/common），不支持新增/修改/删除
 const LOCKED_MESSAGE = '系统角色已固定，不支持新增、修改或删除操作';
@@ -68,27 +69,27 @@ export async function GET(req: NextRequest) {
 
 // POST: 创建角色（已禁用：角色固定为 root/admin/common）
 export async function POST(req: NextRequest) {
-  const operator = await getAuthUser();
-  if (!isAdmin(operator)) {
-    return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+  const operator = await requireAdmin();
+  if (isAuthResponse(operator)) {
+    return operator;
   }
   return NextResponse.json({ error: LOCKED_MESSAGE }, { status: 403 });
 }
 
 // PUT: 更新角色（已禁用：角色固定为 root/admin/common）
 export async function PUT(req: NextRequest) {
-  const operator = await getAuthUser();
-  if (!isAdmin(operator)) {
-    return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+  const operator = await requireAdmin();
+  if (isAuthResponse(operator)) {
+    return operator;
   }
   return NextResponse.json({ error: LOCKED_MESSAGE }, { status: 403 });
 }
 
 // DELETE: 删除角色（已禁用：角色固定为 root/admin/common）
 export async function DELETE(req: NextRequest) {
-  const operator = await getAuthUser();
-  if (!isAdmin(operator)) {
-    return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+  const operator = await requireAdmin();
+  if (isAuthResponse(operator)) {
+    return operator;
   }
   return NextResponse.json({ error: LOCKED_MESSAGE }, { status: 403 });
 }

@@ -1,7 +1,7 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { isAuthResponse, requireAuthUser } from "@/lib/api-auth";
 import { writeOperationLog } from "@/lib/audit-log";
 import { sanitizeRichText, stripHtmlTags } from "@/lib/rich-text";
 import { z } from "zod";
@@ -42,12 +42,9 @@ const submissionSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const user = await getAuthUser();
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
+    const user = await requireAuthUser();
+    if (isAuthResponse(user)) {
+      return user;
     }
 
     const body = await request.json();

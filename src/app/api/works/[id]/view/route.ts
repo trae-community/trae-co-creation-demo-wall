@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { isAuthResponse, optionalAuthUser } from "@/lib/api-auth";
 import { writeOperationLog } from "@/lib/audit-log";
 
 /**
@@ -34,7 +34,10 @@ export async function POST(
     });
 
     // 记录浏览日志（便于排查刷浏览量；未登录用户 operatorId 为空，仅记录 IP）
-    const user = await getAuthUser().catch(() => null);
+    const user = await optionalAuthUser();
+    if (isAuthResponse(user)) {
+      return user;
+    }
     await writeOperationLog({
       operatorId: user?.userId ?? null,
       module: 'work',

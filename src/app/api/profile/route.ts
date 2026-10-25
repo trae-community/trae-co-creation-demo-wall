@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
+import { isAuthResponse, requireAuthUser } from "@/lib/api-auth";
 import { writeOperationLog } from "@/lib/audit-log";
 
 const toSafeString = (value: unknown, maxLength = 255): string => {
@@ -136,9 +137,9 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   try {
-    const authUser = await getAuthUser();
-    if (!authUser) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authUser = await requireAuthUser();
+    if (isAuthResponse(authUser)) {
+      return authUser;
     }
 
     const body = await req.json();

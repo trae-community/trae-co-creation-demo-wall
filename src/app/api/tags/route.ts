@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { CRUD_QUERY_PARAMS, TAG_FILTERS, normalizeFilter } from '@/lib/crud'
-import { getAuthUser } from '@/lib/auth'
+import { isAuthResponse, requireAdmin } from '@/lib/api-auth'
 import { writeOperationLog } from '@/lib/audit-log'
 
 export async function GET(req: NextRequest) {
@@ -51,7 +51,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const operator = await getAuthUser()
+    const operator = await requireAdmin()
+    if (isAuthResponse(operator)) {
+      return operator
+    }
     const body = await req.json()
     const { name, isAutoAudit, auditStartTime, auditEndTime } = body
     const newTag = await prisma.workTag.create({
@@ -63,7 +66,7 @@ export async function POST(req: NextRequest) {
       }
     })
     await writeOperationLog({
-      operatorId: operator?.userId,
+      operatorId: operator.userId,
       module: 'tags',
       action: 'create',
       targetType: 'work_tag',
@@ -88,7 +91,10 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const operator = await getAuthUser()
+    const operator = await requireAdmin()
+    if (isAuthResponse(operator)) {
+      return operator
+    }
     const body = await req.json()
     const { id, name, isAutoAudit, auditStartTime, auditEndTime } = body
     const updatedTag = await prisma.workTag.update({
@@ -101,7 +107,7 @@ export async function PUT(req: NextRequest) {
       }
     })
     await writeOperationLog({
-      operatorId: operator?.userId,
+      operatorId: operator.userId,
       module: 'tags',
       action: 'update',
       targetType: 'work_tag',
@@ -126,14 +132,17 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const operator = await getAuthUser()
+    const operator = await requireAdmin()
+    if (isAuthResponse(operator)) {
+      return operator
+    }
     const { searchParams } = new URL(req.url)
     const id = searchParams.get('id')
     if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 })
 
     await prisma.workTag.delete({ where: { id: Number(id) } })
     await writeOperationLog({
-      operatorId: operator?.userId,
+      operatorId: operator.userId,
       module: 'tags',
       action: 'delete',
       targetType: 'work_tag',

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser } from '@/lib/auth';
+import { isAuthResponse, requireAuthUser } from '@/lib/api-auth';
 import { isCodeBlindBoxEnabled } from '@/lib/code-blind-box/config';
 import {
   confirmBlindBoxSlot,
@@ -19,9 +19,9 @@ function sessionResponse(session: BlindBoxSession) {
 export async function GET() {
   if (!isCodeBlindBoxEnabled()) return featureDisabled();
 
-  const user = await getAuthUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const user = await requireAuthUser();
+  if (isAuthResponse(user)) {
+    return user;
   }
 
   try {
@@ -37,9 +37,9 @@ export async function GET() {
 export async function POST() {
   if (!isCodeBlindBoxEnabled()) return featureDisabled();
 
-  const user = await getAuthUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const user = await requireAuthUser();
+  if (isAuthResponse(user)) {
+    return user;
   }
 
   try {
@@ -55,9 +55,9 @@ export async function POST() {
 export async function PATCH(req: NextRequest) {
   if (!isCodeBlindBoxEnabled()) return featureDisabled();
 
-  const user = await getAuthUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const user = await requireAuthUser();
+  if (isAuthResponse(user)) {
+    return user;
   }
 
   try {

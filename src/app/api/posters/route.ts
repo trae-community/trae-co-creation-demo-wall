@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
+import { isAuthResponse, requireAuthUser } from '@/lib/api-auth';
 import { writeOperationLog } from '@/lib/audit-log';
 
 // Helper to sanitize BigInt
@@ -77,9 +78,9 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const user = await getAuthUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await requireAuthUser();
+    if (isAuthResponse(user)) {
+      return user;
     }
 
     const body = await req.json();

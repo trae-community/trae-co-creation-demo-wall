@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser, isAdmin } from '@/lib/auth';
+import { isAuthResponse, requireAuthUser } from '@/lib/api-auth';
 import { writeOperationLog } from '@/lib/audit-log';
 
 // Helper to sanitize BigInt
@@ -62,9 +63,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getAuthUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await requireAuthUser();
+    if (isAuthResponse(user)) {
+      return user;
     }
 
     const { id: idStr } = await params;
@@ -107,9 +108,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getAuthUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await requireAuthUser();
+    if (isAuthResponse(user)) {
+      return user;
     }
 
     const { id: idStr } = await params;

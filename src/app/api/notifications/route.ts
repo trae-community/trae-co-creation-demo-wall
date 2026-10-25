@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/lib/auth';
+import { isAuthResponse, requireAuthUser } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { serializeNotifications } from '@/lib/user-notifications';
 
@@ -62,9 +63,9 @@ export async function GET(req: NextRequest) {
  */
 export async function PATCH(req: NextRequest) {
   try {
-    const user = await getAuthUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await requireAuthUser();
+    if (isAuthResponse(user)) {
+      return user;
     }
 
     const body = await req.json().catch(() => ({}));

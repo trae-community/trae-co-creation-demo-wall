@@ -3,6 +3,7 @@ import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CRUD_QUERY_PARAMS, DICT_FILTERS, normalizeFilter } from '@/lib/crud';
 import { getAuthUser } from '@/lib/auth';
+import { isAuthResponse, requireAdmin } from '@/lib/api-auth';
 import { writeOperationLog } from '@/lib/audit-log';
 
 // GET: 获取字典列表（包含字典项）
@@ -115,9 +116,12 @@ export async function GET(req: NextRequest) {
 // POST: 创建字典或字典项
 export async function POST(req: NextRequest) {
   try {
+    const operator = await requireAdmin();
+    if (isAuthResponse(operator)) {
+      return operator;
+    }
     const body = await req.json();
     const { type, data } = body; // type: 'dict' | 'item'
-    const operator = await getAuthUser();
 
     if (type === 'dict') {
       const newDict = await prisma.sysDict.create({
@@ -129,7 +133,7 @@ export async function POST(req: NextRequest) {
         }
       });
       await writeOperationLog({
-        operatorId: operator?.userId ?? null,
+        operatorId: operator.userId,
         module: 'dictionary',
         action: 'create',
         targetType: 'dict',
@@ -157,7 +161,7 @@ export async function POST(req: NextRequest) {
         data: itemData
       })
       await writeOperationLog({
-        operatorId: operator?.userId ?? null,
+        operatorId: operator.userId,
         module: 'dictionary',
         action: 'create',
         targetType: 'dict_item',
@@ -180,9 +184,12 @@ export async function POST(req: NextRequest) {
 // PUT: 更新字典或字典项
 export async function PUT(req: NextRequest) {
   try {
+    const operator = await requireAdmin();
+    if (isAuthResponse(operator)) {
+      return operator;
+    }
     const body = await req.json();
     const { type, id, data } = body;
-    const operator = await getAuthUser();
 
     if (type === 'dict') {
       const updatedDict = await prisma.sysDict.update({
@@ -193,7 +200,7 @@ export async function PUT(req: NextRequest) {
         }
       });
       await writeOperationLog({
-        operatorId: operator?.userId ?? null,
+        operatorId: operator.userId,
         module: 'dictionary',
         action: 'update',
         targetType: 'dict',
@@ -221,7 +228,7 @@ export async function PUT(req: NextRequest) {
         data: itemData
       })
       await writeOperationLog({
-        operatorId: operator?.userId ?? null,
+        operatorId: operator.userId,
         module: 'dictionary',
         action: 'update',
         targetType: 'dict_item',
@@ -250,14 +257,17 @@ export async function DELETE(req: NextRequest) {
 
     if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
 
-    const operator = await getAuthUser();
+    const operator = await requireAdmin();
+    if (isAuthResponse(operator)) {
+      return operator;
+    }
 
     if (type === 'dict') {
       await prisma.sysDict.delete({
         where: { id: BigInt(id) }
       });
       await writeOperationLog({
-        operatorId: operator?.userId ?? null,
+        operatorId: operator.userId,
         module: 'dictionary',
         action: 'delete',
         targetType: 'dict',
@@ -269,7 +279,7 @@ export async function DELETE(req: NextRequest) {
         where: { id: BigInt(id) }
       });
       await writeOperationLog({
-        operatorId: operator?.userId ?? null,
+        operatorId: operator.userId,
         module: 'dictionary',
         action: 'delete',
         targetType: 'dict_item',

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { writeOperationLog } from '@/lib/audit-log';
 import { getAuthUser, isRoot } from '@/lib/auth';
+import { isAuthResponse, requireRoot } from '@/lib/api-auth';
 import { CRUD_QUERY_PARAMS } from '@/lib/crud';
 import {
   listBlindBoxDrawsForAdmin,
@@ -63,9 +64,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const operator = await getAuthUser();
-  if (!isRoot(operator)) {
-    return NextResponse.json({ error: 'Forbidden: Root access required' }, { status: 403 });
+  const operator = await requireRoot();
+  if (isAuthResponse(operator)) {
+    return operator;
   }
 
   const { searchParams } = new URL(req.url);

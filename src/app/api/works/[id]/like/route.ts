@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { isAuthResponse, requireAuthUser } from "@/lib/api-auth";
 import { writeOperationLog } from "@/lib/audit-log";
 import { notifyWorkLiked } from "@/lib/user-notifications";
 
@@ -14,12 +14,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getAuthUser();
-    if (!user) {
-      return NextResponse.json(
-        { error: "Unauthorized", code: "LOGIN_REQUIRED" },
-        { status: 401 }
-      );
+    const user = await requireAuthUser({ loginRequired: true });
+    if (isAuthResponse(user)) {
+      return user;
     }
 
     const { id } = await params;
