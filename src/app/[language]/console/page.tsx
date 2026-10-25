@@ -1,7 +1,17 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Users, FileText, UserPlus, TrendingUp, Activity, PieChart, BarChart, Upload, Info } from 'lucide-react'
+import { Users, FileText, UserPlus, TrendingUp, Activity, PieChart, BarChart, Upload, Info, ShieldCheck, Image, Wrench } from 'lucide-react'
+import { Link } from '@/lib/language/navigation'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { LoadingOverlay } from '@/components/common/loading-overlay'
 import { CrudFeedback } from '@/components/crud/crud-feedback'
 import { useFeedback } from '@/lib/use-feedback'
@@ -41,7 +51,15 @@ interface ActivityItem {
   createdAt: string
 }
 
+interface MaintenancePreview {
+  bannedUserCount: number
+  likesFromBannedUsers: number
+  affectedWorkCount: number
+}
+
 interface OverviewData {
+  pendingAudit?: { works: number; posters: number }
+  maintenancePreview?: MaintenancePreview | null
   stats: {
     totalWorks: StatItem
     activeUsers: StatItem
@@ -80,6 +98,8 @@ export default function ConsolePage() {
   const [windowDays, setWindowDays] = useState<OverviewWindow>(7)
   const [isLoading, setIsLoading] = useState(false)
   const [data, setData] = useState<OverviewData>(defaultData)
+  const [purgeDialogOpen, setPurgeDialogOpen] = useState(false)
+  const [isPurging, setIsPurging] = useState(false)
   const { feedback, showFeedback } = useFeedback()
 
   const fetchOverview = useCallback(async () => {
@@ -125,10 +145,117 @@ export default function ConsolePage() {
     })
   }, [data.stats])
 
+  const pendingWorks = data.pendingAudit?.works ?? 0
+  const pendingPosters = data.pendingAudit?.posters ?? 0
+  const maintenance = data.maintenancePreview
+
+  const handlePurgeBannedLikes = async () => {
+    try {
+      setIsPurging(true)
+      const res = await fetch('/api/console/maintenance/purge-banned-likes', { method: 'POST' })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        showFeedback('error', body.error || '剔除失败')
+        return
+      }
+      showFeedback(
+        'success',
+        `已删除 ${body.deletedLikes ?? 0} 条点赞，重算 ${body.recalculatedWorks ?? 0} 个作品`
+      )
+      setPurgeDialogOpen(false)
+      fetchOverview()
+    } catch {
+      showFeedback('error', '剔除失败')
+    } finally {
+      setIsPurging(false)
+    }
+  }
+
   return (
     <div className="space-y-6 relative min-h-[500px]">
       <LoadingOverlay isLoading={isLoading} />
       <CrudFeedback feedback={feedback} />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Link
+          href="/console/works?auditStatus=0"
+          className="p-5 rounded-xl border border-border bg-card hover:border-amber-500/40 transition-colors flex items-center justify-between gap-4"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-600">
+              <ShieldCheck size={22} />
+            </div>
+            <div>
+              <p className="font-semibold text-foreground">待审作品</p>
+              <p className="text-xs text-muted-foreground mt-0.5">点击进入作品管理并筛选待审核</p>
+            </div>
+          </div>
+          <span className="text-3xl font-bold tabular-nums">{formatNumber(pendingWorks)}</span>
+        </Link>
+        <Link
+          href="/console/posters?auditStatus=0"
+          className="p-5 rounded-xl border border-border bg-card hover:border-amber-500/40 transition-colors flex items-center justify-between gap-4"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-600">
+              <Image size={22} aria-hidden />
+            </div>
+            <div>
+              <p className="font-semibold text-foreground">待审海报</p>
+              <p className="text-xs text-muted-foreground mt-0.5">点击进入海报管理并筛选待审核</p>
+            </div>
+          </div>
+          <span className="text-3xl font-bold tabular-nums">{formatNumber(pendingPosters)}</span>
+        </Link>
+      </div>
+
+      {maintenance && (
+        <Card className="p-5 rounded-xl border border-border bg-card">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 rounded-lg bg-muted text-muted-foreground">
+                <Wrench size={20} />
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">数据维护</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  封禁用户 {maintenance.bannedUserCount} 人，仍保留点赞{' '}
+                  {formatNumber(maintenance.likesFromBannedUsers)} 条（涉及{' '}
+                  {maintenance.affectedWorkCount} 个作品）。执行后将删除这些点赞并按实际记录重算点赞数。
+                </p>
+              </div>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={maintenance.likesFromBannedUsers === 0}
+              onClick={() => setPurgeDialogOpen(true)}
+            >
+              剔除封禁用户赞
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      <Dialog open={purgeDialogOpen} onOpenChange={setPurgeDialogOpen}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle>确认剔除封禁用户赞？</DialogTitle>
+            <DialogDescription>
+              将删除 {maintenance?.likesFromBannedUsers ?? 0} 条点赞，并重算{' '}
+              {maintenance?.affectedWorkCount ?? 0} 个作品的点赞数。此操作不可撤销。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setPurgeDialogOpen(false)} disabled={isPurging}>
+              取消
+            </Button>
+            <Button type="button" onClick={handlePurgeBannedLikes} disabled={isPurging}>
+              {isPurging ? '处理中…' : '确认执行'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statEntries.map((stat, index) => (
