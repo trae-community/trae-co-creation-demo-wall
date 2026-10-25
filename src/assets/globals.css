@@ -183,6 +183,14 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .card-fade-up {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 /* 进度条光晕 */
 .progress-glow {
   box-shadow: 0 0 8px rgba(50, 240, 140, 0.4), 0 0 2px rgba(50, 240, 140, 0.2);

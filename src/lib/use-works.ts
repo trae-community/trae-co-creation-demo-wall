@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Work } from '@/lib/types'
 
 interface WorksParams {
@@ -35,5 +35,6 @@ export function useWorks(params: WorksParams) {
       return response.json() as Promise<WorksResponse>
     },
     staleTime: 2 * 60 * 1000, // 2分钟
+    placeholderData: keepPreviousData,
   })
 }
