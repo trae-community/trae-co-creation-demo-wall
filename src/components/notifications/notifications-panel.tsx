@@ -6,6 +6,7 @@ import { Loader2, Bell, CheckCheck, ThumbsUp, FileCheck, FileX, ImageIcon } from
 import { Link } from '@/lib/language/navigation';
 import { cn } from '@/lib/utils';
 import { NotificationType } from '@/lib/user-notifications';
+import { RemoteImage } from '@/components/common/remote-image';
 
 type NotificationItem = {
   id: string;
@@ -189,9 +190,12 @@ export function NotificationsPanel() {
                 >
                   <div className="flex-shrink-0 w-10 h-10 rounded-full bg-muted flex items-center justify-center overflow-hidden border border-border">
                     {item.type === NotificationType.WORK_LIKED && actorAvatar ? (
-                      <img
+                      <RemoteImage
                         src={actorAvatar}
                         alt=""
+                        width={40}
+                        height={40}
+                        sizes="40px"
                         className="w-full h-full object-cover"
                       />
                     ) : item.type.includes('poster') ? (

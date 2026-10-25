@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/lib/language/navigation';
 import { workAssets } from '@/lib/work';
+import { RemoteImage } from '@/components/common/remote-image';
 
 interface WorkCardProps {
   work: Work;
@@ -82,18 +83,13 @@ export function WorkCard({ work }: WorkCardProps) {
     >
       {/* Cover — 4:3 ratio */}
       <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
-        <img
+        <RemoteImage
           src={work.coverUrl}
           alt={work.name}
-          loading="lazy"
-          decoding="async"
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          onError={(e) => {
-            const img = e.target as HTMLImageElement;
-            if (img.dataset.fallback) return; // 防止兑底图也失败时死循环
-            img.dataset.fallback = '1';
-            img.src = workAssets.placeholder;
-          }}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          fallbackSrc={workAssets.placeholder}
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
         {/* Hover overlay with CTA */}
@@ -206,7 +202,14 @@ export function WorkCard({ work }: WorkCardProps) {
                   aria-label={`查看作者 ${work.author?.name || ''}`}
                 >
                   {work.author?.avatar ? (
-                    <img src={work.author.avatar} alt={work.author.name} className="w-full h-full object-cover" />
+                    <RemoteImage
+                      src={work.author.avatar}
+                      alt={work.author.name}
+                      width={32}
+                      height={32}
+                      sizes="32px"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <span className="flex items-center justify-center w-full h-full text-[10px] font-bold text-foreground">
                       {work.author?.name?.charAt(0) || '?'}

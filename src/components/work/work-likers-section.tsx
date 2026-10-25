@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Loader2, UserRound } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from '@/lib/language/navigation';
+import { RemoteImage } from '@/components/common/remote-image';
 
 type LikerUser = {
   id: string;
@@ -74,9 +75,12 @@ export function WorkLikersSection({ workId, enabled }: WorkLikersSectionProps) {
               >
               <span className="w-7 h-7 rounded-full overflow-hidden bg-muted flex-shrink-0 border border-border">
                 {item.user.avatarUrl ? (
-                  <img
+                  <RemoteImage
                     src={item.user.avatarUrl}
                     alt=""
+                    width={28}
+                    height={28}
+                    sizes="28px"
                     className="w-full h-full object-cover"
                   />
                 ) : (

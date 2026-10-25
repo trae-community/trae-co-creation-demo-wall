@@ -12,6 +12,8 @@ import { Work } from "@/lib/types";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useWorksStore } from '@/lib/works-store';
 import { cn } from '@/lib/utils';
+import { RemoteImage } from '@/components/common/remote-image';
+import { workAssets } from '@/lib/work';
 import { posterAssets } from '@/lib/poster';
 
 const toStringList = (value: unknown): string[] => {
@@ -600,10 +602,14 @@ export function WorkDetailView() {
       {/* 封面区 - 精简 */}
       <div className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border">
         <div className="aspect-video w-full bg-muted relative group">
-          <img
+          <RemoteImage
             src={work.coverUrl}
             alt={work.name}
-            className="w-full h-full object-cover cursor-zoom-in"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 896px"
+            fallbackSrc={workAssets.placeholder}
+            className="object-cover cursor-zoom-in"
             onClick={() => openImagePreview([work.coverUrl], 0, work.name)}
             title={t('clickToPreview')}
           />
@@ -749,13 +755,17 @@ export function WorkDetailView() {
                     }
                   }}
                 >
-                  <img
-                    src={screenshotList[activeScreenshotIndex]}
-                    alt={`Screenshot ${activeScreenshotIndex + 1}`}
-                    className="w-full h-[320px] object-cover cursor-zoom-in"
-                    onClick={() => openImagePreview(screenshotList, activeScreenshotIndex, t('screenshots'))}
-                    title={t('clickToPreview')}
-                  />
+                  <div className="relative w-full h-[320px]">
+                    <RemoteImage
+                      src={screenshotList[activeScreenshotIndex]}
+                      alt={`Screenshot ${activeScreenshotIndex + 1}`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 672px"
+                      className="object-cover cursor-zoom-in"
+                      onClick={() => openImagePreview(screenshotList, activeScreenshotIndex, t('screenshots'))}
+                      title={t('clickToPreview')}
+                    />
+                  </div>
                   <div className="absolute top-4 right-4 rounded-full border border-white/15 bg-black/55 px-3 py-1 text-xs text-white/90 backdrop-blur-sm transition-opacity group-hover:opacity-100 opacity-90">
                     {t('clickToPreview')}
                   </div>
@@ -812,7 +822,14 @@ export function WorkDetailView() {
                         onClick={() => setActiveScreenshotIndex(index)}
                         className={`rounded-lg overflow-hidden border ${index === activeScreenshotIndex ? 'border-primary' : 'border-border'}`}
                       >
-                        <img src={url} alt={`Thumbnail ${index + 1}`} className="w-full h-16 object-cover" />
+                        <RemoteImage
+                          src={url}
+                          alt={`Thumbnail ${index + 1}`}
+                          width={120}
+                          height={64}
+                          sizes="120px"
+                          className="w-full h-16 object-cover"
+                        />
                       </button>
                     ))}
                   </div>
@@ -867,9 +884,12 @@ export function WorkDetailView() {
                   className="shrink-0"
                 >
                   {work.author.avatar ? (
-                    <img
+                    <RemoteImage
                       src={work.author.avatar}
                       alt={work.author.name}
+                      width={40}
+                      height={40}
+                      sizes="40px"
                       className="w-10 h-10 rounded-full object-cover border border-border hover:border-primary transition-colors"
                     />
                   ) : (

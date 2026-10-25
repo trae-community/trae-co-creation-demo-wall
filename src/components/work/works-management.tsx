@@ -39,6 +39,7 @@ import {
 import { EditForm } from '@/components/work/edit-form'
 import { ConsoleFilterCard } from '@/components/crud/console-filter-card'
 import { ListEmptyState } from '@/components/common/list-empty-state'
+import { RemoteImage } from '@/components/common/remote-image'
 import { ListRowSkeleton } from '@/components/common/list-row-skeleton'
 import { DatePicker } from '@/components/ui/date-picker'
 import { cn } from '@/lib/utils'
@@ -830,10 +831,12 @@ export function WorksManagement({
               {/* Cover Image */}
               <div className="w-full sm:w-48 h-32 sm:h-auto bg-muted shrink-0 relative group">
                 {work.coverUrl ? (
-                  <img 
-                    src={work.coverUrl} 
-                    alt={work.title} 
-                    className="absolute inset-0 w-full h-full object-cover"
+                  <RemoteImage
+                    src={work.coverUrl}
+                    alt={work.title}
+                    fill
+                    sizes="192px"
+                    className="object-cover"
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-muted-foreground bg-secondary/20">
@@ -1064,13 +1067,17 @@ export function WorksManagement({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-1 rounded-md overflow-hidden border border-border bg-secondary/20 relative group">
                 {viewingWork?.coverUrl ? (
-                  <img
-                    src={viewingWork.coverUrl}
-                    alt={viewingWork.title}
-                    className="w-full h-48 object-cover cursor-zoom-in"
-                    onClick={() => openImagePreview([viewingWork.coverUrl!], 0, `${viewingWork.title} - 封面`)}
-                    title="点击查看大图"
-                  />
+                  <div className="relative h-48 w-full">
+                    <RemoteImage
+                      src={viewingWork.coverUrl}
+                      alt={viewingWork.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 280px"
+                      className="object-cover cursor-zoom-in"
+                      onClick={() => openImagePreview([viewingWork.coverUrl!], 0, `${viewingWork.title} - 封面`)}
+                      title="点击查看大图"
+                    />
+                  </div>
                 ) : (
                   <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">无封面图</div>
                 )}
@@ -1116,11 +1123,13 @@ export function WorksManagement({
               <div className="rounded-md border border-border p-3 bg-secondary/20">
                 {viewingImages.length > 0 ? (
                   <div className="space-y-3">
-                    <div className="relative overflow-hidden rounded-md bg-black/20 group">
-                      <img
+                    <div className="relative overflow-hidden rounded-md bg-black/20 group h-56 sm:h-72">
+                      <RemoteImage
                         src={viewingImages[currentViewImageIndex].imageUrl}
                         alt={`${viewingWork?.title || '作品'}-轮播图-${currentViewImageIndex + 1}`}
-                        className="w-full h-56 sm:h-72 object-cover cursor-zoom-in"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 640px"
+                        className="object-cover cursor-zoom-in"
                         onClick={() => openImagePreview(viewingImages.map(image => image.imageUrl), currentViewImageIndex, `${viewingWork?.title || '作品'} - 项目截图`)}
                         title="点击查看大图"
                       />
@@ -1355,11 +1364,15 @@ export function WorksManagement({
           <div className="space-y-4">
             <div className="relative rounded-md overflow-hidden border border-border bg-black/50">
               {previewImages[previewImageIndex] ? (
-                <img
-                  src={previewImages[previewImageIndex]}
-                  alt={`${previewTitle}-${previewImageIndex + 1}`}
-                  className="w-full max-h-[75vh] object-contain bg-black"
-                />
+                <div className="relative w-full min-h-[200px] max-h-[75vh] aspect-video bg-black">
+                  <RemoteImage
+                    src={previewImages[previewImageIndex]}
+                    alt={`${previewTitle}-${previewImageIndex + 1}`}
+                    fill
+                    sizes="(max-width: 1100px) 100vw, 1100px"
+                    className="object-contain"
+                  />
+                </div>
               ) : null}
               {previewImages.length > 1 && (
                 <>
@@ -1395,7 +1408,14 @@ export function WorksManagement({
                     aria-label={`预览第 ${index + 1} 张图片`}
                     title={`预览第 ${index + 1} 张图片`}
                   >
-                    <img src={image} alt={`${previewTitle}-${index + 1}`} className="w-full h-16 object-cover" />
+                    <RemoteImage
+                      src={image}
+                      alt={`${previewTitle}-${index + 1}`}
+                      width={120}
+                      height={64}
+                      sizes="120px"
+                      className="w-full h-16 object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -1489,7 +1509,14 @@ export function WorksManagement({
                           title="查看主页"
                         >
                           {item.user.avatarUrl ? (
-                            <img src={item.user.avatarUrl} alt={item.user.username} className="h-8 w-8 rounded-full object-cover" />
+                            <RemoteImage
+                              src={item.user.avatarUrl}
+                              alt={item.user.username}
+                              width={32}
+                              height={32}
+                              sizes="32px"
+                              className="h-8 w-8 rounded-full object-cover"
+                            />
                           ) : (
                             <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
                               {item.user.username?.charAt(0)?.toUpperCase() || '?'}

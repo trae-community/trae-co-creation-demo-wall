@@ -5,6 +5,7 @@ import { CodeBlindBoxLauncher } from '@/components/code-blind-box';
 import { cn } from "@/lib/utils";
 import { PlusCircle, Home, LogIn, Languages, Check, LayoutDashboard, UserRound, Menu, X, Trophy, Github, Code2, Globe, MessagesSquare, MessageSquarePlus, Palette } from "lucide-react";
 import { NotificationBell } from '@/components/notifications/notification-bell';
+import { RemoteImage } from '@/components/common/remote-image';
 import { ParticlesBackground } from "./particles-background";
 import { BackToTop } from "@/components/common/back-to-top";
 import { useSession } from 'next-auth/react';
@@ -189,7 +190,14 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               >
                 <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0">
                   {avatarUrl ? (
-                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                    <RemoteImage
+                      src={avatarUrl}
+                      alt="Avatar"
+                      width={20}
+                      height={20}
+                      sizes="20px"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full bg-muted flex items-center justify-center">
                       <UserRound className="w-3.5 h-3.5 text-muted-foreground" />
@@ -363,7 +371,14 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 >
                   <div className="w-6 h-6 rounded-full overflow-hidden bg-muted flex items-center justify-center flex-shrink-0">
                     {avatarUrl ? (
-                      <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                      <RemoteImage
+                        src={avatarUrl}
+                        alt="Avatar"
+                        width={24}
+                        height={24}
+                        sizes="24px"
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <UserRound className="w-4 h-4 text-muted-foreground" />
                     )}

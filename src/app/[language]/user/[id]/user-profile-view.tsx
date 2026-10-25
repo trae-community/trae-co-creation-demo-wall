@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { User, Sparkles, Pencil, Eye, ThumbsUp, ArrowLeft } from 'lucide-react'
 import { Link } from '@/lib/language/navigation'
 import { workAssets } from '@/lib/work'
+import { RemoteImage } from '@/components/common/remote-image'
 
 interface PublicWork {
   id: string
@@ -149,7 +150,14 @@ export function UserProfileView() {
           <div className="relative shrink-0">
             <div className="w-20 h-20 rounded-2xl overflow-hidden border border-border bg-muted">
               {profile.avatarUrl ? (
-                <img src={profile.avatarUrl} alt={profile.username} className="w-full h-full object-cover" />
+                <RemoteImage
+                  src={profile.avatarUrl}
+                  alt={profile.username}
+                  width={80}
+                  height={80}
+                  sizes="80px"
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                   <User className="w-8 h-8" />
@@ -215,16 +223,13 @@ export function UserProfileView() {
               >
                 <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
                   {work.coverUrl ? (
-                    <img
+                    <RemoteImage
                       src={work.coverUrl}
                       alt={work.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      onError={(e) => {
-                        const img = e.target as HTMLImageElement;
-                        if (img.dataset.fallback) return; // 防止兑底图也失败时死循环
-                        img.dataset.fallback = '1';
-                        img.src = workAssets.placeholder;
-                      }}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      fallbackSrc={workAssets.placeholder}
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-muted">

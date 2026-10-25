@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 import { Trophy, MapPin, FileText, Users, Eye, ThumbsUp, Crown, Medal, User, Flame, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Link } from '@/lib/language/navigation'
+import { RemoteImage } from '@/components/common/remote-image'
+import { workAssets } from '@/lib/work'
 
 // ── Data Types ──
 interface CityRankingItem {
@@ -153,16 +155,29 @@ function TopBarCard({ item, rank }: { item: PodiumItem; rank: 0 | 1 | 2 }) {
 
       {/* Image / Icon thumbnail */}
       {hasCover ? (
-        <div className="shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-muted">
-          <img src={item.image!} alt={item.title} className="w-full h-full object-cover" />
+        <div className="relative shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-muted">
+          <RemoteImage
+            src={item.image!}
+            alt={item.title}
+            fill
+            sizes="80px"
+            fallbackSrc={workAssets.placeholder}
+            className="object-cover"
+          />
         </div>
       ) : isCity ? (
         <div className="shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-muted/50 flex items-center justify-center">
           <MapPin className="w-8 h-8 text-muted-foreground" />
         </div>
       ) : item.imageShape === 'avatar' && item.image ? (
-        <div className="shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden bg-muted">
-          <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+        <div className="relative shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden bg-muted">
+          <RemoteImage
+            src={item.image}
+            alt={item.title}
+            fill
+            sizes="80px"
+            className="object-cover"
+          />
         </div>
       ) : (
         <div className="shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden bg-muted/50 flex items-center justify-center">
@@ -537,9 +552,16 @@ export default function RankingsPage() {
                 <div className="shrink-0 w-8 flex justify-center">{rankBadge(idx + 3)}</div>
 
                 {/* Cover */}
-                <div className="shrink-0 w-14 h-14 rounded-lg overflow-hidden border border-border bg-muted">
+                <div className="relative shrink-0 w-14 h-14 rounded-lg overflow-hidden border border-border bg-muted">
                   {work.coverUrl ? (
-                    <img src={work.coverUrl} alt={work.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    <RemoteImage
+                      src={work.coverUrl}
+                      alt={work.title}
+                      fill
+                      sizes="56px"
+                      fallbackSrc={workAssets.placeholder}
+                      className="object-cover group-hover:scale-105 transition-transform"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <FileText className="w-5 h-5 text-muted-foreground" />
@@ -587,9 +609,15 @@ export default function RankingsPage() {
                 <div className="shrink-0 w-8 flex justify-center">{rankBadge(idx + 3)}</div>
 
                 {/* Avatar */}
-                <div className="shrink-0 w-12 h-12 rounded-full overflow-hidden border border-border bg-muted">
+                <div className="relative shrink-0 w-12 h-12 rounded-full overflow-hidden border border-border bg-muted">
                   {creator.avatarUrl ? (
-                    <img src={creator.avatarUrl} alt={creator.username} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    <RemoteImage
+                      src={creator.avatarUrl}
+                      alt={creator.username}
+                      fill
+                      sizes="48px"
+                      className="object-cover group-hover:scale-105 transition-transform"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <User className="w-5 h-5 text-muted-foreground" />
@@ -644,9 +672,16 @@ export default function RankingsPage() {
                   <div className="shrink-0 w-8 flex justify-center">{rankBadge(idx)}</div>
 
                   {/* Cover */}
-                  <div className="shrink-0 w-14 h-14 rounded-lg overflow-hidden border border-border bg-muted">
+                  <div className="relative shrink-0 w-14 h-14 rounded-lg overflow-hidden border border-border bg-muted">
                     {work.coverUrl ? (
-                      <img src={work.coverUrl} alt={work.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                      <RemoteImage
+                        src={work.coverUrl}
+                        alt={work.title}
+                        fill
+                        sizes="56px"
+                        fallbackSrc={workAssets.placeholder}
+                        className="object-cover group-hover:scale-105 transition-transform"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <FileText className="w-5 h-5 text-muted-foreground" />
@@ -659,7 +694,14 @@ export default function RankingsPage() {
                     <p className="font-semibold text-white truncate group-hover:text-primary transition-colors">{work.title}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       {work.author.avatarUrl && (
-                        <img src={work.author.avatarUrl} alt="" className="w-4 h-4 rounded-full object-cover" />
+                        <RemoteImage
+                          src={work.author.avatarUrl}
+                          alt=""
+                          width={16}
+                          height={16}
+                          sizes="16px"
+                          className="w-4 h-4 rounded-full object-cover"
+                        />
                       )}
                       <span className="text-xs text-muted-foreground">{work.author.name}</span>
                       {work.createdAt && (

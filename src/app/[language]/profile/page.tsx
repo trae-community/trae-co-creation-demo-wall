@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { WorksManagement } from "@/components/work/works-management";
 import { LikedWorks } from "@/components/work/liked-works";
 import { MyPosters } from "@/components/work/my-posters";
+import { RemoteImage } from "@/components/common/remote-image";
 
 interface ProfileData {
   profile: {
@@ -287,7 +288,14 @@ export default function ProfilePage() {
           <div className="relative group shrink-0">
             <div className="w-20 h-20 rounded-2xl overflow-hidden border border-border bg-muted">
               {data.profile.avatarUrl ? (
-                <img src={data.profile.avatarUrl} alt={data.profile.username} className="w-full h-full object-cover" />
+                <RemoteImage
+                  src={data.profile.avatarUrl}
+                  alt={data.profile.username}
+                  width={80}
+                  height={80}
+                  sizes="80px"
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                   <User className="w-8 h-8" />

@@ -23,6 +23,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Card } from '@/components/ui/card'
+import { RemoteImage } from '@/components/common/remote-image'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -397,7 +398,14 @@ export default function UsersPage() {
               <div className="flex items-start gap-4 flex-1">
                 <Link href={`/user/${user.id}`} className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 hover:ring-2 hover:ring-primary/40 transition-all">
                   {user.avatarUrl ? (
-                    <img src={user.avatarUrl} alt={user.username} className="h-full w-full rounded-full object-cover" />
+                    <RemoteImage
+                      src={user.avatarUrl}
+                      alt={user.username}
+                      width={40}
+                      height={40}
+                      sizes="40px"
+                      className="h-full w-full rounded-full object-cover"
+                    />
                   ) : (
                     <User size={20} />
                   )}

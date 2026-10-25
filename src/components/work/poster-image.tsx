@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { buildPosterDataUrl, POSTER_H, POSTER_W } from '@/lib/poster';
 import { cn } from '@/lib/utils';
+import { RemoteImage } from '@/components/common/remote-image';
 
 interface PosterImageProps {
   nickname: string;
@@ -27,9 +28,7 @@ function PosterCoverImage({
   imageUrl,
   className,
 }: Pick<PosterImageProps, 'nickname' | 'imageUrl' | 'className'>) {
-  const [failed, setFailed] = useState(false);
-
-  if (failed || !imageUrl) {
+  if (!imageUrl) {
     return (
       <div
         className={cn('flex items-center justify-center bg-muted text-muted-foreground text-xs', className)}
@@ -41,15 +40,18 @@ function PosterCoverImage({
   }
 
   return (
-    <img
-      src={imageUrl}
-      alt={nickname}
-      loading="lazy"
-      decoding="async"
-      className={cn('w-full h-full object-cover', className)}
+    <div
+      className={cn('relative w-full', className)}
       style={{ aspectRatio: `${POSTER_W} / ${POSTER_H}` }}
-      onError={() => setFailed(true)}
-    />
+    >
+      <RemoteImage
+        src={imageUrl}
+        alt={nickname}
+        fill
+        sizes="(max-width: 768px) 50vw, 280px"
+        className="object-cover"
+      />
+    </div>
   );
 }
 
