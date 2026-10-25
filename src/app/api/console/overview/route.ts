@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getAuthUser, isAdmin } from '@/lib/auth';
+import { getAuthUser, isAdmin, isRoot } from '@/lib/auth';
+import { previewPurgeBannedUserLikes } from '@/lib/work-like-maintenance';
 
 type WindowDays = 7 | 30;
 
@@ -63,6 +64,8 @@ export async function GET(req: NextRequest) {
       dailyUploadRows,
       registerActivities,
       uploadActivities,
+      pendingWorksAudit,
+      pendingPostersAudit,
     ] = await Promise.all([
       prisma.workBase.count(),
       prisma.workBase.count({
@@ -175,6 +178,12 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: 'desc' },
         take: 20
       }),
+      prisma.workBase.count({
+        where: { statistic: { auditStatus: 0 } },
+      }),
+      prisma.workPoster.count({
+        where: { auditStatus: 0 },
+      }),
     ]);
 
     const currentActiveUsers = toNumber(currentActiveUsersRaw[0]?.user_count);
@@ -252,7 +261,15 @@ export async function GET(req: NextRequest) {
       { label: '其他操作次数', value: Math.max(operationCount - uploadCount, 0), tip: `近${windowDays}天除上传作品外的其他后台操作次数` }
     ];
 
+    const maintenancePreview =
+      user && isRoot(user) ? await previewPurgeBannedUserLikes() : null;
+
     return NextResponse.json({
+      pendingAudit: {
+        works: pendingWorksAudit,
+        posters: pendingPostersAudit,
+      },
+      maintenancePreview,
       stats: {
         totalWorks: {
           label: '本周新增作品',
